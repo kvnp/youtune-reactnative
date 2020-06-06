@@ -58,8 +58,8 @@ export default function App() {
         <NavigationContainer>
             <StatusBar barStyle = "lighter-content" hidden = {false} backgroundColor = 'transparent' translucent = {true}/>
             <Tab.Navigator>
-                <Tab.Screen name="Suche" component={SearchScreen} />
                 <Tab.Screen name="Home" component={HomeScreen} />
+                <Tab.Screen name="Suche" component={SearchScreen} />
                 <Tab.Screen name="Bibliothek" component={LibraryScreen} />
                 <Tab.Screen name="Einstellungen" component={SettingsScreen} />
             </Tab.Navigator>
