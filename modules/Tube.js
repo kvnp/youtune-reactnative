@@ -19,6 +19,7 @@ export async function fetchResults(query) {
     let response = await getFetchResponse(url, {method: 'POST',
                                                 headers: headers,
                                                 body: JSON.stringify(body)}, "json");
+    
     return digestSearchResults(response);
 }
 
@@ -43,7 +44,8 @@ export async function fetchHome() {
     let response = await getFetchResponse(url, {method: 'POST',
                                                 headers: headers,
                                                 body: JSON.stringify(body)}, "json");
-    return digestSearchResults(response);
+
+    return digestHomeResults(response);
 }
 
 async function getApiKey() {
@@ -129,5 +131,50 @@ function digestSearchResults(json) {
 }
 
 function digestHomeResults(json) {
+    let contentList = json.contents.singleColumnBrowseResultsRenderer.tabs[0].tabRenderer.content.sectionListRenderer.contents;
+
+    let final = {background: "", shelves: []};
+    for (let i = 0; i < contentList.length; i++) {
+        let shelf = {title: "", albums: []};
+        let shelfRenderer;
+
+        if (contentList[i].hasOwnProperty("musicImmersiveCarouselShelfRenderer")) {
+            shelfRenderer = contentList[i].musicImmersiveCarouselShelfRenderer;
+
+            let index = shelfRenderer.backgroundImage.simpleVideoThumbnailRenderer.thumbnail.thumbnails.length - 1;
+            final.background = shelfRenderer.backgroundImage.simpleVideoThumbnailRenderer.thumbnail.thumbnails[index].url;
+
+        } else if (contentList[i].hasOwnProperty("musicCarouselShelfRenderer")) {
+            shelfRenderer = contentList[i].musicCarouselShelfRenderer;
+
+        } else continue;
+
+        for (let j = 0; j < shelfRenderer.header.musicCarouselShelfBasicHeaderRenderer.title.runs.length; j++) {
+            shelf.title += shelfRenderer.header.musicCarouselShelfBasicHeaderRenderer.title.runs[j].text;
+        }
+
+        for (let j = 0; j < shelfRenderer.contents.length; j++) {
+            let album = {thumbnail: "", title: "", subtitle: "", browseId: ""};
+            
+            for (let k = 0; k < shelfRenderer.contents[j].musicTwoRowItemRenderer.title.runs.length; k++) {
+                album.title += shelfRenderer.contents[j].musicTwoRowItemRenderer.title.runs[k].text;
+            }
+
+            for (let k = 0; k < shelfRenderer.contents[j].musicTwoRowItemRenderer.subtitle.runs.length; k++) {
+                album.subtitle += shelfRenderer.contents[j].musicTwoRowItemRenderer.subtitle.runs[k].text;
+            }
+
+            album.browseId = shelfRenderer.contents[j].musicTwoRowItemRenderer.navigationEndpoint.browseEndpoint.browseId;
+
+            album.thumbnail = shelfRenderer.contents[j].musicTwoRowItemRenderer.thumbnailRenderer.musicThumbnailRenderer.thumbnail.thumbnails[0].url;
+
+            //console.log(shelfRenderer.contents[j].musicTwoRowItemRenderer.navigationEndpoint.browseEndpoint.browseEndpointContextSupportedConfigs.browseEndpointContextMusicConfig.pageType);
+
+            shelf.albums.push(album);
+        }
+        
+        final.shelves.push(shelf);
+    }
     
+    return final;
 }
