@@ -10,7 +10,7 @@ import {
     Results,
     Header,
     SearchBar
-} from '../components/SearchComponents.js';
+} from '../components/SearchComponents';
 
 export default class SearchTab extends Component {
     constructor(props) {
