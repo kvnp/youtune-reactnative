@@ -8,7 +8,8 @@ import {
 
 import {
     Header
-} from '../components/SearchComponents.js';
+} from '../components/SharedComponents';
+
 import { Colors } from 'react-native/Libraries/NewAppScreen';
 import { ScrollView } from 'react-native-gesture-handler';
 
