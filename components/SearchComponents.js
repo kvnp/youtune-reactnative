@@ -18,19 +18,6 @@ import { Colors } from 'react-native/Libraries/NewAppScreen';
 
 import * as Tube from '../modules/Tube.js'
 
-export class Header extends Component {
-    render() {
-        return (
-            <>
-                <ImageBackground style={{flex: 1, resizeMode: 'cover', alignItems: 'center', justifyContent: 'center'}}
-                                 source={require('../assets/img/header.jpg')}>
-                    <Text style={{color: Colors.white, fontSize: 45, fontWeight: 'bold'}}>{this.props.text}</Text>
-                </ImageBackground>
-            </>
-        )
-    }
-}
-
 export class SearchBar extends Component {
     constructor(props) {
         super(props);
@@ -92,7 +79,7 @@ export class Results extends Component {
 
     displayElement = (element) => {
         return (
-            <View style={{width:'100%', paddingLeft:15, paddingRight:15, marginTop:10, flexDirection:'row', backgroundColor: Colors.black, alignItems:'center'}}>
+            <View style={{width:'100%', paddingLeft:15, paddingRight:15, marginTop:10, flexDirection:'row', backgroundColor: Colors.dark, alignItems:'center'}}>
                 <Image style={{width:30, height:30}} source={{uri: element.thumb}}></Image>
                 <View style={{paddingLeft: 20, flex:1, flexDirection:'column', alignItems:'center'}}>
                     <Text style={{color:Colors.white}}>{element.title}</Text>
