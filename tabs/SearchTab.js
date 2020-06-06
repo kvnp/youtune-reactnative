@@ -8,9 +8,12 @@ import {
 
 import {
     Results,
-    Header,
     SearchBar
 } from '../components/SearchComponents';
+
+import {
+    Header
+} from '../components/SharedComponents';
 
 export default class SearchTab extends Component {
     constructor(props) {
