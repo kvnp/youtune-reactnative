@@ -3,7 +3,6 @@ import React, {Component} from 'react';
 import {
     Button,
     Image,
-    ImageBackground,
     StyleSheet,
     Text,
     TextInput,
@@ -121,8 +120,7 @@ export class Results extends Component {
         if (this.props.passthroughResults == null || this.props.passthroughResults.results < 1) {
             return (
                 <>
-                    <Text style={{fontSize:70, marginTop:(Dimensions.get("screen").height / 2) - 300, alignSelf:'center'}}>(⟃ ͜ʖ ⟄) </Text>
-                    <Text style={{fontSize:40, paddingTop: '2%'}}>darude sandstorm</Text>
+                    <Text style={{fontSize:70, marginTop:(Dimensions.get("screen").height / 2) - 300, alignSelf:'center'}}>🔍 </Text>
                 </>
             )
         } else {
