@@ -5,7 +5,8 @@ import {
     StyleSheet,
     ScrollView,
     View,
-    Image
+    Image,
+    TouchableOpacity
 } from "react-native";
 
 import { Colors } from 'react-native/Libraries/NewAppScreen';
@@ -15,10 +16,16 @@ export class Results extends Component {
         super();
     }
 
+    openAlbum = (album) => {
+        alert(album.title);
+    }
+
     displayAlbum = (album) => {
         return (
             <View style={styles.album}>
-                <Image style={styles.albumCover} source={{uri: album.thumbnail}}/>
+                <TouchableOpacity onPress={() => {this.openAlbum(album)}}>
+                    <Image style={styles.albumCover} source={{uri: album.thumbnail}}/>
+                </TouchableOpacity>
                 <Text style={styles.albumTitle}>{album.title}</Text>
                 <Text style={styles.albumDesc}>{album.subtitle}</Text>
             </View>
