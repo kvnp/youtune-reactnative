@@ -29,7 +29,7 @@ export default class LibraryTab extends Component {
         return (
             <>
                 <View style={styles.headerPicture}>
-                    <Header style={{borderRadius: 100}} text={"Bibliothek"}/>
+                    <Header text={"Bibliothek"}  color={this.props.passBackground.color} sourcee={this.props.passBackground.source}/>
                 </View>
             
                 <View style={styles.middleView}>

@@ -6,63 +6,115 @@
  * @flow strict-local
  */
 
-import React from 'react';
+import React, {Component} from 'react';
 
-import { Text, StatusBar } from 'react-native';
+import { StatusBar } from 'react-native';
 
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 
-import SearchTab from './tabs/SearchTab.js';
-import HomeTab from './tabs/HomeTab.js';
-import LibraryTab from './tabs/LibraryTab.js';
-import SettingsTab from './tabs/SettingsTab.js';
+import SearchTab from './tabs/SearchTab';
+import HomeTab from './tabs/HomeTab';
+import LibraryTab from './tabs/LibraryTab';
+import SettingsTab from './tabs/SettingsTab';
+import { Colors } from 'react-native/Libraries/NewAppScreen';
 
 
-function SearchScreen() {
-    return (
-        <>
-            <SearchTab/>
-        </>
-    )
+class SearchScreen extends Component {
+    render() {
+        return (
+            <SearchTab passBackground={this.props.passBackground}/>
+        );
+    }
 }
 
-function HomeScreen() {
-    return (
-        <>
-            <HomeTab/>
-        </>
-    );
+class HomeScreen extends Component {
+    callback = (data) => {
+        this.props.appCallback(data);
+    }
+
+    render() {
+        return (
+            <HomeTab callback={this.callback}/>
+        );
+    }
 }
 
-function LibraryScreen() {
-    return (
-        <>
-            <LibraryTab/>
-        </>
-    )
+class LibraryScreen extends Component {
+    render() {
+        return (
+            <LibraryTab passBackground={this.props.passBackground}/>
+        );
+    }
 }
 
-function SettingsScreen() {
-    return (
-        <>
-            <SettingsTab/>
-        </>
-    );
+class SettingsScreen extends Component {
+    render() {
+        return (
+            <SettingsTab passBackground={this.props.passBackground}/>
+        );
+    }
 }
 
 const Tab = createBottomTabNavigator();
 
-export default function App() {
-    return (
-        <NavigationContainer>
-            <StatusBar barStyle = "lighter-content" hidden = {false} backgroundColor = 'transparent' translucent = {true}/>
-            <Tab.Navigator>
-                <Tab.Screen name="Home" component={HomeScreen} />
-                <Tab.Screen name="Suche" component={SearchScreen} />
-                <Tab.Screen name="Bibliothek" component={LibraryScreen} />
-                <Tab.Screen name="Einstellungen" component={SettingsScreen} />
-            </Tab.Navigator>
-        </NavigationContainer>
-    );
+export default class App extends Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            barStyle: "lighter-content",
+            background: {
+                source: require("./assets/img/header.jpg"),
+                bright: false,
+                color: Colors.white
+            }
+        };
+    }
+
+    appCallback = (data) => {
+        let statusStyle;
+        let headerColor;
+        if (data.bright) {
+            statusStyle = "dark-content";
+            headerColor = Colors.dark;
+        } else {
+            statusStyle = "lighter-content";
+            headerColor = Colors.white;
+        }
+
+        this.setState({
+            barStyle: statusStyle,
+            background: data,
+            color: headerColor
+        });
+        
+    }
+
+    render() {
+        return (
+            <NavigationContainer>
+                <StatusBar barStyle={this.state.barStyle}
+                           hidden={false}
+                           backgroundColor='transparent'
+                           translucent={true}/>
+                <Tab.Navigator>
+                    <Tab.Screen name="Home" name="HomeScreen">
+                        {() => <HomeScreen appCallback={this.appCallback} />}
+                    </Tab.Screen>
+
+                    <Tab.Screen name="Suche" name="SearchScreen">
+                        {() => <SearchScreen passBackground={this.state.background}></SearchScreen>}
+                    </Tab.Screen>
+
+                    <Tab.Screen name="Bibliothek" name="LibraryScreen">
+                        {() => <LibraryScreen passBackground={this.state.background}></LibraryScreen>}
+                    </Tab.Screen>
+
+                    <Tab.Screen name="Einstellungen" name="SettingsScreen">
+                        {() => <SettingsScreen passBackground={this.state.background}></SettingsScreen>}
+                    </Tab.Screen>
+                </Tab.Navigator>
+            </NavigationContainer>
+        );
+    } 
 }

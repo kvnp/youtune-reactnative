@@ -31,7 +31,7 @@ export default class SearchTab extends Component {
         return (
             <>
                 <View style={styles.headerPicture}>
-                    <Header text={"Suche"}/>
+                    <Header text={"Suche"} color={this.props.passBackground.color} sourcee={this.props.passBackground.source}/>
                 </View>
 
                 <View style={styles.middleView}>
@@ -57,7 +57,7 @@ const styles = StyleSheet.create({
     },
 
     middleView: {
-        position:'absolute',
+        position: 'absolute',
         top: 150,
         width:'100%',
         height: (Dimensions.get('window').height) - 305

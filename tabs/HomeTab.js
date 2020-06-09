@@ -25,30 +25,83 @@ export default class HomeTab extends Component {
         super(props);
         this.state = {
             home: null,
-            background: require("../assets/img/header.jpg"),
+            background: {
+                source: require("../assets/img/header.jpg"),
+                bright: false,
+                color: Colors.white
+            }
         };
     }
 
-    onPressRefresh = () => {
+
+    refresh = () => {
         Tube.fetchHome().then((result) => {
-
-            /*let source = require("../assets/img/header.jpg");
-            if (result.background != undefined) source = {uri: result.background};
+            if (result.background != undefined) {
+                this.setState({
+                    home: result,
+                    background: {
+                        source: result.background,
+                        bright: this.state.background.bright,
+                        color: this.state.background.color
+                    }
+                });
             
-            this.setState({home: result, background: source});*/
+            } else {
+                this.setState({
+                    home: result,
+                    background: {
+                        source: require("../assets/img/header.jpg"),
+                        bright: false,
+                        color: Colors.white
+                    }
+                });
+            }
 
-            if (result.background != undefined) this.setState({home: result, background: result.background});
-            else                                this.setState({home: result, background: "../assets/img/header.jpg"});
+            const db = {
+                "https://lh3.googleusercontent.com/3OazqYM5TA4lMDZ0A-52-v6Zg4L-uFsAmfMp8aC-l-TUgr_UwPvayfxy_5hs5ll4B4zpj2hrG9A=w2880-h1613-l90-rj":
+                true,
+                "https://lh3.googleusercontent.com/G2nNxQ2O_svAtYlismpu0ZfNvusgKGBVpq-LI4xsHPeJELQO2_wOOu9NvOHcb9X1VvPR5_qx=w2880-h1620-l90-rj":
+                true,
+                "https://lh3.googleusercontent.com/zG2J10I50KGW5v6bk9nPzkHEUI-JRU8Ok_h4rZD1AbrT0dM2zGFUUR-IFzL7oXISeY1ZEJAbrL4=w2880-h1613-l90-rj":
+                true
+            };
+
+            if (db.hasOwnProperty(result.background)) {
+                let color;
+                if (db[result.background]) color = Colors.dark;
+                else                       color = Colors.white;
+
+                this.setState({
+                    home: this.state.home,
+                    background: {
+                        source: this.state.background.source,
+                        bright: db[result.background],
+                        color: color
+                    }
+                });
+            } else {
+                this.setState({
+                    home: this.state.home,
+                    background: {
+                        source: this.state.background.source,
+                        bright: false,
+                        color: Colors.white
+                    }
+                });
+            }
+            this.props.callback(this.state.background);
         });
-        
-        
+    }
+
+    componentDidMount() {
+        this.refresh();
     }
 
     render() {
         return (
             <>
                 <View style={styles.headerPicture}>
-                    <Header style={{borderRadius: 100}} sourcee={this.state.background}  text={"Home"}/>
+                    <Header style={{borderRadius: 100}} color={this.state.background.color} sourcee={this.state.background.source}  text={"Home"}/>
                 </View>
 
                 <View style={styles.middleView}>
@@ -57,10 +110,9 @@ export default class HomeTab extends Component {
                     </ScrollView>
                 </View>
 
-                <TouchableHighlight onPress={this.onPressRefresh} style={styles.refreshButton}>
+                <TouchableHighlight onPress={this.refresh} style={styles.refreshButton}>
                         <Text>Aktualisieren</Text>
                 </TouchableHighlight>
-                
             </>
         );
     }
