@@ -36,7 +36,7 @@ export default class HomeTab extends Component {
 
     refresh = () => {
         Tube.fetchHome().then((result) => {
-            if (result.background != undefined) {
+            if (result.background != undefined)
                 this.setState({
                     home: result,
                     background: {
@@ -46,7 +46,7 @@ export default class HomeTab extends Component {
                     }
                 });
             
-            } else {
+            else
                 this.setState({
                     home: result,
                     background: {
@@ -55,7 +55,6 @@ export default class HomeTab extends Component {
                         color: Colors.white
                     }
                 });
-            }
 
             const db = {
                 "https://lh3.googleusercontent.com/3OazqYM5TA4lMDZ0A-52-v6Zg4L-uFsAmfMp8aC-l-TUgr_UwPvayfxy_5hs5ll4B4zpj2hrG9A=w2880-h1613-l90-rj":
@@ -63,6 +62,8 @@ export default class HomeTab extends Component {
                 "https://lh3.googleusercontent.com/G2nNxQ2O_svAtYlismpu0ZfNvusgKGBVpq-LI4xsHPeJELQO2_wOOu9NvOHcb9X1VvPR5_qx=w2880-h1620-l90-rj":
                 true,
                 "https://lh3.googleusercontent.com/zG2J10I50KGW5v6bk9nPzkHEUI-JRU8Ok_h4rZD1AbrT0dM2zGFUUR-IFzL7oXISeY1ZEJAbrL4=w2880-h1613-l90-rj":
+                true,
+                "https://lh3.googleusercontent.com/KSM3z3kDJmVatKI47EHy7rkP9wZY6kkM1pAe1YGW7dajrs0ioZd9j_BCF2Q0ql25RottK03Z0Q=w2880-h1613-l90-rj":
                 true
             };
 
@@ -79,7 +80,7 @@ export default class HomeTab extends Component {
                         color: color
                     }
                 });
-            } else {
+            } else
                 this.setState({
                     home: this.state.home,
                     background: {
@@ -88,7 +89,7 @@ export default class HomeTab extends Component {
                         color: Colors.white
                     }
                 });
-            }
+
             this.props.callback(this.state.background);
         });
     }

@@ -50,105 +50,8 @@ export class Results extends Component {
         console.log(JSON.stringify(this.props.passthroughHome));
         if (this.props.passthroughHome == null) {
             return (
-                <View>
-                    <Text style={styles.homeText}>New releases</Text>
-                    <ScrollView style={styles.albumCollection} horizontal={true}>
-                        <View style={styles.album}>
-                            <View style={styles.albumCover}></View>
-                            <Text style={styles.albumTitle}>New Release Mix</Text>
-                            <Text style={styles.albumDesc}>Just updated!</Text>
-                        </View>
-
-                        <View style={styles.album}>
-                            <View style={styles.albumCover}></View>
-                            <Text style={styles.albumTitle}>Shaniwar Special Bhajans</Text>
-                            <Text style={styles.albumDesc}>Single • Sonu Nigam {"&"} Poonam Lakkha</Text>
-                        </View>
-
-                        <View style={styles.album}>
-                            <View style={styles.albumCover}></View>
-                            <Text style={styles.albumTitle}>GOOBA</Text>
-                            <Text style={styles.albumDesc}>Single • 6ix9ine</Text>
-                        </View>
-
-                        <View style={styles.album}>
-                            <View style={styles.albumCover}></View>
-                            <Text style={styles.albumTitle}>Jeetenge Hum</Text>
-                            <Text style={styles.albumDesc}>Single • Dhvani Bhanushali</Text>
-                        </View>
-
-                        <View style={styles.album}>
-                            <View style={styles.albumCover}></View>
-                            <Text style={styles.albumTitle}>Chromatica</Text>
-                            <Text style={styles.albumDesc}>Album • Lady Gaga</Text>
-                        </View>
-                    </ScrollView>
-
-                    <Text style={styles.homeText}>Morning Preparation</Text>
-                    <ScrollView style={styles.albumCollection} horizontal={true}>
-                        <View style={styles.album}>
-                            <View style={styles.albumCover}></View>
-                            <Text style={styles.albumTitle}>Boolywood Coolers</Text>
-                            <Text style={styles.albumDesc}>Playlist • YouTube Music</Text>
-                        </View>
-
-                        <View style={styles.album}>
-                            <View style={styles.albumCover}></View>
-                            <Text style={styles.albumTitle}>Bollywood Happy Songs</Text>
-                            <Text style={styles.albumDesc}>Playlist • YouTube Music</Text>
-                        </View>
-
-                        <View style={styles.album}>
-                            <View style={styles.albumCover}></View>
-                            <Text style={styles.albumTitle}>Hindi Mood Elevating Mixtape</Text>
-                            <Text style={styles.albumDesc}>Playlist • YouTube Music</Text>
-                        </View>
-
-                        <View style={styles.album}>
-                            <View style={styles.albumCover}></View>
-                            <Text style={styles.albumTitle}>Bollywood Morning Beats</Text>
-                            <Text style={styles.albumDesc}>Playlist • YouTube Music</Text>
-                        </View>
-
-                        <View style={styles.album}>
-                            <View style={styles.albumCover}></View>
-                            <Text style={styles.albumTitle}>Life is Good: Bollywood</Text>
-                            <Text style={styles.albumDesc}>Playlist • YouTube Music</Text>
-                        </View>
-                    </ScrollView>
-
-                    <Text style={styles.homeText}>Charts</Text>
-                    <ScrollView style={styles.albumCollection} horizontal={true}>
-                        <View style={styles.album}>
-                            <View style={styles.albumCover}></View>
-                            <Text style={styles.albumTitle}>Top 100 Songs India</Text>
-                            <Text style={styles.albumDesc}>Chart • YouTube Music</Text>
-                        </View>
-
-                        <View style={styles.album}>
-                            <View style={styles.albumCover}></View>
-                            <Text style={styles.albumTitle}>Top 100 Music Videos India</Text>
-                            <Text style={styles.albumDesc}>Chart • YouTube Music</Text>
-                        </View>
-
-                        <View style={styles.album}>
-                            <View style={styles.albumCover}></View>
-                            <Text style={styles.albumTitle}>Trending 20 India</Text>
-                            <Text style={styles.albumDesc}>Chart • YouTube Music</Text>
-                        </View>
-
-                        <View style={styles.album}>
-                            <View style={styles.albumCover}></View>
-                            <Text style={styles.albumTitle}>Top 100 Songs Global</Text>
-                            <Text style={styles.albumDesc}>Chart • YouTube Music</Text>
-                        </View>
-
-                        <View style={styles.album}>
-                            <View style={styles.albumCover}></View>
-                            <Text style={styles.albumTitle}>Top 100 Music Videos Global</Text>
-                            <Text style={styles.albumDesc}>Chart • YouTube Music</Text>
-                        </View>
-                    </ScrollView>
+                <View style={styles.preHome}>
+                    <Text>Home</Text>
                 </View>
             )
         } else {
@@ -170,6 +73,14 @@ export class Results extends Component {
 }
 
 const styles = StyleSheet.create({
+    preHome: {
+        alignContent: 'center',
+        alignItems: 'center',
+        justifyContent: 'center',
+        alignSelf: 'center',
+        textAlign: 'center',
+    },
+
     homeText: {
         fontWeight: 'bold',
         paddingLeft: 20,

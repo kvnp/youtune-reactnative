@@ -14,17 +14,6 @@ export class Header extends Component {
         } else return require("../assets/img/header.jpg");
     }
 
-    
-    /*if (this.props.bright != undefined) {
-        if (this.props.bright) this.setState({color: Colors.dark});
-        else                   this.setState({color: Colors.white});
-    }*/
-
-    componentDidUpdate() {
-        //alert(this.props.color);
-    }
-    
-
     render() {
         return (
             <>
