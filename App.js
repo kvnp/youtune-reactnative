@@ -98,19 +98,19 @@ export default class App extends Component {
                            backgroundColor='transparent'
                            translucent={true}/>
                 <Tab.Navigator>
-                    <Tab.Screen name="Home" name="Home">
+                    <Tab.Screen name="Home">
                         {() => <HomeScreen appCallback={this.appCallback} />}
                     </Tab.Screen>
 
-                    <Tab.Screen name="Suche" name="Search">
+                    <Tab.Screen name="Suche" >
                         {() => <SearchScreen passBackground={this.state.background}></SearchScreen>}
                     </Tab.Screen>
 
-                    <Tab.Screen name="Bibliothek" name="Library">
+                    <Tab.Screen name="Bibliothek">
                         {() => <LibraryScreen passBackground={this.state.background}></LibraryScreen>}
                     </Tab.Screen>
 
-                    <Tab.Screen name="Einstellungen" name="Settings">
+                    <Tab.Screen name="Einstellungen">
                         {() => <SettingsScreen passBackground={this.state.background}></SettingsScreen>}
                     </Tab.Screen>
                 </Tab.Navigator>
