@@ -6,7 +6,7 @@ import {
     Text,
     StyleSheet,
     ScrollView,
-    TouchableHighlight
+    TouchableOpacity
 } from 'react-native';
 
 import {
@@ -111,9 +111,9 @@ export default class HomeTab extends Component {
                     </ScrollView>
                 </View>
 
-                <TouchableHighlight onPress={this.refresh} style={styles.refreshButton}>
+                <TouchableOpacity onPress={this.refresh} style={styles.refreshButton}>
                         <Text>Aktualisieren</Text>
-                </TouchableHighlight>
+                </TouchableOpacity>
             </>
         );
     }

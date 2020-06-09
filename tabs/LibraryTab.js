@@ -4,7 +4,7 @@ import {
     View,
     Text,
     StyleSheet,
-    TouchableHighlight
+    TouchableOpacity
 } from 'react-native';
 
 import {
@@ -60,25 +60,25 @@ export default class LibraryTab extends Component {
                 </View>
 
                 <ScrollView style={styles.header} horizontal={true}>
-                    <TouchableHighlight onPress={() => {this.update(0)}} style={this.getStyle(0)}>
+                    <TouchableOpacity onPress={() => {this.update(0)}} style={this.getStyle(0)}>
                         <Text style={this.getTextStyle(0)}>PLAYLISTS</Text>
-                    </TouchableHighlight>
+                    </TouchableOpacity>
 
-                    <TouchableHighlight onPress={() => {this.update(1)}} style={this.getStyle(1)}>
+                    <TouchableOpacity onPress={() => {this.update(1)}} style={this.getStyle(1)}>
                         <Text style={this.getTextStyle(1)}>ALBUMS</Text>
-                    </TouchableHighlight>
+                    </TouchableOpacity>
 
-                    <TouchableHighlight onPress={() => {this.update(2)}} style={this.getStyle(2)}>
+                    <TouchableOpacity onPress={() => {this.update(2)}} style={this.getStyle(2)}>
                         <Text style={this.getTextStyle(2)}>SONGS</Text>
-                    </TouchableHighlight>
+                    </TouchableOpacity>
 
-                    <TouchableHighlight onPress={() => {this.update(3)}} style={this.getStyle(3)}>
+                    <TouchableOpacity onPress={() => {this.update(3)}} style={this.getStyle(3)}>
                         <Text style={this.getTextStyle(3)}>ARTISTS</Text>
-                    </TouchableHighlight>
+                    </TouchableOpacity>
 
-                    <TouchableHighlight onPress={() => {this.update(4)}} style={this.getStyle(4)}>
+                    <TouchableOpacity onPress={() => {this.update(4)}} style={this.getStyle(4)}>
                         <Text style={this.getTextStyle(4)}>SUBSCRIPTIONS</Text>
-                    </TouchableHighlight>
+                    </TouchableOpacity>
                 </ScrollView>
             </>
         );
