@@ -22,7 +22,7 @@ export default class LibraryTab extends Component {
         };
     }
 
-    test = (value) => {
+    update = (value) => {
         this.setState({selection: value});
     }
 
@@ -60,23 +60,23 @@ export default class LibraryTab extends Component {
                 </View>
 
                 <ScrollView style={styles.header} horizontal={true}>
-                    <TouchableHighlight onPress={() => {this.test(0)}} style={this.getStyle(0)}>
+                    <TouchableHighlight onPress={() => {this.update(0)}} style={this.getStyle(0)}>
                         <Text style={this.getTextStyle(0)}>PLAYLISTS</Text>
                     </TouchableHighlight>
 
-                    <TouchableHighlight onPress={() => {this.test(1)}} style={this.getStyle(1)}>
+                    <TouchableHighlight onPress={() => {this.update(1)}} style={this.getStyle(1)}>
                         <Text style={this.getTextStyle(1)}>ALBUMS</Text>
                     </TouchableHighlight>
 
-                    <TouchableHighlight onPress={() => {this.test(2)}} style={this.getStyle(2)}>
+                    <TouchableHighlight onPress={() => {this.update(2)}} style={this.getStyle(2)}>
                         <Text style={this.getTextStyle(2)}>SONGS</Text>
                     </TouchableHighlight>
 
-                    <TouchableHighlight onPress={() => {this.test(3)}} style={this.getStyle(3)}>
+                    <TouchableHighlight onPress={() => {this.update(3)}} style={this.getStyle(3)}>
                         <Text style={this.getTextStyle(3)}>ARTISTS</Text>
                     </TouchableHighlight>
 
-                    <TouchableHighlight onPress={() => {this.test(4)}} style={this.getStyle(4)}>
+                    <TouchableHighlight onPress={() => {this.update(4)}} style={this.getStyle(4)}>
                         <Text style={this.getTextStyle(4)}>SUBSCRIPTIONS</Text>
                     </TouchableHighlight>
                 </ScrollView>
