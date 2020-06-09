@@ -3,7 +3,8 @@ import React, {Component} from 'react';
 import {
     View,
     Text,
-    StyleSheet
+    StyleSheet,
+    TouchableHighlight
 } from 'react-native';
 
 import {
@@ -17,13 +18,27 @@ export default class LibraryTab extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            results: null
+            selection: 0
         };
     }
 
-    resultReceiver = (childData) => {
-        this.setState({results: childData});
-    };
+    test = (value) => {
+        this.setState({selection: value});
+    }
+
+    getStyle = (value) => {
+        if (value == this.state.selection)
+            return styles.headerEntryFocus;
+        else
+            return styles.headerEntry;
+    }
+
+    getTextStyle = (value) => {
+        if (value == this.state.selection)
+            return styles.headerEntryTextFocus;
+        else
+            return styles.headerEntryText;
+    }
 
     render() {
         return (
@@ -33,63 +48,37 @@ export default class LibraryTab extends Component {
                 </View>
             
                 <View style={styles.middleView}>
-                    <ScrollView style={styles.playlistsView}>
-                        <ScrollView style={styles.playlistCollection} contentContainerStyle={styles.playlistCollectionContainer}>
-                            <View style={styles.playlist}>
-                                <View style={styles.playlistCover}>
-                                    <Text style={styles.newPlaylist}>+</Text>
-                                </View>
-                                <Text style={styles.playlistTitle}>Neue Playlist</Text>
-                                <Text style={styles.playlistDesc}></Text>
+                    <ScrollView style={styles.playlistCollection} contentContainerStyle={styles.playlistCollectionContainer}>
+                        <View style={styles.playlist}>
+                            <View style={styles.playlistCover}>
+                                <Text style={styles.newPlaylist}>+</Text>
                             </View>
-
-                            <View style={styles.playlist}>
-                                <View style={styles.playlistCover}></View>
-                                <Text style={styles.playlistTitle}>Meine Playlist 1</Text>
-                                <Text style={styles.playlistDesc}>Kevin • 1 song</Text>
-                            </View>
-
-                            <View style={styles.playlist}>
-                                <View style={styles.playlistCover}></View>
-                                <Text style={styles.playlistTitle}>Meine Playlist 2</Text>
-                                <Text style={styles.playlistDesc}>Kevin • 6 songs</Text>
-                            </View>
-
-                            <View style={styles.playlist}>
-                                <View style={styles.playlistCover}></View>
-                                <Text style={styles.playlistTitle}>Meine Playlist 3</Text>
-                                <Text style={styles.playlistDesc}>Kevin • 20 songs</Text>
-                            </View>
-
-                            <View style={styles.playlist}>
-                                <View style={styles.playlistCover}></View>
-                                <Text style={styles.playlistTitle}>Meine Playlist 4</Text>
-                                <Text style={styles.playlistDesc}>Kevin • 5 songs</Text>
-                            </View>
-                        </ScrollView>
+                            <Text style={styles.playlistTitle}>Neue Playlist</Text>
+                            <Text style={styles.playlistDesc}></Text>
+                        </View>
                     </ScrollView>
                 </View>
 
                 <ScrollView style={styles.header} horizontal={true}>
-                    <View style={styles.headerEntryFocus}>
-                        <Text style={styles.headerEntryTextFocus}>PLAYLISTS</Text>
-                    </View>
+                    <TouchableHighlight onPress={() => {this.test(0)}} style={this.getStyle(0)}>
+                        <Text style={this.getTextStyle(0)}>PLAYLISTS</Text>
+                    </TouchableHighlight>
 
-                    <View style={styles.headerEntry}>
-                        <Text style={styles.headerEntryText}>ALBUMS</Text>
-                    </View>
+                    <TouchableHighlight onPress={() => {this.test(1)}} style={this.getStyle(1)}>
+                        <Text style={this.getTextStyle(1)}>ALBUMS</Text>
+                    </TouchableHighlight>
 
-                    <View style={styles.headerEntry}>
-                        <Text style={styles.headerEntryText}>SONGS</Text>
-                    </View>
+                    <TouchableHighlight onPress={() => {this.test(2)}} style={this.getStyle(2)}>
+                        <Text style={this.getTextStyle(2)}>SONGS</Text>
+                    </TouchableHighlight>
 
-                    <View style={styles.headerEntry}>
-                        <Text style={styles.headerEntryText}>ARTISTS</Text>
-                    </View>
+                    <TouchableHighlight onPress={() => {this.test(3)}} style={this.getStyle(3)}>
+                        <Text style={this.getTextStyle(3)}>ARTISTS</Text>
+                    </TouchableHighlight>
 
-                    <View style={styles.headerEntry}>
-                        <Text style={styles.headerEntryText}>SUBSCRIPTIONS</Text>
-                    </View>
+                    <TouchableHighlight onPress={() => {this.test(4)}} style={this.getStyle(4)}>
+                        <Text style={this.getTextStyle(4)}>SUBSCRIPTIONS</Text>
+                    </TouchableHighlight>
                 </ScrollView>
             </>
         );
@@ -110,7 +99,7 @@ const styles = StyleSheet.create({
 
     header: {
         alignSelf: 'center',
-        width: '98%',
+        width: '100%',
         height: 50,
         position: 'absolute',
         bottom: -5
@@ -129,7 +118,7 @@ const styles = StyleSheet.create({
         paddingRight: 15,
         paddingLeft: 15,
         alignItems: 'center',
-        justifyContent: 'center',
+        justifyContent: 'center'
     },
 
     headerEntryText: {
@@ -143,21 +132,16 @@ const styles = StyleSheet.create({
         borderBottomColor: Colors.dark,
     },
 
-    playlistsView: {
-        alignSelf:'center',
-        alignContent:'center',
-        paddingBottom: 0
-    },
-
     playlistCollection: {
         width: '100%',
         paddingTop: 20,
-        paddingLeft: 20,
-        paddingBottom: 5,
-        marginBottom: 35
     },
 
     playlistCollectionContainer: {
+        alignContent: 'center',
+        alignItems: 'center',
+        alignSelf: 'center',
+        justifyContent: 'center',
         flexDirection: 'row',
         flexGrow: 1,
         flexWrap: 'wrap'
@@ -192,3 +176,29 @@ const styles = StyleSheet.create({
         fontSize: 50,
     }
 });
+
+/*<>
+        <View style={styles.playlist}>
+            <View style={styles.playlistCover}></View>
+            <Text style={styles.playlistTitle}>Meine Playlist 1</Text>
+            <Text style={styles.playlistDesc}>Kevin • 1 song</Text>
+        </View>
+
+        <View style={styles.playlist}>
+            <View style={styles.playlistCover}></View>
+            <Text style={styles.playlistTitle}>Meine Playlist 2</Text>
+            <Text style={styles.playlistDesc}>Kevin • 6 songs</Text>
+        </View>
+
+        <View style={styles.playlist}>
+            <View style={styles.playlistCover}></View>
+            <Text style={styles.playlistTitle}>Meine Playlist 3</Text>
+            <Text style={styles.playlistDesc}>Kevin • 20 songs</Text>
+        </View>
+
+        <View style={styles.playlist}>
+            <View style={styles.playlistCover}></View>
+            <Text style={styles.playlistTitle}>Meine Playlist 4</Text>
+            <Text style={styles.playlistDesc}>Kevin • 5 songs</Text>
+        </View>
+    </>*/
