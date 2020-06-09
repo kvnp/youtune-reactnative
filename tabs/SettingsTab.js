@@ -2,10 +2,17 @@ import React, {Component} from 'react';
 
 import {
     View,
-    Text
+    Text,
+    StyleSheet
 } from 'react-native';
 
-export default class SettingsTab extends Component {
+import {
+    Header
+} from '../components/SharedComponents';
+
+import { ScrollView } from 'react-native-gesture-handler';
+
+export default class LibraryTab extends Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -20,10 +27,29 @@ export default class SettingsTab extends Component {
     render() {
         return (
             <>
-                <View style={{flex:1, alignSelf:'center', justifyContent:'center'}}>
-                    <Text style={{fontSize:40}}>┬┴┬┴┤ ✧≖ ͜ʖ≖)</Text>
+                <View style={styles.headerPicture}>
+                    <Header text={"Einstellungen"}  color={this.props.passBackground.color} sourcee={this.props.passBackground.source}/>
+                </View>
+            
+                <View style={styles.middleView}>
+                    <ScrollView>
+                        <Text>Einstellungen</Text>
+                    </ScrollView>
                 </View>
             </>
         );
     }
 };
+
+const styles = StyleSheet.create({
+    headerPicture: {
+        width: '100%',
+        height: 150,
+        flexDirection: 'column'
+    },
+
+    middleView: {
+        alignContent:'flex-start',
+        width: '100%'
+    }
+});
