@@ -1,11 +1,3 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- * @flow strict-local
- */
-
 import React, {Component} from 'react';
 
 import { StatusBar } from 'react-native';
@@ -13,20 +5,12 @@ import { StatusBar } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 
+import { Colors } from 'react-native/Libraries/NewAppScreen';
+
 import SearchTab from './tabs/SearchTab';
 import HomeTab from './tabs/HomeTab';
 import LibraryTab from './tabs/LibraryTab';
 import SettingsTab from './tabs/SettingsTab';
-import { Colors } from 'react-native/Libraries/NewAppScreen';
-
-
-class SearchScreen extends Component {
-    render() {
-        return (
-            <SearchTab passBackground={this.props.passBackground}/>
-        );
-    }
-}
 
 class HomeScreen extends Component {
     callback = (data) => {
@@ -36,6 +20,14 @@ class HomeScreen extends Component {
     render() {
         return (
             <HomeTab callback={this.callback}/>
+        );
+    }
+}
+
+class SearchScreen extends Component {
+    render() {
+        return (
+            <SearchTab passBackground={this.props.passBackground}/>
         );
     }
 }
