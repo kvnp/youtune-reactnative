@@ -14,12 +14,6 @@ import {
     TouchableOpacity
 } from "react-native";
 
-import {
-    Player,
-    Recorder,
-    MediaStates
-} from '@react-native-community/audio-toolkit';
-
 import { Colors } from 'react-native/Libraries/NewAppScreen';
 
 import * as Tube from '../modules/Tube';
@@ -79,13 +73,6 @@ export class SearchBar extends Component {
 }
 
 export class Results extends Component {
-    constructor(){
-        super();
-        this.state = {
-            url: null
-        }
-    }
-
     startVideo = (id) => {
         Tube.fetchVideo(id).then((data) => {
             /*for (let i = 0; i < data.length; i++) {
@@ -93,7 +80,6 @@ export class Results extends Component {
                 new Player(decodeURIComponent(data[i].signatureCipher.substring(data[i].signatureCipher.indexOf("url=") + 4)));
             }*/
         });
-        
     }
 
     displayElement = (element) => {
