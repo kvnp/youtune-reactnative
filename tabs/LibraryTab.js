@@ -40,6 +40,10 @@ export default class LibraryTab extends Component {
             return styles.headerEntryText;
     }
 
+    addPlaylist = () => {
+        alert("lol");
+    }
+
     render() {
         return (
             <>
@@ -50,9 +54,9 @@ export default class LibraryTab extends Component {
                 <View style={styles.middleView}>
                     <ScrollView style={styles.playlistCollection} contentContainerStyle={styles.playlistCollectionContainer}>
                         <View style={styles.playlist}>
-                            <View style={styles.playlistCover}>
+                            <TouchableOpacity onPress={() => {this.addPlaylist()}} style={styles.playlistCover}>
                                 <Text style={styles.newPlaylist}>+</Text>
-                            </View>
+                            </TouchableOpacity>
                             <Text style={styles.playlistTitle}>Neue Playlist</Text>
                             <Text style={styles.playlistDesc}></Text>
                         </View>
