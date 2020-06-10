@@ -48,6 +48,22 @@ export async function fetchHome() {
     return digestHomeResults(response);
 }
 
+export async function fetchVideo(id) {
+    const url = "https://www.youtube.com/watch?v=" + id;
+
+    let response = await getFetchResponse(url, {method: 'GET'}, "text");
+
+    let begin = response.indexOf("ytplayer.config = ") + 18;
+    let end = response.indexOf(";ytplayer.web_player");
+    //let end = response.indexOf(";ytplayer.load");
+    
+    let slice = response.substring(begin, end);
+    let ytJson = JSON.parse(slice);
+    let ytPlayer = JSON.parse(ytJson.args.player_response)
+    let videoList = ytPlayer.streamingData.adaptiveFormats;
+    return videoList;
+}
+
 async function getApiKey() {
     if (global.apikey == null) {
         const headers = {'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64; rv:77.0) Gecko/20100101 Firefox/77.0'}
