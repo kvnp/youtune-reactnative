@@ -10,12 +10,19 @@ import {
     ScrollView,
     Linking,
     Keyboard,
-    Dimensions
+    Dimensions,
+    TouchableOpacity
 } from "react-native";
+
+import {
+    Player,
+    Recorder,
+    MediaStates
+} from '@react-native-community/audio-toolkit';
 
 import { Colors } from 'react-native/Libraries/NewAppScreen';
 
-import * as Tube from '../modules/Tube.js'
+import * as Tube from '../modules/Tube';
 
 export class SearchBar extends Component {
     constructor(props) {
@@ -74,19 +81,35 @@ export class SearchBar extends Component {
 export class Results extends Component {
     constructor(){
         super();
+        this.state = {
+            url: null
+        }
+    }
+
+    startVideo = (id) => {
+        Tube.fetchVideo(id).then((data) => {
+            /*for (let i = 0; i < data.length; i++) {
+                console.log(decodeURIComponent(data[i].signatureCipher.substring(data[i].signatureCipher.indexOf("url=") + 4)));
+                new Player(decodeURIComponent(data[i].signatureCipher.substring(data[i].signatureCipher.indexOf("url=") + 4)));
+            }*/
+        });
+        
     }
 
     displayElement = (element) => {
         return (
             <View style={{width:'100%', paddingLeft:15, paddingRight:15, marginTop:10, flexDirection:'row', backgroundColor: Colors.dark, alignItems:'center'}}>
-                <Image style={{width:30, height:30}} source={{uri: element.thumb}}></Image>
-                <View style={{paddingLeft: 20, flex:1, flexDirection:'column', alignItems:'center'}}>
+                <TouchableOpacity onPress={() => {this.startVideo(element.videoId)}}>
+                    <Image style={{width: 50, height: 50}} source={{uri: element.thumb}}></Image>
+                </TouchableOpacity>
+                
+                <View style={{paddingLeft: 10, flex:1, flexDirection:'column', alignItems:'center'}}>
                     <Text style={{color:Colors.white}}>{element.title}</Text>
                     <Text style={{color:Colors.white}}>{element.interpret}</Text>
                 </View>
                 <View style={{paddingLeft: 20, flex:1, flexDirection:'column', alignItems:'center'}}>
+                    <Text style={{color:Colors.white}}>{element.type}</Text>
                     <Text style={{color:Colors.white}}>{element.length}</Text>
-                    <Text style={{color:Colors.white}}>{element.videoId}</Text>
                 </View>
                 <Button title="▶️" onPress={() => {Linking.openURL("https://music.youtube.com/watch?v=" + (element.videoId))}}/>
                 <Button title="❤️"/>
