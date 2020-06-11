@@ -4,7 +4,8 @@ import {
     View,
     Text,
     StyleSheet,
-    TouchableOpacity
+    TouchableOpacity,
+    Image
 } from 'react-native';
 
 import {
@@ -18,7 +19,9 @@ export default class LibraryTab extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            selection: 0
+            selection: 0,
+            //playlists: [{title: "test", subtitle: "nest"}, {title: "fest", subtitle: "quest"}]
+            playlists: []
         };
     }
 
@@ -40,8 +43,43 @@ export default class LibraryTab extends Component {
             return styles.headerEntryText;
     }
 
-    addPlaylist = () => {
-        alert("lol");
+    getAddPlaylist = () => {
+        return (
+            <View style={styles.playlist}>
+                <TouchableOpacity onPress={() => {this.createPlaylist()}} style={styles.playlistCover}>
+                    <Text style={styles.newPlaylist}>+</Text>
+                </TouchableOpacity>
+                <Text style={styles.playlistTitle}>Neue Playlist</Text>
+                <Text style={styles.playlistDesc}></Text>
+            </View>
+        )
+    }
+
+    // {cover: require("/**/") title: "name", subtitle: "dame"}
+    /*<View style={styles.playlist}>
+            <View style={styles.playlistCover}></View>
+            <Text style={styles.playlistTitle}>Meine Playlist 1</Text>
+            <Text style={styles.playlistDesc}>Kevin • 1 song</Text>
+    </View>*/
+
+    createPlaylist = () => {
+        let temp = this.state.playlists;
+        temp.push({title: "Meine Playlist 1", subtitle: "Kevin • 1 song"});
+        this.setState({playlists: temp});
+    }
+
+    getPlaylist = (playlistJson) => {
+        return (
+            <View style={styles.playlist}>
+                <Image style={styles.playlistCover}>{playlistJson.cover}</Image>
+                <Text style={styles.playlistTitle}>{playlistJson.title}</Text>
+                <Text style={styles.playlistDesc}>{playlistJson.subtitle}</Text>
+            </View>
+        )
+    }
+
+    getPlaylists = () => {
+        return this.state.playlists.map(this.getPlaylist);
     }
 
     render() {
@@ -53,13 +91,8 @@ export default class LibraryTab extends Component {
             
                 <View style={styles.middleView}>
                     <ScrollView style={styles.playlistCollection} contentContainerStyle={styles.playlistCollectionContainer}>
-                        <View style={styles.playlist}>
-                            <TouchableOpacity onPress={() => {this.addPlaylist()}} style={styles.playlistCover}>
-                                <Text style={styles.newPlaylist}>+</Text>
-                            </TouchableOpacity>
-                            <Text style={styles.playlistTitle}>Neue Playlist</Text>
-                            <Text style={styles.playlistDesc}></Text>
-                        </View>
+                        {this.getAddPlaylist()}
+                        {this.getPlaylists()}
                     </ScrollView>
                 </View>
 
@@ -180,29 +213,3 @@ const styles = StyleSheet.create({
         fontSize: 50,
     }
 });
-
-/*<>
-        <View style={styles.playlist}>
-            <View style={styles.playlistCover}></View>
-            <Text style={styles.playlistTitle}>Meine Playlist 1</Text>
-            <Text style={styles.playlistDesc}>Kevin • 1 song</Text>
-        </View>
-
-        <View style={styles.playlist}>
-            <View style={styles.playlistCover}></View>
-            <Text style={styles.playlistTitle}>Meine Playlist 2</Text>
-            <Text style={styles.playlistDesc}>Kevin • 6 songs</Text>
-        </View>
-
-        <View style={styles.playlist}>
-            <View style={styles.playlistCover}></View>
-            <Text style={styles.playlistTitle}>Meine Playlist 3</Text>
-            <Text style={styles.playlistDesc}>Kevin • 20 songs</Text>
-        </View>
-
-        <View style={styles.playlist}>
-            <View style={styles.playlistCover}></View>
-            <Text style={styles.playlistTitle}>Meine Playlist 4</Text>
-            <Text style={styles.playlistDesc}>Kevin • 5 songs</Text>
-        </View>
-    </>*/
