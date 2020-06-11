@@ -84,21 +84,25 @@ export class Results extends Component {
 
     displayElement = (element) => {
         return (
-            <View style={{width:'100%', paddingLeft:15, paddingRight:15, marginTop:10, flexDirection:'row', backgroundColor: Colors.dark, alignItems:'center'}}>
+            <View style={styles.resultView}>
                 <TouchableOpacity onPress={() => {this.startVideo(element.videoId)}}>
-                    <Image style={{width: 50, height: 50}} source={{uri: element.thumb}}></Image>
+                    <Image style={styles.resultCover} source={{uri: element.thumb}}></Image>
                 </TouchableOpacity>
                 
-                <View style={{paddingLeft: 10, flex:1, flexDirection:'column', alignItems:'center'}}>
-                    <Text style={{color:Colors.white}}>{element.title}</Text>
-                    <Text style={{color:Colors.white}}>{element.interpret}</Text>
+                <View style={styles.resultColumnOne}>
+                    <Text style={styles.resultText}>{element.title}</Text>
+                    <Text style={styles.resultText}>{element.interpret}</Text>
                 </View>
-                <View style={{paddingLeft: 20, flex:1, flexDirection:'column', alignItems:'center'}}>
-                    <Text style={{color:Colors.white}}>{element.type}</Text>
-                    <Text style={{color:Colors.white}}>{element.length}</Text>
+                <View style={styles.resultColumnTwo}>
+                    <Text style={styles.resultText}>{element.type}</Text>
+                    <Text style={styles.resultText}>{element.length}</Text>
                 </View>
-                <Button title="▶️" onPress={() => {Linking.openURL("https://music.youtube.com/watch?v=" + (element.videoId))}}/>
-                <Button title="❤️"/>
+
+                <Button
+                    title="▶️"
+                    onPress={() => {
+                        Linking.openURL("https://music.youtube.com/watch?v=" + (element.videoId))
+                    }}/>
             </View>
         )
     }
@@ -110,8 +114,8 @@ export class Results extends Component {
     displayTopic = (topic) => {
         if (topic.elements.length > 0) {
             return (
-                <View style={{paddingTop:20, width:'100%'}}>
-                    <Text style={{fontWeight:'bold', fontSize:20, paddingLeft:50}}>{topic.topic}</Text>
+                <View style={styles.topicView}>
+                    <Text style={styles.topicHeader}>{topic.topic}</Text>
                     {this.displayElements(topic)}
                 </View>
             )
@@ -129,13 +133,13 @@ export class Results extends Component {
         if (this.props.passthroughResults == null || this.props.passthroughResults.results < 1) {
             return (
                 <>
-                    <Text style={{fontSize:70, marginTop:(Dimensions.get("screen").height / 2) - 300, alignSelf:'center'}}>🔍 </Text>
+                    <Text style={styles.preResults}>🔍 </Text>
                 </>
             )
         } else {
             return (
                 <>
-                    <Text style={{marginTop: 10, fontSize: 30, fontWeight: 'bold'}}>Ergebnisse</Text>
+                    <Text style={styles.resultHeader}>Ergebnisse</Text>
                     {this.displayTopics(this.props.passthroughResults)}
                 </>
             )
@@ -144,11 +148,79 @@ export class Results extends Component {
 
     render() {
         return (
-            <ScrollView style={{height: '100%', flex: 1, flexDirection: 'column'}} contentContainerStyle={{ alignItems: 'center' }}>
+            <ScrollView
+                style={styles.scrollView}
+                contentContainerStyle={styles.scrollContainer}>
                 {this.displayResults()}
             </ScrollView>
         )
     }
 }
 
-const styles = StyleSheet.create({});
+const styles = StyleSheet.create({
+    scrollView: {
+        height: '100%',
+        flex: 1,
+        flexDirection: 'column'
+    },
+
+    scrollContainer: {
+        alignItems: 'center'
+    },
+
+    resultHeader: {
+        marginTop: 10,
+        fontSize: 30,
+        fontWeight: 'bold'
+    },
+
+    preResults: {
+        fontSize: 70,
+        marginTop: (Dimensions.get("screen").height / 2) - 300,
+        alignSelf: 'center'
+    },
+
+    topicView: {
+        paddingTop: 20,
+        width: '100%'
+    },
+
+    topicHeader: {
+        fontWeight: 'bold',
+        fontSize: 20,
+        paddingLeft: 50
+    },
+
+    resultView: {
+        width: '100%',
+        paddingLeft: 15,
+        paddingRight: 15,
+        marginTop: 10,
+        flexDirection: 'row',
+        backgroundColor: Colors.dark,
+        alignItems: 'center'
+    },
+
+    resultCover: {
+        width: 50,
+        height: 50
+    },
+
+    resultColumnOne: {
+        paddingLeft: 10,
+        flex: 1,
+        flexDirection: 'column',
+        alignItems: 'center'
+    },
+
+    resultColumnTwo: {
+        paddingLeft: 20,
+        flex: 1,
+        flexDirection: 'column',
+        alignItems: 'center'
+    },
+
+    resultText: {
+        color: Colors.white
+    }
+});
