@@ -6,7 +6,8 @@ import {
     ScrollView,
     View,
     Image,
-    TouchableOpacity
+    TouchableOpacity,
+    Dimensions
 } from "react-native";
 
 import { Colors } from 'react-native/Libraries/NewAppScreen';
@@ -57,9 +58,9 @@ export class Results extends Component {
         console.log(JSON.stringify(this.props.passthroughHome));
         if (this.props.passthroughHome == null) {
             return (
-                <View style={styles.preHome}>
-                    <Text>Home</Text>
-                </View>
+                <Text style={styles.preHome}>
+                    🏠
+                </Text>
             )
         } else {
             return (
@@ -81,11 +82,9 @@ export class Results extends Component {
 
 const styles = StyleSheet.create({
     preHome: {
-        alignContent: 'center',
-        alignItems: 'center',
-        justifyContent: 'center',
-        alignSelf: 'center',
-        textAlign: 'center',
+        fontSize:70,
+        marginTop:(Dimensions.get("screen").height / 2) - 300,
+        alignSelf:'center'
     },
 
     homeText: {
