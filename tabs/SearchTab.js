@@ -2,8 +2,8 @@ import React, {Component} from 'react';
 
 import {
     View,
-    Dimensions,
-    StyleSheet
+    StyleSheet,
+    Dimensions
 } from 'react-native';
 
 import {
@@ -48,12 +48,8 @@ export default class SearchTab extends Component {
 
 const styles = StyleSheet.create({
     headerPicture: {
-        position: 'absolute',
-        top: 0,
         width: '100%',
-        height: 150,
-        flex: 1,
-        flexDirection: 'column'
+        height: 150
     },
 
     middleView: {

@@ -91,8 +91,8 @@ export default class LibraryTab extends Component {
             
                 <View style={styles.middleView}>
                     <ScrollView style={styles.playlistCollection} contentContainerStyle={styles.playlistCollectionContainer}>
-                        {this.getAddPlaylist()}
                         {this.getPlaylists()}
+                        {this.getAddPlaylist()}
                     </ScrollView>
                 </View>
 
@@ -126,12 +126,11 @@ const styles = StyleSheet.create({
     headerPicture: {
         width: '100%',
         height: 150,
-        flexDirection: 'column'
     },
 
     middleView: {
-        alignContent:'flex-start',
-        width: '100%'
+        width: '100%',
+        marginBottom: 190
     },
 
     header: {
@@ -171,16 +170,12 @@ const styles = StyleSheet.create({
 
     playlistCollection: {
         width: '100%',
-        paddingTop: 20,
+        paddingTop: 20
     },
 
     playlistCollectionContainer: {
-        alignContent: 'center',
-        alignItems: 'center',
-        alignSelf: 'center',
         justifyContent: 'center',
         flexDirection: 'row',
-        flexGrow: 1,
         flexWrap: 'wrap'
     },
 
