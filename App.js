@@ -4,6 +4,7 @@ import { StatusBar } from 'react-native';
 
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
 import { Colors } from 'react-native/Libraries/NewAppScreen';
 
@@ -79,7 +80,6 @@ export default class App extends Component {
             background: data,
             color: headerColor
         });
-        
     }
 
     render() {
@@ -89,20 +89,33 @@ export default class App extends Component {
                            hidden={false}
                            backgroundColor='transparent'
                            translucent={true}/>
+
                 <Tab.Navigator>
-                    <Tab.Screen name="Home">
+                    <Tab.Screen name="Home"
+                                options={{ tabBarIcon: ({ color, size }) =>
+                                    <MaterialCommunityIcons name="home" color={color} size={size} />
+                                }}>
                         {() => <HomeScreen appCallback={this.appCallback} />}
                     </Tab.Screen>
 
-                    <Tab.Screen name="Suche" >
+                    <Tab.Screen name="Suche"
+                                options={{ tabBarIcon: ({ color, size }) =>
+                                    <MaterialCommunityIcons name="magnify" color={color} size={size} />
+                                }}>
                         {() => <SearchScreen passBackground={this.state.background}></SearchScreen>}
                     </Tab.Screen>
 
-                    <Tab.Screen name="Bibliothek">
+                    <Tab.Screen name="Bibliothek"
+                                options={{ tabBarIcon: ({ color, size }) =>
+                                    <MaterialCommunityIcons name="folder" color={color} size={size} />
+                                }}>
                         {() => <LibraryScreen passBackground={this.state.background}></LibraryScreen>}
                     </Tab.Screen>
 
-                    <Tab.Screen name="Einstellungen">
+                    <Tab.Screen name="Einstellungen"
+                                options={{ tabBarIcon: ({ color, size }) =>
+                                <MaterialCommunityIcons name="settings" color={color} size={size} />
+                                }}>
                         {() => <SettingsScreen passBackground={this.state.background}></SettingsScreen>}
                     </Tab.Screen>
                 </Tab.Navigator>
@@ -110,3 +123,17 @@ export default class App extends Component {
         );
     } 
 }
+
+/*
+<Tab.Screen name="Playlist">
+    {() => <View><Text>Playlist</Text></View>}
+</Tab.Screen>
+
+<Tab.Screen name="Musik">
+    {() => <View><Text>Musik</Text></View>}
+</Tab.Screen>
+
+<Tab.Screen name="Künstler">
+    {() => <View><Text>Künstler</Text></View>}
+</Tab.Screen>
+*/
