@@ -118,16 +118,11 @@ export default class LibraryTab extends Component {
 
     getUpdatedView = () => {
         switch (this.state.selection) {
-            case 0:
-                return this.getPlaylistView();
-            case 1:
-                return <><Text>Alben</Text></>;
-            case 2:
-                return <><Text>Songs</Text></>;
-            case 3:
-                return <><Text>Künstler</Text></>;
-            case 4:
-                return <><Text>Abos</Text></>;
+            case 0: return this.getPlaylistView();
+            case 1: return <><Text>Alben</Text></>;
+            case 2: return <><Text>Songs</Text></>;
+            case 3: return <><Text>Künstler</Text></>;
+            case 4: return <><Text>Abos</Text></>;
         }
     }
 
