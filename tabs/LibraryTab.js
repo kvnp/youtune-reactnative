@@ -20,13 +20,12 @@ export default class LibraryTab extends Component {
         super(props);
         this.state = {
             selection: 0,
-            //playlists: [{title: "test", subtitle: "nest"}, {title: "fest", subtitle: "quest"}]
-            playlists: []
+            playlists: [],
+            albums: [],
+            songs: [],
+            artists: [],
+            subscriptions: []
         };
-    }
-
-    update = (value) => {
-        this.setState({selection: value});
     }
 
     getStyle = (value) => {
@@ -54,13 +53,6 @@ export default class LibraryTab extends Component {
             </View>
         )
     }
-
-    // {cover: require("/**/") title: "name", subtitle: "dame"}
-    /*<View style={styles.playlist}>
-            <View style={styles.playlistCover}></View>
-            <Text style={styles.playlistTitle}>Meine Playlist 1</Text>
-            <Text style={styles.playlistDesc}>Kevin • 1 song</Text>
-    </View>*/
 
     createPlaylist = () => {
         let temp = this.state.playlists;
@@ -91,8 +83,7 @@ export default class LibraryTab extends Component {
             
                 <View style={styles.middleView}>
                     <ScrollView style={styles.playlistCollection} contentContainerStyle={styles.playlistCollectionContainer}>
-                        {this.getPlaylists()}
-                        {this.getAddPlaylist()}
+                        {this.getUpdatedView()}
                     </ScrollView>
                 </View>
 
@@ -119,6 +110,34 @@ export default class LibraryTab extends Component {
                 </ScrollView>
             </>
         );
+    }
+
+    update = (value) => {
+        this.setState({selection: value});
+    }
+
+    getUpdatedView = () => {
+        switch (this.state.selection) {
+            case 0:
+                return this.getPlaylistView();
+            case 1:
+                return <><Text>Alben</Text></>;
+            case 2:
+                return <><Text>Songs</Text></>;
+            case 3:
+                return <><Text>Künstler</Text></>;
+            case 4:
+                return <><Text>Abos</Text></>;
+        }
+    }
+
+    getPlaylistView = () => {
+        return (
+            <>
+                {this.getPlaylists()}
+                {this.getAddPlaylist()}
+            </>
+        )
     }
 };
 
