@@ -73,7 +73,6 @@ export default class HomeTab extends Component {
                 else                       color = Colors.white;
 
                 this.setState({
-                    home: this.state.home,
                     background: {
                         source: this.state.background.source,
                         bright: db[result.background],
@@ -82,7 +81,6 @@ export default class HomeTab extends Component {
                 });
             } else
                 this.setState({
-                    home: this.state.home,
                     background: {
                         source: this.state.background.source,
                         bright: false,
