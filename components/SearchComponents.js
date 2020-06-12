@@ -32,13 +32,12 @@ export class SearchBar extends Component {
     }
 
     setQuery = (event) => {
-        if (event.nativeEvent.text.length > 0) {
+        if (event.nativeEvent.text.length > 0) 
             this.setState({query: event.nativeEvent.text,
                            buttonDisabled: false});
-        } else {
+        else 
             this.setState({query: event.nativeEvent.text,
                            buttonDisabled: true});
-        }
     }
 
     search = () => {
@@ -71,14 +70,12 @@ export class SearchBar extends Component {
 }
 
 export class Results extends Component {
-    startVideo = (id) => {
-        Tube.fetchVideo(id).then((data) => {
-            /*for (let i = 0; i < data.length; i++) {
-                console.log(decodeURIComponent(data[i].signatureCipher.substring(data[i].signatureCipher.indexOf("url=") + 4)));
-                new Player(decodeURIComponent(data[i].signatureCipher.substring(data[i].signatureCipher.indexOf("url=") + 4)));
-            }*/
-        });
-    }
+    startVideo = (id) => Tube.fetchVideo(id).then((data) => {
+        /*for (let i = 0; i < data.length; i++) {
+            console.log(decodeURIComponent(data[i].signatureCipher.substring(data[i].signatureCipher.indexOf("url=") + 4)));
+            new Player(decodeURIComponent(data[i].signatureCipher.substring(data[i].signatureCipher.indexOf("url=") + 4)));
+        }*/
+    });
 
     displayElement = (element) => {
         return (
@@ -88,8 +85,8 @@ export class Results extends Component {
                 </TouchableOpacity>
                 
                 <View style={styles.resultColumnOne}>
-                    <Text style={styles.resultText}>{element.title}</Text>
-                    <Text style={styles.resultText}>{element.interpret}</Text>
+                    <Text numberOfLines={1} style={styles.resultText}>{element.title}</Text>
+                    <Text numberOfLines={1} style={styles.resultText}>{element.interpret}</Text>
                 </View>
                 <View style={styles.resultColumnTwo}>
                     <Text style={styles.resultText}>{element.type}</Text>
@@ -116,7 +113,7 @@ export class Results extends Component {
                     <Text style={styles.topicHeader}>{topic.topic}</Text>
                     {this.displayElements(topic)}
                 </View>
-            )
+            );
         }
     }
 
@@ -128,18 +125,10 @@ export class Results extends Component {
     }
 
     displayResults = () => {
-        if (this.props.passthroughResults == null || this.props.passthroughResults.results < 1) {
-            return (
-                <Text style={styles.preResults}>🔍</Text>
-            )
-        } else {
-            return (
-                <>
-                    <Text style={styles.resultHeader}>Ergebnisse</Text>
-                    {this.displayTopics(this.props.passthroughResults)}
-                </>
-            )
-        }
+        if (this.props.passthroughResults == null || this.props.passthroughResults.results < 1)
+            return <Text style={styles.preResults}>🔍</Text>;
+        else
+            return this.displayTopics(this.props.passthroughResults);
     }
 
     render() {
@@ -149,7 +138,7 @@ export class Results extends Component {
                 contentContainerStyle={styles.scrollContainer}>
                 {this.displayResults()}
             </ScrollView>
-        )
+        );
     }
 }
 
@@ -210,7 +199,7 @@ const styles = StyleSheet.create({
     },
 
     resultColumnTwo: {
-        paddingLeft: 20,
+        paddingLeft: 10,
         flex: 1,
         flexDirection: 'column',
         alignItems: 'center'
