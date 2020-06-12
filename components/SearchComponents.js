@@ -37,19 +37,17 @@ export class SearchBar extends Component {
                            buttonDisabled: false});
         } else {
             this.setState({query: event.nativeEvent.text,
-                           buttonDisabled: false});
+                           buttonDisabled: true});
         }
     }
 
     search = () => {
         Keyboard.dismiss();
         if (this.state.query.length > 0) {
-            this.setState({query: this.state.query,
-                           buttonDisabled: true});
+            this.setState({buttonDisabled: true});
 
             Tube.fetchResults(this.state.query)
-                .then(data => { this.setState({query: this.state.query,
-                                               buttonDisabled: true});
+                .then(data => { this.setState({buttonDisabled: true});
                                 this.sendData(data);});
         }
     }
@@ -132,9 +130,7 @@ export class Results extends Component {
     displayResults = () => {
         if (this.props.passthroughResults == null || this.props.passthroughResults.results < 1) {
             return (
-                <>
-                    <Text style={styles.preResults}>🔍 </Text>
-                </>
+                <Text style={styles.preResults}>🔍</Text>
             )
         } else {
             return (
