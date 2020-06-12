@@ -3,14 +3,13 @@ import React, {Component} from 'react';
 import {
     View,
     Text,
-    StyleSheet
+    StyleSheet,
+    Dimensions
 } from 'react-native';
 
 import {
     Header
 } from '../components/SharedComponents';
-
-import { ScrollView } from 'react-native-gesture-handler';
 
 export default class LibraryTab extends Component {
     constructor(props) {
@@ -32,9 +31,7 @@ export default class LibraryTab extends Component {
                 </View>
             
                 <View style={styles.middleView}>
-                    <ScrollView>
-                        <Text>Einstellungen</Text>
-                    </ScrollView>
+                    <Text style={styles.placeholder}>⚙️</Text>
                 </View>
             </>
         );
@@ -51,5 +48,11 @@ const styles = StyleSheet.create({
     middleView: {
         alignContent:'flex-start',
         width: '100%'
-    }
+    },
+
+    placeholder: {
+        fontSize: 70,
+        marginTop: (Dimensions.get("screen").height / 2) - 300,
+        alignSelf: 'center'
+    },
 });
