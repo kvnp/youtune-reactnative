@@ -1,8 +1,9 @@
-import { Component } from "react";
-import { View, StyleSheet } from "react-native";
+import React, { Component } from "react";
+import { View, Text, StyleSheet } from "react-native";
 
 export default class PlayView extends Component {
     render() {
+        global.noTabBar = true;
         return (
             <View style={styles.mainView}>
                 <Text>Play</Text>
@@ -13,8 +14,8 @@ export default class PlayView extends Component {
 
 const styles = StyleSheet.create({
     mainView: {
+        height: '100%',
         alignSelf: 'center',
-        alignItems: 'center',
         justifyContent: 'center'
     }
 });
