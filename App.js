@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 
-import { StatusBar, Button } from 'react-native';
+import { StatusBar } from 'react-native';
 
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
@@ -18,6 +18,7 @@ import SettingsTab from './tabs/SettingsTab';
 import { PlayView } from './views/PlayView';
 import { PlaylistView } from './views/PlaylistView';
 import { ArtistView } from './views/ArtistView';
+import { CreatePlaylistView } from './views/CreatePlaylistView';
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -143,3 +144,5 @@ export default class App extends Component {
                            hidden={false}
                            backgroundColor='transparent'
                            translucent={true}/>*/
+
+/**/

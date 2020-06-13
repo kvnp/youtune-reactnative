@@ -4,8 +4,7 @@ import {
     View,
     Text,
     StyleSheet,
-    TouchableOpacity,
-    Modal
+    TouchableOpacity
 } from 'react-native';
 
 import {
@@ -46,7 +45,7 @@ export default class LibraryTab extends Component {
     getAddPlaylist = () => {
         return (
             <View style={styles.playlist}>
-                <TouchableOpacity onPress={() => {this.createPlaylist()}} style={styles.playlistCover}>
+                <TouchableOpacity onPress={() => {this.openCreatePlaylist()}} style={styles.playlistCover}>
                     <Text style={styles.newPlaylist}>+</Text>
                 </TouchableOpacity>
                 <Text style={styles.playlistTitle}>Neue Playlist</Text>
@@ -55,9 +54,15 @@ export default class LibraryTab extends Component {
         );
     }
 
-    createPlaylist = () => {
+    openCreatePlaylist = () => {
+        this.props.navigation.navigate("CreatePlaylist", {
+            onGoBack: this.createPlaylist
+        });
+    }
+
+    createPlaylist = (title, description) => {
         let temp = this.state.playlists;
-        temp.push({title: "Neue Playlist " + (this.state.playlists.length + 1), subtitle: "Du • 0 songs"});
+        temp.push({title: title, subtitle: description});
 
         this.setState({playlists: temp});
     }
