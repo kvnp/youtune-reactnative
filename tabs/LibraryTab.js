@@ -61,10 +61,15 @@ export default class LibraryTab extends Component {
         this.setState({playlists: temp});
     }
 
+    focusPlaylist = (json) => {
+        global.playlist = json;
+        this.props.navigation.navigate("Playlist");
+    }
+
     getPlaylist = (playlistJson) => {
         return (
             <View style={styles.playlist}>
-                <TouchableOpacity>
+                <TouchableOpacity onPress={() => this.focusPlaylist(playlistJson)}>
                     <Image style={styles.playlistCover}>{playlistJson.cover}</Image>
                 </TouchableOpacity>
                 <Text style={styles.playlistTitle}>{playlistJson.title}</Text>

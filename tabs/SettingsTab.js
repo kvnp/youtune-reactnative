@@ -4,7 +4,8 @@ import {
     View,
     Text,
     StyleSheet,
-    Dimensions
+    Dimensions,
+    TouchableOpacity
 } from 'react-native';
 
 import {
@@ -23,6 +24,10 @@ export default class LibraryTab extends Component {
         this.setState({results: childData});
     };
 
+    switchScreen = () => {
+        this.props.navigation.navigate("Artist");
+    }
+
     render() {
         return (
             <>
@@ -30,9 +35,9 @@ export default class LibraryTab extends Component {
                     <Header text={"Einstellungen"}  color={this.props.passBackground.color} sourcee={this.props.passBackground.source}/>
                 </View>
             
-                <View style={styles.middleView}>
+                <TouchableOpacity style={styles.middleView} onPress={() => this.switchScreen()}>
                     <Text style={styles.placeholder}>⚙️</Text>
-                </View>
+                </TouchableOpacity>
             </>
         );
     }
