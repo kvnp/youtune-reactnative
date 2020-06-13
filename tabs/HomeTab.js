@@ -93,7 +93,7 @@ export default class HomeTab extends Component {
     }
 
     componentDidMount() {
-        this.refresh();
+        //this.refresh();
     }
 
     render() {
@@ -110,7 +110,7 @@ export default class HomeTab extends Component {
                 </View>
 
                 <TouchableOpacity onPress={this.refresh} style={styles.refreshButton}>
-                        <Text>Aktualisieren</Text>
+                    <Text>Aktualisieren</Text>
                 </TouchableOpacity>
             </>
         );
