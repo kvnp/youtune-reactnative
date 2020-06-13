@@ -4,6 +4,8 @@ import { StatusBar } from 'react-native';
 
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { createStackNavigator } from '@react-navigation/stack';
+
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
 import { Colors } from 'react-native/Libraries/NewAppScreen';
@@ -50,6 +52,7 @@ class SettingsScreen extends Component {
 }
 
 const Tab = createBottomTabNavigator();
+const Stack = createStackNavigator();
 
 export default class App extends Component {
     constructor(props) {
@@ -82,6 +85,40 @@ export default class App extends Component {
         });
     }
 
+    getTabScreens = () => {
+        return (
+            <Tab.Navigator>
+                <Tab.Screen name="Home"
+                            options={{ tabBarIcon: ({ color, size }) =>
+                                <MaterialCommunityIcons name="home" color={color} size={size} />
+                            }}>
+                    {() => <HomeScreen appCallback={this.appCallback} />}
+                </Tab.Screen>
+
+                <Tab.Screen name="Suche"
+                            options={{ tabBarIcon: ({ color, size }) =>
+                                <MaterialCommunityIcons name="magnify" color={color} size={size} />
+                            }}>
+                    {() => <SearchScreen passBackground={this.state.background}></SearchScreen>}
+                </Tab.Screen>
+
+                <Tab.Screen name="Bibliothek"
+                            options={{ tabBarIcon: ({ color, size }) =>
+                                <MaterialCommunityIcons name="folder" color={color} size={size} />
+                            }}>
+                    {() => <LibraryScreen passBackground={this.state.background}></LibraryScreen>}
+                </Tab.Screen>
+
+                <Tab.Screen name="Einstellungen"
+                            options={{ tabBarIcon: ({ color, size }) =>
+                            <MaterialCommunityIcons name="settings" color={color} size={size} />
+                            }}>
+                    {() => <SettingsScreen passBackground={this.state.background}></SettingsScreen>}
+                </Tab.Screen>
+            </Tab.Navigator>
+        );
+    }
+
     render() {
         return (
             <NavigationContainer>
@@ -89,51 +126,22 @@ export default class App extends Component {
                            hidden={false}
                            backgroundColor='transparent'
                            translucent={true}/>
+                <Stack.Navigator screenOptions={{headerShown: false}}>
+                    <Stack.Screen name="App" component={this.getTabScreens}></Stack.Screen>
 
-                <Tab.Navigator>
-                    <Tab.Screen name="Home"
-                                options={{ tabBarIcon: ({ color, size }) =>
-                                    <MaterialCommunityIcons name="home" color={color} size={size} />
-                                }}>
-                        {() => <HomeScreen appCallback={this.appCallback} />}
-                    </Tab.Screen>
+                    <Stack.Screen name="Playlist">
+                        {() => <View><Text>Playlist</Text></View>}
+                    </Stack.Screen>
 
-                    <Tab.Screen name="Suche"
-                                options={{ tabBarIcon: ({ color, size }) =>
-                                    <MaterialCommunityIcons name="magnify" color={color} size={size} />
-                                }}>
-                        {() => <SearchScreen passBackground={this.state.background}></SearchScreen>}
-                    </Tab.Screen>
+                    <Stack.Screen name="Musik">
+                        {() => <View><Text>Musik</Text></View>}
+                    </Stack.Screen>
 
-                    <Tab.Screen name="Bibliothek"
-                                options={{ tabBarIcon: ({ color, size }) =>
-                                    <MaterialCommunityIcons name="folder" color={color} size={size} />
-                                }}>
-                        {() => <LibraryScreen passBackground={this.state.background}></LibraryScreen>}
-                    </Tab.Screen>
-
-                    <Tab.Screen name="Einstellungen"
-                                options={{ tabBarIcon: ({ color, size }) =>
-                                <MaterialCommunityIcons name="settings" color={color} size={size} />
-                                }}>
-                        {() => <SettingsScreen passBackground={this.state.background}></SettingsScreen>}
-                    </Tab.Screen>
-                </Tab.Navigator>
+                    <Stack.Screen name="Künstler">
+                        {() => <View><Text>Künstler</Text></View>}
+                    </Stack.Screen>
+                </Stack.Navigator>
             </NavigationContainer>
         );
     } 
 }
-
-/*
-<Tab.Screen name="Playlist">
-    {() => <View><Text>Playlist</Text></View>}
-</Tab.Screen>
-
-<Tab.Screen name="Musik">
-    {() => <View><Text>Musik</Text></View>}
-</Tab.Screen>
-
-<Tab.Screen name="Künstler">
-    {() => <View><Text>Künstler</Text></View>}
-</Tab.Screen>
-*/
