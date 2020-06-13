@@ -25,7 +25,7 @@ export default class LibraryTab extends Component {
             songs: [],
             artists: [],
             subscriptions: []
-        };
+        }
     }
 
     getStyle = (value) => {
@@ -51,23 +51,26 @@ export default class LibraryTab extends Component {
                 <Text style={styles.playlistTitle}>Neue Playlist</Text>
                 <Text style={styles.playlistDesc}></Text>
             </View>
-        )
+        );
     }
 
     createPlaylist = () => {
         let temp = this.state.playlists;
-        temp.push({title: "Meine Playlist 1", subtitle: "Kevin • 1 song"});
+        temp.push({title: "Neue Playlist " + (this.state.playlists.length + 1), subtitle: "Du • 0 songs"});
+
         this.setState({playlists: temp});
     }
 
     getPlaylist = (playlistJson) => {
         return (
             <View style={styles.playlist}>
-                <Image style={styles.playlistCover}>{playlistJson.cover}</Image>
+                <TouchableOpacity>
+                    <Image style={styles.playlistCover}>{playlistJson.cover}</Image>
+                </TouchableOpacity>
                 <Text style={styles.playlistTitle}>{playlistJson.title}</Text>
                 <Text style={styles.playlistDesc}>{playlistJson.subtitle}</Text>
             </View>
-        )
+        );
     }
 
     getPlaylists = () => {
@@ -112,27 +115,25 @@ export default class LibraryTab extends Component {
         );
     }
 
-    update = (value) => {
-        this.setState({selection: value});
-    }
+    update = (value) => this.setState({selection: value});
 
     getUpdatedView = () => {
         switch (this.state.selection) {
             case 0: return this.getPlaylistView();
-            case 1: return <><Text>Alben</Text></>;
-            case 2: return <><Text>Songs</Text></>;
-            case 3: return <><Text>Künstler</Text></>;
-            case 4: return <><Text>Abos</Text></>;
+            case 1: return <Text>Alben</Text>;
+            case 2: return <Text>Songs</Text>;
+            case 3: return <Text>Künstler</Text>;
+            case 4: return <Text>Abos</Text>;
         }
     }
 
     getPlaylistView = () => {
         return (
             <>
-                {this.getPlaylists()}
                 {this.getAddPlaylist()}
+                {this.getPlaylists()}
             </>
-        )
+        );
     }
 };
 
