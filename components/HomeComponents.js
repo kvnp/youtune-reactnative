@@ -55,7 +55,6 @@ export class Results extends Component {
     }
 
     displayHome = () => {
-        console.log(JSON.stringify(this.props.passthroughHome));
         if (this.props.passthroughHome == null) {
             return (
                 <Text style={styles.preHome}>
