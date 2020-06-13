@@ -33,26 +33,22 @@ export default class HomeTab extends Component {
         Tube.fetchHome().then((result) => {
             if (result.background != undefined) {
                 this.setState({home: result});
-                
                 this.props.setHeader(result.background);
             }
         });
-    }
-
-    componentDidMount() {
-        //this.refresh();
     }
 
     render() {
         return (
             <>
                 <View style={styles.headerPicture}>
-                    <Header text={"Home"} color={this.props.passBackground.headerColor} sourcee={this.props.passBackground.source}/>
+                    <Header text={"Home"}
+                            header={this.props.passBackground}/>
                 </View>
 
                 <View style={styles.middleView}>
                     <ScrollView style={styles.homeView}>
-                        <Results passthroughHome={this.state.home}/>
+                        <Results passthroughHome={this.state.home} navigation={this.props.navigation}/>
                     </ScrollView>
                 </View>
 

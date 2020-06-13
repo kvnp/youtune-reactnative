@@ -1,15 +1,13 @@
-import React, { Component } from "react";
-import { View, Text, StyleSheet } from "react-native";
+import React from "react";
+import { View, Text, StatusBar, StyleSheet } from "react-native";
 
-export default class PlayView extends Component {
-    render() {
-        global.noTabBar = true;
-        return (
-            <View style={styles.mainView}>
-                <Text>Play</Text>
-            </View>
-        )
-    }
+export function PlayView({route, navigation}) {
+    StatusBar.setBarStyle('dark-content', true);
+    return (
+        <View style={styles.mainView}>
+            <Text>Play</Text>
+        </View>
+    )
 }
 
 const styles = StyleSheet.create({

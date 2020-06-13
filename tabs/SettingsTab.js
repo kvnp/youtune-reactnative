@@ -33,7 +33,7 @@ export default class LibraryTab extends Component {
             <>
                 <View style={styles.headerPicture}>
                     <Header text={"Einstellungen"}
-                            color={this.props.passBackground.headerColor} sourcee={this.props.passBackground.source}/>
+                            header={this.props.passBackground}/>
                 </View>
             
                 <TouchableOpacity style={styles.middleView} onPress={() => this.switchScreen()}>

@@ -5,11 +5,12 @@ import {
     Text,
     StyleSheet,
     TouchableOpacity,
-    Image
+    Modal
 } from 'react-native';
 
 import {
-    Header
+    Header,
+    Playlist
 } from '../components/SharedComponents';
 
 import { Colors } from 'react-native/Libraries/NewAppScreen';
@@ -61,21 +62,11 @@ export default class LibraryTab extends Component {
         this.setState({playlists: temp});
     }
 
-    focusPlaylist = (json) => {
-        global.playlist = json;
-        this.props.navigation.navigate("Playlist");
-    }
-
     getPlaylist = (playlistJson) => {
         return (
             <View style={styles.playlist}>
-                <TouchableOpacity onPress={() => this.focusPlaylist(playlistJson)}>
-                    <Image style={styles.playlistCover}>{playlistJson.cover}</Image>
-                </TouchableOpacity>
-                <Text style={styles.playlistTitle}>{playlistJson.title}</Text>
-                <Text style={styles.playlistDesc}>{playlistJson.subtitle}</Text>
-            </View>
-        );
+                <Playlist playlist={playlistJson} navigation={this.props.navigation}/>
+            </View>);
     }
 
     getPlaylists = () => {
@@ -87,7 +78,7 @@ export default class LibraryTab extends Component {
             <>
                 <View style={styles.headerPicture}>
                     <Header text={"Bibliothek"}
-                            color={this.props.passBackground.headerColor} sourcee={this.props.passBackground.source}/>
+                            header={this.props.passBackground}/>
                 </View>
             
                 <View style={styles.middleView}>
@@ -191,13 +182,13 @@ const styles = StyleSheet.create({
 
     playlistCollection: {
         width: '100%',
-        paddingTop: 20
+        paddingTop: 20,
     },
 
     playlistCollectionContainer: {
         justifyContent: 'center',
         flexDirection: 'row',
-        flexWrap: 'wrap'
+        flexWrap: 'wrap-reverse'
     },
 
     playlist: {
@@ -227,5 +218,9 @@ const styles = StyleSheet.create({
     newPlaylist: {
         color: Colors.white,
         fontSize: 50,
+    },
+
+    addPlaylist: {
+
     }
 });

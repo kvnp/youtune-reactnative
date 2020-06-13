@@ -11,6 +11,7 @@ import {
 } from "react-native";
 
 import { Colors } from 'react-native/Libraries/NewAppScreen';
+import { Playlist } from './SharedComponents';
 
 export class Results extends Component {
     constructor(){
@@ -18,19 +19,15 @@ export class Results extends Component {
     }
 
     openAlbum = (album) => {
-        alert(album.title);
+        this.props.navigation.navigate("Playlist", album);
     }
 
     displayAlbum = (album) => {
         return (
             <View style={styles.album}>
-                <TouchableOpacity onPress={() => {this.openAlbum(album)}}>
-                    <Image style={styles.albumCover} source={{uri: album.thumbnail}}/>
-                </TouchableOpacity>
-                <Text style={styles.albumTitle}>{album.title}</Text>
-                <Text style={styles.albumDesc}>{album.subtitle}</Text>
+                <Playlist playlist={album} navigation={this.props.navigation}/>
             </View>
-        )
+        );
     }
 
     displayAlbums = (albums) => {
