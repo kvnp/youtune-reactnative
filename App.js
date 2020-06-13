@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 
-import { StatusBar, View, Text, StyleSheet } from 'react-native';
+import { StatusBar, View, Text } from 'react-native';
 
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
@@ -14,6 +14,10 @@ import SearchTab from './tabs/SearchTab';
 import HomeTab from './tabs/HomeTab';
 import LibraryTab from './tabs/LibraryTab';
 import SettingsTab from './tabs/SettingsTab';
+
+import PlayView from './views/PlayView';
+import PlaylistView from './views/PlaylistView';
+import ArtistView from './views/ArtistView';
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -94,15 +98,15 @@ export default class App extends Component {
                     <Stack.Screen name="App" component={this.getTabScreens}></Stack.Screen>
 
                     <Stack.Screen name="Playlist">
-                        {() => <View style={{alignSelf: 'center', justifyContent: 'center'}}><Text>Playlist</Text></View>}
+                        {() => <PlaylistView/>}
                     </Stack.Screen>
 
                     <Stack.Screen name="Musik">
-                        {() => <View style={{alignSelf: 'center', justifyContent: 'center'}}><Text>Musik</Text></View>}
+                        {() => <PlayView/>}
                     </Stack.Screen>
 
                     <Stack.Screen name="Künstler">
-                        {() => <View style={{alignSelf: 'center', justifyContent: 'center'}}><Text>Künstler</Text></View>}
+                        {() => <ArtistView/>}
                     </Stack.Screen>
                 </Stack.Navigator>
             </NavigationContainer>
