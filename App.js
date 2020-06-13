@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 
-import { StatusBar } from 'react-native';
+import { StatusBar, View, Text, StyleSheet } from 'react-native';
 
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
@@ -14,42 +14,6 @@ import SearchTab from './tabs/SearchTab';
 import HomeTab from './tabs/HomeTab';
 import LibraryTab from './tabs/LibraryTab';
 import SettingsTab from './tabs/SettingsTab';
-
-class HomeScreen extends Component {
-    callback = (data) => {
-        this.props.appCallback(data);
-    }
-
-    render() {
-        return (
-            <HomeTab callback={this.callback}/>
-        );
-    }
-}
-
-class SearchScreen extends Component {
-    render() {
-        return (
-            <SearchTab passBackground={this.props.passBackground}/>
-        );
-    }
-}
-
-class LibraryScreen extends Component {
-    render() {
-        return (
-            <LibraryTab passBackground={this.props.passBackground}/>
-        );
-    }
-}
-
-class SettingsScreen extends Component {
-    render() {
-        return (
-            <SettingsTab passBackground={this.props.passBackground}/>
-        );
-    }
-}
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -85,35 +49,35 @@ export default class App extends Component {
         });
     }
 
-    getTabScreens = () => {
+    getTabScreens = ({navigation}) => {
         return (
             <Tab.Navigator>
                 <Tab.Screen name="Home"
                             options={{ tabBarIcon: ({ color, size }) =>
                                 <MaterialCommunityIcons name="home" color={color} size={size} />
                             }}>
-                    {() => <HomeScreen appCallback={this.appCallback} />}
+                    {() => <HomeTab appCallback={this.appCallback} navigation={navigation} />}
                 </Tab.Screen>
 
                 <Tab.Screen name="Suche"
                             options={{ tabBarIcon: ({ color, size }) =>
                                 <MaterialCommunityIcons name="magnify" color={color} size={size} />
                             }}>
-                    {() => <SearchScreen passBackground={this.state.background}></SearchScreen>}
+                    {() => <SearchTab passBackground={this.state.background} navigation={navigation}></SearchTab>}
                 </Tab.Screen>
 
                 <Tab.Screen name="Bibliothek"
                             options={{ tabBarIcon: ({ color, size }) =>
                                 <MaterialCommunityIcons name="folder" color={color} size={size} />
                             }}>
-                    {() => <LibraryScreen passBackground={this.state.background}></LibraryScreen>}
+                    {() => <LibraryTab passBackground={this.state.background} navigation={navigation}></LibraryTab>}
                 </Tab.Screen>
 
                 <Tab.Screen name="Einstellungen"
                             options={{ tabBarIcon: ({ color, size }) =>
                             <MaterialCommunityIcons name="settings" color={color} size={size} />
                             }}>
-                    {() => <SettingsScreen passBackground={this.state.background}></SettingsScreen>}
+                    {() => <SettingsTab passBackground={this.state.background} navigation={navigation}></SettingsTab>}
                 </Tab.Screen>
             </Tab.Navigator>
         );
@@ -130,15 +94,15 @@ export default class App extends Component {
                     <Stack.Screen name="App" component={this.getTabScreens}></Stack.Screen>
 
                     <Stack.Screen name="Playlist">
-                        {() => <View><Text>Playlist</Text></View>}
+                        {() => <View style={{alignSelf: 'center', justifyContent: 'center'}}><Text>Playlist</Text></View>}
                     </Stack.Screen>
 
                     <Stack.Screen name="Musik">
-                        {() => <View><Text>Musik</Text></View>}
+                        {() => <View style={{alignSelf: 'center', justifyContent: 'center'}}><Text>Musik</Text></View>}
                     </Stack.Screen>
 
                     <Stack.Screen name="Künstler">
-                        {() => <View><Text>Künstler</Text></View>}
+                        {() => <View style={{alignSelf: 'center', justifyContent: 'center'}}><Text>Künstler</Text></View>}
                     </Stack.Screen>
                 </Stack.Navigator>
             </NavigationContainer>
