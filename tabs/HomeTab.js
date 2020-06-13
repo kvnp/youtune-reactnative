@@ -88,7 +88,7 @@ export default class HomeTab extends Component {
                     }
                 });
 
-            this.props.callback(this.state.background);
+            this.props.appCallback(this.state.background);
         });
     }
 
