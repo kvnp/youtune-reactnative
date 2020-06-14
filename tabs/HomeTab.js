@@ -16,7 +16,6 @@ import {
 import {
     Results
 } from '../components/HomeComponents';
-import { Colors } from 'react-native/Libraries/NewAppScreen';
 
 import * as Tube from '../modules/Tube';
 
@@ -24,13 +23,29 @@ export default class HomeTab extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            home: null
+            home: null,
+            icon: '🏠'
         };
     }
 
-
     refresh = () => {
+        this.setState({icon: '|', home: null});
+        let loader = setInterval(() => {
+            switch (this.state.icon) {
+                case '|' :
+                    return this.setState({icon: '/'});
+                case '/' :
+                    return this.setState({icon: '-'});
+                case '-' :
+                    return this.setState({icon: '\\'});
+                case '\\':
+                    return this.setState({icon: '|'});
+            }
+        }, 300);
+
         Tube.fetchHome().then((result) => {
+            clearInterval(loader);
+            this.setState({icon: '🏠'});
             if (result.background != undefined) {
                 this.setState({home: result});
                 this.props.setHeader(result.background);
@@ -48,7 +63,7 @@ export default class HomeTab extends Component {
 
                 <View style={styles.middleView}>
                     <ScrollView style={styles.homeView}>
-                        <Results passthroughHome={this.state.home} navigation={this.props.navigation}/>
+                        <Results passthroughHome={this.state.home} homeIcon={this.state.icon} navigation={this.props.navigation}/>
                     </ScrollView>
                 </View>
 
@@ -88,7 +103,7 @@ const styles = StyleSheet.create({
         alignSelf: 'center',
         alignItems: 'center',
         justifyContent: 'center',
-        backgroundColor: Colors.white
+        backgroundColor: 'white'
     },
 
     homeView: {
@@ -118,7 +133,7 @@ const styles = StyleSheet.create({
     albumCover: {
         height: 100,
         width: 100,
-        backgroundColor: Colors.dark
+        backgroundColor: 'gray'
     },
 
     albumTitle: {

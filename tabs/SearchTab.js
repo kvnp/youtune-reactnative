@@ -19,13 +19,19 @@ export default class SearchTab extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            results: null
+            results: null,
+            icon: '🔎'
         };
     }
 
-    resultReceiver = (childData) => {
-        this.setState({results: childData});
+    resultReceiver = (data) => {
+        this.setState({results: data});
     };
+
+    iconReceiver = (icon) => {
+        if (this.state.results != null) this.setState({results: null});
+        this.setState({icon: icon});
+    }
 
     render() {
         return (
@@ -36,11 +42,11 @@ export default class SearchTab extends Component {
                 </View>
 
                 <View style={styles.middleView}>
-                    <Results passthroughResults={this.state.results}/>
+                    <Results passResults={this.state.results} passIcon={this.state.icon}/>
                 </View>
 
                 <View style={styles.searchBar}>
-                    <SearchBar resultSender={this.resultReceiver}/>
+                    <SearchBar resultSender={this.resultReceiver} sendIcon={this.iconReceiver}/>
                 </View>
             </>
         );

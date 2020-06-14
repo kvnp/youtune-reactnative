@@ -5,17 +5,14 @@ import {
     StyleSheet,
     ScrollView,
     View,
-    Image,
-    TouchableOpacity,
     Dimensions
 } from "react-native";
 
-import { Colors } from 'react-native/Libraries/NewAppScreen';
 import { Playlist } from './SharedComponents';
 
 export class Results extends Component {
-    constructor(){
-        super();
+    constructor(props){
+        super(props);
     }
 
     openAlbum = (album) => {
@@ -52,19 +49,18 @@ export class Results extends Component {
     }
 
     displayHome = () => {
-        if (this.props.passthroughHome == null) {
+        if (this.props.passthroughHome == null)
             return (
                 <Text style={styles.preHome}>
-                    🏠
+                    {this.props.homeIcon}
                 </Text>
             )
-        } else {
+        else 
             return (
                 <View>
                     {this.displayShelves(this.props.passthroughHome)}
                 </View>
             )
-        }
     }
 
     render() {
@@ -78,9 +74,9 @@ export class Results extends Component {
 
 const styles = StyleSheet.create({
     preHome: {
-        fontSize:70,
-        marginTop:(Dimensions.get("screen").height / 2) - 300,
-        alignSelf:'center'
+        fontSize: 70,
+        marginTop: (Dimensions.get("screen").height / 2) - 300,
+        alignSelf: 'center'
     },
 
     homeText: {
@@ -106,13 +102,13 @@ const styles = StyleSheet.create({
     albumCover: {
         height: 100,
         width: 100,
-        backgroundColor: Colors.dark
+        backgroundColor: 'gray'
     },
 
     albumTitle: {
         paddingTop: 5,
         fontSize: 10,
-        fontWeight:'bold'
+        fontWeight: 'bold'
     },
 
     albumDesc: {

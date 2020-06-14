@@ -8,8 +8,6 @@ import { createStackNavigator } from '@react-navigation/stack';
 
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
-import { Colors } from 'react-native/Libraries/NewAppScreen';
-
 import SearchTab from './tabs/SearchTab';
 import HomeTab from './tabs/HomeTab';
 import LibraryTab from './tabs/LibraryTab';
@@ -38,7 +36,7 @@ export default class App extends Component {
             accessingView: false,
             background: {
                 source: require("./assets/img/header.jpg"),
-                headerColor: Colors.white
+                headerColor: 'white'
             }
         };
     }
@@ -50,10 +48,10 @@ export default class App extends Component {
 
             if (HeaderDb[url]) {
                 barStyle = "dark-content";
-                headerColor = Colors.dark;
+                headerColor = 'gray';
             } else {
                 barStyle = "light-content";
-                headerColor = Colors.white;
+                headerColor = 'white';
             }
             this.setState({
                 barStyle: barStyle,
@@ -67,7 +65,7 @@ export default class App extends Component {
                 barStyle: "light-content",
                 background: {
                     source: url,
-                    headerColor: Colors.white
+                    headerColor: 'white'
                 }
             });
         }
@@ -114,13 +112,6 @@ export default class App extends Component {
         );
     }
 
-    getCorrectStyle = () => {
-        if (this.state.accessingView)
-            return "dark-content";
-        else
-            return this.state.barStyle;
-    }
-
     render() {
         return (
             <NavigationContainer>
@@ -145,4 +136,11 @@ export default class App extends Component {
                            backgroundColor='transparent'
                            translucent={true}/>*/
 
-/**/
+/*
+getCorrectStyle = () => {
+    if (this.state.accessingView)
+        return "dark-content";
+    else
+        return this.state.barStyle;
+}
+*/

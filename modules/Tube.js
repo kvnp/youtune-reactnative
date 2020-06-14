@@ -180,7 +180,7 @@ function digestHomeResults(json) {
                 album.subtitle += shelfRenderer.contents[j].musicTwoRowItemRenderer.subtitle.runs[k].text;
             }
 
-            album.browseId = shelfRenderer.contents[j].musicTwoRowItemRenderer.navigationEndpoint.browseEndpoint.browseId;
+            //album.browseId = shelfRenderer.contents[j].musicTwoRowItemRenderer.navigationEndpoint.browseEndpoint.browseId;
 
             album.thumbnail = shelfRenderer.contents[j].musicTwoRowItemRenderer.thumbnailRenderer.musicThumbnailRenderer.thumbnail.thumbnails[0].url;
 

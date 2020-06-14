@@ -10,7 +10,6 @@ import {
     Image
 } from "react-native";
 
-import { Colors } from "react-native/Libraries/NewAppScreen";
 import { Playlist } from "../components/SharedComponents";
 
 export function ArtistView({ route, navigation }) {
@@ -246,7 +245,7 @@ const styles = StyleSheet.create({
     },
 
     artistName: {
-        color: Colors.white,
+        color: 'white',
         fontWeight: 'bold',
         fontSize: 25
     },
@@ -273,7 +272,7 @@ const styles = StyleSheet.create({
         paddingRight: 13,
         paddingTop: 2,
         paddingBottom: 2,
-        backgroundColor: Colors.white,
+        backgroundColor: 'white',
         borderRadius: 5
     },
 
@@ -305,7 +304,7 @@ const styles = StyleSheet.create({
     },
 
     musicCover: {
-        backgroundColor: Colors.dark,
+        backgroundColor: 'gray',
         width: 40,
         height: 40,
         marginRight: 15,
@@ -325,7 +324,7 @@ const styles = StyleSheet.create({
     },
 
     allTitlesButton: {
-        backgroundColor: Colors.dark,
+        backgroundColor: 'gray',
         alignSelf: 'baseline',
         marginTop: 10,
         paddingRight: 10,
@@ -334,7 +333,7 @@ const styles = StyleSheet.create({
     },
 
     allTitlesButtonText: {
-        color: Colors.white,
+        color: 'white',
     },
 
     playlistCollection: {

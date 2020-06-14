@@ -6,9 +6,9 @@ import {
     StatusBar,
     StyleSheet,
     ImageBackground,
-    TouchableOpacity
+    TouchableOpacity,
+    TextInput
 } from "react-native";
-import { TextInput } from "react-native-gesture-handler";
 
 export function CreatePlaylistView({ route, navigation }) {
     StatusBar.setBarStyle('dark-content', true);
@@ -139,32 +139,6 @@ const styles = StyleSheet.create({
 
     closeButtonText: {
         fontSize: 15,
-    },
-
-    topicView: {
-        padding: 25
-    },
-
-    topicTitle: {
-        fontWeight: 'bold',
-        fontSize: 30
-    },
-
-    titleView: {
-        paddingTop: 5,
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-around',
-    },
-
-    titleCover: {
-        width: 50,
-        height: 50,
-        backgroundColor: 'gray'
-    },
-
-    titleTextCollection: {
-        width: '60%'
     }
 });
 

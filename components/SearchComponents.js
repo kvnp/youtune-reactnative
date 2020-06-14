@@ -23,12 +23,8 @@ export class SearchBar extends Component {
         super(props);
         this.state = {
             query: null,
-            buttonDisabled: true
+            buttonDisabled: true,
         };
-    }
-
-    sendData = (result) => {
-        this.props.resultSender(result);
     }
 
     setQuery = (event) => {
@@ -43,11 +39,32 @@ export class SearchBar extends Component {
     search = () => {
         Keyboard.dismiss();
         if (this.state.query.length > 0) {
-            this.setState({buttonDisabled: true});
 
+            let icon = '|';
+            this.props.sendIcon(icon);
+            let loader = setInterval(() => {
+                switch (icon) {
+                    case '|' :
+                        icon = '/';
+                        return this.props.sendIcon(icon);
+                    case '/' :
+                        icon = '-';
+                        return this.props.sendIcon(icon);
+                    case '-' :
+                        icon = '\\';
+                        return this.props.sendIcon(icon);
+                    case '\\':
+                        icon = '|';
+                        return this.props.sendIcon(icon);
+                }
+            }, 300);
+
+            this.setState({buttonDisabled: true});
             Tube.fetchResults(this.state.query)
-                .then(data => { this.setState({buttonDisabled: true});
-                                this.sendData(data);});
+                .then(data => { clearInterval(loader);
+                                this.props.sendIcon('🔎');
+                                this.props.resultSender(data);
+                               });
         }
     }
 
@@ -125,10 +142,10 @@ export class Results extends Component {
     }
 
     displayResults = () => {
-        if (this.props.passthroughResults == null || this.props.passthroughResults.results < 1)
-            return <Text style={styles.preResults}>🔍</Text>;
+        if (this.props.passResults == null || this.props.passResults.results < 1)
+            return <Text style={styles.preResults}>{this.props.passIcon}</Text>;
         else
-            return this.displayTopics(this.props.passthroughResults);
+            return this.displayTopics(this.props.passResults);
     }
 
     render() {

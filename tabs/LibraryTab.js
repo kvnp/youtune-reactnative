@@ -12,7 +12,6 @@ import {
     Playlist
 } from '../components/SharedComponents';
 
-import { Colors } from 'react-native/Libraries/NewAppScreen';
 import { ScrollView } from 'react-native-gesture-handler';
 
 export default class LibraryTab extends Component {
@@ -182,7 +181,7 @@ const styles = StyleSheet.create({
     headerEntryTextFocus: {
         fontWeight: 'bold',
         borderBottomWidth: 3,
-        borderBottomColor: Colors.dark,
+        borderBottomColor: 'gray',
     },
 
     playlistCollection: {
@@ -207,7 +206,7 @@ const styles = StyleSheet.create({
         justifyContent:'center',
         height: 100,
         width: 100,
-        backgroundColor: Colors.dark
+        backgroundColor: 'gray'
     },
 
     playlistTitle: {
@@ -221,7 +220,7 @@ const styles = StyleSheet.create({
     },
 
     newPlaylist: {
-        color: Colors.white,
+        color: 'white',
         fontSize: 50,
     },
 
