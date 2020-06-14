@@ -49,7 +49,7 @@ export class Results extends Component {
     }
 
     displayHome = () => {
-        if (this.props.passthroughHome == null)
+        if (this.props.passHome == null)
             return (
                 <Text style={styles.preHome}>
                     {this.props.homeIcon}
@@ -58,7 +58,7 @@ export class Results extends Component {
         else 
             return (
                 <View>
-                    {this.displayShelves(this.props.passthroughHome)}
+                    {this.displayShelves(this.props.passHome)}
                 </View>
             )
     }

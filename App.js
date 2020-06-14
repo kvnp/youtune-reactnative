@@ -1,22 +1,23 @@
-import React, {Component} from 'react';
+import React, {Component} from "react";
 
-import { StatusBar } from 'react-native';
+import { StatusBar, View, Text } from "react-native";
 
-import { NavigationContainer } from '@react-navigation/native';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { createStackNavigator } from '@react-navigation/stack';
+import { NavigationContainer } from "@react-navigation/native";
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import { createStackNavigator } from "@react-navigation/stack";
 
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 
-import SearchTab from './tabs/SearchTab';
-import HomeTab from './tabs/HomeTab';
-import LibraryTab from './tabs/LibraryTab';
-import SettingsTab from './tabs/SettingsTab';
+import SearchTab from "./tabs/SearchTab";
+import HomeTab from "./tabs/HomeTab";
+import LibraryTab from "./tabs/LibraryTab";
+import SettingsTab from "./tabs/SettingsTab";
 
-import { PlayView } from './views/PlayView';
-import { PlaylistView } from './views/PlaylistView';
-import { ArtistView } from './views/ArtistView';
-import { CreatePlaylistView } from './views/CreatePlaylistView';
+import { PlayView } from "./views/PlayView";
+import { PlaylistView } from "./views/PlaylistView";
+import { ArtistView } from "./views/ArtistView";
+import { CreatePlaylistView } from "./views/CreatePlaylistView";
+import { Header} from "./components/SharedComponents";
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -33,10 +34,10 @@ export default class App extends Component {
         super(props);
         this.state = {
             barStyle: "light-content",
-            accessingView: false,
+            title: "Home",
             background: {
                 source: require("./assets/img/header.jpg"),
-                headerColor: 'white'
+                headerColor: "white"
             }
         };
     }
@@ -48,10 +49,10 @@ export default class App extends Component {
 
             if (HeaderDb[url]) {
                 barStyle = "dark-content";
-                headerColor = 'gray';
+                headerColor = "gray";
             } else {
                 barStyle = "light-content";
-                headerColor = 'white';
+                headerColor = "white";
             }
             this.setState({
                 barStyle: barStyle,
@@ -65,48 +66,50 @@ export default class App extends Component {
                 barStyle: "light-content",
                 background: {
                     source: url,
-                    headerColor: 'white'
+                    headerColor: "white"
                 }
             });
         }
 
         StatusBar.setBarStyle(this.state.barStyle, true);
         StatusBar.setTranslucent(true);
-        StatusBar.setBackgroundColor('transparent', true);
+        StatusBar.setBackgroundColor("transparent", true);
     }
 
     getTabScreens = ({navigation}) => {
         StatusBar.setBarStyle(this.state.barStyle, true);
         StatusBar.setTranslucent(true);
-        StatusBar.setBackgroundColor('transparent', true);
+        StatusBar.setBackgroundColor("transparent", true);
+
+        const header = <Header text={this.state.title} header={this.state.background}/>
         return (
             <Tab.Navigator>
                 <Tab.Screen name="Home"
                             options={{ tabBarIcon: ({ color, size }) =>
                                 <MaterialCommunityIcons name="home" color={color} size={size} />
                             }}>
-                    {() => <HomeTab passBackground={this.state.background} setHeader={this.setHeader} navigation={navigation}/>}
+                    {() => <HomeTab passBackground={header} setHeader={this.setHeader} navigation={navigation}/>}
                 </Tab.Screen>
 
                 <Tab.Screen name="Suche"
                             options={{ tabBarIcon: ({ color, size }) =>
                                 <MaterialCommunityIcons name="magnify" color={color} size={size} />
                             }}>
-                    {() => <SearchTab passBackground={this.state.background} navigation={navigation}/>}
+                    {() => <SearchTab passBackground={header} navigation={navigation}/>}
                 </Tab.Screen>
 
                 <Tab.Screen name="Bibliothek"
                             options={{ tabBarIcon: ({ color, size }) =>
                                 <MaterialCommunityIcons name="folder" color={color} size={size} />
                             }}>
-                    {() => <LibraryTab passBackground={this.state.background} navigation={navigation}/>}
+                    {() => <LibraryTab passBackground={header} navigation={navigation}/>}
                 </Tab.Screen>
 
                 <Tab.Screen name="Einstellungen"
                             options={{ tabBarIcon: ({ color, size }) =>
                             <MaterialCommunityIcons name="settings" color={color} size={size} />
                             }}>
-                    {() => <SettingsTab passBackground={this.state.background} navigation={navigation}/>}
+                    {() => <SettingsTab passBackground={header} navigation={navigation}/>}
                 </Tab.Screen>
             </Tab.Navigator>
         );
@@ -131,10 +134,12 @@ export default class App extends Component {
     } 
 }
 
-/*<StatusBar barStyle={this.getCorrectStyle()}
+/*
+<StatusBar barStyle={this.getCorrectStyle()}
                            hidden={false}
-                           backgroundColor='transparent'
-                           translucent={true}/>*/
+                           backgroundColor="transparent"
+                           translucent={true}/>
+*/
 
 /*
 getCorrectStyle = () => {

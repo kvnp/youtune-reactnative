@@ -11,35 +11,33 @@ import {
 
 export class Header extends Component {
     fetchImage = (data) => {
-        if (typeof data == "string") {
-            if (data != "") return {uri: data};
-            else            return require("../assets/img/header.jpg");
-
-        } else return require("../assets/img/header.jpg");
+        if      (typeof data == "string") {
+            return {uri: data};
+        } else if (typeof data == "number") {
+            return data;
+        }
     }
 
     render() {
         return (
-            <>
-                <ImageBackground imageStyle={styles.imageStyle} style={styles.containerStyle}
-                                 source={this.fetchImage(this.props.header.source)} >
-                    <Text style={[{color: this.props.header.headerColor}, styles.textStyle]}>{this.props.text}</Text>
-                </ImageBackground>
-            </>
+            <ImageBackground imageStyle={styles.imageStyle} style={styles.containerStyle}
+                             source={this.fetchImage(this.props.header.source)}>
+                <Text style={[{color: this.props.header.headerColor}, styles.textStyle]}>{this.props.text}</Text>
+            </ImageBackground>
         )
     }
 }
 
 export class Playlist extends Component {
-    focusPlaylist = (json) => {
-        this.props.navigation.navigate("Playlist", json);
-    }
+    focusPlaylist = (json) => this.props.navigation.navigate("Playlist", json);
 
     render() {
-        /*let imageSource
+        /*
+        let imageSource
         if (this.props.playlist.thumbnail.includes("http")) {
             imageSource = {uri: this.props.playlist.thumbnail}
-        }*/
+        }
+        */
 
         return (
             <View style={styles.playlist}>

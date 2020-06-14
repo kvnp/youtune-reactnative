@@ -10,10 +10,6 @@ import {
 } from 'react-native';
 
 import {
-    Header
-} from '../components/SharedComponents'
-
-import {
     Results
 } from '../components/HomeComponents';
 
@@ -47,8 +43,8 @@ export default class HomeTab extends Component {
             clearInterval(loader);
             this.setState({icon: '🏠'});
             if (result.background != undefined) {
-                this.setState({home: result});
                 this.props.setHeader(result.background);
+                this.setState({home: result});
             }
         });
     }
@@ -57,13 +53,12 @@ export default class HomeTab extends Component {
         return (
             <>
                 <View style={styles.headerPicture}>
-                    <Header text={"Home"}
-                            header={this.props.passBackground}/>
+                    {this.props.passBackground}
                 </View>
 
                 <View style={styles.middleView}>
                     <ScrollView style={styles.homeView}>
-                        <Results passthroughHome={this.state.home} homeIcon={this.state.icon} navigation={this.props.navigation}/>
+                        <Results passHome={this.state.home} homeIcon={this.state.icon} navigation={this.props.navigation}/>
                     </ScrollView>
                 </View>
 
@@ -74,6 +69,11 @@ export default class HomeTab extends Component {
         );
     }
 };
+
+/*
+<Header text={"Home"}
+        header={this.props.passBackground}/>
+*/
 
 const styles = StyleSheet.create({
     headerPicture: {

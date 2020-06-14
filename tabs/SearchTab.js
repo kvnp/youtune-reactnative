@@ -37,8 +37,7 @@ export default class SearchTab extends Component {
         return (
             <>
                 <View style={styles.headerPicture}>
-                    <Header text={"Suche"}
-                            header={this.props.passBackground}/>
+                    {this.props.passBackground}
                 </View>
 
                 <View style={styles.middleView}>

@@ -81,8 +81,7 @@ export default class LibraryTab extends Component {
         return (
             <>
                 <View style={styles.headerPicture}>
-                    <Header text={"Bibliothek"}
-                            header={this.props.passBackground}/>
+                    {this.props.passBackground}
                 </View>
             
                 <View style={styles.middleView}>

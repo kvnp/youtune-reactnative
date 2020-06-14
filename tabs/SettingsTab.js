@@ -24,19 +24,14 @@ export default class LibraryTab extends Component {
         this.setState({results: childData});
     };
 
-    switchScreen = () => {
-        this.props.navigation.navigate("Artist");
-    }
-
     render() {
         return (
             <>
                 <View style={styles.headerPicture}>
-                    <Header text={"Einstellungen"}
-                            header={this.props.passBackground}/>
+                    {this.props.passBackground}
                 </View>
             
-                <TouchableOpacity style={styles.middleView} onPress={() => this.switchScreen()}>
+                <TouchableOpacity style={styles.middleView} onPress={() => this.props.navigation.navigate("Artist")}>
                     <Text style={styles.placeholder}>⚙️</Text>
                 </TouchableOpacity>
             </>
