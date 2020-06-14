@@ -8,7 +8,6 @@ import {
     TouchableOpacity,
     View
 } from "react-native";
-import { Colors } from 'react-native/Libraries/NewAppScreen';
 
 export class Header extends Component {
     fetchImage = (data) => {
@@ -83,7 +82,7 @@ const styles = StyleSheet.create({
         justifyContent:'center',
         height: 100,
         width: 100,
-        backgroundColor: Colors.dark
+        backgroundColor: 'gray'
     },
 
     playlistTitle: {

@@ -14,8 +14,6 @@ import {
     TouchableOpacity
 } from "react-native";
 
-import { Colors } from 'react-native/Libraries/NewAppScreen';
-
 import * as Tube from '../modules/Tube';
 
 export class SearchBar extends Component {
@@ -70,7 +68,7 @@ export class SearchBar extends Component {
 
     render() {
         return (
-            <View style={{backgroundColor: Colors.white, width: '100%', alignItems:'center'}}>
+            <View style={{backgroundColor: 'white', width: '100%', alignItems:'center'}}>
                 <TextInput style={{marginBottom: 5, width: '80%'}}
                            placeholder="Suchen"
                            onChange={this.setQuery}
@@ -199,7 +197,7 @@ const styles = StyleSheet.create({
         paddingRight: 15,
         marginTop: 10,
         flexDirection: 'row',
-        backgroundColor: Colors.dark,
+        backgroundColor: 'gray',
         alignItems: 'center'
     },
 
@@ -223,6 +221,6 @@ const styles = StyleSheet.create({
     },
 
     resultText: {
-        color: Colors.white
+        color: 'white'
     }
 });
