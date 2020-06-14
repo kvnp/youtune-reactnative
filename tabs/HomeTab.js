@@ -14,18 +14,22 @@ import {
 } from '../components/HomeComponents';
 
 import * as Tube from '../modules/Tube';
+import { Header } from '../components/SharedComponents';
 
 export default class HomeTab extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            home: null,
-            icon: '🏠'
+            icon: '🏠',
+            home: {
+                shelves: [],
+                background: null
+            }
         };
     }
 
     refresh = () => {
-        this.setState({icon: '|', home: null});
+        this.setState({icon: '|', home: {shelves: []}});
         let loader = setInterval(() => {
             switch (this.state.icon) {
                 case '|' :
@@ -43,7 +47,7 @@ export default class HomeTab extends Component {
             clearInterval(loader);
             this.setState({icon: '🏠'});
             if (result.background != undefined) {
-                this.props.setHeader(result.background);
+                this.props.setImage(result.background);
                 this.setState({home: result});
             }
         });
@@ -53,7 +57,7 @@ export default class HomeTab extends Component {
         return (
             <>
                 <View style={styles.headerPicture}>
-                    {this.props.passBackground}
+                    <Header text="Home" source={this.state.home.background}/>
                 </View>
 
                 <View style={styles.middleView}>
@@ -69,11 +73,6 @@ export default class HomeTab extends Component {
         );
     }
 };
-
-/*
-<Header text={"Home"}
-        header={this.props.passBackground}/>
-*/
 
 const styles = StyleSheet.create({
     headerPicture: {

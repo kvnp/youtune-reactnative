@@ -10,10 +10,7 @@ import {
     Results,
     SearchBar
 } from '../components/SearchComponents';
-
-import {
-    Header
-} from '../components/SharedComponents';
+import { Header } from '../components/SharedComponents';
 
 export default class SearchTab extends Component {
     constructor(props) {
@@ -37,7 +34,7 @@ export default class SearchTab extends Component {
         return (
             <>
                 <View style={styles.headerPicture}>
-                    {this.props.passBackground}
+                    <Header text="Suche" source={this.props.passImage}/>
                 </View>
 
                 <View style={styles.middleView}>

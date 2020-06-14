@@ -8,8 +8,7 @@ import {
 } from 'react-native';
 
 import {
-    Header,
-    Playlist
+    Playlist, Header
 } from '../components/SharedComponents';
 
 import { ScrollView } from 'react-native-gesture-handler';
@@ -81,7 +80,7 @@ export default class LibraryTab extends Component {
         return (
             <>
                 <View style={styles.headerPicture}>
-                    {this.props.passBackground}
+                    <Header text="Bibliothek" source={this.props.passImage}/>
                 </View>
             
                 <View style={styles.middleView}>

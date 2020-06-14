@@ -49,13 +49,14 @@ export class Results extends Component {
     }
 
     displayHome = () => {
-        if (this.props.passHome == null)
+        if (this.props.passHome.shelves.size < 1) {
+            alert(this.props.homeIcon);
             return (
                 <Text style={styles.preHome}>
                     {this.props.homeIcon}
                 </Text>
             )
-        else 
+        } else 
             return (
                 <View>
                     {this.displayShelves(this.props.passHome)}

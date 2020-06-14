@@ -7,10 +7,7 @@ import {
     Dimensions,
     TouchableOpacity
 } from 'react-native';
-
-import {
-    Header
-} from '../components/SharedComponents';
+import { Header } from '../components/SharedComponents';
 
 export default class LibraryTab extends Component {
     constructor(props) {
@@ -28,7 +25,7 @@ export default class LibraryTab extends Component {
         return (
             <>
                 <View style={styles.headerPicture}>
-                    {this.props.passBackground}
+                    <Header text="Einstellungen" source={this.props.passImage}/>
                 </View>
             
                 <TouchableOpacity style={styles.middleView} onPress={() => this.props.navigation.navigate("Artist")}>
