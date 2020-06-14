@@ -179,30 +179,33 @@ export function ArtistView({ route, navigation }) {
                     </View>
                 </View>
             </ScrollView>
-            <ImageBackground style={styles.headerPicture}>
-                <View style={styles.headerRowContainer}>
-                    <View style={styles.headerArtistContainer}>
-                        <Text style={styles.artistName}>Tristam</Text>
-                        <TouchableOpacity>
-                            <Text style={styles.subscribeArtist}>ABONNIEREN 271.000</Text>
-                        </TouchableOpacity>
-
-                        <View style={styles.headerButtonView}>
-                            <TouchableOpacity style={styles.headerButton}>
-                                <Text style={styles.headerButtonText}>ZUFALLSMIX</Text>
-                            </TouchableOpacity>
-                            <TouchableOpacity style={styles.headerButton}>
-                                <Text style={styles.headerButtonText}>RADIO</Text>
-                            </TouchableOpacity>
-                            <TouchableOpacity style={styles.headerButton}>
-                                <Text style={styles.headerButtonText}>TEILEN</Text>
+            <ImageBackground style={styles.headerContainer}>
+                <View style={styles.headerCenterContainer}>
+                    <View style={styles.headerTopRow}>
+                        <View style={styles.headerTopLeftPadding}/>
+                        <View style={styles.headerArtistColumn}>
+                            <Text style={styles.artistName}>Tristam</Text>
+                            <TouchableOpacity>
+                                <Text style={styles.subscribeArtist}>ABONNIEREN 271.000</Text>
                             </TouchableOpacity>
                         </View>
+                        <TouchableOpacity style={styles.closeButton}
+                                          onPress={() => {navigation.pop()}}>
+                            <Text style={[styles.headerButtonText, styles.closeButtonText]}>X</Text>
+                        </TouchableOpacity>
                     </View>
-                    <TouchableOpacity style={styles.closeButton}
-                                      onPress={() => {navigation.pop()}}>
-                        <Text style={[styles.headerButtonText, styles.closeButtonText]}>X</Text>
-                    </TouchableOpacity>
+
+                    <View style={styles.headerButtonView}>
+                        <TouchableOpacity style={styles.headerButton}>
+                            <Text style={styles.headerButtonText}>WIEDERGEBEN</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity style={styles.headerButton}>
+                            <Text style={styles.headerButtonText}>ZUR MEDIATHEK</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity style={styles.headerButton}>
+                            <Text style={styles.headerButtonText}>TEILEN</Text>
+                        </TouchableOpacity>
+                    </View>
                 </View>
             </ImageBackground>
         </>
@@ -225,8 +228,23 @@ const styles = StyleSheet.create({
         paddingRight: '10%',
     },
 
-    headerRowContainer: {
+    headerTopRow: {
         flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        paddingTop: 10,
+        paddingLeft: 5,
+        paddingRight: 5,
+    },
+
+    headerTopLeftPadding: {
+        flexGrow: 1
+    },
+
+    headerArtistColumn: {
+        paddingRight: 40,
+        alignSelf: 'flex-end',
+        alignItems: 'flex-end',
     },
 
     closeButton: {
@@ -258,6 +276,18 @@ const styles = StyleSheet.create({
         paddingRight: 5,
         paddingLeft: 5,
         borderRadius: 5,
+    },
+
+    headerContainer: {
+        backgroundColor: 'gray',
+        width: '100%',
+        height: 130,
+        alignSelf: 'flex-end',
+        justifyContent: 'space-around',
+    },
+
+    headerCenterContainer: {
+        alignSelf: 'center',
     },
 
     headerButtonView: {
