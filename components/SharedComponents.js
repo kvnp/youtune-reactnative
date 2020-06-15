@@ -65,25 +65,22 @@ export class Header extends Component {
             if (HeaderDb.hasOwnProperty(url)) {
                 let barStyle = HeaderDb[url] ? "dark-content" : "light-content";
                 let headerColor = HeaderDb[url] ? "gray" : "white";
+                StatusBar.setBarStyle(barStyle, true);
 
                 this.setState({
                     barStyle: barStyle,
                     headerColor: headerColor
                 });
-
-                StatusBar.setBarStyle(this.state.barStyle, true);
             } else {
                 this.setState({
                     barStyle: "light-content",
                     headerColor: "white"
                 });
 
-                if (typeof url == "string")
-                    StatusBar.setBarStyle(this.state.barStyle, true);
-                else if (typeof url == "number")
-                    StatusBar.setBarStyle(this.state.barStyle, true);
+                StatusBar.setBarStyle("light-content", true);
             }
         }
+
     }
 
     render() {

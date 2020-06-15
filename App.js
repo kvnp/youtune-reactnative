@@ -60,7 +60,7 @@ export default class App extends Component {
     getBottomTabScreens = ({ navigation }) => {
         const Tab = createBottomTabNavigator();
         return (
-            <Tab.Navigator>
+            <Tab.Navigator lazy={false}>
                 <Tab.Screen name="Home"
                             options={{ tabBarIcon: ({ color, size }) => <MaterialCommunityIcons name="home" color={color} size={size} /> }}>
                     {() => <HomeTab setImage={this.setImage} navigation={navigation}/>}
