@@ -13,60 +13,40 @@ import {
     Results
 } from '../components/HomeComponents';
 
-import * as Tube from '../modules/Tube';
 import { Header } from '../components/SharedComponents';
 
 export default class HomeTab extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            icon: '🏠',
-            home: {
-                shelves: [],
-                background: null
-            }
-        };
+            loading: false
+        }
     }
 
-    refresh = () => {
-        this.setState({icon: '|', home: {shelves: []}});
-        let loader = setInterval(() => {
-            switch (this.state.icon) {
-                case '|' :
-                    return this.setState({icon: '/'});
-                case '/' :
-                    return this.setState({icon: '-'});
-                case '-' :
-                    return this.setState({icon: '\\'});
-                case '\\':
-                    return this.setState({icon: '|'});
-            }
-        }, 300);
+    startLoading = () => {
+        if (this.state.loading == false)
+            this.setState({loading: true});
+    }
 
-        Tube.fetchHome().then((result) => {
-            clearInterval(loader);
-            this.setState({icon: '🏠'});
-            if (result.background != undefined) {
-                this.props.setImage(result.background);
-                this.setState({home: result});
-            }
-        });
+    setImage = (source) => {
+        this.props.setImage(source);
+        this.setState({loading: false});
     }
 
     render() {
         return (
             <>
                 <View style={styles.headerPicture}>
-                    <Header text="Home" source={this.state.home.background}/>
+                    <Header text="Home" source={this.props.passImage}/>
                 </View>
 
                 <View style={styles.middleView}>
                     <ScrollView style={styles.homeView}>
-                        <Results passHome={this.state.home} homeIcon={this.state.icon} navigation={this.props.navigation}/>
+                        <Results setImage={this.setImage} load={this.state.loading} navigation={this.props.navigation}/>
                     </ScrollView>
                 </View>
 
-                <TouchableOpacity onPress={this.refresh} style={styles.refreshButton}>
+                <TouchableOpacity onPress={this.startLoading} style={styles.refreshButton}>
                     <Text>Aktualisieren</Text>
                 </TouchableOpacity>
             </>

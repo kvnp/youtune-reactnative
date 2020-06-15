@@ -10,25 +10,66 @@ import {
 
 import { Playlist } from './SharedComponents';
 
+import { fetchHome } from '../modules/Tube';
+
 export class Results extends Component {
     constructor(props){
         super(props);
+        this.state = {
+            icon: '🏠',
+            home: null,
+            started: false,
+        }
+    }
+
+    componentDidUpdate() {
+        if (this.props.load && !this.state.started) {
+            alert("los gehts");
+            this.setState({started: true});
+            this.startRefresh();
+        }
+    }
+    
+    startRefresh = () => {
+        this.setState({icon: '|'});
+
+        let loader = setInterval(() => {
+            switch (this.state.icon) {
+                case '|' :
+                    return this.setState({icon: '/'});
+                case '/' :
+                    return this.setState({icon: '-'});
+                case '-' :
+                    return this.setState({icon: '\\'});
+                case '\\':
+                    return this.setState({icon: '|'});
+            }
+        }, 300);
+
+        fetchHome().then((result) => {
+            clearInterval(loader);
+
+            if (result.background != undefined) {
+                this.props.setImage(result.background);
+                this.setState({home: result});
+            } else this.props.setImage(null);
+
+            this.setState({icon: '🏠', started: false});
+        });
     }
 
     openAlbum = (album) => {
         this.props.navigation.navigate("Playlist", album);
     }
 
-    displayAlbum = (album) => {
-        return (
-            <View style={styles.album}>
-                <Playlist playlist={album} navigation={this.props.navigation}/>
-            </View>
-        );
-    }
-
     displayAlbums = (albums) => {
-        return albums.map(this.displayAlbum);
+        return albums.map(album => {
+            return (
+                <View style={styles.album}>
+                    <Playlist playlist={album} navigation={this.props.navigation}/>
+                </View>
+            );
+        });
     }
 
     displayShelf = (shelf) => {
@@ -49,17 +90,16 @@ export class Results extends Component {
     }
 
     displayHome = () => {
-        if (this.props.passHome.shelves.size < 1) {
-            alert(this.props.homeIcon);
+        if (this.state.home == null) {
             return (
                 <Text style={styles.preHome}>
-                    {this.props.homeIcon}
+                    {this.state.icon}
                 </Text>
             )
         } else 
             return (
                 <View>
-                    {this.displayShelves(this.props.passHome)}
+                    {this.displayShelves(this.state.home)}
                 </View>
             )
     }

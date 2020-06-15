@@ -17,7 +17,6 @@ import { PlayView } from "./views/PlayView";
 import { PlaylistView } from "./views/PlaylistView";
 import { ArtistView } from "./views/ArtistView";
 import { CreatePlaylistView } from "./views/CreatePlaylistView";
-import { Header } from "./components/SharedComponents";
 
 export default class App extends Component {
     constructor(props) {
@@ -28,16 +27,18 @@ export default class App extends Component {
         };
     }
 
+    componentDidMount() {
+        StatusBar.setBarStyle("light-content", true);
+        StatusBar.setTranslucent(true);
+        StatusBar.setBackgroundColor("transparent", true);
+    }
+
     setImage = (url) => {
         this.setState({image: url});
     }
 
     render() {
         const Stack = createStackNavigator();
-        StatusBar.setBarStyle("light-content", true);
-        StatusBar.setTranslucent(true);
-        StatusBar.setBackgroundColor("transparent", true);
-
         return (
             <NavigationContainer>
                 <Stack.Navigator>
@@ -61,7 +62,7 @@ export default class App extends Component {
             <Tab.Navigator>
                 <Tab.Screen name="Home"
                             options={{ tabBarIcon: ({ color, size }) => <MaterialCommunityIcons name="home" color={color} size={size} /> }}>
-                    {() => <HomeTab setImage={this.setImage} navigation={navigation}/>}
+                    {() => <HomeTab passImage={this.state.image} setImage={this.setImage} navigation={navigation}/>}
                 </Tab.Screen>
 
                 <Tab.Screen name="Suche"

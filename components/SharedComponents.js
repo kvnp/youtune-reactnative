@@ -23,22 +23,30 @@ export class Header extends Component {
         super(props);
         this.state = {
             barStyle: "light-content",
-            headerColor: "white"
+            headerColor: "white",
+            source: require("../assets/img/header.jpg")
+        }
+    }
+
+    componentWillReceiveProps() {
+        if (this.props.source != undefined) {
+            this.setImage(this.props.source);
+            this.setHeader(this.props.source);
         }
     }
 
     setImage = (url) => {
         if (url == null) {
-            return require("../assets/img/header.jpg");
+            this.setState({source: require("../assets/img/header.jpg")});
         } else {
             if (HeaderDb.hasOwnProperty(url))
-                return {uri: url};
+                this.setState({source: {uri: url}});
 
             else {
                 if (typeof url == "string")
-                    return {uri: url};
+                    this.setState({source: {uri: url}});
                 else if (typeof url == "number")
-                    return url;
+                    this.setState({source: url});
             }
         }
     }
@@ -75,7 +83,7 @@ export class Header extends Component {
     render() {
         return (
             <ImageBackground imageStyle={styles.imageStyle} style={styles.containerStyle}
-                             source={this.setImage(this.props.source)}>
+                             source={this.state.source}>
                 <Text style={[{color: this.state.headerColor}, styles.textStyle]}>{this.props.text}</Text>
             </ImageBackground>
         )
@@ -84,12 +92,12 @@ export class Header extends Component {
 
 
 export class Playlist extends Component {
-    focusPlaylist = (json) => this.props.navigation.navigate("Playlist", json);
+    viewPlaylist = (json) => this.props.navigation.navigate("Playlist", json);
 
     render() {
         return (
             <View style={styles.playlist}>
-                <TouchableOpacity onPress={() => this.focusPlaylist(this.props.playlist)}>
+                <TouchableOpacity onPress={() => this.viewPlaylist(this.props.playlist)}>
                     <Image style={styles.playlistCover} source={{uri: this.props.playlist.thumbnail}}/>
                 </TouchableOpacity>
                 <Text style={styles.playlistTitle}>{this.props.playlist.title}</Text>
