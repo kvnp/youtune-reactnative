@@ -24,7 +24,6 @@ export class Results extends Component {
 
     componentDidUpdate() {
         if (this.props.load && !this.state.started) {
-            alert("los gehts");
             this.setState({started: true});
             this.startRefresh();
         }
@@ -90,7 +89,7 @@ export class Results extends Component {
     }
 
     displayHome = () => {
-        if (this.state.home == null) {
+        if (this.state.home == null || this.state.started) {
             return (
                 <Text style={styles.preHome}>
                     {this.state.icon}
@@ -106,7 +105,7 @@ export class Results extends Component {
 
     render() {
         return (
-            <ScrollView style={{height: '100%', flex: 1, flexDirection: 'column'}} contentContainerStyle={{ alignItems: 'center' }}>
+            <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContainer}>
                 {this.displayHome()}
             </ScrollView>
         )
@@ -118,6 +117,16 @@ const styles = StyleSheet.create({
         fontSize: 70,
         marginTop: (Dimensions.get("screen").height / 2) - 300,
         alignSelf: 'center'
+    },
+
+    scrollView: {
+        height: '100%',
+        flex: 1,
+        flexDirection: 'column'
+    },
+    
+    scrollContainer: {
+        alignItems: 'center'
     },
 
     homeText: {
