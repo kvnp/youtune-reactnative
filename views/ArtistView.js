@@ -87,7 +87,7 @@ export function ArtistView({ route, navigation }) {
                             <View style={styles.topicTextCollection}>
                                 <Text style={styles.topicText}>Alben</Text>
                             </View>
-                            <ScrollView horizontal={true} style={styles.playlistCollection} contentContainerStyle={styles.playlistCollectionContainer}>
+                            <ScrollView style={styles.playlistCollection} contentContainerStyle={styles.playlistCollectionContainer} horizontal={true} showsHorizontalScrollIndicator={false}>
                                 <View style={styles.playlistContainer}>
                                     <Playlist  navigation={navigation} playlist={{title: "Colors", subtitle: "EP - 2017"}}/>
                                 </View>
@@ -117,7 +117,7 @@ export function ArtistView({ route, navigation }) {
                                 <View style={styles.topicTextCollection}>
                                     <Text style={styles.topicText}>Videos</Text>
                                 </View>
-                                <ScrollView horizontal={true} style={styles.playlistCollection} contentContainerStyle={styles.playlistCollectionContainer}>
+                                <ScrollView style={styles.playlistCollection} contentContainerStyle={styles.playlistCollectionContainer} horizontal={true} showsHorizontalScrollIndicator={false}>
                                     <View style={styles.playlistContainer}>
                                         <Playlist navigation={navigation} playlist={{title: "Colors", subtitle: "EP - 2017"}}/>
                                     </View>
@@ -149,7 +149,7 @@ export function ArtistView({ route, navigation }) {
                                 <View style={styles.topicTextCollection}>
                                     <Text style={styles.topicText}>Das könnte Fans auch gefallen</Text>
                                 </View>
-                                <ScrollView horizontal={true} style={styles.playlistCollection} contentContainerStyle={styles.playlistCollectionContainer}>
+                                <ScrollView style={styles.playlistCollection} contentContainerStyle={styles.playlistCollectionContainer} horizontal={true} showsHorizontalScrollIndicator={false}>
                                     <View style={styles.playlistContainer}>
                                         <Playlist navigation={navigation} playlist={{title: "Colors", subtitle: "EP - 2017"}}/>
                                     </View>

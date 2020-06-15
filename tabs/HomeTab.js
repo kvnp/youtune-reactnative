@@ -36,11 +36,8 @@ export default class HomeTab extends Component {
     render() {
         return (
             <>
-                <View style={styles.headerPicture}>
-                    <Header text="Home" source={this.state.image}/>
-                </View>
-
-                <Results  style={styles.homeView} setImage={this.setImage} load={this.state.loading} navigation={this.props.navigation}/>
+                <Header style={styles.headerPicture} text="Home" source={this.state.image}/>
+                <Results style={styles.homeView} setImage={this.setImage} load={this.state.loading} navigation={this.props.navigation}/>
 
                 <TouchableOpacity onPress={this.startLoading} style={styles.refreshButton}>
                     <Text>Aktualisieren</Text>

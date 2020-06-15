@@ -85,10 +85,11 @@ export class Header extends Component {
 
     render() {
         return (
-            <ImageBackground imageStyle={styles.imageStyle} style={styles.containerStyle}
-                             source={this.state.source}>
-                <Text style={[{color: this.state.headerColor}, styles.textStyle]}>{this.props.text}</Text>
-            </ImageBackground>
+                <ImageBackground imageStyle={styles.imageStyle}
+                                 style={[styles.containerStyle, this.props.style]}
+                                 source={this.state.source}>
+                    <Text style={[{color: this.state.headerColor}, styles.textStyle]}>{this.props.text}</Text>
+                </ImageBackground>
         )
     }
 }
@@ -99,7 +100,7 @@ export class Playlist extends Component {
 
     render() {
         return (
-            <View style={styles.playlist}>
+            <View style={[this.props.style, styles.playlist]}>
                 <TouchableOpacity onPress={() => this.viewPlaylist(this.props.playlist)}>
                     <Image style={styles.playlistCover} source={{uri: this.props.playlist.thumbnail}}/>
                 </TouchableOpacity>
@@ -117,8 +118,6 @@ const styles = StyleSheet.create({
     },
 
     containerStyle: {
-        flex: 1,
-        resizeMode: 'cover',
         alignItems: 'center',
         justifyContent: 'center'
     },
@@ -128,27 +127,26 @@ const styles = StyleSheet.create({
         fontWeight: 'bold'
     },
 
-
     playlist: {
-        width: 100,
-        height: 160
+        height: 220,
+        width: 150,
     },
 
     playlistCover: {
         alignItems:'center',
         justifyContent:'center',
-        height: 100,
-        width: 100,
+        height: 150,
+        width: 150,
         backgroundColor: 'gray'
     },
 
     playlistTitle: {
         paddingTop: 5,
-        fontSize: 10,
+        fontSize: 15,
         fontWeight:'bold'
     },
 
     playlistDesc: {
-        fontSize: 10,
+        fontSize: 15,
     },
 });

@@ -62,13 +62,7 @@ export class Results extends Component {
     }
 
     displayAlbums = (albums) => {
-        return albums.map(album => {
-            return (
-                <View style={styles.album}>
-                    <Playlist playlist={album} navigation={this.props.navigation}/>
-                </View>
-            );
-        });
+        return albums.map(album => {return <Playlist style={styles.album} playlist={album} navigation={this.props.navigation}/>} );
     }
 
     displayShelf = (shelf) => {
@@ -76,7 +70,7 @@ export class Results extends Component {
             return (
                 <>
                     <Text style={styles.homeText}>{shelf.title}</Text>
-                    <ScrollView style={styles.albumCollection} horizontal={true}>
+                    <ScrollView style={styles.albumCollection} horizontal={true} showsHorizontalScrollIndicator={false}>
                         {this.displayAlbums(shelf.albums)}
                     </ScrollView>
                 </>
@@ -105,7 +99,7 @@ export class Results extends Component {
 
     render() {
         return (
-            <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContainer} showsVerticalScrollIndicator={false} showsHorizontalScrollIndicator={false}>
+            <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContainer}>
                 {this.displayHome()}
             </ScrollView>
         )
@@ -118,35 +112,32 @@ const styles = StyleSheet.create({
     },
 
     scrollView: {
-        height: '100%',
         flexGrow: 1,
         flexDirection: 'column'
     },
     
     scrollContainer: {
-        alignItems: 'center',
         flexGrow: 1,
+        alignItems: 'center',
         justifyContent: 'center'
     },
 
     homeText: {
         fontWeight: 'bold',
         paddingLeft: 20,
-        paddingTop: 15,
-        fontSize: 20
+        paddingTop: 20,
+        fontSize: 25
     },
 
     albumCollection: {
-        paddingTop: 20,
+        paddingTop: 10,
         paddingLeft: 20,
         paddingBottom: 5,
         marginBottom: 35
     },
 
     album: {
-        marginRight: 20,
-        width: 100,
-        height: 160
+        marginRight: 20
     },
 
     albumCover: {

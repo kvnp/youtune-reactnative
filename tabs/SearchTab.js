@@ -34,17 +34,9 @@ export default class SearchTab extends Component {
     render() {
         return (
             <>
-                <View style={styles.headerPicture}>
-                    <Header text="Suche" source={this.props.passImage}/>
-                </View>
-
-                <View style={styles.middleView}>
-                    <Results passResults={this.state.results} passIcon={this.state.icon}/>
-                </View>
-
-                <View style={styles.searchBar}>
-                    <SearchBar resultSender={this.resultReceiver} sendIcon={this.iconReceiver}/>
-                </View>
+                <Header style={styles.headerPicture} text="Suche" source={this.props.passImage}/>
+                <Results style={styles.resultView} passResults={this.state.results} passIcon={this.state.icon}/>
+                <SearchBar style={styles.searchBar} resultSender={this.resultReceiver} sendIcon={this.iconReceiver}/>
             </>
         );
     }
@@ -56,11 +48,8 @@ const styles = StyleSheet.create({
         height: 150
     },
 
-    middleView: {
-        position: 'absolute',
-        top: 150,
-        width:'100%',
-        height: (Dimensions.get('window').height) - 305
+    resultView: {
+        paddingBottom: 120
     },
 
     searchBar: {

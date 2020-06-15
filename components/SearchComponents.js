@@ -68,7 +68,7 @@ export class SearchBar extends Component {
 
     render() {
         return (
-            <View style={{backgroundColor: 'white', width: '100%', alignItems:'center'}}>
+            <View style={[styles.searchBox, this.props.style]}>
                 <TextInput style={{marginBottom: 5, width: '80%'}}
                            placeholder="Suchen"
                            onChange={this.setQuery}
@@ -150,7 +150,7 @@ export class Results extends Component {
         return (
             <ScrollView
                 style={styles.scrollView}
-                contentContainerStyle={styles.scrollContainer}>
+                contentContainerStyle={[styles.scrollContainer, this.props.style]}>
                 {this.displayResults()}
             </ScrollView>
         );
@@ -158,14 +158,20 @@ export class Results extends Component {
 }
 
 const styles = StyleSheet.create({
+    searchBox: {
+        backgroundColor: 'white',
+        width: '100%',
+        alignItems: 'center'
+    },
+
     scrollView: {
-        height: '100%',
-        flex: 1,
         flexDirection: 'column'
     },
 
     scrollContainer: {
-        alignItems: 'center'
+        flexGrow: 1,
+        alignItems: 'center',
+        justifyContent: 'center'
     },
 
     resultHeader: {
@@ -176,7 +182,6 @@ const styles = StyleSheet.create({
 
     preResults: {
         fontSize: 70,
-        marginTop: (Dimensions.get("screen").height / 2) - 300,
         alignSelf: 'center'
     },
 

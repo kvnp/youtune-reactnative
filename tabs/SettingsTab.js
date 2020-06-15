@@ -25,10 +25,8 @@ export default class LibraryTab extends Component {
     render() {
         return (
             <>
-                <View style={styles.headerPicture}>
-                    <Header text="Einstellungen" source={this.props.passImage}/>
-                </View>
-            
+                <Header style={styles.headerPicture} text="Einstellungen" source={this.props.passImage}/>
+
                 <TouchableOpacity style={styles.middleView} onPress={() => this.props.navigation.navigate("Artist")}>
                     <Text style={styles.placeholder}>⚙️</Text>
                 </TouchableOpacity>
@@ -45,13 +43,13 @@ const styles = StyleSheet.create({
     },
 
     middleView: {
-        alignContent:'flex-start',
+        flexGrow: 1,
+        alignItems: 'center',
+        justifyContent: 'center',
         width: '100%'
     },
 
     placeholder: {
-        fontSize: 70,
-        marginTop: (Dimensions.get("screen").height / 2) - 300,
-        alignSelf: 'center'
+        fontSize: 70
     },
 });

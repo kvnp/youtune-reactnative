@@ -80,17 +80,13 @@ export default class LibraryTab extends Component {
     render() {
         return (
             <>
-                <View style={styles.headerPicture}>
-                    <Header text="Bibliothek" source={this.props.passImage}/>
-                </View>
+                <Header style={styles.headerPicture} text="Bibliothek" source={this.props.passImage}/>
             
-                <View style={styles.middleView}>
-                    <ScrollView style={styles.playlistCollection} contentContainerStyle={styles.playlistCollectionContainer}>
-                        {this.getUpdatedView()}
-                    </ScrollView>
-                </View>
+                <ScrollView style={styles.playlistCollection} contentContainerStyle={styles.playlistCollectionContainer}>
+                    {this.getUpdatedView()}
+                </ScrollView>
 
-                <ScrollView style={styles.header} horizontal={true}>
+                <ScrollView style={styles.header} horizontal={true} showsHorizontalScrollIndicator={false}>
                     <TouchableOpacity onPress={() => {this.update(0)}} style={this.getStyle(0)}>
                         <Text style={this.getTextStyle(0)}>PLAYLISTS</Text>
                     </TouchableOpacity>
@@ -120,10 +116,10 @@ export default class LibraryTab extends Component {
     getUpdatedView = () => {
         switch (this.state.selection) {
             case 0: return this.getPlaylistView();
-            case 1: return <Text>Alben</Text>;
-            case 2: return <Text>Songs</Text>;
-            case 3: return <Text>Künstler</Text>;
-            case 4: return <Text>Abos</Text>;
+            case 1: return <Text style={{paddingBottom: 50}}>Alben</Text>;
+            case 2: return <Text style={{paddingBottom: 50}}>Songs</Text>;
+            case 3: return <Text style={{paddingBottom: 50}}>Künstler</Text>;
+            case 4: return <Text style={{paddingBottom: 50}}>Abos</Text>;
         }
     }
 
@@ -141,11 +137,6 @@ const styles = StyleSheet.create({
     headerPicture: {
         width: '100%',
         height: 150,
-    },
-
-    middleView: {
-        width: '100%',
-        marginBottom: 190
     },
 
     header: {
@@ -185,10 +176,11 @@ const styles = StyleSheet.create({
 
     playlistCollection: {
         width: '100%',
-        paddingTop: 20,
+        paddingBottom: 20
     },
 
     playlistCollectionContainer: {
+        flexGrow: 1,
         justifyContent: 'center',
         flexDirection: 'row',
         flexWrap: 'wrap-reverse'
