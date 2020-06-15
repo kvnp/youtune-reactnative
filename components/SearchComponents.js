@@ -93,28 +93,75 @@ export class Results extends Component {
     });
 
     displayElement = (element) => {
-        return (
-            <View style={styles.resultView}>
-                <TouchableOpacity onPress={() => {this.startVideo(element.videoId)}}>
-                    <Image style={styles.resultCover} source={{uri: element.thumb}}></Image>
-                </TouchableOpacity>
-                
-                <View style={styles.resultColumnOne}>
-                    <Text numberOfLines={1} style={styles.resultText}>{element.title}</Text>
-                    <Text numberOfLines={1} style={styles.resultText}>{element.interpret}</Text>
-                </View>
-                <View style={styles.resultColumnTwo}>
-                    <Text style={styles.resultText}>{element.type}</Text>
-                    <Text style={styles.resultText}>{element.length}</Text>
-                </View>
+        if (["Song", "Video"].includes(element.type))
+            return (
+                <View style={styles.resultView}>
+                    <TouchableOpacity onPress={() => {this.startVideo(element.videoId)}}>
+                        <Image style={styles.resultCover} source={{uri: element.thumb}}></Image>
+                    </TouchableOpacity>
+                    
+                    <View style={styles.resultColumnOne}>
+                        <Text numberOfLines={1} style={styles.resultText}>{element.title}</Text>
+                        <Text numberOfLines={1} style={styles.resultText}>{element.interpret}</Text>
+                    </View>
+                    <View style={styles.resultColumnTwo}>
+                        <Text style={styles.resultText}>{element.type}</Text>
+                        <Text style={styles.resultText}>{element.length}</Text>
+                    </View>
 
-                <Button
-                    title="▶️"
-                    onPress={() => {
-                        Linking.openURL("https://music.youtube.com/watch?v=" + (element.videoId))
-                    }}/>
-            </View>
-        )
+                    <Button
+                        title="▶️"
+                        onPress={() => {
+                            Linking.openURL("https://music.youtube.com/watch?v=" + (element.videoId))
+                        }}/>
+                </View>
+            )
+        else if (["Playlist"].includes(element.type))
+            return (
+                <View style={styles.resultView}>
+                    <TouchableOpacity onPress={() => {this.startVideo(element.videoId)}}>
+                        <Image style={styles.resultCover} source={{uri: element.thumb}}></Image>
+                    </TouchableOpacity>
+                    
+                    <View style={styles.resultColumnOne}>
+                        <Text numberOfLines={1} style={styles.resultText}>{element.title}</Text>
+                        <Text numberOfLines={1} style={styles.resultText}>{element.subtitle}</Text>
+                    </View>
+                    <View style={styles.resultColumnTwo}>
+                        <Text style={styles.resultText}>{element.type}</Text>
+                        <Text style={styles.resultText}>{element.songsText}</Text>
+                    </View>
+
+                    <Button
+                        title="▶️"
+                        onPress={() => {
+                            Linking.openURL("https://music.youtube.com/playlist?list=" + (element.playlistId))
+                        }}/>
+                </View>
+            )
+        else if (["Single"].includes(element.type))
+            return (
+                <View style={styles.resultView}>
+                    <TouchableOpacity onPress={() => {this.startVideo(element.videoId)}}>
+                        <Image style={styles.resultCover} source={{uri: element.thumb}}></Image>
+                    </TouchableOpacity>
+                    
+                    <View style={styles.resultColumnOne}>
+                        <Text numberOfLines={1} style={styles.resultText}>{element.title}</Text>
+                        <Text numberOfLines={1} style={styles.resultText}>{element.subtitle}</Text>
+                    </View>
+                    <View style={styles.resultColumnTwo}>
+                        <Text style={styles.resultText}>{element.type}</Text>
+                        <Text style={styles.resultText}>{element.year}</Text>
+                    </View>
+
+                    <Button
+                        title="▶️"
+                        onPress={() => {
+                            Linking.openURL("https://music.youtube.com/playlist?list=" + (element.playlistId))
+                        }}/>
+                </View>
+            )
     }
 
     displayElements = (elements) => {

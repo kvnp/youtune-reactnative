@@ -71,6 +71,7 @@ async function getApiKey() {
 
         text = text.slice(text.indexOf("INNERTUBE_API_KEY\":\"")+20);
         global.apikey = text.slice(0, text.indexOf("\""));
+        console.log(global.apikey);
     }
     return global.apikey;
 }
@@ -109,9 +110,9 @@ function digestSearchResults(json) {
 
     let musicshelves = [];
 
-    for (let i = 0; i < json.contents.sectionListRenderer.contents.length; i++) {
-        if (json.contents.sectionListRenderer.contents[i].hasOwnProperty("musicShelfRenderer")) {
-            musicshelves.push(json.contents.sectionListRenderer.contents[i].musicShelfRenderer);
+    for (let x = 0; x < json.contents.sectionListRenderer.contents.length; x++) {
+        if (json.contents.sectionListRenderer.contents[x].hasOwnProperty("musicShelfRenderer")) {
+            musicshelves.push(json.contents.sectionListRenderer.contents[x].musicShelfRenderer);
         }
     }
     final.results = musicshelves.length;
@@ -119,8 +120,10 @@ function digestSearchResults(json) {
     for (let i = 0; i < musicshelves.length; i++) {
         final.topics.push({});
         final.topics[i].topic = musicshelves[i].title.runs[0].text;
+        console.log(final.topics[i].topic = musicshelves[i].title.runs[0].text);
         final.topics[i].elements = [];
         for (let j = 0; j < musicshelves[i].contents.length; j++) {
+            console.log(j + ": " + musicshelves[i].contents[j].musicResponsiveListItemRenderer.flexColumns[1].musicResponsiveListItemFlexColumnRenderer.text.runs[0].text);
             if (musicshelves[i].contents[j].musicResponsiveListItemRenderer.flexColumns[1].musicResponsiveListItemFlexColumnRenderer.text.runs[0].text === "Song") {
                 final.topics[i].elements.push({});
                 final.topics[i].elements[j].type = musicshelves[i].contents[j].musicResponsiveListItemRenderer.flexColumns[1].musicResponsiveListItemFlexColumnRenderer.text.runs[0].text;
@@ -129,7 +132,19 @@ function digestSearchResults(json) {
                 final.topics[i].elements[j].album = musicshelves[i].contents[j].musicResponsiveListItemRenderer.flexColumns[3].musicResponsiveListItemFlexColumnRenderer.text.runs[0].text;
                 final.topics[i].elements[j].length = musicshelves[i].contents[j].musicResponsiveListItemRenderer.flexColumns[4].musicResponsiveListItemFlexColumnRenderer.text.runs[0].text;
                 final.topics[i].elements[j].videoId = musicshelves[i].contents[j].musicResponsiveListItemRenderer.doubleTapCommand.watchEndpoint.videoId;
-                final.topics[i].elements[j].thumb = musicshelves[i].contents[j].musicResponsiveListItemRenderer.thumbnail.musicThumbnailRenderer.thumbnail.thumbnails[0].url;
+                final.topics[i].elements[j].playlistId = musicshelves[i].contents[j].musicResponsiveListItemRenderer.doubleTapCommand.watchEndpoint.playlistId;
+                final.topics[i].elements[j].thumb = musicshelves[i].contents[j].musicResponsiveListItemRenderer.thumbnail.musicThumbnailRenderer.thumbnail.thumbnails[1].url;
+
+            } else if (musicshelves[i].contents[j].musicResponsiveListItemRenderer.flexColumns[1].musicResponsiveListItemFlexColumnRenderer.text.runs[0].text === "Single") {
+                final.topics[i].elements.push({});
+                final.topics[i].elements[j].type = musicshelves[i].contents[j].musicResponsiveListItemRenderer.flexColumns[1].musicResponsiveListItemFlexColumnRenderer.text.runs[0].text;
+                final.topics[i].elements[j].title = musicshelves[i].contents[j].musicResponsiveListItemRenderer.flexColumns[0].musicResponsiveListItemFlexColumnRenderer.text.runs[0].text;
+                final.topics[i].elements[j].interpret = musicshelves[i].contents[j].musicResponsiveListItemRenderer.flexColumns[2].musicResponsiveListItemFlexColumnRenderer.text.runs[0].text;
+                final.topics[i].elements[j].year = musicshelves[i].contents[j].musicResponsiveListItemRenderer.flexColumns[3].musicResponsiveListItemFlexColumnRenderer.text.runs[0].text;
+                final.topics[i].elements[j].playlistId = musicshelves[i].contents[j].musicResponsiveListItemRenderer.doubleTapCommand.watchPlaylistEndpoint.playlistId;
+                //console.log("\n\n" + musicshelves[i].contents[j].musicResponsiveListItemRenderer.thumbnail + "\n\n");
+                final.topics[i].elements[j].thumb = musicshelves[i].contents[j].musicResponsiveListItemRenderer.thumbnail.musicThumbnailRenderer.thumbnail.thumbnails[1].url;
+
             } else if (musicshelves[i].contents[j].musicResponsiveListItemRenderer.flexColumns[1].musicResponsiveListItemFlexColumnRenderer.text.runs[0].text === "Video") {
                 final.topics[i].elements.push({});
                 final.topics[i].elements[j].type = musicshelves[i].contents[j].musicResponsiveListItemRenderer.flexColumns[1].musicResponsiveListItemFlexColumnRenderer.text.runs[0].text;
@@ -138,11 +153,20 @@ function digestSearchResults(json) {
                 final.topics[i].elements[j].views = musicshelves[i].contents[j].musicResponsiveListItemRenderer.flexColumns[3].musicResponsiveListItemFlexColumnRenderer.text.runs[0].text;
                 final.topics[i].elements[j].length = musicshelves[i].contents[j].musicResponsiveListItemRenderer.flexColumns[4].musicResponsiveListItemFlexColumnRenderer.text.runs[0].text
                 final.topics[i].elements[j].videoId = musicshelves[i].contents[j].musicResponsiveListItemRenderer.doubleTapCommand.watchEndpoint.videoId;
-                final.topics[i].elements[j].thumb = musicshelves[i].contents[j].musicResponsiveListItemRenderer.thumbnail.musicThumbnailRenderer.thumbnail.thumbnails[0].url;
+                final.topics[i].elements[j].playlistId = musicshelves[i].contents[j].musicResponsiveListItemRenderer.doubleTapCommand.watchEndpoint.playlistId;
+                final.topics[i].elements[j].thumb = musicshelves[i].contents[j].musicResponsiveListItemRenderer.thumbnail.musicThumbnailRenderer.thumbnail.thumbnails[1].url;
+
+            } else if (musicshelves[i].contents[j].musicResponsiveListItemRenderer.flexColumns[1].musicResponsiveListItemFlexColumnRenderer.text.runs[0].text === "Playlist") {
+                final.topics[i].elements.push({});
+                final.topics[i].elements[j].type = musicshelves[i].contents[j].musicResponsiveListItemRenderer.flexColumns[1].musicResponsiveListItemFlexColumnRenderer.text.runs[0].text;
+                final.topics[i].elements[j].title = musicshelves[i].contents[j].musicResponsiveListItemRenderer.flexColumns[0].musicResponsiveListItemFlexColumnRenderer.text.runs[0].text;
+                final.topics[i].elements[j].subtitle = musicshelves[i].contents[j].musicResponsiveListItemRenderer.flexColumns[2].musicResponsiveListItemFlexColumnRenderer.text.runs[0].text;
+                final.topics[i].elements[j].songsText = musicshelves[i].contents[j].musicResponsiveListItemRenderer.flexColumns[3].musicResponsiveListItemFlexColumnRenderer.text.runs[0].text;
+                final.topics[i].elements[j].playlistId = musicshelves[i].contents[j].musicResponsiveListItemRenderer.doubleTapCommand.watchPlaylistEndpoint.playlistId;
+                final.topics[i].elements[j].thumb = musicshelves[i].contents[j].musicResponsiveListItemRenderer.thumbnail.musicThumbnailRenderer.thumbnail.thumbnails[1].url;
             }
         }
     }
-
     return final;
 }
 
