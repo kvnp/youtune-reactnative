@@ -7,6 +7,7 @@ import {
     Dimensions,
     TouchableOpacity
 } from 'react-native';
+
 import { Header } from '../components/SharedComponents';
 
 export default class LibraryTab extends Component {

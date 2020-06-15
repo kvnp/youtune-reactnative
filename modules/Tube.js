@@ -149,7 +149,7 @@ function digestSearchResults(json) {
 function digestHomeResults(json) {
     let contentList = json.contents.singleColumnBrowseResultsRenderer.tabs[0].tabRenderer.content.sectionListRenderer.contents;
 
-    let final = {background: "", shelves: []};
+    let final = {background: null, shelves: []};
     for (let i = 0; i < contentList.length; i++) {
         let shelf = {title: "", albums: []};
         let shelfRenderer;

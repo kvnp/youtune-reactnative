@@ -37,6 +37,7 @@ export default class App extends Component {
         this.setState({image: url});
     }
 
+    
     render() {
         const Stack = createStackNavigator();
         return (
@@ -62,7 +63,7 @@ export default class App extends Component {
             <Tab.Navigator>
                 <Tab.Screen name="Home"
                             options={{ tabBarIcon: ({ color, size }) => <MaterialCommunityIcons name="home" color={color} size={size} /> }}>
-                    {() => <HomeTab passImage={this.state.image} setImage={this.setImage} navigation={navigation}/>}
+                    {() => <HomeTab setImage={this.setImage} navigation={navigation}/>}
                 </Tab.Screen>
 
                 <Tab.Screen name="Suche"

@@ -28,12 +28,18 @@ export class Header extends Component {
         }
     }
 
-    componentWillReceiveProps() {
+    componentDidUpdate(previousProps, previousState) {
         if (this.props.source != undefined) {
-            this.setImage(this.props.source);
-            this.setHeader(this.props.source);
+            if (this.props.source != previousProps.source) {
+                this.setImage(this.props.source);
+                this.setHeader(this.props.source);
+            }
         }
     }
+
+    /*static getDerivedStateFromProps(props, state) {
+        alert(JSON.stringify(props));
+    }*/
 
     setImage = (url) => {
         if (url == null) {

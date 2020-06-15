@@ -35,14 +35,14 @@ export function CreatePlaylistView({ route, navigation }) {
                                    placeholder="Beschreibung"/>
                     </View>
                     <TouchableOpacity style={styles.closeButton}
-                                      onPress={() => {navigation.pop()}}>
+                                      onPress={() => navigation.pop() }>
                         <Text style={[styles.headerButtonText, styles.closeButtonText]}>X</Text>
                     </TouchableOpacity>
                 </View>
 
                 <View style={styles.headerButtonView}>
                     <TouchableOpacity style={styles.headerButton}
-                                      onPress={() => {navigation.pop()}}>
+                                      onPress={() => navigation.pop() }>
                         <Text style={styles.headerButtonText}>ABBRECHEN</Text>
                     </TouchableOpacity>
                     <TouchableOpacity style={styles.headerButton}

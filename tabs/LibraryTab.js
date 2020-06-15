@@ -8,7 +8,8 @@ import {
 } from 'react-native';
 
 import {
-    Playlist, Header
+    Header,
+    Playlist
 } from '../components/SharedComponents';
 
 import { ScrollView } from 'react-native-gesture-handler';

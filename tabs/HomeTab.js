@@ -19,7 +19,8 @@ export default class HomeTab extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            loading: false
+            loading: false,
+            image: null,
         }
     }
 
@@ -30,14 +31,14 @@ export default class HomeTab extends Component {
 
     setImage = (source) => {
         this.props.setImage(source);
-        this.setState({loading: false});
+        this.setState({loading: false, image: source});
     }
 
     render() {
         return (
             <>
                 <View style={styles.headerPicture}>
-                    <Header text="Home" source={this.props.passImage}/>
+                    <Header text="Home" source={this.state.image}/>
                 </View>
 
                 <View style={styles.middleView}>
