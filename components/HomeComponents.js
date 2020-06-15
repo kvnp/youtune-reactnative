@@ -105,7 +105,7 @@ export class Results extends Component {
 
     render() {
         return (
-            <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContainer}>
+            <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContainer} showsVerticalScrollIndicator={false} showsHorizontalScrollIndicator={false}>
                 {this.displayHome()}
             </ScrollView>
         )
@@ -115,18 +115,18 @@ export class Results extends Component {
 const styles = StyleSheet.create({
     preHome: {
         fontSize: 70,
-        marginTop: (Dimensions.get("screen").height / 2) - 300,
-        alignSelf: 'center'
     },
 
     scrollView: {
         height: '100%',
-        flex: 1,
+        flexGrow: 1,
         flexDirection: 'column'
     },
     
     scrollContainer: {
-        alignItems: 'center'
+        alignItems: 'center',
+        flexGrow: 1,
+        justifyContent: 'center'
     },
 
     homeText: {

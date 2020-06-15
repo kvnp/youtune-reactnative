@@ -2,7 +2,6 @@ import React, {Component} from 'react';
 
 import {
     View,
-    Dimensions,
     Text,
     StyleSheet,
     ScrollView,
@@ -41,11 +40,7 @@ export default class HomeTab extends Component {
                     <Header text="Home" source={this.state.image}/>
                 </View>
 
-                <View style={styles.middleView}>
-                    <ScrollView style={styles.homeView}>
-                        <Results setImage={this.setImage} load={this.state.loading} navigation={this.props.navigation}/>
-                    </ScrollView>
-                </View>
+                <Results  style={styles.homeView} setImage={this.setImage} load={this.state.loading} navigation={this.props.navigation}/>
 
                 <TouchableOpacity onPress={this.startLoading} style={styles.refreshButton}>
                     <Text>Aktualisieren</Text>
@@ -57,37 +52,27 @@ export default class HomeTab extends Component {
 
 const styles = StyleSheet.create({
     headerPicture: {
-        position: 'absolute',
-        top: 0,
         width: '100%',
         height: 150,
-        flex: 1,
         flexDirection: 'column'
     },
 
-    middleView: {
-        position: 'absolute',
-        top: 150,
-        width: '100%',
-        height: (Dimensions.get('window').height) - 200
+    homeView: {
+        flexGrow: 1,
+        width: '100%'
     },
 
     refreshButton: {
         position: 'absolute',
         bottom: 5,
-        paddingRight: 10,
-        paddingLeft: 10,
+        paddingRight: 15,
+        paddingLeft: 15,
         paddingBottom: 5,
         paddingTop: 5,
         borderRadius: 20,
         alignSelf: 'center',
-        alignItems: 'center',
         justifyContent: 'center',
         backgroundColor: 'white'
-    },
-
-    homeView: {
-        paddingBottom:0
     },
 
     homeText: {
@@ -119,7 +104,7 @@ const styles = StyleSheet.create({
     albumTitle: {
         paddingTop: 5,
         fontSize: 10,
-        fontWeight:'bold'
+        fontWeight: 'bold'
     },
 
     albumDesc: {
