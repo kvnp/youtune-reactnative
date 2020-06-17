@@ -48,8 +48,7 @@ export default class HomeTab extends Component {
 const styles = StyleSheet.create({
     headerPicture: {
         width: '100%',
-        height: 150,
-        flexDirection: 'column'
+        height: '20%'
     },
 
     homeView: {

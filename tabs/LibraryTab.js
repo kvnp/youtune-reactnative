@@ -4,15 +4,14 @@ import {
     View,
     Text,
     StyleSheet,
-    TouchableOpacity
+    TouchableOpacity,
+    ScrollView
 } from 'react-native';
 
 import {
     Header,
     Playlist
 } from '../components/SharedComponents';
-
-import { ScrollView } from 'react-native-gesture-handler';
 
 export default class LibraryTab extends Component {
     constructor(props) {
@@ -44,11 +43,11 @@ export default class LibraryTab extends Component {
     getAddPlaylist = () => {
         return (
             <View style={styles.playlist}>
-                <TouchableOpacity onPress={() => {this.openCreatePlaylist()}} style={styles.playlistCover}>
+                <TouchableOpacity onPress={() => {this.openCreatePlaylist()}}
+                                  style={styles.playlistCover}>
                     <Text style={styles.newPlaylist}>+</Text>
                 </TouchableOpacity>
                 <Text style={styles.playlistTitle}>Neue Playlist</Text>
-                <Text style={styles.playlistDesc}></Text>
             </View>
         );
     }
@@ -136,7 +135,7 @@ export default class LibraryTab extends Component {
 const styles = StyleSheet.create({
     headerPicture: {
         width: '100%',
-        height: 150,
+        height: '20%'
     },
 
     header: {
@@ -175,8 +174,7 @@ const styles = StyleSheet.create({
     },
 
     playlistCollection: {
-        width: '100%',
-        paddingBottom: 20
+        width: '100%'
     },
 
     playlistCollectionContainer: {
@@ -187,23 +185,27 @@ const styles = StyleSheet.create({
     },
 
     playlist: {
-        margin: 10,
+        alignItems: 'center',
+        marginTop: 140,
+        marginLeft: 30,
+        marginRight: 30,
         width: 100,
-        height: 160
+        height: 100
     },
 
     playlistCover: {
         alignItems:'center',
         justifyContent:'center',
-        height: 100,
-        width: 100,
+        height: 150,
+        width: 150,
         backgroundColor: 'gray'
     },
 
     playlistTitle: {
         paddingTop: 5,
-        fontSize: 10,
-        fontWeight:'bold'
+        fontSize: 15,
+        fontWeight:'bold',
+        width: '150%',
     },
 
     playlistDesc: {
@@ -212,7 +214,7 @@ const styles = StyleSheet.create({
 
     newPlaylist: {
         color: 'white',
-        fontSize: 50,
+        fontSize: 80,
     },
 
     addPlaylist: {

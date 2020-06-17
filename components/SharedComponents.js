@@ -100,7 +100,7 @@ export class Playlist extends Component {
 
     render() {
         return (
-            <View style={[this.props.style, styles.playlist]}>
+            <View style={[this.props.style, styles.playlistContainer]}>
                 <TouchableOpacity onPress={() => this.viewPlaylist(this.props.playlist)}>
                     <Image style={styles.playlistCover} source={{uri: this.props.playlist.thumbnail}}/>
                 </TouchableOpacity>
@@ -127,8 +127,8 @@ const styles = StyleSheet.create({
         fontWeight: 'bold'
     },
 
-    playlist: {
-        height: 150,
+    playlistContainer: {
+        height: 230,
         width: 150,
     },
 
@@ -142,11 +142,11 @@ const styles = StyleSheet.create({
 
     playlistTitle: {
         paddingTop: 5,
-        fontSize: 15,
+        fontSize: 14,
         fontWeight:'bold'
     },
 
     playlistDesc: {
-        fontSize: 15,
+        fontSize: 14,
     },
 });

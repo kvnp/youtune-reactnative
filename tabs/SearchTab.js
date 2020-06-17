@@ -41,7 +41,7 @@ export default class SearchTab extends Component {
 const styles = StyleSheet.create({
     headerPicture: {
         width: '100%',
-        height: 150
+        height: '20%'
     },
 
     resultView: {
