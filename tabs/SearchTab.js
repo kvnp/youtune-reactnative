@@ -1,10 +1,6 @@
 import React, {Component} from 'react';
 
-import {
-    View,
-    StyleSheet,
-    Dimensions
-} from 'react-native';
+import { StyleSheet } from 'react-native';
 
 import {
     Results,

@@ -10,11 +10,13 @@ import {
     ScrollView,
     Linking,
     Keyboard,
-    Dimensions,
     TouchableOpacity
 } from "react-native";
 
-import * as Tube from '../modules/Tube';
+import {
+    fetchResults,
+    fetchVideo
+} from '../modules/Tube';
 
 export class SearchBar extends Component {
     constructor(props) {
@@ -58,7 +60,7 @@ export class SearchBar extends Component {
             }, 300);
 
             this.setState({buttonDisabled: true});
-            Tube.fetchResults(this.state.query)
+            fetchResults(this.state.query)
                 .then(data => { clearInterval(loader);
                                 this.props.sendIcon('🔎');
                                 this.props.resultSender(data);
@@ -85,7 +87,7 @@ export class SearchBar extends Component {
 }
 
 export class Results extends Component {
-    startVideo = (id) => Tube.fetchVideo(id).then((data) => {
+    startVideo = (id) => fetchVideo(id).then((data) => {
         /*for (let i = 0; i < data.length; i++) {
             console.log(decodeURIComponent(data[i].signatureCipher.substring(data[i].signatureCipher.indexOf("url=") + 4)));
             new Player(decodeURIComponent(data[i].signatureCipher.substring(data[i].signatureCipher.indexOf("url=") + 4)));
@@ -139,7 +141,7 @@ export class Results extends Component {
                         }}/>
                 </View>
             )
-        else if (["Single"].includes(element.type))
+        else if ("Single" == element.type)
             return (
                 <View style={styles.resultView}>
                     <TouchableOpacity onPress={() => {this.startVideo(element.videoId)}}>
@@ -153,6 +155,28 @@ export class Results extends Component {
                     <View style={styles.resultColumnTwo}>
                         <Text style={styles.resultText}>{element.type}</Text>
                         <Text style={styles.resultText}>{element.year}</Text>
+                    </View>
+
+                    <Button
+                        title="▶️"
+                        onPress={() => {
+                            Linking.openURL("https://music.youtube.com/playlist?list=" + (element.playlistId))
+                        }}/>
+                </View>
+            )
+        else if ("Artist" == element.type)
+            return (
+                <View style={styles.resultView}>
+                    <TouchableOpacity onPress={() => {this.startVideo(element.videoId)}}>
+                        <Image style={styles.resultCover} source={{uri: element.thumb}}></Image>
+                    </TouchableOpacity>
+                    
+                    <View style={styles.resultColumnOne}>
+                        <Text numberOfLines={1} style={styles.resultText}>{element.title}</Text>
+                    </View>
+                    <View style={styles.resultColumnTwo}>
+                        <Text style={styles.resultText}>{element.type}</Text>
+                        <Text style={styles.resultText}>{element.subsText}</Text>
                     </View>
 
                     <Button

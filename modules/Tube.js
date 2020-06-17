@@ -34,7 +34,7 @@ export async function fetchHome() {
             }
         },
         "browseId": "FEmusic_home"
-    }
+    };
 
     const headers = {
         'Referer': "https://music.youtube.com/",
@@ -95,11 +95,11 @@ function digestSearchResults(json) {
                 return final;
             }
         } else if (json.contents.sectionListRenderer.contents[0].itemSectionRenderer.contents[0].hasOwnProperty("didYouMeanRenderer")) {
-            for (let i = 0; i < json.contents.sectionListRenderer.contents[0].itemSectionRenderer.contents[0].didYouMeanRenderer.correctedQuery.runs.length; i++) {
-                let text = json.contents.sectionListRenderer.contents[0].itemSectionRenderer.contents[0].didYouMeanRenderer.correctedQuery.runs[i].text;
+            for (let q = 0; q < json.contents.sectionListRenderer.contents[0].itemSectionRenderer.contents[0].didYouMeanRenderer.correctedQuery.runs.length; q++) {
+                let text = json.contents.sectionListRenderer.contents[0].itemSectionRenderer.contents[0].didYouMeanRenderer.correctedQuery.runs[q].text;
 
-                if (json.contents.sectionListRenderer.contents[0].itemSectionRenderer.contents[0].didYouMeanRenderer.correctedQuery.runs[i].hasOwnProperty("italics")) {
-                    let italics = json.contents.sectionListRenderer.contents[0].itemSectionRenderer.contents[0].didYouMeanRenderer.correctedQuery.runs[i].italics;
+                if (json.contents.sectionListRenderer.contents[0].itemSectionRenderer.contents[0].didYouMeanRenderer.correctedQuery.runs[q].hasOwnProperty("italics")) {
+                    let italics = json.contents.sectionListRenderer.contents[0].itemSectionRenderer.contents[0].didYouMeanRenderer.correctedQuery.runs[q].italics;
                     final.suggestion.push({text: text, italics: italics});
                 } else {
                     final.suggestion.push({text: text, italics: false});
@@ -123,48 +123,45 @@ function digestSearchResults(json) {
         console.log(final.topics[i].topic = musicshelves[i].title.runs[0].text);
         final.topics[i].elements = [];
         for (let j = 0; j < musicshelves[i].contents.length; j++) {
-            console.log(j + ": " + musicshelves[i].contents[j].musicResponsiveListItemRenderer.flexColumns[1].musicResponsiveListItemFlexColumnRenderer.text.runs[0].text);
-            if (musicshelves[i].contents[j].musicResponsiveListItemRenderer.flexColumns[1].musicResponsiveListItemFlexColumnRenderer.text.runs[0].text === "Song") {
-                final.topics[i].elements.push({});
-                final.topics[i].elements[j].type = musicshelves[i].contents[j].musicResponsiveListItemRenderer.flexColumns[1].musicResponsiveListItemFlexColumnRenderer.text.runs[0].text;
-                final.topics[i].elements[j].title = musicshelves[i].contents[j].musicResponsiveListItemRenderer.flexColumns[0].musicResponsiveListItemFlexColumnRenderer.text.runs[0].text;
-                final.topics[i].elements[j].interpret = musicshelves[i].contents[j].musicResponsiveListItemRenderer.flexColumns[2].musicResponsiveListItemFlexColumnRenderer.text.runs[0].text;
-                final.topics[i].elements[j].album = musicshelves[i].contents[j].musicResponsiveListItemRenderer.flexColumns[3].musicResponsiveListItemFlexColumnRenderer.text.runs[0].text;
-                final.topics[i].elements[j].length = musicshelves[i].contents[j].musicResponsiveListItemRenderer.flexColumns[4].musicResponsiveListItemFlexColumnRenderer.text.runs[0].text;
-                final.topics[i].elements[j].videoId = musicshelves[i].contents[j].musicResponsiveListItemRenderer.doubleTapCommand.watchEndpoint.videoId;
-                final.topics[i].elements[j].playlistId = musicshelves[i].contents[j].musicResponsiveListItemRenderer.doubleTapCommand.watchEndpoint.playlistId;
-                final.topics[i].elements[j].thumb = musicshelves[i].contents[j].musicResponsiveListItemRenderer.thumbnail.musicThumbnailRenderer.thumbnail.thumbnails[1].url;
-
-            } else if (musicshelves[i].contents[j].musicResponsiveListItemRenderer.flexColumns[1].musicResponsiveListItemFlexColumnRenderer.text.runs[0].text === "Single") {
-                final.topics[i].elements.push({});
-                final.topics[i].elements[j].type = musicshelves[i].contents[j].musicResponsiveListItemRenderer.flexColumns[1].musicResponsiveListItemFlexColumnRenderer.text.runs[0].text;
-                final.topics[i].elements[j].title = musicshelves[i].contents[j].musicResponsiveListItemRenderer.flexColumns[0].musicResponsiveListItemFlexColumnRenderer.text.runs[0].text;
+            let topic = musicshelves[i].contents[j].musicResponsiveListItemRenderer.flexColumns[1].musicResponsiveListItemFlexColumnRenderer.text.runs[0].text;
+            let title = musicshelves[i].contents[j].musicResponsiveListItemRenderer.flexColumns[0].musicResponsiveListItemFlexColumnRenderer.text.runs[0].text;
+            
+            let thumbArrayLength = musicshelves[i].contents[j].musicResponsiveListItemRenderer.thumbnail.musicThumbnailRenderer.thumbnail.thumbnails.length
+            let thumb = musicshelves[i].contents[j].musicResponsiveListItemRenderer.thumbnail.musicThumbnailRenderer.thumbnail.thumbnails[thumbArrayLength - 1].url;
+            
+            console.log(j + ": " + topic);
+            final.topics[i].elements.push({});
+            final.topics[i].elements[j].type = topic;
+            final.topics[i].elements[j].title = title;
+            final.topics[i].elements[j].thumb = thumb;
+            
+            if (topic === "Playlist") {
+                final.topics[i].elements[j].subtitle = musicshelves[i].contents[j].musicResponsiveListItemRenderer.flexColumns[2].musicResponsiveListItemFlexColumnRenderer.text.runs[0].text;
+                final.topics[i].elements[j].songsText = musicshelves[i].contents[j].musicResponsiveListItemRenderer.flexColumns[3].musicResponsiveListItemFlexColumnRenderer.text.runs[0].text;
+                final.topics[i].elements[j].playlistId = musicshelves[i].contents[j].musicResponsiveListItemRenderer.doubleTapCommand.watchPlaylistEndpoint.playlistId;
+            
+            } else if (topic === "Single") {
                 final.topics[i].elements[j].interpret = musicshelves[i].contents[j].musicResponsiveListItemRenderer.flexColumns[2].musicResponsiveListItemFlexColumnRenderer.text.runs[0].text;
                 final.topics[i].elements[j].year = musicshelves[i].contents[j].musicResponsiveListItemRenderer.flexColumns[3].musicResponsiveListItemFlexColumnRenderer.text.runs[0].text;
                 final.topics[i].elements[j].playlistId = musicshelves[i].contents[j].musicResponsiveListItemRenderer.doubleTapCommand.watchPlaylistEndpoint.playlistId;
                 //console.log("\n\n" + musicshelves[i].contents[j].musicResponsiveListItemRenderer.thumbnail + "\n\n");
-                final.topics[i].elements[j].thumb = musicshelves[i].contents[j].musicResponsiveListItemRenderer.thumbnail.musicThumbnailRenderer.thumbnail.thumbnails[1].url;
 
-            } else if (musicshelves[i].contents[j].musicResponsiveListItemRenderer.flexColumns[1].musicResponsiveListItemFlexColumnRenderer.text.runs[0].text === "Video") {
-                final.topics[i].elements.push({});
-                final.topics[i].elements[j].type = musicshelves[i].contents[j].musicResponsiveListItemRenderer.flexColumns[1].musicResponsiveListItemFlexColumnRenderer.text.runs[0].text;
-                final.topics[i].elements[j].title = musicshelves[i].contents[j].musicResponsiveListItemRenderer.flexColumns[0].musicResponsiveListItemFlexColumnRenderer.text.runs[0].text;
+            } else if (topic === "Video") {
                 final.topics[i].elements[j].interpret = musicshelves[i].contents[j].musicResponsiveListItemRenderer.flexColumns[2].musicResponsiveListItemFlexColumnRenderer.text.runs[0].text;
                 final.topics[i].elements[j].views = musicshelves[i].contents[j].musicResponsiveListItemRenderer.flexColumns[3].musicResponsiveListItemFlexColumnRenderer.text.runs[0].text;
                 final.topics[i].elements[j].length = musicshelves[i].contents[j].musicResponsiveListItemRenderer.flexColumns[4].musicResponsiveListItemFlexColumnRenderer.text.runs[0].text
                 final.topics[i].elements[j].videoId = musicshelves[i].contents[j].musicResponsiveListItemRenderer.doubleTapCommand.watchEndpoint.videoId;
                 final.topics[i].elements[j].playlistId = musicshelves[i].contents[j].musicResponsiveListItemRenderer.doubleTapCommand.watchEndpoint.playlistId;
-                final.topics[i].elements[j].thumb = musicshelves[i].contents[j].musicResponsiveListItemRenderer.thumbnail.musicThumbnailRenderer.thumbnail.thumbnails[1].url;
 
-            } else if (musicshelves[i].contents[j].musicResponsiveListItemRenderer.flexColumns[1].musicResponsiveListItemFlexColumnRenderer.text.runs[0].text === "Playlist") {
-                final.topics[i].elements.push({});
-                final.topics[i].elements[j].type = musicshelves[i].contents[j].musicResponsiveListItemRenderer.flexColumns[1].musicResponsiveListItemFlexColumnRenderer.text.runs[0].text;
-                final.topics[i].elements[j].title = musicshelves[i].contents[j].musicResponsiveListItemRenderer.flexColumns[0].musicResponsiveListItemFlexColumnRenderer.text.runs[0].text;
-                final.topics[i].elements[j].subtitle = musicshelves[i].contents[j].musicResponsiveListItemRenderer.flexColumns[2].musicResponsiveListItemFlexColumnRenderer.text.runs[0].text;
-                final.topics[i].elements[j].songsText = musicshelves[i].contents[j].musicResponsiveListItemRenderer.flexColumns[3].musicResponsiveListItemFlexColumnRenderer.text.runs[0].text;
-                final.topics[i].elements[j].playlistId = musicshelves[i].contents[j].musicResponsiveListItemRenderer.doubleTapCommand.watchPlaylistEndpoint.playlistId;
-                final.topics[i].elements[j].thumb = musicshelves[i].contents[j].musicResponsiveListItemRenderer.thumbnail.musicThumbnailRenderer.thumbnail.thumbnails[1].url;
-            }
+            } else if (topic === "Song") {
+                final.topics[i].elements[j].interpret = musicshelves[i].contents[j].musicResponsiveListItemRenderer.flexColumns[2].musicResponsiveListItemFlexColumnRenderer.text.runs[0].text;
+                final.topics[i].elements[j].album = musicshelves[i].contents[j].musicResponsiveListItemRenderer.flexColumns[3].musicResponsiveListItemFlexColumnRenderer.text.runs[0].text;
+                final.topics[i].elements[j].length = musicshelves[i].contents[j].musicResponsiveListItemRenderer.flexColumns[4].musicResponsiveListItemFlexColumnRenderer.text.runs[0].text;
+                final.topics[i].elements[j].videoId = musicshelves[i].contents[j].musicResponsiveListItemRenderer.doubleTapCommand.watchEndpoint.videoId;
+                final.topics[i].elements[j].playlistId = musicshelves[i].contents[j].musicResponsiveListItemRenderer.doubleTapCommand.watchEndpoint.playlistId;
+            
+            } else if (topic === "Artist")
+                final.topics[i].elements[j].subsText = musicshelves[i].contents[j].musicResponsiveListItemRenderer.flexColumns[2].musicResponsiveListItemFlexColumnRenderer.text.runs[0].text;
         }
     }
     return final;
@@ -174,39 +171,39 @@ function digestHomeResults(json) {
     let contentList = json.contents.singleColumnBrowseResultsRenderer.tabs[0].tabRenderer.content.sectionListRenderer.contents;
 
     let final = {background: null, shelves: []};
-    for (let i = 0; i < contentList.length; i++) {
+    for (let y = 0; y < contentList.length; y++) {
         let shelf = {title: "", albums: []};
         let shelfRenderer;
 
-        if (contentList[i].hasOwnProperty("musicImmersiveCarouselShelfRenderer")) {
-            shelfRenderer = contentList[i].musicImmersiveCarouselShelfRenderer;
+        if (contentList[y].hasOwnProperty("musicImmersiveCarouselShelfRenderer")) {
+            shelfRenderer = contentList[y].musicImmersiveCarouselShelfRenderer;
 
             let index = shelfRenderer.backgroundImage.simpleVideoThumbnailRenderer.thumbnail.thumbnails.length - 1;
             final.background = shelfRenderer.backgroundImage.simpleVideoThumbnailRenderer.thumbnail.thumbnails[index].url;
 
-        } else if (contentList[i].hasOwnProperty("musicCarouselShelfRenderer")) {
-            shelfRenderer = contentList[i].musicCarouselShelfRenderer;
+        } else if (contentList[y].hasOwnProperty("musicCarouselShelfRenderer")) {
+            shelfRenderer = contentList[y].musicCarouselShelfRenderer;
 
         } else continue;
 
-        for (let j = 0; j < shelfRenderer.header.musicCarouselShelfBasicHeaderRenderer.title.runs.length; j++) {
-            shelf.title += shelfRenderer.header.musicCarouselShelfBasicHeaderRenderer.title.runs[j].text;
+        for (let l = 0; l < shelfRenderer.header.musicCarouselShelfBasicHeaderRenderer.title.runs.length; l++) {
+            shelf.title += shelfRenderer.header.musicCarouselShelfBasicHeaderRenderer.title.runs[l].text;
         }
 
-        for (let j = 0; j < shelfRenderer.contents.length; j++) {
+        for (let m = 0; m < shelfRenderer.contents.length; m++) {
             let album = {thumbnail: "", title: "", subtitle: "", browseId: ""};
             
-            for (let k = 0; k < shelfRenderer.contents[j].musicTwoRowItemRenderer.title.runs.length; k++) {
-                album.title += shelfRenderer.contents[j].musicTwoRowItemRenderer.title.runs[k].text;
+            for (let k = 0; k < shelfRenderer.contents[m].musicTwoRowItemRenderer.title.runs.length; k++) {
+                album.title += shelfRenderer.contents[m].musicTwoRowItemRenderer.title.runs[k].text;
             }
 
-            for (let k = 0; k < shelfRenderer.contents[j].musicTwoRowItemRenderer.subtitle.runs.length; k++) {
-                album.subtitle += shelfRenderer.contents[j].musicTwoRowItemRenderer.subtitle.runs[k].text;
+            for (let k = 0; k < shelfRenderer.contents[m].musicTwoRowItemRenderer.subtitle.runs.length; k++) {
+                album.subtitle += shelfRenderer.contents[m].musicTwoRowItemRenderer.subtitle.runs[k].text;
             }
 
             //album.browseId = shelfRenderer.contents[j].musicTwoRowItemRenderer.navigationEndpoint.browseEndpoint.browseId;
 
-            album.thumbnail = shelfRenderer.contents[j].musicTwoRowItemRenderer.thumbnailRenderer.musicThumbnailRenderer.thumbnail.thumbnails[0].url;
+            album.thumbnail = shelfRenderer.contents[m].musicTwoRowItemRenderer.thumbnailRenderer.musicThumbnailRenderer.thumbnail.thumbnails[0].url;
 
             //console.log(shelfRenderer.contents[j].musicTwoRowItemRenderer.navigationEndpoint.browseEndpoint.browseEndpointContextSupportedConfigs.browseEndpointContextMusicConfig.pageType);
 
