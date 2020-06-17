@@ -128,7 +128,7 @@ const styles = StyleSheet.create({
     },
 
     playlist: {
-        height: 220,
+        height: 150,
         width: 150,
     },
 

@@ -120,7 +120,6 @@ function digestSearchResults(json) {
     for (let i = 0; i < musicshelves.length; i++) {
         final.topics.push({});
         final.topics[i].topic = musicshelves[i].title.runs[0].text;
-        console.log(final.topics[i].topic = musicshelves[i].title.runs[0].text);
         final.topics[i].elements = [];
         for (let j = 0; j < musicshelves[i].contents.length; j++) {
             let topic = musicshelves[i].contents[j].musicResponsiveListItemRenderer.flexColumns[1].musicResponsiveListItemFlexColumnRenderer.text.runs[0].text;
@@ -129,7 +128,6 @@ function digestSearchResults(json) {
             let thumbArrayLength = musicshelves[i].contents[j].musicResponsiveListItemRenderer.thumbnail.musicThumbnailRenderer.thumbnail.thumbnails.length
             let thumb = musicshelves[i].contents[j].musicResponsiveListItemRenderer.thumbnail.musicThumbnailRenderer.thumbnail.thumbnails[thumbArrayLength - 1].url;
             
-            console.log(j + ": " + topic);
             final.topics[i].elements.push({});
             final.topics[i].elements[j].type = topic;
             final.topics[i].elements[j].title = title;
@@ -144,8 +142,7 @@ function digestSearchResults(json) {
                 final.topics[i].elements[j].interpret = musicshelves[i].contents[j].musicResponsiveListItemRenderer.flexColumns[2].musicResponsiveListItemFlexColumnRenderer.text.runs[0].text;
                 final.topics[i].elements[j].year = musicshelves[i].contents[j].musicResponsiveListItemRenderer.flexColumns[3].musicResponsiveListItemFlexColumnRenderer.text.runs[0].text;
                 final.topics[i].elements[j].playlistId = musicshelves[i].contents[j].musicResponsiveListItemRenderer.doubleTapCommand.watchPlaylistEndpoint.playlistId;
-                //console.log("\n\n" + musicshelves[i].contents[j].musicResponsiveListItemRenderer.thumbnail + "\n\n");
-
+                
             } else if (topic === "Video") {
                 final.topics[i].elements[j].interpret = musicshelves[i].contents[j].musicResponsiveListItemRenderer.flexColumns[2].musicResponsiveListItemFlexColumnRenderer.text.runs[0].text;
                 final.topics[i].elements[j].views = musicshelves[i].contents[j].musicResponsiveListItemRenderer.flexColumns[3].musicResponsiveListItemFlexColumnRenderer.text.runs[0].text;
