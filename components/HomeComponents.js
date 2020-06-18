@@ -4,8 +4,7 @@ import {
     Text,
     StyleSheet,
     ScrollView,
-    View,
-    Dimensions
+    View
 } from "react-native";
 
 import { Playlist } from './SharedComponents';
@@ -112,6 +111,8 @@ const styles = StyleSheet.create({
     },
 
     scrollView: {
+        paddingTop: 20,
+        marginBottom: 50,
         flexGrow: 1,
         flexDirection: 'column'
     },

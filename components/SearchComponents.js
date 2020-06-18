@@ -277,10 +277,11 @@ const styles = StyleSheet.create({
 
     scrollView: {
         flexDirection: 'column',
+        paddingTop: 20,
+        marginBottom: 50
     },
 
     scrollContainer: {
-        marginBottom: 20,
         flexGrow: 1,
         alignItems: 'center',
         justifyContent: 'center'
