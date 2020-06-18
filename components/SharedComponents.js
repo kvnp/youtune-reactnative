@@ -80,13 +80,13 @@ export class Header extends Component {
 
     render() {
         return (
-                <ImageBackground imageStyle={styles.imageStyle}
-                                 style={[styles.containerStyle, this.props.style]}
-                                 source={this.state.source}>
-                    <LinearGradient style={[styles.linearGradient, styles.imageStyle]} colors={["white", "#ffffff00"]}>
-                        <Text style={[{color: this.state.headerColor}, styles.textStyle]}>{this.props.text}</Text>
-                    </LinearGradient>
-                </ImageBackground>
+            <ImageBackground imageStyle={styles.imageStyle}
+                                style={[styles.containerStyle, this.props.style]}
+                                source={this.state.source}>
+                <LinearGradient style={[styles.linearGradient, styles.imageStyle]} colors={["#7f9f9f9f", "#ffffff00"]}>
+                    <Text style={[{color: this.state.headerColor}, styles.textStyle]}>{this.props.text}</Text>
+                </LinearGradient>
+            </ImageBackground>
         )
     }
 }
