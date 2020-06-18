@@ -1,19 +1,38 @@
+import { getSystemLocale } from "./Native";
+const gl = getSystemLocale().slice(3, 5);
+const hl = getSystemLocale().slice(0, 2);
+
+function getContext() {
+    let enableSafetyMode = false;
+    let enableLanguagePreference = false;
+
+    let body = {
+        context: {
+            client: {
+                clientName: "WEB_REMIX",
+                clientVersion: "0.1",
+            }
+        }
+    };
+
+    if (enableLanguagePreference) {
+        body.context.client["gl"] = gl;
+        body.context.client["hl"] = hl;
+    }
+
+    if (!enableSafetyMode)
+        body.context["user"] = {enableSafetyMode: false}
+
+    return body;
+}
+
 export async function fetchResults(query) {
     const apikey = await getApiKey();
     const url = "https://music.youtube.com/youtubei/v1/" +
                 "search?alt=json&key=" + apikey;
-    const body = {
-        context: {
-            client: {
-                clientName: "WEB_REMIX",
-                clientVersion: "0.1"
-            },
-            user: {
-                enableSafetyMode: false
-            }
-        },
-        query: query
-    };
+
+    let body = getContext();
+    body["query"] = query;
 
     const headers = {
         "Referer": "https://music.youtube.com/",
@@ -31,18 +50,9 @@ export async function fetchSpecificResults(kind) {
     const apikey = await getApiKey();
     const url = "https://music.youtube.com/youtubei/v1/" +
                 "browse?alt=json&key=" + apikey;
-    const body = {
-        context: {
-            client: {
-                clientName: "WEB_REMIX",
-                clientVersion: "0.1"
-            },
-            user: {
-                enableSafetyMode: false
-            }
-        },
-        browseId: "FEmusic_home"
-    };
+
+    let body = getContext();
+    body["input"] = input;
 
     const headers = {
         Referer: "https://music.youtube.com/",
@@ -60,18 +70,9 @@ export async function fetchHome() {
     const apikey = await getApiKey();
     const url = "https://music.youtube.com/youtubei/v1/" +
                 "browse?alt=json&key=" + apikey;
-    const body = {
-        context: {
-            client: {
-                clientName: "WEB_REMIX",
-                clientVersion: "0.1"
-            },
-            user: {
-                enableSafetyMode: false
-            }
-        },
-        browseId: "FEmusic_home"
-    };
+
+    let body = getContext();
+    body["browseId"] = "FEmusic_home";
 
     const headers = {
         Referer: "https://music.youtube.com/",
@@ -89,18 +90,29 @@ export async function fetchSuggestions(input) {
     const apikey = await getApiKey();
     const url = "https://music.youtube.com/youtubei/v1/" +
                 "music/get_search_suggestions?alt=json&key=" + apikey;
-    const body = {
-        context: {
-            client: {
-                clientName: "WEB_REMIX",
-                clientVersion: "0.1"
-            },
-            user: {
-                enableSafetyMode: false
-            }
-        },
-        input: input
+
+    let body = getContext();
+    body["input"] = input;
+
+    const headers = {
+        Referer: "https://music.youtube.com/",
+        "Content-Type": "application/json"
     };
+
+    let response = await getFetchResponse(url, {method: "POST",
+                                                headers: headers,
+                                                body: JSON.stringify(body)}, "json");
+
+    return null;
+}
+
+export async function fetchExplore() {
+    const apikey = await getApiKey();
+    const url = "https://music.youtube.com/youtubei/v1/" +
+                "music/get_search_suggestions?alt=json&key=" + apikey;
+
+    let body = getContext();
+    body["input"] = input;
 
     const headers = {
         Referer: "https://music.youtube.com/",
@@ -186,6 +198,7 @@ function digestSearchResults(json) {
     for (let i = 0; i < musicshelves.length; i++) {
         final.topics.push({});
         final.topics[i].topic = musicshelves[i].title.runs[0].text;
+        console.log("! " + final.topics[i].topic);
         final.topics[i].elements = [];
         for (let j = 0; j < musicshelves[i].contents.length; j++) {
             let topic = musicshelves[i].contents[j].musicResponsiveListItemRenderer.flexColumns[1].musicResponsiveListItemFlexColumnRenderer.text.runs[0].text;
@@ -193,7 +206,7 @@ function digestSearchResults(json) {
             
             let thumbArrayLength = musicshelves[i].contents[j].musicResponsiveListItemRenderer.thumbnail.musicThumbnailRenderer.thumbnail.thumbnails.length
             let thumb = musicshelves[i].contents[j].musicResponsiveListItemRenderer.thumbnail.musicThumbnailRenderer.thumbnail.thumbnails[thumbArrayLength - 1].url;
-            
+            console.log("IN: " + j + ": " + topic);
             final.topics[i].elements.push({});
             final.topics[i].elements[j].type = topic;
             final.topics[i].elements[j].title = title;
