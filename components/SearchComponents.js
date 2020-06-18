@@ -24,6 +24,7 @@ export class SearchBar extends Component {
         this.state = {
             query: null,
             buttonDisabled: true,
+            results: null
         };
     }
 
@@ -39,7 +40,6 @@ export class SearchBar extends Component {
     search = () => {
         Keyboard.dismiss();
         if (this.state.query.length > 0) {
-
             let icon = '|';
             this.props.sendIcon(icon);
             let loader = setInterval(() => {
@@ -63,18 +63,58 @@ export class SearchBar extends Component {
             fetchResults(this.state.query)
                 .then(data => { clearInterval(loader);
                                 this.props.sendIcon('🔎');
+                                this.setState({results: data});
                                 this.props.resultSender(data);
                                });
         }
     }
 
+    getSpecificButtons = () => {
+        if (this.state.results != null)
+            return (
+                <View style={styles.specificButtonContainer}>
+                    <TouchableOpacity style={styles.specificButton}>
+                        <Text style={styles.specificButtonText}>
+                            Videos
+                        </Text>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity style={styles.specificButton}>
+                        <Text style={styles.specificButtonText}>
+                            Playlists
+                        </Text>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity style={styles.specificButton}>
+                        <Text style={styles.specificButtonText}>
+                            Songs
+                        </Text>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity style={styles.specificButton}>
+                        <Text style={styles.specificButtonText}>
+                            Künstler
+                        </Text>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity style={styles.specificButton}>
+                        <Text style={styles.specificButtonText}>
+                            Alben
+                        </Text>
+                    </TouchableOpacity>
+                </View>
+            )
+        else return null;
+    }
+
     render() {
         return (
             <View style={[styles.searchBox, this.props.style]}>
+                {this.getSpecificButtons()}
                 <TextInput style={{marginBottom: 5, width: '80%'}}
-                           placeholder="Suchen"
-                           onChange={this.setQuery}
-                           onSubmitEditing={this.search}/>
+                        placeholder="Suchen"
+                        onChange={this.setQuery}
+                        onSubmitEditing={this.search}/>
 
                 <View style={{width: '80%', marginBottom: 5}}>
                     <Button onPress={this.search}
@@ -236,10 +276,11 @@ const styles = StyleSheet.create({
     },
 
     scrollView: {
-        flexDirection: 'column'
+        flexDirection: 'column',
     },
 
     scrollContainer: {
+        marginBottom: 20,
         flexGrow: 1,
         alignItems: 'center',
         justifyContent: 'center'
@@ -298,5 +339,30 @@ const styles = StyleSheet.create({
 
     resultText: {
         color: 'white'
-    }
+    },
+
+    specificButtonContainer: {
+        paddingTop: 5,
+        paddingBottom: 5,
+        flexDirection: 'row',
+        width: '80%',
+        backgroundColor: 'transparent'
+    },
+
+    specificButton: {
+        backgroundColor: 'transparent',
+        flexGrow: 1,
+        height: 30,
+        borderRadius: 75,
+        marginLeft: 2,
+        marginRight: 2,
+        justifyContent: 'center',
+        borderColor: 'black',
+        borderWidth: 1.5
+    },
+
+    specificButtonText: {
+        color: 'black',
+        alignSelf: 'center',
+    },
 });

@@ -1,57 +1,123 @@
 export async function fetchResults(query) {
     const apikey = await getApiKey();
-    const url = "https://music.youtube.com/youtubei/v1/search?alt=json&key=" + apikey;
+    const url = "https://music.youtube.com/youtubei/v1/" +
+                "search?alt=json&key=" + apikey;
     const body = {
-        "context": {
-            "client": {
-                "clientName": "WEB_REMIX",
-                "clientVersion": "0.1"
+        context: {
+            client: {
+                clientName: "WEB_REMIX",
+                clientVersion: "0.1"
+            },
+            user: {
+                enableSafetyMode: false
             }
         },
-        "query": query
+        query: query
     };
 
     const headers = {
-        'Referer': "https://music.youtube.com/",
-        'Content-Type': 'application/json'
+        "Referer": "https://music.youtube.com/",
+        "Content-Type": "application/json"
     };
 
-    let response = await getFetchResponse(url, {method: 'POST',
+    let response = await getFetchResponse(url, {method: "POST",
                                                 headers: headers,
                                                 body: JSON.stringify(body)}, "json");
     
     return digestSearchResults(response);
 }
 
-export async function fetchHome() {
+export async function fetchSpecificResults(kind) {
     const apikey = await getApiKey();
-    const url = "https://music.youtube.com/youtubei/v1/browse?alt=json&key=" + apikey;
+    const url = "https://music.youtube.com/youtubei/v1/" +
+                "browse?alt=json&key=" + apikey;
     const body = {
-        "context": {
-            "client": {
-                "clientName": "WEB_REMIX",
-                "clientVersion": "0.1"
+        context: {
+            client: {
+                clientName: "WEB_REMIX",
+                clientVersion: "0.1"
+            },
+            user: {
+                enableSafetyMode: false
             }
         },
-        "browseId": "FEmusic_home"
+        browseId: "FEmusic_home"
     };
 
     const headers = {
-        'Referer': "https://music.youtube.com/",
-        'Content-Type': 'application/json'
+        Referer: "https://music.youtube.com/",
+        "Content-Type": "application/json"
     };
 
-    let response = await getFetchResponse(url, {method: 'POST',
+    let response = await getFetchResponse(url, {method: "POST",
+                                                headers: headers,
+                                                body: JSON.stringify(body)}, "json");
+
+    return digestSearchResults(response);
+}
+
+export async function fetchHome() {
+    const apikey = await getApiKey();
+    const url = "https://music.youtube.com/youtubei/v1/" +
+                "browse?alt=json&key=" + apikey;
+    const body = {
+        context: {
+            client: {
+                clientName: "WEB_REMIX",
+                clientVersion: "0.1"
+            },
+            user: {
+                enableSafetyMode: false
+            }
+        },
+        browseId: "FEmusic_home"
+    };
+
+    const headers = {
+        Referer: "https://music.youtube.com/",
+        "Content-Type": "application/json"
+    };
+
+    let response = await getFetchResponse(url, {method: "POST",
                                                 headers: headers,
                                                 body: JSON.stringify(body)}, "json");
 
     return digestHomeResults(response);
 }
 
+export async function fetchSuggestions(input) {
+    const apikey = await getApiKey();
+    const url = "https://music.youtube.com/youtubei/v1/" +
+                "music/get_search_suggestions?alt=json&key=" + apikey;
+    const body = {
+        context: {
+            client: {
+                clientName: "WEB_REMIX",
+                clientVersion: "0.1"
+            },
+            user: {
+                enableSafetyMode: false
+            }
+        },
+        input: input
+    };
+
+    const headers = {
+        Referer: "https://music.youtube.com/",
+        "Content-Type": "application/json"
+    };
+
+    let response = await getFetchResponse(url, {method: "POST",
+                                                headers: headers,
+                                                body: JSON.stringify(body)}, "json");
+
+    return null;
+}
+
 export async function fetchVideo(id) {
     const url = "https://www.youtube.com/watch?v=" + id;
 
-    let response = await getFetchResponse(url, {method: 'GET'}, "text");
+    let response = await getFetchResponse(url, {method: "GET"}, "text");
 
     let begin = response.indexOf("ytplayer.config = ") + 18;
     let end = response.indexOf(";ytplayer.web_player");
@@ -66,8 +132,8 @@ export async function fetchVideo(id) {
 
 async function getApiKey() {
     if (global.apikey == null) {
-        const headers = {'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64; rv:77.0) Gecko/20100101 Firefox/77.0'}
-        let text = await getFetchResponse("https://music.youtube.com/", {method: 'GET', headers: headers}, "text");
+        const headers = {"User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:77.0) Gecko/20100101 Firefox/77.0"}
+        let text = await getFetchResponse("https://music.youtube.com/", {method: "GET", headers: headers}, "text");
 
         text = text.slice(text.indexOf("INNERTUBE_API_KEY\":\"")+20);
         global.apikey = text.slice(0, text.indexOf("\""));

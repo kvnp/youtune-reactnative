@@ -28,7 +28,7 @@ export default class App extends Component {
     }
 
     componentDidMount() {
-        StatusBar.setBarStyle("light-content", true);
+        StatusBar.setBarStyle("dark-content", true);
         StatusBar.setTranslucent(true);
         StatusBar.setBackgroundColor("transparent", true);
     }
