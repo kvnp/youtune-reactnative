@@ -116,8 +116,6 @@ export function digestHomeResults(json) {
 
             album.thumbnail = shelfRenderer.contents[m].musicTwoRowItemRenderer.thumbnailRenderer.musicThumbnailRenderer.thumbnail.thumbnails[0].url;
 
-            //console.log(shelfRenderer.contents[m].musicTwoRowItemRenderer.navigationEndpoint.browseEndpoint.browseEndpointContextSupportedConfigs.browseEndpointContextMusicConfig.pageType);
-
             shelf.albums.push(album);
         }
         
@@ -125,4 +123,8 @@ export function digestHomeResults(json) {
     }
     
     return final;
+}
+
+export function digestBrowseResults(json) {
+    console.log("ja");
 }

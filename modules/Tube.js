@@ -1,6 +1,6 @@
 import { getHL, getGL } from "./Native";
 import { digestHomeResults, digestSearchResults } from "./Extractor";
-import { getHttpResponse } from "./HTTP";
+import { getHttpResponse, getUrl } from "./HTTP";
 
 async function getApiKey() {
     if (global.apikey == null) {
@@ -40,8 +40,7 @@ function getRequestBody() {
 
 export async function fetchResults(query) {
     const apikey = await getApiKey();
-    const url = "https://music.youtube.com/youtubei/v1/" +
-                "search?alt=json&key=" + apikey;
+    const url = getUrl("search", apikey);
 
     let body = getRequestBody();
     body["query"] = query;
@@ -52,16 +51,15 @@ export async function fetchResults(query) {
     };
 
     let response = await getHttpResponse(url, {method: "POST",
-                                                headers: headers,
-                                                body: JSON.stringify(body)}, "json");
+                                               headers: headers,
+                                               body: JSON.stringify(body)}, "json");
     
     return digestSearchResults(response);
 }
 
 export async function fetchSpecificResults(kind) {
     const apikey = await getApiKey();
-    const url = "https://music.youtube.com/youtubei/v1/" +
-                "browse?alt=json&key=" + apikey;
+    const url = getUrl("browse", apikey);
 
     let body = getRequestBody();
     body["input"] = input;
@@ -72,16 +70,15 @@ export async function fetchSpecificResults(kind) {
     };
 
     let response = await getHttpResponse(url, {method: "POST",
-                                                headers: headers,
-                                                body: JSON.stringify(body)}, "json");
+                                               headers: headers,
+                                               body: JSON.stringify(body)}, "json");
 
     return digestSearchResults(response);
 }
 
 export async function fetchHome() {
     const apikey = await getApiKey();
-    const url = "https://music.youtube.com/youtubei/v1/" +
-                "browse?alt=json&key=" + apikey;
+    const url = getUrl("browse", apikey);
 
     let body = getRequestBody();
     body["browseId"] = "FEmusic_home";
@@ -92,16 +89,15 @@ export async function fetchHome() {
     };
 
     let response = await getHttpResponse(url, {method: "POST",
-                                                headers: headers,
-                                                body: JSON.stringify(body)}, "json");
+                                               headers: headers,
+                                               body: JSON.stringify(body)}, "json");
 
     return digestHomeResults(response);
 }
 
 export async function fetchSuggestions(input) {
     const apikey = await getApiKey();
-    const url = "https://music.youtube.com/youtubei/v1/" +
-                "music/get_search_suggestions?alt=json&key=" + apikey;
+    const url = getUrl("get_search_suggestions", apikey);
 
     let body = getRequestBody();
     body["input"] = input;
@@ -112,16 +108,15 @@ export async function fetchSuggestions(input) {
     };
 
     let response = await getHttpResponse(url, {method: "POST",
-                                                headers: headers,
-                                                body: JSON.stringify(body)}, "json");
+                                               headers: headers,
+                                               body: JSON.stringify(body)}, "json");
 
     return null;
 }
 
 export async function fetchBrowse(playlistId) {
     const apikey = await getApiKey();
-    const url = "https://music.youtube.com/youtubei/v1/" +
-                "music/?alt=json&key=" + apikey;
+    const url = getUrl("browse", apikey);
 
     let body = getRequestBody();
     body["browseId"] = "VL" + playlistId;
@@ -132,8 +127,8 @@ export async function fetchBrowse(playlistId) {
     };
 
     let response = await getHttpResponse(url, {method: "POST",
-                                                headers: headers,
-                                                body: JSON.stringify(body)}, "json");
+                                               headers: headers,
+                                               body: JSON.stringify(body)}, "json");
 
     return null;
 }
