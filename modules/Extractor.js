@@ -101,7 +101,7 @@ export function digestHomeResults(json) {
         }
 
         for (let m = 0; m < shelfRenderer.contents.length; m++) {
-            let album = {thumbnail: "", title: "", subtitle: "", playlistId: ""};
+            let album = {title: "", subtitle: ""};
             
             for (let k = 0; k < shelfRenderer.contents[m].musicTwoRowItemRenderer.title.runs.length; k++) {
                 album.title += shelfRenderer.contents[m].musicTwoRowItemRenderer.title.runs[k].text;
@@ -111,7 +111,7 @@ export function digestHomeResults(json) {
                 album.subtitle += shelfRenderer.contents[m].musicTwoRowItemRenderer.subtitle.runs[k].text;
             }
 
-            //album.browseId = shelfRenderer.contents[m].musicTwoRowItemRenderer.navigationEndpoint.browseEndpoint.browseId;
+            album.browseId = shelfRenderer.contents[m].musicTwoRowItemRenderer.navigationEndpoint.browseEndpoint.browseId;
             album.playlistId = shelfRenderer.contents[m].musicTwoRowItemRenderer.thumbnailOverlay.musicItemThumbnailOverlayRenderer.content.musicPlayButtonRenderer.playNavigationEndpoint.watchPlaylistEndpoint.playlistId;
 
             album.thumbnail = shelfRenderer.contents[m].musicTwoRowItemRenderer.thumbnailRenderer.musicThumbnailRenderer.thumbnail.thumbnails[0].url;
@@ -125,7 +125,7 @@ export function digestHomeResults(json) {
     return final;
 }
 
-export function digestBrowseResults(json) {
+function getPlaylist(json) {
     let titlelist = json.header.musicDetailHeaderRenderer.title.runs;
     let subtitlelist = json.header.musicDetailHeaderRenderer.subtitle.runs;
     let secondsubtitlelist = json.header.musicDetailHeaderRenderer.secondSubtitle.runs;
@@ -199,4 +199,65 @@ export function digestBrowseResults(json) {
     }
 
     return browse;
+}
+
+function msToMin(ms) {
+    return Math.floor((ms / 1000 / 60) % 60);
+}
+
+function msToMMSS(ms) {
+    const seconds = Math.floor((ms / 1000) % 60);
+    const minutes = msToMin(ms);
+
+    let secondString = seconds + "";
+    if (secondString.length == 1) secondString = "0" + secondString;
+    
+    return minutes + ":" + secondString;
+}
+
+function getAlbum(json) {
+    let updatelist = json.frameworkUpdates.entityBatchUpdate.mutations
+
+    let browse = {title: "", subtitle: "", secondSubtitle: "", description: "", thumbnail: null, songs: []};
+
+    for (let ul = 0; ul < updatelist.length; ul++) {
+        let payload = updatelist[ul].payload;
+
+        if (payload.hasOwnProperty("musicTrack")) {
+            let musicTrack = payload.musicTrack;
+            let thumbnaillist = musicTrack.thumbnailDetails.thumbnails;
+
+            let song = {title: "", subtitle: "", secondSubtitle: "", length: "", videoId: null, thumbnail: null};
+            song.title = musicTrack.title;
+            song.subtitle = musicTrack.artistNames;
+            song.videoId = musicTrack.videoId;
+            song.thumbnail = thumbnaillist[thumbnaillist.length - 1].url;
+            song.length = msToMMSS(musicTrack.lengthMs);
+            browse.songs.push(song);
+        }
+
+        if (payload.hasOwnProperty("musicAlbumRelease")) {
+            let albumRelease = payload.musicAlbumRelease;
+            let minutes = msToMin(Number.parseInt(albumRelease.durationMs));
+
+            browse.title = albumRelease.title;
+            browse.subtitle = "Album • " + albumRelease.artistDisplayName + " • " + albumRelease.releaseDate.year;
+            browse.secondSubtitle = albumRelease.trackCount + " songs" + " • " + minutes + " minutes";
+        }
+
+        if (payload.hasOwnProperty("musicAlbumReleaseDetail")) {
+            let albumDetail = payload.musicAlbumReleaseDetail;
+
+            browse.description = albumDetail.description;
+        }
+    }
+
+    return browse;
+}
+
+export function digestBrowseResults(json, browseId) {
+    if (browseId.slice(0, 2) === "VL")
+        return getPlaylist(json);
+    else
+        return getAlbum(json);
 }

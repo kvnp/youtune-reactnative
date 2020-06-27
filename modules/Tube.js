@@ -114,12 +114,13 @@ export async function fetchSuggestions(input) {
     return null;
 }
 
-export async function fetchBrowse(playlistId) {
+export async function fetchBrowse(browseId) {
     const apikey = await getApiKey();
     const url = getUrl("browse", apikey);
 
     let body = getRequestBody();
-    body["browseId"] = "VL" + playlistId;
+    //body["browseId"] = "VL" + playlistId;
+    body["browseId"] = browseId;
 
     const headers = {
         Referer:        "https://music.youtube.com/",
@@ -130,7 +131,7 @@ export async function fetchBrowse(playlistId) {
                                                headers: headers,
                                                body: JSON.stringify(body)}, "json");
 
-    return digestBrowseResults(response);
+    return digestBrowseResults(response, browseId);
 }
 
 export async function fetchVideo(id) {
