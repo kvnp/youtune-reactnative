@@ -1,5 +1,5 @@
 import { getHL, getGL } from "./Native";
-import { digestHomeResults, digestSearchResults } from "./Extractor";
+import { digestHomeResults, digestSearchResults, digestBrowseResults } from "./Extractor";
 import { getHttpResponse, getUrl } from "./HTTP";
 
 async function getApiKey() {
@@ -130,7 +130,7 @@ export async function fetchBrowse(playlistId) {
                                                headers: headers,
                                                body: JSON.stringify(body)}, "json");
 
-    return null;
+    return digestBrowseResults(response);
 }
 
 export async function fetchVideo(id) {

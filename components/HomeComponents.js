@@ -56,12 +56,10 @@ export class Results extends Component {
         });
     }
 
-    openAlbum = (album) => {
-        this.props.navigation.navigate("Playlist", album);
-    }
+    openAlbum = (album) => this.props.navigation.navigate("Playlist", album);
 
     displayAlbums = (albums) => {
-        return albums.map(album => {return <Playlist style={styles.album} playlist={album} navigation={this.props.navigation}/>} );
+        return albums.map(album => { return <Playlist style={styles.album} playlist={album} navigation={this.props.navigation}/> } );
     }
 
     displayShelf = (shelf) => {
@@ -82,18 +80,10 @@ export class Results extends Component {
     }
 
     displayHome = () => {
-        if (this.state.home == null || this.state.started) {
-            return (
-                <Text style={styles.preHome}>
-                    {this.state.icon}
-                </Text>
-            )
-        } else 
-            return (
-                <View>
-                    {this.displayShelves(this.state.home)}
-                </View>
-            )
+        if (this.state.home == null || this.state.started)
+            return <Text style={styles.preHome}>{this.state.icon}</Text>
+        else
+            return <View>{this.displayShelves(this.state.home)}</View>
     }
 
     render() {

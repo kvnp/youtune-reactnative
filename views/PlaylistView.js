@@ -4,134 +4,42 @@ import {
     ScrollView,
     Text,
     Image,
-    StatusBar,
     StyleSheet,
     ImageBackground,
     TouchableOpacity
 } from "react-native";
 
+function getEntry(song) {
+    return (
+        <TouchableOpacity style={styles.titleView}>
+            <Image style={styles.titleCover} source={song.thumbnail}/>
+            <View style={styles.titleTextCollection}>
+                <Text numberOfLines={1} style={styles.titleTitle}>
+                    {song.title}
+                </Text>
+                <Text numberOfLines={1} style={styles.titleSubTitle}>
+                    {song.subtitle}
+                </Text>
+            </View>
+            <Text style={styles.titleTimeText}>
+                {song.length}
+            </Text>
+        </TouchableOpacity>
+    )
+}
+
+function getEntries(songs) {
+    return songs.map(getEntry);
+}
+
 export function PlaylistView({ route, navigation }) {
-    StatusBar.setBarStyle('dark-content', true);
-    const {title, subtitle} = route.params;
+    const browse = route.params;
     return (
         <>
             <ScrollView style={styles.playlistContent}>
                 <View style={styles.topicView}>
-                    <Text style={styles.topicTitle}>{title}</Text>
-                    <TouchableOpacity style={styles.titleView}>
-                        <Image style={styles.titleCover}/>
-                        <View style={styles.titleTextCollection}>
-                            <Text numberOfLines={1} style={styles.titleTitle}>
-                                No Friends
-                            </Text>
-                            <Text numberOfLines={1} style={styles.titleSubTitle}>
-                                Cadmium and Rosendale - No Friends
-                            </Text>
-                        </View>
-                        <Text style={styles.titleTimeText}>
-                            3:55
-                        </Text>
-                    </TouchableOpacity>
-
-                    <TouchableOpacity style={styles.titleView}>
-                        <Image style={styles.titleCover}/>
-                        <View style={styles.titleTextCollection}>
-                            <Text numberOfLines={1} style={styles.titleTitle}>
-                                Cities
-                            </Text>
-
-                            <Text numberOfLines={1} style={styles.titleSubTitle}>
-                                Throttle - Where U Are
-                            </Text>
-                        </View>
-                        <Text style={styles.titleTimeText}>3:00</Text>
-                    </TouchableOpacity>
-
-                    <TouchableOpacity style={styles.titleView}>
-                        <Image style={styles.titleCover}/>
-                        <View style={styles.titleTextCollection}>
-                            <Text numberOfLines={1} style={styles.titleTitle}>
-                                Solar Eclipses
-                            </Text>
-
-                            <Text numberOfLines={1} style={styles.titleSubTitle}>
-                                Hollywood Principle und Dr. Awkward - Solar Eclipses
-                            </Text>
-                        </View>
-                        <Text style={styles.titleTimeText}>3:29</Text>
-                    </TouchableOpacity>
-
-                    <TouchableOpacity style={styles.titleView}>
-                        <Image style={styles.titleCover}/>
-                        <View style={styles.titleTextCollection}>
-                            <Text numberOfLines={1} style={styles.titleTitle}>
-                                No Friends
-                            </Text>
-                            <Text numberOfLines={1} style={styles.titleSubTitle}>
-                                Cadmium and Rosendale - No Friends
-                            </Text>
-                        </View>
-                        <Text style={styles.titleTimeText}>
-                            3:55
-                        </Text>
-                    </TouchableOpacity>
-
-                    <TouchableOpacity style={styles.titleView}>
-                        <Image style={styles.titleCover}/>
-                        <View style={styles.titleTextCollection}>
-                            <Text numberOfLines={1} style={styles.titleTitle}>
-                                Cities
-                            </Text>
-
-                            <Text numberOfLines={1} style={styles.titleSubTitle}>
-                                Throttle - Where U Are
-                            </Text>
-                        </View>
-                        <Text style={styles.titleTimeText}>3:00</Text>
-                    </TouchableOpacity>
-
-                    <TouchableOpacity style={styles.titleView}>
-                        <Image style={styles.titleCover}/>
-                        <View style={styles.titleTextCollection}>
-                            <Text numberOfLines={1} style={styles.titleTitle}>
-                                Solar Eclipses
-                            </Text>
-
-                            <Text numberOfLines={1} style={styles.titleSubTitle}>
-                                Hollywood Principle und Dr. Awkward - Solar Eclipses
-                            </Text>
-                        </View>
-                        <Text style={styles.titleTimeText}>3:29</Text>
-                    </TouchableOpacity>
-
-                    <TouchableOpacity style={styles.titleView}>
-                        <Image style={styles.titleCover}/>
-                        <View style={styles.titleTextCollection}>
-                            <Text numberOfLines={1} style={styles.titleTitle}>
-                                No Friends
-                            </Text>
-                            <Text numberOfLines={1} style={styles.titleSubTitle}>
-                                Cadmium and Rosendale - No Friends
-                            </Text>
-                        </View>
-                        <Text style={styles.titleTimeText}>
-                            3:55
-                        </Text>
-                    </TouchableOpacity>
-
-                    <TouchableOpacity style={styles.titleView}>
-                        <Image style={styles.titleCover}/>
-                        <View style={styles.titleTextCollection}>
-                            <Text numberOfLines={1} style={styles.titleTitle}>
-                                Cities
-                            </Text>
-
-                            <Text numberOfLines={1} style={styles.titleSubTitle}>
-                                Throttle - Where U Are
-                            </Text>
-                        </View>
-                        <Text style={styles.titleTimeText}>3:00</Text>
-                    </TouchableOpacity>
+                    <Text style={styles.topicTitle}>{browse.title}</Text>
+                    {getEntries(browse.songs)}
                 </View>
             </ScrollView>
 
@@ -140,9 +48,9 @@ export function PlaylistView({ route, navigation }) {
                     <View style={styles.headerTopRow}>
                         <Image style={styles.albumCover}/>
                         <View style={styles.headerTopColumn}>
-                            <Text style={styles.albumTitle}>{title}</Text>
-                            <Text style={styles.albumSubTitle}>{subtitle}</Text>
-                            <Text style={styles.albumInfo}>5 Titel - 18 Minuten</Text>
+                            <Text style={styles.albumTitle}>{browse.title}</Text>
+                            <Text style={styles.albumSubTitle}>{browse.subtitle}</Text>
+                            <Text style={styles.albumInfo}>{browse.secondSubtitle}</Text>
                         </View>
                         <TouchableOpacity style={styles.closeButton}
                                           onPress={() => {navigation.pop()}}>
