@@ -1,23 +1,37 @@
 import { NativeModules } from 'react-native';
 
-export function getSystemLocale() {
-  let locale;
-  // iOS
-  if (
+var gl = null;
+var hl = null;
+
+function getSystemLocale() {
+    let locale;
+    // iOS
+    if (
     NativeModules.SettingsManager &&
     NativeModules.SettingsManager.settings &&
     NativeModules.SettingsManager.settings.AppleLanguages
-  ) {
+    ) {
     locale = NativeModules.SettingsManager.settings.AppleLanguages[0];
     // Android
-  } else if (NativeModules.I18nManager) {
+    } else if (NativeModules.I18nManager) {
     locale = NativeModules.I18nManager.localeIdentifier;
-  }
+    }
 
-  if (typeof locale === 'undefined') {
+    if (typeof locale === 'undefined') {
     console.log('Couldnt get locale');
     return 'en';
-  }
+    }
 
-  return locale;
+    return locale;
+}
+
+export function getGL() {
+    if (gl == null) gl = getSystemLocale().slice(3, 5);
+    return gl;
+}
+
+export function getHL() {
+    if (hl == null) hl = getSystemLocale().slice(0, 2);
+    return hl;
+    
 }
