@@ -11,6 +11,8 @@ import {
 
 import LinearGradient from 'react-native-linear-gradient';
 
+import { fetchBrowse } from '../modules/Tube';
+
 /*const HeaderDb = {
     "https://lh3.googleusercontent.com/3OazqYM5TA4lMDZ0A-52-v6Zg4L-uFsAmfMp8aC-l-TUgr_UwPvayfxy_5hs5ll4B4zpj2hrG9A=w2880-h1613-l90-rj": true,
     "https://lh3.googleusercontent.com/G2nNxQ2O_svAtYlismpu0ZfNvusgKGBVpq-LI4xsHPeJELQO2_wOOu9NvOHcb9X1VvPR5_qx=w2880-h1620-l90-rj":    true,
@@ -44,12 +46,12 @@ export class Header extends Component {
         } else {
             /*if (HeaderDb.hasOwnProperty(url))
                 this.setState({source: {uri: url}});
-
             else {***}*/
-                if (typeof url == "string")
-                    this.setState({source: {uri: url}});
-                else if (typeof url == "number")
-                    this.setState({source: url});
+
+            if (typeof url == "string")
+                this.setState({source: {uri: url}});
+            else if (typeof url == "number")
+                this.setState({source: url});
         }
     }
 
@@ -81,10 +83,14 @@ export class Header extends Component {
     render() {
         return (
             <ImageBackground imageStyle={styles.imageStyle}
-                                style={[styles.containerStyle, this.props.style]}
-                                source={this.state.source}>
-                <LinearGradient style={[styles.linearGradient, styles.imageStyle]} colors={["#7f9f9f9f", "#ffffff00"]}>
-                    <Text style={[{color: this.state.headerColor}, styles.textStyle]}>{this.props.text}</Text>
+                             style={[styles.containerStyle, this.props.style]}
+                             source={this.state.source}>
+                <LinearGradient style={[styles.linearGradient, styles.imageStyle]}
+                                colors={["#7f9f9f9f", "#ffffff00"]}>
+                                    
+                    <Text style={[{color: this.state.headerColor}, styles.textStyle]}>
+                        {this.props.text}
+                    </Text>
                 </LinearGradient>
             </ImageBackground>
         )
@@ -93,16 +99,37 @@ export class Header extends Component {
 
 
 export class Playlist extends Component {
-    viewPlaylist = (json) => this.props.navigation.navigate("Playlist", json);
+    constructor(props) {
+        super(props);
+        this.playlist = this.props.playlist;
+        this.browse = null;
+    }
+
+    viewPlaylist = () => {
+        if (this.browse == null) fetchBrowse(this.playlist.playlistId).then((result) => {
+            this.browse = result;
+            this.props.navigation.navigate("Playlist", result);
+        });
+
+        else this.props.navigation.navigate("Playlist", this.state.browse);
+    }
 
     render() {
         return (
             <View style={[this.props.style, styles.playlistContainer]}>
-                <TouchableOpacity onPress={() => this.viewPlaylist(this.props.playlist)}>
-                    <Image style={styles.playlistCover} source={{uri: this.props.playlist.thumbnail}}/>
+                <TouchableOpacity onPress={() => this.viewPlaylist()}>
+                    <Image style={styles.playlistCover} source={{uri: this.playlist.thumbnail}}/>
                 </TouchableOpacity>
-                <Text style={styles.playlistTitle}>{this.props.playlist.title}</Text>
-                <Text style={styles.playlistDesc}>{this.props.playlist.subtitle}</Text>
+
+                <Text style={styles.playlistTitle}
+                      numberOfLines={2}>
+                    {this.playlist.title}
+                </Text>
+
+                <Text style={styles.playlistDesc}
+                      numberOfLines={2}>
+                    {this.playlist.subtitle}
+                </Text>
             </View>
         );
     }
@@ -110,7 +137,7 @@ export class Playlist extends Component {
 
 const styles = StyleSheet.create({
     imageStyle: {
-        borderBottomLeftRadius:25,
+        borderBottomLeftRadius: 25,
         borderBottomRightRadius: 25,
         backgroundColor: 'transparent'
     },
