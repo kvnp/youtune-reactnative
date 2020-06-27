@@ -267,7 +267,7 @@ function digestHomeResults(json) {
         }
 
         for (let m = 0; m < shelfRenderer.contents.length; m++) {
-            let album = {thumbnail: "", title: "", subtitle: "", browseId: ""};
+            let album = {thumbnail: "", title: "", subtitle: "", playlistId: ""};
             
             for (let k = 0; k < shelfRenderer.contents[m].musicTwoRowItemRenderer.title.runs.length; k++) {
                 album.title += shelfRenderer.contents[m].musicTwoRowItemRenderer.title.runs[k].text;
@@ -277,11 +277,12 @@ function digestHomeResults(json) {
                 album.subtitle += shelfRenderer.contents[m].musicTwoRowItemRenderer.subtitle.runs[k].text;
             }
 
-            //album.browseId = shelfRenderer.contents[j].musicTwoRowItemRenderer.navigationEndpoint.browseEndpoint.browseId;
+            //album.browseId = shelfRenderer.contents[m].musicTwoRowItemRenderer.navigationEndpoint.browseEndpoint.browseId;
+            album.playlistId = shelfRenderer.contents[m].musicTwoRowItemRenderer.thumbnailOverlay.musicItemThumbnailOverlayRenderer.content.musicPlayButtonRenderer.playNavigationEndpoint.watchPlaylistEndpoint.playlistId;
 
             album.thumbnail = shelfRenderer.contents[m].musicTwoRowItemRenderer.thumbnailRenderer.musicThumbnailRenderer.thumbnail.thumbnails[0].url;
 
-            //console.log(shelfRenderer.contents[j].musicTwoRowItemRenderer.navigationEndpoint.browseEndpoint.browseEndpointContextSupportedConfigs.browseEndpointContextMusicConfig.pageType);
+            //console.log(shelfRenderer.contents[m].musicTwoRowItemRenderer.navigationEndpoint.browseEndpoint.browseEndpointContextSupportedConfigs.browseEndpointContextMusicConfig.pageType);
 
             shelf.albums.push(album);
         }
