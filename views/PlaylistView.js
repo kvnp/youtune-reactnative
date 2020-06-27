@@ -12,7 +12,7 @@ import {
 function getEntry(song) {
     return (
         <TouchableOpacity style={styles.titleView}>
-            <Image style={styles.titleCover} source={song.thumbnail}/>
+            <Image style={styles.titleCover} source={{uri: song.thumbnail}}/>
             <View style={styles.titleTextCollection}>
                 <Text numberOfLines={1} style={styles.titleTitle}>
                     {song.title}
@@ -46,7 +46,7 @@ export function PlaylistView({ route, navigation }) {
             <ImageBackground style={styles.headerContainer}>
                 <View style={styles.headerCenterContainer}>
                     <View style={styles.headerTopRow}>
-                        <Image style={styles.albumCover}/>
+                        <Image style={styles.albumCover} source={{uri: browse.thumbnail}}/>
                         <View style={styles.headerTopColumn}>
                             <Text style={styles.albumTitle}>{browse.title}</Text>
                             <Text style={styles.albumSubTitle}>{browse.subtitle}</Text>
