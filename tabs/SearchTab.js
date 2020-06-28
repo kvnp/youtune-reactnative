@@ -31,7 +31,7 @@ export default class SearchTab extends Component {
         return (
             <>
                 <Header style={styles.headerPicture} text="Suche" source={this.props.passImage}/>
-                <Results style={styles.resultView} passResults={this.state.results} passIcon={this.state.icon}/>
+                <Results style={styles.resultView} passResults={this.state.results} passIcon={this.state.icon} navigation={this.props.navigation}/>
                 <SearchBar style={styles.searchBar} resultSender={this.resultReceiver} sendIcon={this.iconReceiver}/>
             </>
         );

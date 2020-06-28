@@ -15,7 +15,8 @@ import {
 
 import {
     fetchResults,
-    fetchVideo
+    fetchVideo,
+    fetchBrowse
 } from '../modules/Tube';
 
 export class SearchBar extends Component {
@@ -134,11 +135,19 @@ export class Results extends Component {
         }*/
     });
 
+    triggerEvent = (element) => {
+        if (["Song", "Video"].includes(element.type))
+            this.startVideo(element.videoId);
+        else
+            fetchBrowse(element.browseId).then((result) => 
+                this.props.navigation.navigate("Playlist", result)
+            );
+    }
+
     displayElement = (element) => {
-        console.log(element.type);
         return (
             <View style={styles.resultView}>
-                <TouchableOpacity onPress={() => {this.startVideo(element.videoId)}}>
+                <TouchableOpacity onPress={() => {this.triggerEvent(element)}}>
                     <Image style={styles.resultCover} source={{uri: element.thumbnail}}></Image>
                 </TouchableOpacity>
 
@@ -161,7 +170,6 @@ export class Results extends Component {
     }
 
     displayElements = (elements) => {
-        console.log("\n");
         return elements.elements.map(this.displayElement);
     }
 

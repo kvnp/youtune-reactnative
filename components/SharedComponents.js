@@ -66,7 +66,6 @@ export class Playlist extends Component {
 
     viewPlaylist = () => {
         if (this.browse == null) fetchBrowse(this.playlist.browseId).then((result) => {
-            //console.log(result);
             this.browse = result;
             this.props.navigation.navigate("Playlist", result);
         });
