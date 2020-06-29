@@ -8,7 +8,7 @@ import {
 
 import { Header } from '../components/SharedComponents';
 
-export default class LibraryTab extends Component {
+export default class SettingsTab extends Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -16,9 +16,7 @@ export default class LibraryTab extends Component {
         };
     }
 
-    resultReceiver = (childData) => {
-        this.setState({results: childData});
-    };
+    resultReceiver = (childData) => this.setState({results: childData});
 
     render() {
         return (

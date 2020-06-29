@@ -69,7 +69,8 @@ export default class LibraryTab extends Component {
         return (
             <View style={styles.playlist}>
                 <Playlist playlist={playlistJson} navigation={this.props.navigation}/>
-            </View>);
+            </View>
+        );
     }
 
     getPlaylists = () => {
