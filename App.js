@@ -20,6 +20,9 @@ import { CreatePlaylistView } from "./views/CreatePlaylistView";
 
 export default class App extends Component {
     constructor(props) {
+        StatusBar.setBarStyle("dark-content", true);
+        StatusBar.setTranslucent(true);
+        StatusBar.setBackgroundColor("transparent", true);
         super(props);
         this.state = {
             title: "Home",
@@ -27,16 +30,9 @@ export default class App extends Component {
         };
     }
 
-    componentDidMount() {
-        StatusBar.setBarStyle("dark-content", true);
-        StatusBar.setTranslucent(true);
-        StatusBar.setBackgroundColor("transparent", true);
-    }
-
     setImage = (url) => {
         this.setState({image: url});
     }
-
     
     render() {
         const Stack = createStackNavigator();
