@@ -9,7 +9,6 @@ import {
 } from 'react-native';
 
 import {
-    Header,
     Playlist
 } from '../components/SharedComponents';
 
@@ -24,6 +23,16 @@ export default class LibraryTab extends Component {
             artists: [],
             subscriptions: []
         }
+    }
+
+    componentDidMount() {
+        this._unsubscribe = this.props.navigation.addListener('focus', () => {
+            global.setHeader("Library");
+        });
+    }
+    
+    componentWillUnmount() {
+        this._unsubscribe();
     }
 
     getStyle = (value) => {
@@ -80,8 +89,6 @@ export default class LibraryTab extends Component {
     render() {
         return (
             <>
-                <Header style={styles.headerPicture} text="Bibliothek" source={this.props.passImage}/>
-            
                 <ScrollView style={styles.playlistCollection} contentContainerStyle={styles.playlistCollectionContainer}>
                     {this.getUpdatedView()}
                 </ScrollView>

@@ -10,16 +10,24 @@ import {
     Results
 } from '../components/HomeComponents';
 
-import { Header } from '../components/SharedComponents';
-
 export default class HomeTab extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            loading: false,
-            image: null,
+            loading: false
         }
     }
+
+    componentDidMount() {
+        this._unsubscribe = this.props.navigation.addListener('focus', () => {
+            global.setHeader("Home");
+        });
+    }
+    
+    componentWillUnmount() {
+        this._unsubscribe();
+    }
+
 
     startLoading = () => {
         if (this.state.loading == false)
@@ -27,14 +35,13 @@ export default class HomeTab extends Component {
     }
 
     setImage = (source) => {
-        this.props.setImage(source);
-        this.setState({loading: false, image: source});
+        this.setState({loading: false});
+        global.setHeader("Home", source);
     }
 
     render() {
         return (
             <>
-                <Header style={styles.headerPicture} text="Home" source={this.state.image}/>
                 <Results style={styles.homeView} setImage={this.setImage} load={this.state.loading} navigation={this.props.navigation}/>
 
                 <TouchableOpacity onPress={this.startLoading} style={styles.refreshButton}>
@@ -46,11 +53,6 @@ export default class HomeTab extends Component {
 };
 
 const styles = StyleSheet.create({
-    headerPicture: {
-        width: '100%',
-        height: '20%'
-    },
-
     homeView: {
         flexGrow: 1,
         width: '100%'

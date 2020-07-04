@@ -7,8 +7,6 @@ import {
     SearchBar
 } from '../components/SearchComponents';
 
-import { Header } from '../components/SharedComponents';
-
 export default class SearchTab extends Component {
     constructor(props) {
         super(props);
@@ -16,6 +14,16 @@ export default class SearchTab extends Component {
             results: null,
             icon: '🔎'
         };
+    }
+
+    componentDidMount() {
+        this._unsubscribe = this.props.navigation.addListener('focus', () => {
+            global.setHeader("Search");
+        });
+    }
+    
+    componentWillUnmount() {
+        this._unsubscribe();
     }
 
     resultReceiver = (data) => {
@@ -30,7 +38,6 @@ export default class SearchTab extends Component {
     render() {
         return (
             <>
-                <Header style={styles.headerPicture} text="Suche" source={this.props.passImage}/>
                 <Results style={styles.resultView} passResults={this.state.results} passIcon={this.state.icon} navigation={this.props.navigation}/>
                 <SearchBar style={styles.searchBar} resultSender={this.resultReceiver} sendIcon={this.iconReceiver}/>
             </>

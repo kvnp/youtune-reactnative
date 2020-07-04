@@ -6,8 +6,6 @@ import {
     TouchableOpacity
 } from 'react-native';
 
-import { Header } from '../components/SharedComponents';
-
 export default class SettingsTab extends Component {
     constructor(props) {
         super(props);
@@ -16,17 +14,23 @@ export default class SettingsTab extends Component {
         };
     }
 
+    componentDidMount() {
+        this._unsubscribe = this.props.navigation.addListener('focus', () => {
+            global.setHeader("Settings");
+        });
+    }
+    
+    componentWillUnmount() {
+        this._unsubscribe();
+    }
+
     resultReceiver = (childData) => this.setState({results: childData});
 
     render() {
         return (
-            <>
-                <Header style={styles.headerPicture} text="Einstellungen" source={this.props.passImage}/>
-
-                <TouchableOpacity style={styles.middleView} onPress={() => this.props.navigation.navigate("Artist")}>
-                    <Text style={styles.placeholder}>⚙️</Text>
-                </TouchableOpacity>
-            </>
+            <TouchableOpacity style={styles.middleView} onPress={() => this.props.navigation.navigate("Artist")}>
+                <Text style={styles.placeholder}>⚙️</Text>
+            </TouchableOpacity>
         );
     }
 };
