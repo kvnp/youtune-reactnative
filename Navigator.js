@@ -28,8 +28,12 @@ export default class Navigator extends Component {
         }
     }
 
-    getIcon = (icon, color, size) => {
-        return <MaterialCommunityIcons name={icon} color={color} size={size} />;
+    getIcon = (title, color, size) => {
+        return <MaterialCommunityIcons name={title} color={color} size={size} />;
+    }
+
+    getTabOptions = (title) => {
+        return { tabBarIcon: ({ color, size }) => this.getIcon(title, color, size) }
     }
 
     render() {
@@ -38,17 +42,10 @@ export default class Navigator extends Component {
             <>
                 <Header style={headerStyle.headerPicture} text={this.state.title} source={this.state.image}/>
                 <Tab.Navigator>
-                    <Tab.Screen name="Home" component={HomeTab}
-                                options={{ tabBarIcon: ({ color, size }) => this.getIcon("home", color, size)}}/>
-
-                    <Tab.Screen name="Suche" component={SearchTab}
-                                options={{ tabBarIcon: ({ color, size }) => this.getIcon("magnify", color, size) }}/>
-
-                    <Tab.Screen name="Bibliothek" component={LibraryTab}
-                                options={{ tabBarIcon: ({ color, size }) => this.getIcon("folder", color, size) }}/>
-
-                    <Tab.Screen name="Einstellungen" component={SettingsTab}
-                                options={{ tabBarIcon: ({ color, size }) => this.getIcon("settings", color, size) }}/>
+                    <Tab.Screen name="Home" component={HomeTab} options={this.getTabOptions("home")}/>
+                    <Tab.Screen name="Suche" component={SearchTab} options={this.getTabOptions("magnify")}/>
+                    <Tab.Screen name="Bibliothek" component={LibraryTab} options={this.getTabOptions("folder")}/>
+                    <Tab.Screen name="Einstellungen" component={SettingsTab} options={this.getTabOptions("settings")}/>
                 </Tab.Navigator>
             </>
         );
