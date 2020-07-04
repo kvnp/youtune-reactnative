@@ -317,10 +317,109 @@ function getAlbum(json) {
     return browse;
 }
 
+function getArtist(json) {
+    let final = {
+        header : {
+            title: "",
+            subscriptions: "",
+            thumbnail: "",
+        },
+
+        shelves: []
+    };
+
+    let titleList = json.header.musicImmersiveHeaderRenderer.title.runs;
+    for (let ttl = 0; ttl < titleList.length; ttl++) {
+        final.header.title += titleList[ttl];
+    }
+
+    let subList = json.header.musicImmersiveCarouselShelfRenderer.subscriptionButton.subscribeButtonRenderer.subscriberCountText.runs;
+    for (let sl = 0; sl < subList.length; sl++) {
+        final.header.subscriptions += subList[sl];
+    }
+
+    let thumbnailList = json.header.musicImmersiveCarouselShelfRenderer.thumbnail.musicThumbnailRenderer.thumbnail.thumbnails;
+    final.header.thumbnail = thumbnailList[0].url;
+
+    let tabList = json.contents.singleColumnBrowseResultsRenderer.tabs;
+    for (let tbl = 0; tbl < tabList.length; tbl++) {
+
+        let contentList = tabList[tbl].tabRenderer.content.sectionListRenderer.contents;
+        for (let ctl = 0; ctl < contentList.length; ctl++) {
+            let shelfEntry = contentList[ctl];
+
+            let shelf = {title: "", type: "", items: []};
+            if (shelfEntry.hasOwnProperty("musicShelfRenderer")) {
+                shelf.type = "Songs";
+                let musicShelf = shelf.musicShelfRenderer;
+
+                let shelfTitleList = musicShelf.title.runs;
+                for (let sttl = 0; sttl < shelfTitleList.length; sttl++) {
+                    shelf.title += shelfTitleList[sttl];
+                }
+
+                let songList = musicShelf.contents;
+                for (let sgl = 0; sgl < songList.length; sgl++) {
+                    let songObject = songList[sgl].musicResponsiveListItemRenderer;
+
+                    let song = {
+                        title: "",
+                        subtitle: "",
+                        secondTitle: "",
+                        secondSubtitle: "",
+                        thumbnail: "",
+                        videoId: ""
+                    };
+
+                    let thumbnailList = songObject.thumbnail.musicThumbnailRendeer.thumbnail.thumbnails;
+                    song.thumbnail = thumbnailList[0].url;
+
+                    let watchEndpoint = songObject.content.musicPlayButtonRenderer.playNavigationEndpoint.watchEndpoint;
+                    let videoId = watchEndpoint.videoId;
+                    let playlistId = watchEndpoint.playlistId;
+                    song.playlistId = playlistId;
+                    song.videoId = videoId;
+
+                    let flexColumnList = songObject.flexColumns;
+                    for (let sfcl = 0; sfcl < flexColumnList.length; sfcl++) {
+                        let flexColumn = flexColumnList[sfcl].musicResponsiveListItemFlexColumnRenderer;
+
+                        let flexTextList = flexColumn.text.runs;
+
+                        let text = ""
+                        for (let fttt = 0; fttt < flexTextList.length; fttt++)
+                            text += flexTextList[fttt].text;
+
+                        if (sfcl == 0)
+                            song.title = text; 
+                        else if (sfcl == 1)
+                            song.subtitle = text;
+                        else if (sfcl == 2)
+                            song.secondTitle = text;
+                        else if (sfcl == 3)
+                            song.secondSubtitle = text;
+                    }
+                }
+            }
+
+            if (shelfEntry.hasOwnProperty("musicCarouselShelfRenderer")) {
+                shelf.type = "Playlists";
+                let playlistShelf = shelf.musicCarouselShelfRenderer;
+                
+            }
+
+            final.shelves.push(shelf);
+        }
+    }
+}
+
 export function digestBrowseResults(json, browseId) {
     console.log(browseId);
-    if (browseId.slice(0, 2) === "VL")
+    if (browseId.slice(0, 2) === "VL") {
         return getPlaylist(json);
-    else
+    } else if (browseId.slice(0, 2) === "UC") {
+        return getArtist(json);
+    } else {
         return getAlbum(json);
+    }
 }

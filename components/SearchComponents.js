@@ -30,10 +30,10 @@ export class SearchBar extends Component {
     }
 
     setQuery = (event) => {
-        if (event.nativeEvent.text.length > 0) 
+        if (event.nativeEvent.text.length > 0)
             this.setState({query: event.nativeEvent.text,
                            buttonDisabled: false});
-        else 
+        else
             this.setState({query: event.nativeEvent.text,
                            buttonDisabled: true});
     }
@@ -137,11 +137,12 @@ export class Results extends Component {
 
     triggerEvent = (element) => {
         if (["Song", "Video"].includes(element.type))
-            this.startVideo(element.videoId);
-        else
+            this.startVideo(element.videoId); // TODO: PlayerView
+        else if (["Album", "Playlist"].includes(element.type))
             fetchBrowse(element.browseId).then((result) => 
                 this.props.navigation.navigate("Playlist", result)
             );
+        else console.log(element.browseId);
     }
 
     displayElement = (element) => {

@@ -9,23 +9,10 @@ import {
     TouchableOpacity
 } from "react-native";
 
+import { Song } from "../components/SharedComponents";
+
 function getEntry(song) {
-    return (
-        <TouchableOpacity style={styles.titleView}>
-            <Image style={styles.titleCover} source={{uri: song.thumbnail}}/>
-            <View style={styles.titleTextCollection}>
-                <Text numberOfLines={1} style={styles.titleTitle}>
-                    {song.title}
-                </Text>
-                <Text numberOfLines={1} style={styles.titleSubTitle}>
-                    {song.subtitle}
-                </Text>
-            </View>
-            <Text style={styles.titleTimeText}>
-                {song.length}
-            </Text>
-        </TouchableOpacity>
-    )
+    return <Song song={song}/>
 }
 
 function getEntries(songs) {
@@ -147,22 +134,5 @@ const styles = StyleSheet.create({
     topicTitle: {
         fontWeight: 'bold',
         fontSize: 30
-    },
-
-    titleView: {
-        paddingTop: 5,
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-around',
-    },
-
-    titleCover: {
-        width: 50,
-        height: 50,
-        backgroundColor: 'gray'
-    },
-
-    titleTextCollection: {
-        width: '60%'
     }
 });

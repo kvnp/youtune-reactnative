@@ -17,7 +17,7 @@ export class Header extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            source: require("../assets/img/header.jpg")
+            source: null
         }
     }
 
@@ -31,7 +31,7 @@ export class Header extends Component {
 
     setImage = (url) => {
         if (url == null) {
-            this.setState({source: require("../assets/img/header.jpg")});
+            this.setState({source: null});
         } else {
             if (typeof url == "string")
                 this.setState({source: {uri: url}});
@@ -53,6 +53,32 @@ export class Header extends Component {
                     </Text>
                 </LinearGradient>
             </ImageBackground>
+        )
+    }
+}
+
+export class Song extends Component {
+    constructor(props) {
+        super(props);
+        this.song = this.props.song;
+    }
+
+    render() {
+        return (
+            <TouchableOpacity style={styles.titleView}>
+                <Image style={styles.titleCover} source={{uri: this.song.thumbnail}}/>
+                <View style={styles.titleTextCollection}>
+                    <Text numberOfLines={1} style={styles.titleTitle}>
+                        {this.song.title}
+                    </Text>
+                    <Text numberOfLines={1} style={styles.titleSubTitle}>
+                        {this.song.subtitle}
+                    </Text>
+                </View>
+                <Text style={styles.titleTimeText}>
+                    {this.song.length}
+                </Text>
+            </TouchableOpacity>
         )
     }
 }
@@ -143,4 +169,25 @@ const styles = StyleSheet.create({
     playlistDesc: {
         fontSize: 14,
     },
+
+    titleView: {
+        paddingTop: 5,
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-around',
+    },
+
+    titleCover: {
+        width: 50,
+        height: 50,
+        backgroundColor: 'gray'
+    },
+
+    titleTextCollection: {
+        width: '60%'
+    },
+
+    titleTitle: {
+        fontWeight: 'bold'
+    }
 });

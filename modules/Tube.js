@@ -2,10 +2,16 @@ import { getHL, getGL } from "./Native";
 import { digestHomeResults, digestSearchResults, digestBrowseResults } from "./Extractor";
 import { getHttpResponse, getUrl } from "./HTTP";
 
+const headers_api = {"User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:77.0) Gecko/20100101 Firefox/77.0"};
+const headers_ytm = {
+    "Referer":      "https://music.youtube.com/",
+    "Content-Type": "application/json"
+};
+
+
 async function getApiKey() {
     if (global.apikey == null) {
-        const headers = {"User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:77.0) Gecko/20100101 Firefox/77.0"}
-        let text = await getHttpResponse("https://music.youtube.com/", {method: "GET", headers: headers}, "text");
+        let text = await getHttpResponse("https://music.youtube.com/", {method: "GET", headers: headers_api}, "text");
 
         text = text.slice(text.indexOf("INNERTUBE_API_KEY\":\"")+20);
         global.apikey = text.slice(0, text.indexOf("\""));
@@ -45,13 +51,8 @@ export async function fetchResults(query) {
     let body = getRequestBody();
     body["query"] = query;
 
-    const headers = {
-        "Referer":      "https://music.youtube.com/",
-        "Content-Type": "application/json"
-    };
-
     let response = await getHttpResponse(url, {method: "POST",
-                                               headers: headers,
+                                               headers: headers_ytm,
                                                body: JSON.stringify(body)}, "json");
     
     return digestSearchResults(response);
@@ -64,13 +65,8 @@ export async function fetchSpecificResults(kind) {
     let body = getRequestBody();
     body["input"] = input;
 
-    const headers = {
-        Referer:        "https://music.youtube.com/",
-        "Content-Type": "application/json"
-    };
-
     let response = await getHttpResponse(url, {method: "POST",
-                                               headers: headers,
+                                               headers: headers_ytm,
                                                body: JSON.stringify(body)}, "json");
 
     return digestSearchResults(response);
@@ -83,13 +79,8 @@ export async function fetchHome() {
     let body = getRequestBody();
     body["browseId"] = "FEmusic_home";
 
-    const headers = {
-        Referer:        "https://music.youtube.com/",
-        "Content-Type": "application/json"
-    };
-
     let response = await getHttpResponse(url, {method: "POST",
-                                               headers: headers,
+                                               headers: headers_ytm,
                                                body: JSON.stringify(body)}, "json");
 
     return digestHomeResults(response);
@@ -102,13 +93,8 @@ export async function fetchSuggestions(input) {
     let body = getRequestBody();
     body["input"] = input;
 
-    const headers = {
-        Referer:        "https://music.youtube.com/",
-        "Content-Type": "application/json"
-    };
-
     let response = await getHttpResponse(url, {method: "POST",
-                                               headers: headers,
+                                               headers: headers_ytm,
                                                body: JSON.stringify(body)}, "json");
 
     return null;
@@ -122,13 +108,8 @@ export async function fetchBrowse(browseId) {
     //body["browseId"] = "VL" + playlistId;
     body["browseId"] = browseId;
 
-    const headers = {
-        Referer:        "https://music.youtube.com/",
-        "Content-Type": "application/json"
-    };
-
     let response = await getHttpResponse(url, {method: "POST",
-                                               headers: headers,
+                                               headers: headers_ytm,
                                                body: JSON.stringify(body)}, "json");
 
     return digestBrowseResults(response, browseId);
