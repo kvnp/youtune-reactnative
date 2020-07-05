@@ -6,6 +6,16 @@ import {
 } from "react-native";
 
 export default class Songs extends PureComponent {
+    componentDidMount() {
+        this._unsubscribe = this.props.navigation.addListener('focus', () => {
+            global.setLibraryNavigator(2);
+        });
+    }
+    
+    componentWillUnmount() {
+        this._unsubscribe();
+    }
+
     render() {
         return (
             <ScrollView style={styles.playlistCollection} contentContainerStyle={styles.playlistCollectionContainer}>

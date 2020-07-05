@@ -19,6 +19,16 @@ export default class Playlists extends PureComponent {
         }
     }
 
+    componentDidMount() {
+        this._unsubscribe = this.props.navigation.addListener('focus', () => {
+            global.setLibraryNavigator(0);
+        });
+    }
+    
+    componentWillUnmount() {
+        this._unsubscribe();
+    }
+
     openCreatePlaylist = () => {
         this.props.navigation.navigate("CreatePlaylist", {
             onGoBack: this.createPlaylist

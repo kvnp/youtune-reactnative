@@ -13,6 +13,11 @@ export class LibraryNavigator extends PureComponent {
         this.state = {
             selection: 0
         }
+
+        global.setLibraryNavigator = (selection) => {
+            if (this.state.selection != selection)
+                this.setState({selection: selection});
+        };
     }
 
     getStyle = (value) => {
