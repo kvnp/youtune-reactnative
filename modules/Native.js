@@ -5,6 +5,7 @@ var hl = null;
 
 function getSystemLocale() {
     let locale;
+
     // iOS
     if ( NativeModules.SettingsManager &&
          NativeModules.SettingsManager.settings &&
@@ -15,9 +16,7 @@ function getSystemLocale() {
     else if (NativeModules.I18nManager)
         locale = NativeModules.I18nManager.localeIdentifier;
     
-
     if (typeof locale === 'undefined') return 'en';
-    
     return locale;
 }
 

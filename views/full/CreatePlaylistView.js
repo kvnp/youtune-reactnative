@@ -49,7 +49,7 @@ export function CreatePlaylistView({ route, navigation }) {
                                       onPress={() =>  {
                                           if (title.length > 0 && description.length > 0) {
                                             navigation.goBack();
-                                            route.params.onGoBack(title, description);
+                                            global.createPlaylist(title, description);
                                           }
                                       }}>
                         <Text style={styles.headerButtonText}>SPEICHERN</Text>

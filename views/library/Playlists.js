@@ -17,6 +17,10 @@ export default class Playlists extends PureComponent {
         this.state = {
             playlists: []
         }
+
+        global.createPlaylist = (title, subtitle) => {
+            this.createPlaylist(title, subtitle);
+        }
     }
 
     componentDidMount() {
@@ -30,9 +34,7 @@ export default class Playlists extends PureComponent {
     }
 
     openCreatePlaylist = () => {
-        this.props.navigation.navigate("CreatePlaylist", {
-            onGoBack: this.createPlaylist
-        });
+        this.props.navigation.navigate("CreatePlaylist");
     }
 
     createPlaylist = (title, description) => {
@@ -40,6 +42,7 @@ export default class Playlists extends PureComponent {
         temp.push({title: title, subtitle: description});
 
         this.setState({playlists: temp});
+        this.forceUpdate();
     }
 
     getPlaylist = (playlistJson) => {
