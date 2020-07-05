@@ -10,7 +10,7 @@ import LibraryTab from "../tabs/LibraryTab";
 import SettingsTab from "../tabs/SettingsTab";
 
 import { Header } from "../../components/SharedComponents";
-import { headerStyle } from "../../styles/App";
+import { headerStyle, appColor } from "../../styles/App";
 
 export default class Navigator extends PureComponent {
     constructor(props) {
@@ -41,7 +41,7 @@ export default class Navigator extends PureComponent {
         return (
             <>
                 <Header style={headerStyle.headerPicture} text={this.state.title} source={this.state.image}/>
-                <Tab.Navigator initialRouteName="Home" barStyle={{ backgroundColor: '#694fad' }}>
+                <Tab.Navigator initialRouteName="Home" barStyle={appColor.background}>
                     <Tab.Screen name="Home" component={HomeTab} options={this.getTabOptions("home")}/>
                     <Tab.Screen name="Suche" component={SearchTab} options={this.getTabOptions("search")}/>
                     <Tab.Screen name="Bibliothek" component={LibraryTab} options={this.getTabOptions("folder")}/>

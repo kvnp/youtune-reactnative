@@ -26,6 +26,7 @@ export default class Playlists extends PureComponent {
     componentDidMount() {
         this._unsubscribe = this.props.navigation.addListener('focus', () => {
             global.setLibraryNavigator(0);
+            this.forceUpdate();
         });
     }
     
