@@ -20,7 +20,8 @@ export default class App extends Component {
         StatusBar.setTranslucent(true);
         StatusBar.setBackgroundColor("transparent", true);
         super(props);
-        this.options = {
+
+        global.navigationOptions = {
             headerTitle: null,
             headerShown: false
         };
@@ -31,11 +32,11 @@ export default class App extends Component {
         return (
             <NavigationContainer>
                 <Stack.Navigator>
-                    <Stack.Screen options={this.options} name="App" component={Navigator} />
-                    <Stack.Screen options={this.options} name="Playlist" component={PlaylistView}/>
-                    <Stack.Screen options={this.options} name="Music" component={PlayView}/>
-                    <Stack.Screen options={this.options} name="Artist" component={ArtistView}/>
-                    <Stack.Screen options={this.options} name="CreatePlaylist" component={CreatePlaylistView}/>
+                    <Stack.Screen name="App" component={Navigator} options={global.navigationOptions}/>
+                    <Stack.Screen name="Playlist" component={PlaylistView} options={global.navigationOptions}/>
+                    <Stack.Screen name="Music" component={PlayView} options={global.navigationOptions}/>
+                    <Stack.Screen name="Artist" component={ArtistView} options={global.navigationOptions}/>
+                    <Stack.Screen name="CreatePlaylist" component={CreatePlaylistView} options={global.navigationOptions}/>
                 </Stack.Navigator>
             </NavigationContainer>
         );

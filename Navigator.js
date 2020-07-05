@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 
-import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import { createMaterialBottomTabNavigator } from "@react-navigation/material-bottom-tabs";
 
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 
@@ -28,20 +28,20 @@ export default class Navigator extends Component {
         }
     }
 
-    getIcon = (title, color, size) => {
-        return <MaterialIcons name={title} color={color} size={size} />;
+    getIcon = (title, color) => {
+        return <MaterialIcons name={title} color={color} size={24} />;
     }
 
     getTabOptions = (title) => {
-        return { tabBarIcon: ({ color, size }) => this.getIcon(title, color, size) }
+        return { tabBarIcon: ({ color }) => this.getIcon(title, color) }
     }
 
     render() {
-        const Tab = createBottomTabNavigator();
+        const Tab = createMaterialBottomTabNavigator();
         return (
             <>
                 <Header style={headerStyle.headerPicture} text={this.state.title} source={this.state.image}/>
-                <Tab.Navigator>
+                <Tab.Navigator initialRouteName="Home" barStyle={{ backgroundColor: '#694fad' }}>
                     <Tab.Screen name="Home" component={HomeTab} options={this.getTabOptions("home")}/>
                     <Tab.Screen name="Suche" component={SearchTab} options={this.getTabOptions("search")}/>
                     <Tab.Screen name="Bibliothek" component={LibraryTab} options={this.getTabOptions("folder")}/>
