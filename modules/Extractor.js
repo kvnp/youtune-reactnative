@@ -1,3 +1,5 @@
+import { msToMin, msToMMSS } from "./Utils";
+
 export function digestSearchResults(json) {
     let final = {results: 0, suggestion: [], reason: null, topics: []};
 
@@ -149,8 +151,35 @@ export function digestHomeResults(json) {
                 album.subtitle += shelfRenderer.contents[m].musicTwoRowItemRenderer.subtitle.runs[k].text;
             }
 
-            album.browseId = shelfRenderer.contents[m].musicTwoRowItemRenderer.navigationEndpoint.browseEndpoint.browseId;
-            album.playlistId = shelfRenderer.contents[m].musicTwoRowItemRenderer.thumbnailOverlay.musicItemThumbnailOverlayRenderer.content.musicPlayButtonRenderer.playNavigationEndpoint.watchPlaylistEndpoint.playlistId;
+            let videoId;
+            let browseId;
+            let playlistId;
+
+            let musicItem = shelfRenderer.contents[m].musicTwoRowItemRenderer;
+            if (musicItem.hasOwnProperty("navigationEndpoint")) {
+                let navigationEndpoint = shelfRenderer.contents[m].musicTwoRowItemRenderer.navigationEndpoint;
+                if (navigationEndpoint.hasOwnProperty("watchEndpoint")) {
+                    if (navigationEndpoint.watchEndpoint.hasOwnProperty("watchPlaylistEndpoint"))
+                        playlistId = playNavigationEndpoint.watchPlaylistEndpoint.playlistId;
+
+                    if (navigationEndpoint.watchEndpoint.hasOwnProperty("videoId"))
+                        videoId = navigationEndpoint.watchEndpoint.videoId;
+                }
+
+                if (navigationEndpoint.hasOwnProperty("browseEndpoint")) {
+                    if (navigationEndpoint.browseEndpoint.hasOwnProperty("browseId"))
+                        browseId = navigationEndpoint.browseEndpoint.browseId;
+                }
+            }
+
+            if (browseId != undefined)
+                album.browseId = browseId;
+
+            if (playlistId != undefined)
+                album.playlistId = playlistId;
+
+            if (videoId != undefined)
+                album.videoId = videoId;
 
             album.thumbnail = shelfRenderer.contents[m].musicTwoRowItemRenderer.thumbnailRenderer.musicThumbnailRenderer.thumbnail.thumbnails[0].url;
 
@@ -260,19 +289,7 @@ function getPlaylist(json) {
     return browse;
 }
 
-function msToMin(ms) {
-    return Math.floor((ms / 1000 / 60) % 60);
-}
 
-function msToMMSS(ms) {
-    const seconds = Math.floor((ms / 1000) % 60);
-    const minutes = msToMin(ms);
-
-    let secondString = seconds + "";
-    if (secondString.length == 1) secondString = "0" + secondString;
-    
-    return minutes + ":" + secondString;
-}
 
 function getAlbum(json) {
     let updatelist = json.frameworkUpdates.entityBatchUpdate.mutations
@@ -414,7 +431,6 @@ function getArtist(json) {
 }
 
 export function digestBrowseResults(json, browseId) {
-    console.log(browseId);
     if (browseId.slice(0, 2) === "VL") {
         return getPlaylist(json);
     } else if (browseId.slice(0, 2) === "UC") {

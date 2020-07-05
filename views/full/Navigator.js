@@ -29,7 +29,7 @@ export default class Navigator extends PureComponent {
     }
 
     getIcon = (title, color) => {
-        return <MaterialIcons name={title} color={color} size={24} />;
+        return <MaterialIcons name={title} color={color} size={24}/>;
     }
 
     getTabOptions = (title) => {
