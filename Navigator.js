@@ -2,7 +2,7 @@ import React, { Component } from "react";
 
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 
-import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
+import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 
 import SearchTab from "./tabs/SearchTab";
 import HomeTab from "./tabs/HomeTab";
@@ -29,7 +29,7 @@ export default class Navigator extends Component {
     }
 
     getIcon = (title, color, size) => {
-        return <MaterialCommunityIcons name={title} color={color} size={size} />;
+        return <MaterialIcons name={title} color={color} size={size} />;
     }
 
     getTabOptions = (title) => {
@@ -43,7 +43,7 @@ export default class Navigator extends Component {
                 <Header style={headerStyle.headerPicture} text={this.state.title} source={this.state.image}/>
                 <Tab.Navigator>
                     <Tab.Screen name="Home" component={HomeTab} options={this.getTabOptions("home")}/>
-                    <Tab.Screen name="Suche" component={SearchTab} options={this.getTabOptions("magnify")}/>
+                    <Tab.Screen name="Suche" component={SearchTab} options={this.getTabOptions("search")}/>
                     <Tab.Screen name="Bibliothek" component={LibraryTab} options={this.getTabOptions("folder")}/>
                     <Tab.Screen name="Einstellungen" component={SettingsTab} options={this.getTabOptions("settings")}/>
                 </Tab.Navigator>
