@@ -1,11 +1,11 @@
-import React, { Component } from "react";
+import React, { PureComponent } from "react";
 import {
     ScrollView,
     StyleSheet,
     Text,
 } from "react-native";
 
-export default class Subscriptions extends Component {
+export default class Subscriptions extends PureComponent {
     render() {
         return (
             <ScrollView style={styles.playlistCollection} contentContainerStyle={styles.playlistCollectionContainer}>

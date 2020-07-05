@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import React, { PureComponent } from 'react';
 
 import {
     Text,
@@ -10,7 +10,7 @@ import {
     Results
 } from '../components/HomeComponents';
 
-export default class HomeTab extends Component {
+export default class HomeTab extends PureComponent {
     constructor(props) {
         super(props);
         this.state = {

@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import React, { PureComponent } from 'react';
 
 import {
     Text,
@@ -6,7 +6,7 @@ import {
     TouchableOpacity
 } from 'react-native';
 
-export default class SettingsTab extends Component {
+export default class SettingsTab extends PureComponent {
     constructor(props) {
         super(props);
         this.state = {

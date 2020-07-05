@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import React, {PureComponent} from 'react';
 
 import {
     ImageBackground,
@@ -13,7 +13,7 @@ import LinearGradient from 'react-native-linear-gradient';
 
 import { fetchBrowse } from '../modules/Tube';
 
-export class Header extends Component {
+export class Header extends PureComponent {
     constructor(props) {
         super(props);
         this.state = {
@@ -57,7 +57,7 @@ export class Header extends Component {
     }
 }
 
-export class Song extends Component {
+export class Song extends PureComponent {
     constructor(props) {
         super(props);
         this.song = this.props.song;
@@ -83,7 +83,7 @@ export class Song extends Component {
     }
 }
 
-export class Playlist extends Component {
+export class Playlist extends PureComponent {
     constructor(props) {
         super(props);
         this.playlist = this.props.playlist;

@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React, { PureComponent } from "react";
 
 import {
     StatusBar
@@ -14,7 +14,7 @@ import { CreatePlaylistView } from "./views/CreatePlaylistView";
 
 import Navigator from "./Navigator";
 
-export default class App extends Component {
+export default class App extends PureComponent {
     constructor(props) {
         StatusBar.setBarStyle("dark-content", true);
         StatusBar.setTranslucent(true);

@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React, { PureComponent } from "react";
 import {
     ScrollView,
     StyleSheet,
@@ -11,7 +11,7 @@ import {
     Playlist
 } from '../components/SharedComponents';
 
-export default class Playlists extends Component {
+export default class Playlists extends PureComponent {
     constructor(props) {
         super(props);
         this.state = {

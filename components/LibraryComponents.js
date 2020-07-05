@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import React, { PureComponent } from 'react';
 
 import {
     Text,
@@ -7,7 +7,7 @@ import {
     TouchableOpacity
 } from "react-native";
 
-export class LibraryNavigator extends Component {
+export class LibraryNavigator extends PureComponent {
     constructor(props) {
         super(props);
         this.state = {

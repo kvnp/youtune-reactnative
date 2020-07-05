@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import React, { PureComponent } from 'react';
 
 import { StyleSheet } from 'react-native';
 
@@ -7,7 +7,7 @@ import {
     SearchBar
 } from '../components/SearchComponents';
 
-export default class SearchTab extends Component {
+export default class SearchTab extends PureComponent {
     constructor(props) {
         super(props);
         this.state = {

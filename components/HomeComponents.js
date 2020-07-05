@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import React, { PureComponent } from 'react';
 
 import {
     Text,
@@ -11,7 +11,7 @@ import { Playlist } from './SharedComponents';
 
 import { fetchHome } from '../modules/Tube';
 
-export class Results extends Component {
+export class Results extends PureComponent {
     constructor(props){
         super(props);
         this.state = {

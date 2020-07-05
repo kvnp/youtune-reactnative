@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React, { PureComponent } from "react";
 
 import { createMaterialBottomTabNavigator } from "@react-navigation/material-bottom-tabs";
 
@@ -12,7 +12,7 @@ import SettingsTab from "./tabs/SettingsTab";
 import { Header } from "./components/SharedComponents";
 import { headerStyle } from "./styles/App";
 
-export default class Navigator extends Component {
+export default class Navigator extends PureComponent {
     constructor(props) {
         super(props);
         this.state = {

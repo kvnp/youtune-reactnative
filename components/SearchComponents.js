@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import React, {PureComponent} from 'react';
 
 import {
     Button,
@@ -19,7 +19,7 @@ import {
     fetchBrowse
 } from '../modules/Tube';
 
-export class SearchBar extends Component {
+export class SearchBar extends PureComponent {
     constructor(props) {
         super(props);
         this.state = {
@@ -127,7 +127,7 @@ export class SearchBar extends Component {
     }
 }
 
-export class Results extends Component {
+export class Results extends PureComponent {
     startVideo = (id) => fetchVideo(id).then((data) => {
         /*for (let i = 0; i < data.length; i++) {
             console.log(decodeURIComponent(data[i].signatureCipher.substring(data[i].signatureCipher.indexOf("url=") + 4)));
