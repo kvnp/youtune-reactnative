@@ -6,34 +6,12 @@ import {
     ScrollView,
 } from "react-native";
 
-import {
-    fetchVideo,
-    fetchBrowse
-} from '../../modules/API';
-
-import { searchStyle, topicStyle } from '../../styles/SearchTab';
-import SongElement from '../shared/SongElement';
+import { searchStyle, topicStyle } from '../../styles/Search';
+import Entry from '../shared/Entry';
 
 export default class SearchResults extends PureComponent {
-    startVideo = (id) => fetchVideo(id).then((data) => {
-        /*for (let i = 0; i < data.length; i++) {
-            console.log(decodeURIComponent(data[i].signatureCipher.substring(data[i].signatureCipher.indexOf("url=") + 4)));
-            new Player(decodeURIComponent(data[i].signatureCipher.substring(data[i].signatureCipher.indexOf("url=") + 4)));
-        }*/
-    });
-
-    triggerEvent = (element) => {
-        if (["Song", "Video"].includes(element.type))
-            this.startVideo(element.videoId); // TODO: PlayerView
-        else if (["Album", "Playlist"].includes(element.type))
-            fetchBrowse(element.browseId).then((result) => 
-                this.props.navigation.navigate("Playlist", result)
-            );
-        else console.log(element.browseId);
-    }
-
     displayElement = (element) => {
-        return <SongElement song={element}/>;
+        return <Entry song={element} navigation={this.props.navigation}/>;
     }
 
     displayElements = (elements) => {
@@ -41,14 +19,13 @@ export default class SearchResults extends PureComponent {
     }
 
     displayTopic = (topic) => {
-        if (topic.elements.length > 0) {
+        if (topic.elements.length > 0)
             return (
                 <View style={topicStyle.topicView}>
                     <Text style={topicStyle.topicHeader}>{topic.topic}</Text>
                     {this.displayElements(topic)}
                 </View>
             );
-        }
     }
 
     displayTopics = (result) => {

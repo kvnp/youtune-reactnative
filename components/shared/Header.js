@@ -3,10 +3,10 @@ import React, { PureComponent } from 'react';
 import {
     ImageBackground,
     Text,
-    StyleSheet
 } from "react-native";
 
 import LinearGradient from 'react-native-linear-gradient';
+import { headerStyle, gradientColors } from '../../styles/App';
 
 export default class Header extends PureComponent {
     constructor(props) {
@@ -37,13 +37,13 @@ export default class Header extends PureComponent {
 
     render() {
         return (
-            <ImageBackground imageStyle={styles.imageStyle}
-                             style={[styles.containerStyle, this.props.style]}
+            <ImageBackground imageStyle={headerStyle.image}
+                             style={[headerStyle.container, this.props.style]}
                              source={this.state.source}>
-                <LinearGradient style={[styles.linearGradient, styles.imageStyle]}
-                                colors={["#7f9f9f9f", "#ffffff00"]}>
+                <LinearGradient style={[headerStyle.gradient, headerStyle.image]}
+                                colors={gradientColors}>
                                     
-                    <Text style={[{color: this.state.headerColor}, styles.textStyle]}>
+                    <Text style={[{color: this.state.headerColor}, headerStyle.text]}>
                         {this.props.text}
                     </Text>
                 </LinearGradient>
@@ -51,75 +51,3 @@ export default class Header extends PureComponent {
         )
     }
 }
-
-const styles = StyleSheet.create({
-    imageStyle: {
-        borderBottomLeftRadius: 25,
-        borderBottomRightRadius: 25,
-        backgroundColor: 'transparent'
-    },
-
-    linearGradient: {
-        width: '100%',
-        height: '100%',
-        alignItems: 'center',
-        justifyContent: 'center'
-    },
-
-    containerStyle: {
-        alignItems: 'center',
-        justifyContent: 'center',
-        backgroundColor: 'transparent',
-        marginBottom: -20,
-        zIndex: 1
-    },
-
-    textStyle: {
-        fontSize: 45,
-        fontWeight: 'bold'
-    },
-
-    playlistContainer: {
-        height: 230,
-        width: 150,
-    },
-
-    playlistCover: {
-        alignItems:'center',
-        justifyContent:'center',
-        height: 150,
-        width: 150,
-        backgroundColor: 'gray'
-    },
-
-    playlistTitle: {
-        paddingTop: 5,
-        fontSize: 14,
-        fontWeight:'bold'
-    },
-
-    playlistDesc: {
-        fontSize: 14,
-    },
-
-    titleView: {
-        paddingTop: 5,
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-around',
-    },
-
-    titleCover: {
-        width: 50,
-        height: 50,
-        backgroundColor: 'gray'
-    },
-
-    titleTextCollection: {
-        width: '60%'
-    },
-
-    titleTitle: {
-        fontWeight: 'bold'
-    }
-});

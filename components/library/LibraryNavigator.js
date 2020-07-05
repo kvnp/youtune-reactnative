@@ -2,10 +2,10 @@ import React, { PureComponent } from 'react';
 
 import {
     Text,
-    StyleSheet,
     ScrollView,
     TouchableOpacity
 } from "react-native";
+import { navigatorStyle } from '../../styles/Library';
 
 export default class LibraryNavigator extends PureComponent {
     constructor(props) {
@@ -22,16 +22,16 @@ export default class LibraryNavigator extends PureComponent {
 
     getStyle = (value) => {
         if (value == this.state.selection)
-            return styles.headerEntryFocus;
+            return navigatorStyle.focus;
         else
-            return styles.headerEntry;
+            return navigatorStyle.entry;
     }
 
     getTextStyle = (value) => {
         if (value == this.state.selection)
-            return styles.headerEntryTextFocus;
+            return navigatorStyle.focusText;
         else
-            return styles.headerEntryText;
+            return navigatorStyle.entryText;
     }
 
     update = (value) => {
@@ -59,7 +59,7 @@ export default class LibraryNavigator extends PureComponent {
 
     render() {
         return (
-            <ScrollView style={styles.header} horizontal={true} showsHorizontalScrollIndicator={false}>
+            <ScrollView style={navigatorStyle.container} horizontal={true} showsHorizontalScrollIndicator={false}>
                 <TouchableOpacity onPress={() => {this.update(0)}} style={this.getStyle(0)}>
                     <Text style={this.getTextStyle(0)}>PLAYLISTS</Text>
                 </TouchableOpacity>
@@ -83,93 +83,3 @@ export default class LibraryNavigator extends PureComponent {
         );
     }
 }
-
-const styles = StyleSheet.create({
-    headerPicture: {
-        width: '100%',
-        height: '20%'
-    },
-
-    header: {
-        alignSelf: 'center',
-        width: '100%',
-        height: 50,
-        position: 'absolute',
-        bottom: -5
-    },
-
-    headerEntry: {
-        height: 50,
-        paddingRight: 15,
-        paddingLeft: 15,
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
-
-    headerEntryFocus: {
-        height: 50,
-        paddingRight: 15,
-        paddingLeft: 15,
-        alignItems: 'center',
-        justifyContent: 'center'
-    },
-
-    headerEntryText: {
-        borderBottomWidth: 3,
-        borderBottomColor: 'transparent',
-    },
-
-    headerEntryTextFocus: {
-        fontWeight: 'bold',
-        borderBottomWidth: 3,
-        borderBottomColor: 'gray',
-    },
-
-    playlistCollection: {
-        width: '100%'
-    },
-
-    playlistCollectionContainer: {
-        flexGrow: 1,
-        justifyContent: 'center',
-        flexDirection: 'row',
-        flexWrap: 'wrap-reverse'
-    },
-
-    playlist: {
-        alignItems: 'center',
-        marginTop: 140,
-        marginLeft: 30,
-        marginRight: 30,
-        width: 100,
-        height: 100
-    },
-
-    playlistCover: {
-        alignItems:'center',
-        justifyContent:'center',
-        height: 150,
-        width: 150,
-        backgroundColor: 'gray'
-    },
-
-    playlistTitle: {
-        paddingTop: 5,
-        fontSize: 15,
-        fontWeight:'bold',
-        width: '150%',
-    },
-
-    playlistDesc: {
-        fontSize: 10,
-    },
-
-    newPlaylist: {
-        color: 'white',
-        fontSize: 80,
-    },
-
-    addPlaylist: {
-
-    }
-});

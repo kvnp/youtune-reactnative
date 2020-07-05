@@ -3,7 +3,7 @@ import React, { PureComponent } from 'react';
 import SearchBar from '../../components/search/SearchBar';
 import Results from '../../components/search/SearchResults';
 
-import { searchBarStyle } from '../../styles/SearchTab';
+import { searchBarStyle } from '../../styles/Search';
 
 export default class SearchTab extends PureComponent {
     constructor(props) {

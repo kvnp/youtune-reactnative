@@ -6,7 +6,7 @@ import {
 } from 'react-native';
 
 import Results from '../../components/home/HomeResults';
-import { mainStyle, refreshStyle } from '../../styles/HomeTab';
+import { mainStyle, refreshStyle } from '../../styles/Home';
 
 export default class HomeTab extends PureComponent {
     constructor(props) {

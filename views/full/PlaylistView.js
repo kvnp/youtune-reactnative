@@ -9,10 +9,10 @@ import {
     TouchableOpacity
 } from "react-native";
 
-import Song from "../../components/shared/Song";
+import Entry from "../../components/shared/Entry";
 
 function getEntry(song) {
-    return <Song song={song}/>
+    return <Entry song={song}/>
 }
 
 function getEntries(songs) {

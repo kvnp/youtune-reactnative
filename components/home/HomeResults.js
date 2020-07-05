@@ -2,7 +2,6 @@ import React, { PureComponent } from 'react';
 
 import {
     Text,
-    StyleSheet,
     ScrollView,
     View
 } from "react-native";
@@ -10,6 +9,8 @@ import {
 import Playlist from '../shared/Playlist';
 
 import { fetchHome } from '../../modules/API';
+
+import { resultHomeStyle, albumStyle } from '../../styles/Home';
 
 export default class Results extends PureComponent {
     constructor(props){
@@ -59,15 +60,15 @@ export default class Results extends PureComponent {
     openAlbum = (album) => this.props.navigation.navigate("Playlist", album);
 
     displayAlbums = (albums) => {
-        return albums.map(album => { return <Playlist style={styles.album} playlist={album} navigation={this.props.navigation}/> } );
+        return albums.map(album => { return <Playlist style={albumStyle.album} playlist={album} navigation={this.props.navigation}/> } );
     }
 
     displayShelf = (shelf) => {
         if (shelf.albums.length > 0) {
             return (
                 <>
-                    <Text style={styles.homeText}>{shelf.title}</Text>
-                    <ScrollView style={styles.albumCollection} horizontal={true} showsHorizontalScrollIndicator={false}>
+                    <Text style={resultHomeStyle.homeText}>{shelf.title}</Text>
+                    <ScrollView style={albumStyle.albumCollection} horizontal={true} showsHorizontalScrollIndicator={false}>
                         {this.displayAlbums(shelf.albums)}
                     </ScrollView>
                 </>
@@ -81,68 +82,17 @@ export default class Results extends PureComponent {
 
     displayHome = () => {
         if (this.state.home == null || this.state.started)
-            return <Text style={styles.preHome}>{this.state.icon}</Text>
+            return <Text style={resultHomeStyle.preHome}>{this.state.icon}</Text>
         else
             return <View>{this.displayShelves(this.state.home)}</View>
     }
 
     render() {
         return (
-            <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContainer}>
+            <ScrollView style={resultHomeStyle.scrollView}
+                        contentContainerStyle={resultHomeStyle.scrollContainer}>
                 {this.displayHome()}
             </ScrollView>
         )
     }
 }
-
-const styles = StyleSheet.create({
-    preHome: {
-        fontSize: 70,
-    },
-
-    scrollView: {
-        paddingTop: 15,
-        flexGrow: 1,
-        flexDirection: 'column'
-    },
-    
-    scrollContainer: {
-        flexGrow: 1,
-        alignItems: 'center',
-        justifyContent: 'center'
-    },
-
-    homeText: {
-        fontWeight: 'bold',
-        paddingLeft: 20,
-        paddingTop: 20,
-        fontSize: 25
-    },
-
-    albumCollection: {
-        paddingTop: 10,
-        paddingLeft: 20,
-        paddingBottom: 5,
-        marginBottom: 35
-    },
-
-    album: {
-        marginRight: 20
-    },
-
-    albumCover: {
-        height: 100,
-        width: 100,
-        backgroundColor: 'gray'
-    },
-
-    albumTitle: {
-        paddingTop: 5,
-        fontSize: 10,
-        fontWeight: 'bold'
-    },
-
-    albumDesc: {
-        fontSize: 10,
-    }
-});

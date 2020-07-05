@@ -11,7 +11,7 @@ import {
 
 import { fetchResults } from '../../modules/API';
 
-import { searchBarStyle, specificStyle } from '../../styles/SearchTab';
+import { searchBarStyle, specificStyle } from '../../styles/Search';
 import { textStyle } from '../../styles/App';
 
 export default class SearchBar extends PureComponent {
