@@ -1,5 +1,10 @@
 import { getHL, getGL } from "./Native";
-import { digestHomeResults, digestSearchResults, digestBrowseResults } from "./Extractor";
+import {
+    digestHomeResults,
+    digestSearchResults,
+    digestBrowseResults
+} from "./Extractor";
+
 import { getHttpResponse, getUrl } from "./HTTP";
 
 const headers_api = {"User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:77.0) Gecko/20100101 Firefox/77.0"};
@@ -8,16 +13,16 @@ const headers_ytm = {
     "Content-Type": "application/json"
 };
 
-
 async function getApiKey() {
-    if (global.apikey == null) {
+    if (global.apiKey == null) {
         let text = await getHttpResponse("https://music.youtube.com/", {method: "GET", headers: headers_api}, "text");
 
         text = text.slice(text.indexOf("INNERTUBE_API_KEY\":\"")+20);
-        global.apikey = text.slice(0, text.indexOf("\""));
-        console.log(global.apikey);
+        global.apiKey = text.slice(0, text.indexOf("\""));
+        console.log(global.apiKey);
     }
-    return global.apikey;
+
+    return global.apiKey;
 }
 
 function getRequestBody() {
@@ -105,7 +110,6 @@ export async function fetchBrowse(browseId) {
     const url = getUrl("browse", apikey);
 
     let body = getRequestBody();
-    //body["browseId"] = "VL" + playlistId;
     body["browseId"] = browseId;
 
     let response = await getHttpResponse(url, {method: "POST",

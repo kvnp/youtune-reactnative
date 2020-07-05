@@ -11,7 +11,7 @@ import {
 
 import LinearGradient from 'react-native-linear-gradient';
 
-import { fetchBrowse } from '../modules/Tube';
+import { fetchBrowse } from '../modules/API';
 
 export class Header extends PureComponent {
     constructor(props) {

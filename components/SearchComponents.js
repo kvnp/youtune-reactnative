@@ -17,7 +17,7 @@ import {
     fetchResults,
     fetchVideo,
     fetchBrowse
-} from '../modules/Tube';
+} from '../modules/API';
 
 export class SearchBar extends PureComponent {
     constructor(props) {

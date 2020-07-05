@@ -9,7 +9,7 @@ import {
 
 import { Playlist } from './SharedComponents';
 
-import { fetchHome } from '../modules/Tube';
+import { fetchHome } from '../modules/API';
 
 export class Results extends PureComponent {
     constructor(props){
