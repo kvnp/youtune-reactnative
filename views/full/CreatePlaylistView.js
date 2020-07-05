@@ -142,7 +142,6 @@ const styles = StyleSheet.create({
     }
 });
 
-
 /*
 "Man hilft immer zwei", Elias Koné - 14. Juni 2020
 */

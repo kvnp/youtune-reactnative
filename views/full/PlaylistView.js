@@ -9,7 +9,7 @@ import {
     TouchableOpacity
 } from "react-native";
 
-import { Song } from "../../components/SharedComponents";
+import Song from "../../components/shared/Song";
 
 function getEntry(song) {
     return <Song song={song}/>

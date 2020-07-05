@@ -7,9 +7,7 @@ import {
     TouchableOpacity
 } from "react-native";
 
-import {
-    Playlist
-} from '../../components/SharedComponents';
+import Playlist from '../../components/shared/Playlist';
 
 export default class Playlists extends PureComponent {
     constructor(props) {

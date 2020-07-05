@@ -1,19 +1,14 @@
-import React, {PureComponent} from 'react';
+import React, { PureComponent } from 'react';
 
 import {
     ImageBackground,
     Text,
-    StyleSheet,
-    Image,
-    TouchableOpacity,
-    View
+    StyleSheet
 } from "react-native";
 
 import LinearGradient from 'react-native-linear-gradient';
 
-import { fetchBrowse } from '../modules/API';
-
-export class Header extends PureComponent {
+export default class Header extends PureComponent {
     constructor(props) {
         super(props);
         this.state = {
@@ -54,69 +49,6 @@ export class Header extends PureComponent {
                 </LinearGradient>
             </ImageBackground>
         )
-    }
-}
-
-export class Song extends PureComponent {
-    constructor(props) {
-        super(props);
-        this.song = this.props.song;
-    }
-
-    render() {
-        return (
-            <TouchableOpacity style={styles.titleView}>
-                <Image style={styles.titleCover} source={{uri: this.song.thumbnail}}/>
-                <View style={styles.titleTextCollection}>
-                    <Text numberOfLines={1} style={styles.titleTitle}>
-                        {this.song.title}
-                    </Text>
-                    <Text numberOfLines={1} style={styles.titleSubTitle}>
-                        {this.song.subtitle}
-                    </Text>
-                </View>
-                <Text style={styles.titleTimeText}>
-                    {this.song.length}
-                </Text>
-            </TouchableOpacity>
-        )
-    }
-}
-
-export class Playlist extends PureComponent {
-    constructor(props) {
-        super(props);
-        this.playlist = this.props.playlist;
-        this.browse = null;
-    }
-
-    viewPlaylist = () => {
-        if (this.browse == null) fetchBrowse(this.playlist.browseId).then((result) => {
-            this.browse = result;
-            this.props.navigation.navigate("Playlist", result);
-        });
-
-        else this.props.navigation.navigate("Playlist", this.browse);
-    }
-
-    render() {
-        return (
-            <View style={[this.props.style, styles.playlistContainer]}>
-                <TouchableOpacity onPress={() => this.viewPlaylist()}>
-                    <Image style={styles.playlistCover} source={{uri: this.playlist.thumbnail}}/>
-                </TouchableOpacity>
-
-                <Text style={styles.playlistTitle}
-                      numberOfLines={2}>
-                    {this.playlist.title}
-                </Text>
-
-                <Text style={styles.playlistDesc}
-                      numberOfLines={2}>
-                    {this.playlist.subtitle}
-                </Text>
-            </View>
-        );
     }
 }
 

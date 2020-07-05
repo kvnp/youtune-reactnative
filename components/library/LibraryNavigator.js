@@ -7,7 +7,7 @@ import {
     TouchableOpacity
 } from "react-native";
 
-export class LibraryNavigator extends PureComponent {
+export default class LibraryNavigator extends PureComponent {
     constructor(props) {
         super(props);
         this.state = {

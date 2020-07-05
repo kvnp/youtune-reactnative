@@ -1,7 +1,7 @@
 import React, { PureComponent } from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
 
-import { LibraryNavigator } from '../../components/LibraryComponents';
+import LibraryNavigator from '../../components/library/LibraryNavigator';
 import Playlists from '../library/Playlists';
 import Albums from '../library/Albums';
 import Songs from '../library/Songs';

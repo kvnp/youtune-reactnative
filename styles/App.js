@@ -12,3 +12,13 @@ export const headerStyle = StyleSheet.create({
         height: '20%'
     }
 });
+
+export const textStyle = StyleSheet.create({
+    text: {
+        color: 'white'
+    },
+
+    placeholder: {
+        color: 'darkgray'
+    }
+});

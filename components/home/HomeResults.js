@@ -7,11 +7,11 @@ import {
     View
 } from "react-native";
 
-import { Playlist } from './SharedComponents';
+import Playlist from '../shared/Playlist';
 
-import { fetchHome } from '../modules/API';
+import { fetchHome } from '../../modules/API';
 
-export class Results extends PureComponent {
+export default class Results extends PureComponent {
     constructor(props){
         super(props);
         this.state = {

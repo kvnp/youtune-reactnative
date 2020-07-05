@@ -1,11 +1,9 @@
 import React, { PureComponent } from 'react';
 
-import { StyleSheet } from 'react-native';
+import SearchBar from '../../components/search/SearchBar';
+import Results from '../../components/search/SearchResults';
 
-import {
-    Results,
-    SearchBar
-} from '../../components/SearchComponents';
+import { searchBarStyle } from '../../styles/SearchTab';
 
 export default class SearchTab extends PureComponent {
     constructor(props) {
@@ -38,27 +36,9 @@ export default class SearchTab extends PureComponent {
     render() {
         return (
             <>
-                <Results style={styles.resultView} passResults={this.state.results} passIcon={this.state.icon} navigation={this.props.navigation}/>
-                <SearchBar style={styles.searchBar} resultSender={this.resultReceiver} sendIcon={this.iconReceiver}/>
+                <Results passResults={this.state.results} passIcon={this.state.icon} navigation={this.props.navigation}/>
+                <SearchBar style={searchBarStyle.bar} resultSender={this.resultReceiver} sendIcon={this.iconReceiver}/>
             </>
         );
     }
 };
-
-const styles = StyleSheet.create({
-    headerPicture: {
-        width: '100%',
-        height: '20%'
-    },
-
-    resultView: {
-        paddingBottom: 120
-    },
-
-    searchBar: {
-        width: '100%',
-        position: 'absolute',
-        bottom: 10,
-        alignSelf: 'center'
-    }
-});

@@ -5,9 +5,7 @@ import {
     TouchableOpacity
 } from 'react-native';
 
-import {
-    Results
-} from '../../components/HomeComponents';
+import Results from '../../components/home/HomeResults';
 import { mainStyle, refreshStyle } from '../../styles/HomeTab';
 
 export default class HomeTab extends PureComponent {

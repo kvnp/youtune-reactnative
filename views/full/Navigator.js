@@ -9,7 +9,7 @@ import HomeTab from "../tabs/HomeTab";
 import LibraryTab from "../tabs/LibraryTab";
 import SettingsTab from "../tabs/SettingsTab";
 
-import { Header } from "../../components/SharedComponents";
+import Header from "../../components/shared/Header";
 import { headerStyle, appColor } from "../../styles/App";
 
 export default class Navigator extends PureComponent {
