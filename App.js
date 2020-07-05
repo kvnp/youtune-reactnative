@@ -12,7 +12,7 @@ import { PlaylistView } from "./views/full/PlaylistView";
 import { ArtistView } from "./views/full/ArtistView";
 import { CreatePlaylistView } from "./views/full/CreatePlaylistView";
 
-import Navigator from "./Navigator";
+import Navigator from "./views/full/Navigator";
 
 export default class App extends PureComponent {
     constructor(props) {
