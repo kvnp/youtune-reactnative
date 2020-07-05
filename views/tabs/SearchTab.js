@@ -5,7 +5,7 @@ import { StyleSheet } from 'react-native';
 import {
     Results,
     SearchBar
-} from '../components/SearchComponents';
+} from '../../components/SearchComponents';
 
 export default class SearchTab extends PureComponent {
     constructor(props) {

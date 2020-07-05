@@ -1,12 +1,12 @@
 import React, { PureComponent } from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
 
-import { LibraryNavigator } from '../components/LibraryComponents';
-import Playlists from '../views/library/Playlists';
-import Albums from '../views/library/Albums';
-import Songs from '../views/library/Songs';
-import Artists from '../views/library/Artists';
-import Subscriptions from '../views/library/Subscriptions';
+import { LibraryNavigator } from '../../components/LibraryComponents';
+import Playlists from '../library/Playlists';
+import Albums from '../library/Albums';
+import Songs from '../library/Songs';
+import Artists from '../library/Artists';
+import Subscriptions from '../library/Subscriptions';
 
 export default class LibraryTab extends PureComponent {
     componentDidMount() {

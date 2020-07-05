@@ -8,7 +8,7 @@ import {
 
 import {
     Results
-} from '../components/HomeComponents';
+} from '../../components/HomeComponents';
 
 export default class HomeTab extends PureComponent {
     constructor(props) {

@@ -4,10 +4,10 @@ import { createMaterialBottomTabNavigator } from "@react-navigation/material-bot
 
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 
-import SearchTab from "./tabs/SearchTab";
-import HomeTab from "./tabs/HomeTab";
-import LibraryTab from "./tabs/LibraryTab";
-import SettingsTab from "./tabs/SettingsTab";
+import SearchTab from "./views/tabs/SearchTab";
+import HomeTab from "./views/tabs/HomeTab";
+import LibraryTab from "./views/tabs/LibraryTab";
+import SettingsTab from "./views/tabs/SettingsTab";
 
 import { Header } from "./components/SharedComponents";
 import { headerStyle } from "./styles/App";
