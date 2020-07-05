@@ -10,7 +10,7 @@ import {
     Image
 } from "react-native";
 
-import { Playlist } from "../components/SharedComponents";
+import { Playlist } from "../../components/SharedComponents";
 
 export function ArtistView({ route, navigation }) {
     StatusBar.setBarStyle('dark-content', true);

@@ -9,7 +9,7 @@ import {
 
 import {
     Playlist
-} from '../components/SharedComponents';
+} from '../../components/SharedComponents';
 
 export default class Playlists extends PureComponent {
     constructor(props) {
