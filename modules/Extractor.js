@@ -333,7 +333,7 @@ function getAlbum(json) {
 }
 
 function getArtist(json) {
-    let final = {
+    let artist = {
         header : {
             title: "",
             subscriptions: "",
@@ -345,16 +345,16 @@ function getArtist(json) {
 
     let titleList = json.header.musicImmersiveHeaderRenderer.title.runs;
     for (let ttl = 0; ttl < titleList.length; ttl++) {
-        final.header.title += titleList[ttl];
+        artist.header.title += titleList[ttl];
     }
 
-    let subList = json.header.musicImmersiveCarouselShelfRenderer.subscriptionButton.subscribeButtonRenderer.subscriberCountText.runs;
+    let subList = json.header.musicImmersiveHeaderRenderer.subscriptionButton.subscribeButtonRenderer.subscriberCountText.runs;
     for (let sl = 0; sl < subList.length; sl++) {
-        final.header.subscriptions += subList[sl];
+        artist.header.subscriptions += subList[sl].text;
     }
 
-    let thumbnailList = json.header.musicImmersiveCarouselShelfRenderer.thumbnail.musicThumbnailRenderer.thumbnail.thumbnails;
-    final.header.thumbnail = thumbnailList[0].url;
+    let thumbnailList = json.header.musicImmersiveHeaderRenderer.thumbnail.musicThumbnailRenderer.thumbnail.thumbnails;
+    artist.header.thumbnail = thumbnailList[0].url;
 
     let tabList = json.contents.singleColumnBrowseResultsRenderer.tabs;
     for (let tbl = 0; tbl < tabList.length; tbl++) {
@@ -368,8 +368,8 @@ function getArtist(json) {
                 shelf.type = "Songs";
                 shelf.songs = [];
 
-                let musicShelf = shelf.musicShelfRenderer;
-
+                let musicShelf = shelfEntry.musicShelfRenderer;
+                
                 let shelfTitleList = musicShelf.title.runs;
                 for (let sttl = 0; sttl < shelfTitleList.length; sttl++) {
                     shelf.title += shelfTitleList[sttl];
@@ -388,10 +388,10 @@ function getArtist(json) {
                         videoId: ""
                     };
 
-                    let thumbnailList = songObject.thumbnail.musicThumbnailRendeer.thumbnail.thumbnails;
+                    let thumbnailList = songObject.thumbnail.musicThumbnailRenderer.thumbnail.thumbnails;
                     song.thumbnail = thumbnailList[0].url;
 
-                    let watchEndpoint = songObject.content.musicPlayButtonRenderer.playNavigationEndpoint.watchEndpoint;
+                    let watchEndpoint = songObject.overlay.musicItemThumbnailOverlayRenderer.content.musicPlayButtonRenderer.playNavigationEndpoint.watchEndpoint;
                     let videoId = watchEndpoint.videoId;
                     let playlistId = watchEndpoint.playlistId;
                     song.playlistId = playlistId;
@@ -424,7 +424,7 @@ function getArtist(json) {
             if (shelfEntry.hasOwnProperty("musicCarouselShelfRenderer")) {
                 shelf.type = "Playlists";
                 shelf.albums = [];
-                let playlistShelf = shelf.musicCarouselShelfRenderer;
+                let playlistShelf = shelfEntry.musicCarouselShelfRenderer;
 
                 let headerList = playlistShelf.header.musicCarouselShelfBasicHeaderRenderer.title.runs;
                 for (let hdrl = 0; hdrl < headerList.length; hdrl++) {
@@ -432,14 +432,13 @@ function getArtist(json) {
                 }
 
                 let shelfContents = playlistShelf.contents;
-
                 for (let psfc = 0; psfc < shelfContents.length; psfc++) {
-                    let album = {title: "", subtitle: "", thumbnail};
+                    let album = {title: "", subtitle: "", thumbnail: ""};
 
                     let music = shelfContents[psfc].musicTwoRowItemRenderer;
 
                     let titleList = music.title.runs;
-                    for (let pttl = 0; pttl < titleList.length; pttl) {
+                    for (let pttl = 0; pttl < titleList.length; pttl++) {
                         album.title += titleList[pttl].text;
                     }
 
@@ -451,7 +450,7 @@ function getArtist(json) {
                     let thumbnailList = music.thumbnailRenderer.musicThumbnailRenderer.thumbnail.thumbnails;
                     /*for (let thbl = 0; thbl < thumbnailList.length; thbl++) {
                     }*/
-                    song.thumbnail = thumbnailList[0].url;
+                    album.thumbnail = thumbnailList[0].url;
 
                     let videoId;
                     let browseId;
@@ -495,9 +494,11 @@ function getArtist(json) {
                     shelf.title += headerList[ttll].text;
                 }
 
-                let subheaderList = descriptionShelf.subheader.runs;
-                for (let stll = 0; stll < titleList.length; stll++) {
-                    shelf.subtitle += subheaderList[stll].text;
+                if (descriptionShelf.hasOwnProperty("subheader")) {
+                    let subheaderList = descriptionShelf.subheader.runs;
+                    for (let stll = 0; stll < titleList.length; stll++) {
+                        shelf.subtitle += subheaderList[stll].text;
+                    }
                 }
 
                 let descriptionList = descriptionShelf.description.runs;
@@ -506,9 +507,11 @@ function getArtist(json) {
                 }
             }
 
-            final.shelves.push(shelf);
+            artist.shelves.push(shelf);
         }
     }
+
+    return artist;
 }
 
 export function digestBrowseResults(json, browseId) {
