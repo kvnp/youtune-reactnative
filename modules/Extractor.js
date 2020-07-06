@@ -345,7 +345,7 @@ function getArtist(json) {
 
     let titleList = json.header.musicImmersiveHeaderRenderer.title.runs;
     for (let ttl = 0; ttl < titleList.length; ttl++) {
-        artist.header.title += titleList[ttl];
+        artist.header.title += titleList[ttl].text;
     }
 
     let subList = json.header.musicImmersiveHeaderRenderer.subscriptionButton.subscribeButtonRenderer.subscriberCountText.runs;
