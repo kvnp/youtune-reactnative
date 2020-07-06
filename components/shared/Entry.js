@@ -24,7 +24,7 @@ export default class Entry extends PureComponent {
         }*/
     });
 
-    triggerEvent = (element) => {
+    triggerEvent = () => {
         let { type, videoId, browseId, playlistId } = this.props.song;
         if (["Song", "Video"].includes(type))
             this.startVideo(videoId); // TODO: PlayerView
@@ -32,11 +32,12 @@ export default class Entry extends PureComponent {
             fetchBrowse(browseId).then((result) => 
                 this.props.navigation.navigate("Playlist", result)
             );
-        else console.log(element.browseId);
+        else console.log(browseId);
     }
 
     render() {
-        let { title, subtitle, secondTitle, secondSubtitle, thumbnail } = this.props.song;
+        let { title, subtitle, secondTitle, secondSubtitle, thumbnail, videoId } = this.props.song;
+
         return (
             <View style={resultStyle.resultView}>
                 <TouchableOpacity onPress={() => {this.triggerEvent()}}>
@@ -44,19 +45,18 @@ export default class Entry extends PureComponent {
                 </TouchableOpacity>
 
                 <View style={resultStyle.resultColumnOne}>
-                        <Text numberOfLines={1} style={resultStyle.resultText}>{title}</Text>
-                        <Text style={resultStyle.resultText}>{subtitle}</Text>
-                    </View>
-                    <View style={resultStyle.resultColumnTwo}>
-                        <Text numberOfLines={1} style={resultStyle.resultText}>{secondTitle}</Text>
-                        <Text style={resultStyle.resultText}>{secondSubtitle}</Text>
+                    <Text numberOfLines={1} style={resultStyle.resultText}>{title}</Text>
+                    <Text numberOfLines={1} style={resultStyle.resultText}>{subtitle}</Text>
                 </View>
 
-                <Button
-                    title="▶️"
-                    onPress={() => {
-                        Linking.openURL("https://music.youtube.com/watch?v=" + (element.videoId))
-                    }}/>
+                <View style={resultStyle.resultColumnTwo}>
+                    <Text numberOfLines={1} style={resultStyle.resultText}>{secondTitle}</Text>
+                    <Text numberOfLines={1} style={resultStyle.resultText}>{secondSubtitle}</Text>
+                </View>
+
+                <Button title="▶️" onPress={() => {
+                    Linking.openURL("https://music.youtube.com/watch?v=" + (videoId))
+                }}/>
             </View>
         )
     }

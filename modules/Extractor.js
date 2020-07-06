@@ -239,7 +239,7 @@ function getPlaylist(json) {
                 let songLengthlist = responsiveMusicItem.fixedColumns[0].musicResponsiveListItemFixedColumnRenderer.text.runs;
                 let songThumbnaillist = responsiveMusicItem.thumbnail.musicThumbnailRenderer.thumbnail.thumbnails;
 
-                let song = {title: "", subtitle: "", secondSubtitle: "", length: "", videoId: null, thumbnail: null};
+                let song = {title: "", subtitle: "", secondTitle: "", secondSubtitle: "",  videoId: null, thumbnail: null};
 
                 for (let stl = 0; stl < songTitlelist.length; stl++) {
                     song.title += songTitlelist[stl].text;
@@ -255,7 +255,7 @@ function getPlaylist(json) {
                     }
 
                 for (let sll = 0; sll < songLengthlist.length; sll++) {
-                    song.length += songLengthlist[sll].text;
+                    song.secondTitle += songLengthlist[sll].text;
                 }
 
                 //song.thumbnail = songThumbnaillist[songThumbnaillist.length - 1].url;
