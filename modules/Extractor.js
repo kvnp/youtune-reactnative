@@ -289,8 +289,6 @@ function getPlaylist(json) {
     return browse;
 }
 
-
-
 function getAlbum(json) {
     let updatelist = json.frameworkUpdates.entityBatchUpdate.mutations
 
@@ -365,9 +363,11 @@ function getArtist(json) {
         for (let ctl = 0; ctl < contentList.length; ctl++) {
             let shelfEntry = contentList[ctl];
 
-            let shelf = {title: "", type: "", items: []};
+            let shelf = {title: "", subtitle: "", type: ""};
             if (shelfEntry.hasOwnProperty("musicShelfRenderer")) {
                 shelf.type = "Songs";
+                shelf.songs = [];
+
                 let musicShelf = shelf.musicShelfRenderer;
 
                 let shelfTitleList = musicShelf.title.runs;
@@ -416,13 +416,93 @@ function getArtist(json) {
                         else if (sfcl == 3)
                             song.secondSubtitle = text;
                     }
+
+                    shelf.songs.push(song);
                 }
             }
 
             if (shelfEntry.hasOwnProperty("musicCarouselShelfRenderer")) {
                 shelf.type = "Playlists";
+                shelf.albums = [];
                 let playlistShelf = shelf.musicCarouselShelfRenderer;
-                
+
+                let headerList = playlistShelf.header.musicCarouselShelfBasicHeaderRenderer.title.runs;
+                for (let hdrl = 0; hdrl < headerList.length; hdrl++) {
+                    shelf.title += headerList[hdrl].text;
+                }
+
+                let shelfContents = playlistShelf.contents;
+
+                for (let psfc = 0; psfc < shelfContents.length; psfc++) {
+                    let album = {title: "", subtitle: "", thumbnail};
+
+                    let music = shelfContents[psfc].musicTwoRowItemRenderer;
+
+                    let titleList = music.title.runs;
+                    for (let pttl = 0; pttl < titleList.length; pttl) {
+                        album.title += titleList[pttl].text;
+                    }
+
+                    let subtitleList = music.subtitle.runs;
+                    for (let pstl = 0; pstl < subtitleList.length; pstl++) {
+                        album.subtitle += subtitleList[pstl].text;
+                    }
+
+                    let thumbnailList = music.thumbnailRenderer.musicThumbnailRenderer.thumbnail.thumbnails;
+                    /*for (let thbl = 0; thbl < thumbnailList.length; thbl++) {
+                    }*/
+                    song.thumbnail = thumbnailList[0].url;
+
+                    let videoId;
+                    let browseId;
+                    let playlistId;
+
+                    if (music.hasOwnProperty("navigationEndpoint")) {
+                        let navigationEndpoint = music.navigationEndpoint;
+                        if (navigationEndpoint.hasOwnProperty("browseEndpoint")) {
+                            if (navigationEndpoint.browseEndpoint.hasOwnProperty("browseId"))
+                                browseId = navigationEndpoint.browseEndpoint.browseId;
+                        }
+
+                        if (navigationEndpoint.hasOwnProperty("watchEndpoint")) {
+                            if (navigationEndpoint.watchEndpoint.hasOwnProperty("playlistId"))
+                                playlistId = navigationEndpoint.watchEndpoint.playlistId;
+
+                            if (navigationEndpoint.watchEndpoint.hasOwnProperty("videoId"))
+                                videoId = navigationEndpoint.watchEndpoint.videoId;
+                        }
+                    }
+
+                    if (videoId != undefined)
+                        album.videoId = videoId;
+
+                    if (browseId != undefined)
+                        album.browseId = browseId;
+
+                    if (playlistId != undefined)
+                        album.playlistId = playlistId;
+
+                }
+            }
+
+            if (shelfEntry.hasOwnProperty("musicDescriptionShelfRenderer")) {
+                shelf.description = "";
+                let descriptionShelf = shelfEntry.musicDescriptionShelfRenderer;
+
+                let headerList = descriptionShelf.header.runs;
+                for (let ttll = 0; ttll < titleList.length; ttll++) {
+                    shelf.title += headerList[ttll].text;
+                }
+
+                let subheaderList = descriptionShelf.subheader.runs;
+                for (let stll = 0; stll < titleList.length; stll++) {
+                    shelf.subtitle += subheaderList[stll].text;
+                }
+
+                let descriptionList = descriptionShelf.description.runs;
+                for (let dspl = 0; dspl < titleList.length; dspl++) {
+                    shelf.description += descriptionList[dspl].text;
+                }
             }
 
             final.shelves.push(shelf);
