@@ -32,7 +32,6 @@ export default class Entry extends PureComponent {
             fetchBrowse(browseId).then((result) => 
                 this.props.navigation.navigate("Playlist", result)
             );
-        else console.log(browseId);
     }
 
     render() {

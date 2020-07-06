@@ -1,7 +1,7 @@
 import { msToMin, msToMMSS } from "./Utils";
 
 export function digestSearchResults(json) {
-    let final = {results: 0, suggestion: [], reason: null, topics: []};
+    let final = {results: 0, suggestion: [], reason: null, shelves: []};
 
     let sectionList = json.contents.sectionListRenderer.contents;
 
@@ -46,12 +46,12 @@ export function digestSearchResults(json) {
                 title += titlelist[ttl].text;
             }
 
-            let topic = {topic: title, elements: []};
+            let shelf = {title: title, entries: []};
 
             let responsiveMusicList = musicShelf.contents;
             for (let rml = 0; rml < responsiveMusicList.length; rml++) {
                 let responsiveMusicItem = responsiveMusicList[rml].musicResponsiveListItemRenderer;
-                let element = {
+                let entry = {
                     title: "",
                     subtitle: "",
                     secondTitle: "",
@@ -75,42 +75,42 @@ export function digestSearchResults(json) {
                     }
 
                     if (fcl == 0)
-                        element.title = text;
+                        entry.title = text;
                     else if (fcl == 1)
-                        element.subtitle = text;
+                        entry.subtitle = text;
                     else if (fcl == 2)
-                        element.secondTitle = text;
+                        entry.secondTitle = text;
                     else if (fcl == 3)
-                        element.secondSubtitle = text;
+                        entry.secondSubtitle = text;
                     else if (fcl == 4)
-                        element.additionalInfo = text;
+                        entry.additionalInfo = text;
                 }
                 
                 let thumbnaillist = responsiveMusicItem.thumbnail.musicThumbnailRenderer.thumbnail.thumbnails;
-                element.thumbnail = thumbnaillist[0].url;
+                entry.thumbnail = thumbnaillist[0].url;
                 
                 if (responsiveMusicItem.hasOwnProperty("navigationEndpoint")) {
                     let type = responsiveMusicItem.navigationEndpoint.browseEndpoint.browseEndpointContextSupportedConfigs.browseEndpointContextMusicConfig.pageType;
                     if (type == "MUSIC_PAGE_TYPE_ARTIST")
-                        element.type = "Artist";
+                        entry.type = "Artist";
                     else if (type == "MUSIC_PAGE_TYPE_ALBUM")
-                        element.type = "Album";
+                        entry.type = "Album";
                     else if (type == "MUSIC_PAGE_TYPE_PLAYLIST")
-                        element.type = "Playlist";
+                        entry.type = "Playlist";
                     
-                    element.playlistId = responsiveMusicItem.doubleTapCommand.watchPlaylistEndpoint.playlistId;
-                    element.browseId = responsiveMusicItem.navigationEndpoint.browseEndpoint.browseId;
+                    entry.playlistId = responsiveMusicItem.doubleTapCommand.watchPlaylistEndpoint.playlistId;
+                    entry.browseId = responsiveMusicItem.navigationEndpoint.browseEndpoint.browseId;
                 } else {
-                    element.type = "Title";
-                    element.videoId = responsiveMusicItem.doubleTapCommand.watchEndpoint.videoId;
-                    element.playlistId = responsiveMusicItem.doubleTapCommand.watchEndpoint.playlistId;
+                    entry.type = "Title";
+                    entry.videoId = responsiveMusicItem.doubleTapCommand.watchEndpoint.videoId;
+                    entry.playlistId = responsiveMusicItem.doubleTapCommand.watchEndpoint.playlistId;
                 }
 
                 final.results += 1;
-                topic.elements.push(element);
+                shelf.entries.push(entry);
             }
 
-            final.topics.push(topic);
+            final.shelves.push(shelf);
         }
     }
 
@@ -303,12 +303,12 @@ function getAlbum(json) {
             let musicTrack = payload.musicTrack;
             let thumbnaillist = musicTrack.thumbnailDetails.thumbnails;
 
-            let song = {title: "", subtitle: "", secondSubtitle: "", length: "", videoId: null, thumbnail: null};
+            let song = {title: "", subtitle: "", secondTitle: "", secondSubtitle: "", videoId: null, thumbnail: null};
             song.title = musicTrack.title;
             song.subtitle = musicTrack.artistNames;
             song.videoId = musicTrack.videoId;
             song.thumbnail = thumbnaillist[0].url;
-            song.length = msToMMSS(musicTrack.lengthMs);
+            song.secondSubtitle = msToMMSS(musicTrack.lengthMs);
             browse.songs.push(song);
         }
 

@@ -21,24 +21,13 @@ export const refreshStyle = StyleSheet.create({
 });
 
 export const resultHomeStyle = StyleSheet.create({
-    scrollView: {
-        paddingTop: 15,
-        flexGrow: 1,
-        flexDirection: 'column'
-    },
-    
-    scrollContainer: {
-        flexGrow: 1,
-        alignItems: 'center',
-        justifyContent: 'center'
-    },
-
     preHome: {
         fontSize: 70,
     },
 
     homeText: {
         fontWeight: 'bold',
+        alignSelf: 'flex-start',
         paddingLeft: 20,
         paddingTop: 20,
         fontSize: 25

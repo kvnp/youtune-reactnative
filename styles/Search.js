@@ -10,7 +10,7 @@ export const searchBarStyle = StyleSheet.create({
     bar: {
         width: '100%',
         position: 'absolute',
-        bottom: 10,
+        bottom: 0,
         alignSelf: 'center',
         backgroundColor: appColor.background.backgroundColor
     },
@@ -35,6 +35,10 @@ export const topicStyle = StyleSheet.create({
 });
 
 export const resultStyle = StyleSheet.create({
+    scrollMargin: {
+        marginBottom: 100
+    },
+
     resultHeader: {
         marginTop: 10,
         fontSize: 30,
@@ -79,19 +83,7 @@ export const searchStyle = StyleSheet.create({
     preResults: {
         fontSize: 70,
         alignSelf: 'center'
-    },
-
-    scrollView: {
-        flexDirection: 'column',
-        paddingTop: 20,
-        marginBottom: 50
-    },
-
-    scrollContainer: {
-        flexGrow: 1,
-        alignItems: 'center',
-        justifyContent: 'center'
-    },
+    }
 });
 
 export const specificStyle = StyleSheet.create({

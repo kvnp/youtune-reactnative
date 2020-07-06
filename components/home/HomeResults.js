@@ -6,11 +6,11 @@ import {
     View
 } from "react-native";
 
-import Playlist from '../shared/Playlist';
-
 import { fetchHome } from '../../modules/API';
 
-import { resultHomeStyle, albumStyle } from '../../styles/Home';
+import { resultHomeStyle } from '../../styles/Home';
+import Shelf from '../shared/Shelf';
+import { shelvesStyle } from '../../styles/Shelves';
 
 export default class Results extends PureComponent {
     constructor(props){
@@ -57,23 +57,8 @@ export default class Results extends PureComponent {
         });
     }
 
-    openAlbum = (album) => this.props.navigation.navigate("Playlist", album);
-
-    displayAlbums = (albums) => {
-        return albums.map(album => { return <Playlist style={albumStyle.album} playlist={album} navigation={this.props.navigation}/> } );
-    }
-
     displayShelf = (shelf) => {
-        if (shelf.albums.length > 0) {
-            return (
-                <>
-                    <Text style={resultHomeStyle.homeText}>{shelf.title}</Text>
-                    <ScrollView style={albumStyle.albumCollection} horizontal={true} showsHorizontalScrollIndicator={false}>
-                        {this.displayAlbums(shelf.albums)}
-                    </ScrollView>
-                </>
-            )
-        }
+        return <Shelf shelf={shelf} navigation={this.props.navigation}/>
     }
 
     displayShelves = (result) => {
@@ -89,10 +74,10 @@ export default class Results extends PureComponent {
 
     render() {
         return (
-            <ScrollView style={resultHomeStyle.scrollView}
-                        contentContainerStyle={resultHomeStyle.scrollContainer}>
+            <ScrollView style={shelvesStyle.scrollView}
+                        contentContainerStyle={shelvesStyle.scrollContainer}>
                 {this.displayHome()}
             </ScrollView>
-        )
+        );
     }
 }
