@@ -17,14 +17,37 @@ export default class Playlist extends PureComponent {
     }
 
     viewPlaylist = () => {
-        let { browseId } = this.props.playlist;
+        let { videoId, browseId, playlistId } = this.props.playlist;
+        let type;
+
+        if (browseId.slice(0, 2) == "UC")
+            type = "Artist";
+        else
+            type = "Playlist";
+
+
+        console.log(browseId);
+        if (["Song", "Video"].includes(type))
+            this.startVideo(videoId); // TODO: PlayerView
+        else if (["Album", "Playlist"].includes(type))
+            fetchBrowse(browseId).then((result) => 
+                this.props.navigation.push("Playlist", result)
+            );
+        else if (["Artist"].includes(type))
+            fetchBrowse(browseId).then((artist) =>
+                this.props.navigation.push("Artist", artist)
+            );
+
+
+
+        /*let { browseId } = this.props.playlist;
 
         if (this.browse == null) fetchBrowse(browseId).then((result) => {
             this.browse = result;
             this.props.navigation.navigate("Playlist", result);
         });
 
-        else this.props.navigation.navigate("Playlist", this.browse);
+        else this.props.navigation.navigate("Playlist", this.browse);*/
     }
 
     render() {

@@ -9,7 +9,7 @@ import { createStackNavigator } from "@react-navigation/stack";
 
 import { PlayView } from "./views/full/PlayView";
 import { PlaylistView } from "./views/full/PlaylistView";
-import { ArtistView } from "./views/full/ArtistView";
+import ArtistView from "./views/full/ArtistView";
 import { CreatePlaylistView } from "./views/full/CreatePlaylistView";
 
 import Navigator from "./views/full/Navigator";

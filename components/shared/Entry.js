@@ -30,7 +30,11 @@ export default class Entry extends PureComponent {
             this.startVideo(videoId); // TODO: PlayerView
         else if (["Album", "Playlist"].includes(type))
             fetchBrowse(browseId).then((result) => 
-                this.props.navigation.navigate("Playlist", result)
+                this.props.navigation.push("Playlist", result)
+            );
+        else if (["Artist"].includes(type))
+            fetchBrowse(browseId).then((artist) =>
+                this.props.navigation.push("Artist", artist)
             );
     }
 

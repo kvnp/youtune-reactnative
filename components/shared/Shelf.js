@@ -17,38 +17,40 @@ export default class Shelf extends PureComponent {
         return albums.map(album => { return <Playlist style={albumStyle.album} playlist={album} navigation={this.props.navigation}/> } );
     }
 
-    getAlbumShelf = (albums) => {
+    displayElement = (entry) => {
+        return <Entry song={entry} navigation={this.props.navigation}/>;
+    }
+
+    render() {
+        const { title, subtitle, albums, entries, description } = this.props.shelf;
+        try {
+            console.log(JSON.parse(title));
+        } catch {
+        }
+
+        let view = [];
+        if (description != undefined)
+        view.push(<Text>{description}</Text>)
+
+        if (subtitle != undefined || subtitle != "")
+        view.push(<Text>{subtitle}</Text>)
+
+        if (entries != undefined)
+        view.push(entries.map(this.displayElement));
+        
         if (albums != undefined)
-        return (
+        view.push(
             <ScrollView style={albumStyle.albumCollection}
                         horizontal={true}
                         showsHorizontalScrollIndicator={false}>
                 {this.displayAlbums(albums)}
             </ScrollView>
-        )
-    }
+        );
 
-    getInfoShelf = (info) => {
-
-    }
-
-    displayElement = (entry) => {
-        return <Entry song={entry} navigation={this.props.navigation}/>;
-    }
-
-    getEntryShelf = (entries) => {
-        if (entries != undefined)
-        return entries.map(this.displayElement);
-    }
-
-    render() {
-        let { title, albums, entries, info } = this.props.shelf;
         return (
             <>
                 <Text style={resultHomeStyle.homeText}>{title}</Text>
-                {this.getAlbumShelf(albums)}
-                {this.getInfoShelf(info)}
-                {this.getEntryShelf(entries)}
+                {view}
             </>
         );
     }
