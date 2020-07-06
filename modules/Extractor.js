@@ -482,6 +482,7 @@ function getArtist(json) {
                     if (playlistId != undefined)
                         album.playlistId = playlistId;
 
+                    shelf.albums.push(album);
                 }
             }
 
