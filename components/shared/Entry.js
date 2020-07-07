@@ -25,7 +25,7 @@ export default class Entry extends PureComponent {
     });
 
     triggerEvent = () => {
-        let { type, videoId, browseId, playlistId } = this.props.song;
+        let { type, videoId, browseId, playlistId } = this.props.entry;
         if (["Song", "Video"].includes(type))
             this.startVideo(videoId); // TODO: PlayerView
         else if (["Album", "Playlist"].includes(type))
@@ -39,7 +39,7 @@ export default class Entry extends PureComponent {
     }
 
     render() {
-        let { title, subtitle, secondTitle, secondSubtitle, thumbnail, videoId } = this.props.song;
+        let { title, subtitle, secondTitle, secondSubtitle, thumbnail, videoId } = this.props.entry;
 
         return (
             <View style={resultStyle.resultView}>

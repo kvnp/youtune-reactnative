@@ -9,6 +9,7 @@ import Entry from '../shared/Entry';
 import Playlist from '../shared/Playlist';
 
 import { resultHomeStyle, albumStyle } from '../../styles/Home';
+import { descriptionStyle } from '../../styles/Description';
 
 export default class Shelf extends PureComponent {
     openAlbum = (album) => this.props.navigation.navigate("Playlist", album);
@@ -18,34 +19,30 @@ export default class Shelf extends PureComponent {
     }
 
     displayElement = (entry) => {
-        return <Entry song={entry} navigation={this.props.navigation}/>;
+        return <Entry entry={entry} navigation={this.props.navigation}/>;
     }
 
     render() {
-        const { title, subtitle, albums, entries, description } = this.props.shelf;
-        try {
-            console.log(JSON.parse(title));
-        } catch {
-        }
+        const { title, entries, subtitle, albums, description } = this.props.shelf;
 
         let view = [];
         if (description != undefined)
-        view.push(<Text>{description}</Text>)
+            view.push(<Text style={descriptionStyle.text}>{description}</Text>)
 
         if (subtitle != undefined || subtitle != "")
-        view.push(<Text>{subtitle}</Text>)
+            view.push(<Text>{subtitle}</Text>)
 
         if (entries != undefined)
-        view.push(entries.map(this.displayElement));
+            view.push(entries.map(this.displayElement));
         
         if (albums != undefined)
-        view.push(
-            <ScrollView style={albumStyle.albumCollection}
-                        horizontal={true}
-                        showsHorizontalScrollIndicator={false}>
-                {this.displayAlbums(albums)}
-            </ScrollView>
-        );
+            view.push(
+                <ScrollView style={albumStyle.albumCollection}
+                            horizontal={true}
+                            showsHorizontalScrollIndicator={false}>
+                    {this.displayAlbums(albums)}
+                </ScrollView>
+            );
 
         return (
             <>

@@ -25,8 +25,6 @@ export default class Playlist extends PureComponent {
         else
             type = "Playlist";
 
-
-        console.log(browseId);
         if (["Song", "Video"].includes(type))
             this.startVideo(videoId); // TODO: PlayerView
         else if (["Album", "Playlist"].includes(type))

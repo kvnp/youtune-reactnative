@@ -6,7 +6,7 @@ export const appColor = StyleSheet.create({
     }
 });
 
-export const gradientColors = ["#7f9f9f9f", "#ffffff00"];
+export const gradientColors = ['rgba(255, 255, 255, 0.5)', 'rgba(255, 255, 255, 0.1)'];
 
 export const headerStyle = StyleSheet.create({
     headerPicture: {

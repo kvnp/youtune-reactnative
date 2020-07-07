@@ -11,12 +11,12 @@ import {
 
 import Entry from "../../components/shared/Entry";
 
-function getEntry(song) {
-    return <Entry song={song}/>
+function getEntry(entry) {
+    return <Entry entry={entry}/>
 }
 
-function getEntries(songs) {
-    return songs.map(getEntry);
+function getEntries(entries) {
+    return entries.map(getEntry);
 }
 
 export function PlaylistView({ route, navigation }) {
@@ -26,7 +26,7 @@ export function PlaylistView({ route, navigation }) {
             <ScrollView style={styles.playlistContent}>
                 <View style={styles.topicView}>
                     <Text style={styles.topicTitle}>{browse.title}</Text>
-                    {getEntries(browse.songs)}
+                    {getEntries(browse.entries)}
                 </View>
             </ScrollView>
 

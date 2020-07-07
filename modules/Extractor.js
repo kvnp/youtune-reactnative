@@ -193,7 +193,7 @@ export function digestHomeResults(json) {
 }
 
 function getPlaylist(json) {
-    let browse = {title: "", subtitle: "", secondSubtitle: "", description: "", thumbnail: null, songs: []};
+    let browse = {title: "", subtitle: "", secondSubtitle: "", description: "", thumbnail: null, entries: []};
     let musicHeader = json.header.musicDetailHeaderRenderer;
 
     let titlelist = musicHeader.title.runs;
@@ -239,27 +239,27 @@ function getPlaylist(json) {
                 let songLengthlist = responsiveMusicItem.fixedColumns[0].musicResponsiveListItemFixedColumnRenderer.text.runs;
                 let songThumbnaillist = responsiveMusicItem.thumbnail.musicThumbnailRenderer.thumbnail.thumbnails;
 
-                let song = {title: "", subtitle: "", secondTitle: "", secondSubtitle: "",  videoId: null, thumbnail: null};
+                let entry = {title: "", subtitle: "", secondTitle: "", secondSubtitle: "",  videoId: null, thumbnail: null};
 
                 for (let stl = 0; stl < songTitlelist.length; stl++) {
-                    song.title += songTitlelist[stl].text;
+                    entry.title += songTitlelist[stl].text;
                 }
 
                 for (let ssl = 0; ssl < songSubtitlelist.length; ssl++) {
-                    song.subtitle += songSubtitlelist[ssl].text;
+                    entry.subtitle += songSubtitlelist[ssl].text;
                 }
 
                 if (songSecondsubtitlelist != undefined)
                     for (let sssl = 0; sssl < songSecondsubtitlelist.length; sssl++) {
-                        song.secondSubtitle += songSecondsubtitlelist[sssl].text;
+                        entry.secondSubtitle += songSecondsubtitlelist[sssl].text;
                     }
 
                 for (let sll = 0; sll < songLengthlist.length; sll++) {
-                    song.secondTitle += songLengthlist[sll].text;
+                    entry.secondTitle += songLengthlist[sll].text;
                 }
 
-                //song.thumbnail = songThumbnaillist[songThumbnaillist.length - 1].url;
-                song.thumbnail = songThumbnaillist[0].url;
+                //entry.thumbnail = songThumbnaillist[songThumbnaillist.length - 1].url;
+                entry.thumbnail = songThumbnaillist[0].url;
 
                 if (responsiveMusicItem.menu == undefined) continue; // ??
 
@@ -275,13 +275,13 @@ function getPlaylist(json) {
                             let navigation = menuItem.navigationEndpoint;
     
                             if (navigation.hasOwnProperty("watchEndpoint")) {
-                                song.videoId = navigation.watchEndpoint.videoId;
+                                entry.videoId = navigation.watchEndpoint.videoId;
                             }
                         }
                     }
                 }
 
-                browse.songs.push(song);
+                browse.entries.push(entry);
             }
         }
     }
@@ -292,7 +292,7 @@ function getPlaylist(json) {
 function getAlbum(json) {
     let updatelist = json.frameworkUpdates.entityBatchUpdate.mutations
 
-    let browse = {title: "", subtitle: "", secondSubtitle: "", description: "", thumbnail: null, songs: []};
+    let browse = {title: "", subtitle: "", secondSubtitle: "", description: "", thumbnail: null, entries: []};
 
     for (let ul = 0; ul < updatelist.length; ul++) {
         let payload = updatelist[ul].payload;
@@ -301,13 +301,13 @@ function getAlbum(json) {
             let musicTrack = payload.musicTrack;
             let thumbnaillist = musicTrack.thumbnailDetails.thumbnails;
 
-            let song = {title: "", subtitle: "", secondTitle: "", secondSubtitle: "", videoId: null, thumbnail: null};
-            song.title = musicTrack.title;
-            song.subtitle = musicTrack.artistNames;
-            song.videoId = musicTrack.videoId;
-            song.thumbnail = thumbnaillist[0].url;
-            song.secondSubtitle = msToMMSS(musicTrack.lengthMs);
-            browse.songs.push(song);
+            let entry = {title: "", subtitle: "", secondTitle: "", secondSubtitle: "", videoId: null, thumbnail: null};
+            entry.title = musicTrack.title;
+            entry.subtitle = musicTrack.artistNames;
+            entry.videoId = musicTrack.videoId;
+            entry.thumbnail = thumbnaillist[0].url;
+            entry.secondSubtitle = msToMMSS(musicTrack.lengthMs);
+            browse.entries.push(entry);
         }
 
         if (payload.hasOwnProperty("musicAlbumRelease")) {
@@ -347,6 +347,7 @@ function getArtist(json) {
     for (let ttl = 0; ttl < titleList.length; ttl++) {
         artist.header.title += titleList[ttl].text;
     }
+    console.log(artist.header.title);
 
     let subList = json.header.musicImmersiveHeaderRenderer.subscriptionButton.subscribeButtonRenderer.subscriberCountText.runs;
     for (let sl = 0; sl < subList.length; sl++) {
@@ -366,20 +367,20 @@ function getArtist(json) {
             let shelf = {title: "", subtitle: "", type: ""};
             if (shelfEntry.hasOwnProperty("musicShelfRenderer")) {
                 shelf.type = "Songs";
-                shelf.songs = [];
+                shelf.entries = [];
 
                 let musicShelf = shelfEntry.musicShelfRenderer;
                 
                 let shelfTitleList = musicShelf.title.runs;
                 for (let sttl = 0; sttl < shelfTitleList.length; sttl++) {
-                    shelf.title += shelfTitleList[sttl];
+                    shelf.title += shelfTitleList[sttl].text;
                 }
 
                 let songList = musicShelf.contents;
                 for (let sgl = 0; sgl < songList.length; sgl++) {
                     let songObject = songList[sgl].musicResponsiveListItemRenderer;
 
-                    let song = {
+                    let entry = {
                         title: "",
                         subtitle: "",
                         secondTitle: "",
@@ -389,13 +390,13 @@ function getArtist(json) {
                     };
 
                     let thumbnailList = songObject.thumbnail.musicThumbnailRenderer.thumbnail.thumbnails;
-                    song.thumbnail = thumbnailList[0].url;
+                    entry.thumbnail = thumbnailList[0].url;
 
                     let watchEndpoint = songObject.overlay.musicItemThumbnailOverlayRenderer.content.musicPlayButtonRenderer.playNavigationEndpoint.watchEndpoint;
                     let videoId = watchEndpoint.videoId;
                     let playlistId = watchEndpoint.playlistId;
-                    song.playlistId = playlistId;
-                    song.videoId = videoId;
+                    entry.playlistId = playlistId;
+                    entry.videoId = videoId;
 
                     let flexColumnList = songObject.flexColumns;
                     for (let sfcl = 0; sfcl < flexColumnList.length; sfcl++) {
@@ -408,16 +409,16 @@ function getArtist(json) {
                             text += flexTextList[fttt].text;
 
                         if (sfcl == 0)
-                            song.title = text; 
+                            entry.title = text; 
                         else if (sfcl == 1)
-                            song.subtitle = text;
+                            entry.subtitle = text;
                         else if (sfcl == 2)
-                            song.secondTitle = text;
+                            entry.secondTitle = text;
                         else if (sfcl == 3)
-                            song.secondSubtitle = text;
+                            entry.secondSubtitle = text;
                     }
 
-                    shelf.songs.push(song);
+                    shelf.entries.push(entry);
                 }
             }
 
