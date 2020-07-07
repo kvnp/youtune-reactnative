@@ -9,7 +9,8 @@ import {
 
 import Shelf from "../../components/shared/Shelf";
 import LinearGradient from "react-native-linear-gradient";
-import { bottomBarStyle } from "../../styles/Artist";
+import { bottomBarStyle } from "../../styles/BottomBar";
+import { resultHomeStyle } from "../../styles/Home";
 
 export default class ArtistView extends PureComponent {
     getShelf = (shelf) => {
@@ -23,6 +24,7 @@ export default class ArtistView extends PureComponent {
         return (
             <>
                 <ScrollView>
+                    <Text style={resultHomeStyle.homeText}>{title}</Text>
                     {shelves.map(this.getShelf)}
                 </ScrollView>
                 <ImageBackground style={bottomBarStyle.container} source={{uri: thumbnail}}>

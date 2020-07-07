@@ -83,3 +83,29 @@ export const bottomBarStyle = StyleSheet.create({
         borderRadius: 5,
     },
 });
+
+export const bottomBarAlbumStyle = StyleSheet.create({
+    albumCover: {
+        backgroundColor: appColor.background.backgroundColor,
+        height: 70,
+        width: 70,
+        marginRight: 30,
+    },
+
+    topColumn: {
+
+    },
+
+    albumTitle: {
+
+    },
+
+    albumSubtitle: {
+
+    },
+
+    albumInfo: {
+        
+    }
+});
+
