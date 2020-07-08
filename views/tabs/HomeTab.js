@@ -11,6 +11,7 @@ import { refreshStyle, preResultHomeStyle } from '../../styles/Home';
 import { fetchHome } from "../../modules/API";
 import { shelvesStyle } from '../../styles/Shelves';
 import Shelf from '../../components/shared/Shelf';
+import { ActivityIndicator } from 'react-native-paper';
 
 export default class HomeTab extends PureComponent {
     constructor(props) {
@@ -48,17 +49,20 @@ export default class HomeTab extends PureComponent {
     }
 
     render() {
-        return (
-            <>
-                <FlatList
+        return <FlatList
                     style={shelvesStyle.scrollView}
                     contentContainerStyle={shelvesStyle.scrollContainer}
 
                     ListEmptyComponent={
-                        <View>
-                            <Text style={[preResultHomeStyle.preHomeBottomText, preResultHomeStyle.preHomeTopText]}>🏠</Text>
-                            <Text style={preResultHomeStyle.preHomeBottomText}>Pull down to load</Text>
-                        </View>
+                        this.state.loading ? 
+                            <View style={[shelvesStyle.scrollView, shelvesStyle.scrollContainer]}>
+                                <ActivityIndicator size="large"/>
+                            </View>
+                        :
+                            <View>
+                                <Text style={[preResultHomeStyle.preHomeBottomText, preResultHomeStyle.preHomeTopText]}>🏠</Text>
+                                <Text style={preResultHomeStyle.preHomeBottomText}>Pull down to load</Text>
+                            </View>
                     }
 
                     ListFooterComponent={
@@ -88,8 +92,6 @@ export default class HomeTab extends PureComponent {
 
                     data={this.state.shelves}
                     keyExtractor={item => item.title}
-                />
-            </>
-        );
+            />
     }
 };

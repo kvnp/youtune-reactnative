@@ -9,6 +9,8 @@ import {
     TouchableOpacity
 } from 'react-native';
 
+import { ActivityIndicator } from 'react-native-paper';
+
 import { searchBarStyle, specificStyle } from '../../styles/Search';
 import { resultHomeStyle, preResultHomeStyle } from '../../styles/Home';
 import Entry from '../../components/shared/Entry';
@@ -67,63 +69,66 @@ export default class SearchTab extends PureComponent {
     }
 
     render() {
-        return (
-            <>
-                <SectionList
-                    style={shelvesStyle.scrollView}
-                    contentContainerStyle={shelvesStyle.scrollContainer}
+        return <>
+                    <SectionList
+                        style={shelvesStyle.scrollView}
+                        contentContainerStyle={shelvesStyle.scrollContainer}
 
-                    ListEmptyComponent={
-                        <View>
-                            <Text style={[preResultHomeStyle.preHomeBottomText, preResultHomeStyle.preHomeTopText]}>🔍</Text>
-                            <Text style={preResultHomeStyle.preHomeBottomText}>Look for music using the search bar</Text>
-                        </View>
-                    }
+                        ListEmptyComponent={
+                            this.state.loading ? 
+                                <View style={[shelvesStyle.scrollView, shelvesStyle.scrollContainer]}>
+                                    <ActivityIndicator size="large"/>
+                                </View> 
+                            :
+                                <View>
+                                    <Text style={[preResultHomeStyle.preHomeBottomText, preResultHomeStyle.preHomeTopText]}>🔍</Text>
+                                    <Text style={preResultHomeStyle.preHomeBottomText}>Look for music using the search bar</Text>
+                                </View>
+                        }
 
-                    renderSectionHeader={({ section: { title } }) => (
-                        <View style={resultHomeStyle.textView}>
-                            <Text style={resultHomeStyle.homeText}>{title}</Text>
-                        </View>
-                    )}
+                        renderSectionHeader={({ section: { title } }) => (
+                            <View style={resultHomeStyle.textView}>
+                                <Text style={resultHomeStyle.homeText}>{title}</Text>
+                            </View>
+                        )}
 
-                    progressViewOffset={20}
-                    sections={this.state.shelves}
+                        progressViewOffset={20}
+                        sections={this.state.shelves}
 
-                    refreshing={this.state.loading}
-                    onRefresh={
-                        this.state.oldQuery == null ?
-                            undefined :
-                            () => {
-                                if (this.state.query != this.state.oldQuery) {
-                                    this.setState({query: this.state.oldQuery});
-                                    this.forceUpdate();
+                        refreshing={this.state.loading}
+                        onRefresh={
+                            this.state.oldQuery == null ?
+                                undefined :
+                                () => {
+                                    if (this.state.query != this.state.oldQuery) {
+                                        this.setState({query: this.state.oldQuery});
+                                        this.forceUpdate();
+                                    }
+                                    
+                                    this.search();
                                 }
-                                
-                                this.search();
-                            }
-                    }
+                        }
 
-                    keyExtractor={(item, index) => index + item.title}
-                    renderItem={({ item }) =>  <Entry entry={item} navigation={this.props.navigation}/>}
-                />
+                        keyExtractor={(item, index) => index + item.title}
+                        renderItem={({ item }) =>  <Entry entry={item} navigation={this.props.navigation}/>}
+                    />
 
-                <View style={[searchBarStyle.container, searchBarStyle.bar]}>
-                    {this.getSpecificButtons()}
-                    <TextInput style={[searchBarStyle.content, textStyle.text]}
-                            placeholder="Search"
-                            value={this.state.query}
-                            placeholderTextColor={textStyle.placeholder.color}
-                            onChange={this.setQuery}
-                            onSubmitEditing={this.search}/>
+                    <View style={[searchBarStyle.container, searchBarStyle.bar]}>
+                        {this.getSpecificButtons()}
+                        <TextInput style={[searchBarStyle.content, textStyle.text]}
+                                placeholder="Search"
+                                value={this.state.query}
+                                placeholderTextColor={textStyle.placeholder.color}
+                                onChange={this.setQuery}
+                                onSubmitEditing={this.search}/>
 
-                    <View style={searchBarStyle.content}>
-                        <Button onPress={this.search}
-                                title='🔎'
-                                disabled={this.state.buttonDisabled}/>
+                        <View style={searchBarStyle.content}>
+                            <Button onPress={this.search}
+                                    title='🔎'
+                                    disabled={this.state.buttonDisabled}/>
+                        </View>
                     </View>
-                </View>
-            </>
-        );
+                </>
     }
 
     getSpecificButtons = () => {

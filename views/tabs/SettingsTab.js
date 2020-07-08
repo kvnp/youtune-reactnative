@@ -16,7 +16,7 @@ export default ({ navigation }) => {
     }, [navigation]);
 
     return (
-        <TouchableOpacity style={styles.middleView} onPress={() => navigation.navigate("Artist")}>
+        <TouchableOpacity style={styles.middleView} onPress={() => navigation.navigate("Music")}>
             <Text style={styles.placeholder}>⚙️</Text>
         </TouchableOpacity>
     );

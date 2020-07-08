@@ -25,9 +25,9 @@ export default () => {
         <NavigationContainer>
             <Stack.Navigator>
                 <Stack.Screen name="App" component={Navigator} options={global.navigationOptions}/>
-                <Stack.Screen name="Playlist" component={PlaylistView} options={global.navigationOptions}/>
+                <Stack.Screen name="Playlist" component={PlaylistView}/>
                 <Stack.Screen name="Music" component={PlayView} options={global.navigationOptions}/>
-                <Stack.Screen name="Artist" component={ArtistView} options={global.navigationOptions}/>
+                <Stack.Screen name="Artist" component={ArtistView}/>
             </Stack.Navigator>
         </NavigationContainer>
     );

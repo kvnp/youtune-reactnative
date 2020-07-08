@@ -7,16 +7,18 @@ import {
     TouchableOpacity
 } from "react-native";
 
-import { bottomBarStyle, bottomBarAlbumStyle } from "../../styles/BottomBar";
+import {
+    bottomBarStyle,
+    bottomBarAlbumStyle
+} from "../../styles/BottomBar";
+
 import FlatEntries from "../../components/collections/FlatEntries";
-import { playlistViewStyle } from "../../styles/Playlist";
 
 export default ({ route, navigation }) => {
     const { entries, title, subtitle, secondSubtitle, thumbnail} = route.params;
-
+    navigation.setOptions({ title: title });
     return (
         <>
-            <Text style={playlistViewStyle.topText}>{title}</Text>
             <FlatEntries entries={entries} navigation={navigation}/>
 
             <ImageBackground style={bottomBarStyle.container}>

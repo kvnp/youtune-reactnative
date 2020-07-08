@@ -14,6 +14,7 @@ import FlatShelves from "../../components/collections/FlatShelves";
 export default ({route, navigation}) => {
     const { shelves } = route.params;
     const { title, subscriptions, thumbnail } = route.params.header;
+    navigation.setOptions({ title: title });
 
     return (
         <>
