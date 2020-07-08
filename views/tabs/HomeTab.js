@@ -2,17 +2,22 @@ import React, { PureComponent } from 'react';
 
 import {
     Text,
-    TouchableOpacity
+    TouchableOpacity,
+    FlatList,
+    View
 } from 'react-native';
 
-import Results from '../../components/home/HomeResults';
-import { mainStyle, refreshStyle } from '../../styles/Home';
+import { refreshStyle, preResultHomeStyle } from '../../styles/Home';
+import { fetchHome } from "../../modules/API";
+import { shelvesStyle } from '../../styles/Shelves';
+import Shelf from '../../components/shared/Shelf';
 
 export default class HomeTab extends PureComponent {
     constructor(props) {
         super(props);
         this.state = {
-            loading: false
+            shelves: [],
+            loading: false,
         }
     }
 
@@ -26,23 +31,56 @@ export default class HomeTab extends PureComponent {
         this._unsubscribe();
     }
 
+    startRefresh = () => {
+        this.setState({loading: true})
+        fetchHome().then((result) => {
+            if (result.background != undefined) {
+                this.setImage(result.background);
+                this.setState({shelves: result.shelves});
+            }
 
-    startLoading = () => {
-        if (this.state.loading == false)
-            this.setState({loading: true});
+            this.setState({loading: false});
+        });
     }
 
     setImage = (source) => {
-        this.setState({loading: false});
         global.setHeader({image: source});
     }
 
     render() {
         return (
             <>
-                <Results style={mainStyle.homeView} setImage={this.setImage} load={this.state.loading} navigation={this.props.navigation}/>
+                <FlatList
+                    style={shelvesStyle.scrollView}
+                    progressViewOffset={20}
+                    refreshing={this.state.loading}
+                    onRefresh={() => {
+                        this.startRefresh();
+                    }}
 
-                <TouchableOpacity onPress={this.startLoading} style={refreshStyle.button}>
+                    ListEmptyComponent={
+                        <View>
+                            <Text style={[preResultHomeStyle.preHomeBottomText, preResultHomeStyle.preHomeTopText]}>🏠</Text>
+                            <Text style={preResultHomeStyle.preHomeBottomText}>Pull down to refresh</Text>
+                        </View>
+                    }
+
+                    contentContainerStyle={
+                        this.state.shelves.length < 1 ? {
+                            flexGrow: 1,
+                            justifyContent: "center",
+                            alignItems: "center"
+                        }: {}
+                    }
+
+                    data={this.state.shelves}
+                    keyExtractor={item => item.title}
+                    renderItem={
+                        ({item}) => <Shelf shelf={item} navigation={this.props.navigation}/>
+                    }
+                />
+
+                <TouchableOpacity onPress={() => this.startRefresh()} style={refreshStyle.button}>
                     <Text style={refreshStyle.buttonText}>Aktualisieren</Text>
                 </TouchableOpacity>
             </>

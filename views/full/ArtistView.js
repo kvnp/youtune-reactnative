@@ -1,16 +1,15 @@
 import React from "react";
 import {
     View,
-    ScrollView,
     Text,
     ImageBackground,
     TouchableOpacity
 } from "react-native";
 
-import Shelf from "../../components/shared/Shelf";
 import LinearGradient from "react-native-linear-gradient";
 import { bottomBarStyle, artistGradient } from "../../styles/BottomBar";
-import { resultHomeStyle } from "../../styles/Home";
+
+import FlatShelves from "../../components/collections/FlatShelves";
 
 export default function ArtistView({route, navigation}) {
     const { shelves } = route.params;
@@ -18,16 +17,7 @@ export default function ArtistView({route, navigation}) {
 
     return (
         <>
-            <ScrollView>
-                <Text style={resultHomeStyle.homeText}>{title}</Text>
-                {
-                    shelves.map(
-                        (shelf) => {
-                            return <Shelf navigation={navigation} shelf={shelf}/>
-                        }
-                    )
-                }
-            </ScrollView>
+            {FlatShelves(shelves, navigation)}
             <ImageBackground style={bottomBarStyle.container} source={{uri: thumbnail}}>
                 <LinearGradient style={bottomBarStyle.artistGradientStyle} colors={artistGradient}>
                     <View style={bottomBarStyle.centerContainer}>

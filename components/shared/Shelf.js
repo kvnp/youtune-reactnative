@@ -1,27 +1,16 @@
 import React, { PureComponent } from 'react';
 
-import {
-    Text,
-    ScrollView
-} from "react-native";
+import { Text } from "react-native";
 
 import Entry from '../shared/Entry';
 import Playlist from '../shared/Playlist';
 
 import { resultHomeStyle, albumStyle } from '../../styles/Home';
 import { descriptionStyle } from '../../styles/Description';
+import FlatAlbums from '../collections/FlatAlbums';
+import FlatEntries from '../collections/FlatEntries';
 
 export default class Shelf extends PureComponent {
-    openAlbum = (album) => this.props.navigation.navigate("Playlist", album);
-
-    displayAlbums = (albums) => {
-        return albums.map(album => { return <Playlist style={albumStyle.album} playlist={album} navigation={this.props.navigation}/> } );
-    }
-
-    displayElement = (entry) => {
-        return Entry(entry, this.props.navigation);
-    }
-
     render() {
         const { title, entries, subtitle, albums, description } = this.props.shelf;
 
@@ -33,16 +22,10 @@ export default class Shelf extends PureComponent {
             view.push(<Text>{subtitle}</Text>)
 
         if (entries != undefined)
-            view.push(entries.map(this.displayElement));
+            view.push(FlatEntries(entries, this.props.navigation));
         
         if (albums != undefined)
-            view.push(
-                <ScrollView style={albumStyle.albumCollection}
-                            horizontal={true}
-                            showsHorizontalScrollIndicator={false}>
-                    {this.displayAlbums(albums)}
-                </ScrollView>
-            );
+            view.push(FlatAlbums(albums, this.props.navigation));
 
         return (
             <>

@@ -20,13 +20,15 @@ export default class Header extends PureComponent {
         global.setHeader = ({title, image}) => {
             if (image != this.state.image) {
                 this.setState({
-                    title: title,
-                    source: { uri: image }
+                    source: {
+                        uri: image
+                    }
                 });
             }
 
-            if (title != undefined)
+            if (title != undefined) {
                 this.setState({title: title});
+            }
         }
     }
 

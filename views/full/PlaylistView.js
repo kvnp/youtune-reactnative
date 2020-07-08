@@ -11,20 +11,17 @@ import {
 import Entry from "../../components/shared/Entry";
 import { bottomBarStyle, bottomBarAlbumStyle } from "../../styles/BottomBar";
 import { resultHomeStyle } from "../../styles/Home";
+import FlatAlbums from "../../components/collections/FlatAlbums";
+import FlatEntries from "../../components/collections/FlatEntries";
+import { playlistViewStyle } from "../../styles/Playlist";
 
 export default function PlaylistView({ route, navigation }) {
-    const { entries, title, subtitle, secondSubtitle, thumbnail} = route.params.browse;
+    const { entries, title, subtitle, secondSubtitle, thumbnail} = route.params;
 
     return (
         <>
-            <ScrollView>
-                <Text style={resultHomeStyle.homeText}>{title}</Text>
-                {entries.map(
-                    (entry) => {
-                        return Entry(entry, navigation);
-                    }
-                )}
-            </ScrollView>
+            <Text style={playlistViewStyle.topText}>{title}</Text>
+            {FlatEntries(entries, navigation)}
 
             <ImageBackground style={bottomBarStyle.container}>
                 <View style={bottomBarStyle.centerContainer}>

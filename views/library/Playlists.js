@@ -65,7 +65,8 @@ export default class Playlists extends PureComponent {
 
                 </ScrollView>
 
-                <Modal animationType="slide"
+                <Modal
+                    animationType="slide"
                     transparent={true}
                     visible={this.state.modalVisible}
                     onRequestClose={() => {
@@ -77,12 +78,14 @@ export default class Playlists extends PureComponent {
                     }}
                 >
                     <View style={styles.modalView}>
+                        <View style={styles.modalChild}>
                         {PlaylistCreator({
                             callback: (obj) => {
                                 if (obj != undefined) this.createPlaylist(obj);
                                 this.setModalVisible(false);
                             }
                         })}
+                        </View>
                     </View>
                 </Modal>
             </>
@@ -98,10 +101,13 @@ const styles = StyleSheet.create({
     },
     
     modalView: {
+        backgroundColor: "transparent",
+        alignSelf: "center",
+    },
+
+    modalChild: {
         backgroundColor: "white",
-        borderRadius: 20,
-        justifyContent: "center",
-        shadowColor: "#000",
+        borderRadius: 10,
     },
 
     openButton: {

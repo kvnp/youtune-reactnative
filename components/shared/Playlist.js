@@ -24,7 +24,7 @@ export default class Playlist extends PureComponent {
 
         return (
             <View style={[this.props.style, playlistStyle.container]}>
-                <TouchableOpacity onPress={() => handleMedia(viewObject)}>
+                <TouchableOpacity onPress={() => handleMedia(viewObject, this.props.navigation)}>
                     <Image style={playlistStyle.cover} source={{uri: thumbnail}}/>
                 </TouchableOpacity>
 

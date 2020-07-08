@@ -24,3 +24,13 @@ export const playlistStyle = StyleSheet.create({
         fontSize: 14,
     }
 });
+
+export const playlistViewStyle = StyleSheet.create({
+    topText: {
+        fontWeight: 'bold',
+        alignSelf: 'flex-start',
+        paddingLeft: 20,
+        paddingTop: 20,
+        fontSize: 25,
+    }
+});

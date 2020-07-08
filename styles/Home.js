@@ -20,18 +20,26 @@ export const refreshStyle = StyleSheet.create({
     }
 });
 
-export const resultHomeStyle = StyleSheet.create({
-    preHome: {
-        fontSize: 70,
+export const preResultHomeStyle = StyleSheet.create({
+    preHomeTopText: {
+        fontSize: 50,
+        paddingBottom: 50
     },
 
+    preHomeBottomText: {
+        fontSize: 20,
+        textAlign: "center",
+        alignSelf: "center",
+    },
+});
+
+export const resultHomeStyle = StyleSheet.create({
     homeText: {
         fontWeight: 'bold',
         alignSelf: 'flex-start',
         paddingLeft: 20,
         paddingTop: 20,
         fontSize: 25,
-        marginBottom: -20,
     }
 });
 
@@ -39,6 +47,7 @@ export const albumStyle = StyleSheet.create({
     albumCollection: {
         paddingTop: 10,
         paddingLeft: 20,
+        paddingRight: 20,
         paddingBottom: 5,
         marginBottom: 35
     },
