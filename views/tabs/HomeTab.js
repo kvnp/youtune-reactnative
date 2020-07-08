@@ -65,6 +65,20 @@ export default class HomeTab extends PureComponent {
                         </View>
                     }
 
+                    ListFooterComponent={
+                        <TouchableOpacity onPress={() => this.startRefresh()} style={refreshStyle.button}>
+                            <Text style={refreshStyle.buttonText}>Aktualisieren</Text>
+                        </TouchableOpacity>
+                    }
+
+                    ListFooterComponentStyle={
+                        this.state.shelves.length == 0 ? {
+                            display: "none"
+                        }: {
+                            paddingBottom: 20
+                        }
+                    }
+
                     contentContainerStyle={
                         this.state.shelves.length < 1 ? {
                             flexGrow: 1,
@@ -79,10 +93,6 @@ export default class HomeTab extends PureComponent {
                         ({item}) => <Shelf shelf={item} navigation={this.props.navigation}/>
                     }
                 />
-
-                <TouchableOpacity onPress={() => this.startRefresh()} style={refreshStyle.button}>
-                    <Text style={refreshStyle.buttonText}>Aktualisieren</Text>
-                </TouchableOpacity>
             </>
         );
     }

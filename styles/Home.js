@@ -3,7 +3,6 @@ import { appColor } from './App';
 
 export const refreshStyle = StyleSheet.create({
     button: {
-        position: 'absolute',
         bottom: 5,
         paddingRight: 15,
         paddingLeft: 15,
@@ -45,11 +44,10 @@ export const resultHomeStyle = StyleSheet.create({
 
 export const albumStyle = StyleSheet.create({
     albumCollection: {
-        paddingTop: 10,
         paddingLeft: 20,
         paddingRight: 20,
         paddingBottom: 5,
-        marginBottom: 35
+        marginBottom: 25
     },
 
     album: {
