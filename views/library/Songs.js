@@ -1,39 +1,21 @@
-import React, { PureComponent } from "react";
+import React from "react";
 import {
     ScrollView,
-    StyleSheet,
     Text,
 } from "react-native";
 
-export default class Songs extends PureComponent {
-    componentDidMount() {
-        this._unsubscribe = this.props.navigation.addListener('focus', () => {
+export default function Songs({ navigation }) {
+    React.useEffect(() => {
+        const unsubscribe = navigation.addListener('focus', () => {
             global.setLibraryNavigator(2);
         });
-    }
-    
-    componentWillUnmount() {
-        this._unsubscribe();
-    }
 
-    render() {
-        return (
-            <ScrollView style={styles.playlistCollection} contentContainerStyle={styles.playlistCollectionContainer}>
-                <Text style={{paddingBottom: 50}}>Songs</Text>
-            </ScrollView>
-        );
-    }
+        return () => unsubscribe();
+    });
+
+    return (
+        <ScrollView>
+            <Text>Songs</Text>
+        </ScrollView>
+    );
 }
-
-const styles = StyleSheet.create({
-    playlistCollection: {
-        width: '100%'
-    },
-
-    playlistCollectionContainer: {
-        flexGrow: 1,
-        justifyContent: 'center',
-        flexDirection: 'row',
-        flexWrap: 'wrap-reverse'
-    },
-});

@@ -20,12 +20,12 @@ export default function LibraryTab({navigation}) {
     const LibraryStack = createStackNavigator();
     return (
         <>
-            <LibraryStack.Navigator>
-                <LibraryStack.Screen name="LibraryPlaylist" component={Playlists} options={global.navigationOptions}/>
-                <LibraryStack.Screen name="LibraryAlbums" component={Albums} options={global.navigationOptions}/>
-                <LibraryStack.Screen name="LibrarySongs" component={Songs} options={global.navigationOptions}/>
-                <LibraryStack.Screen name="LibraryArtists" component={Artists} options={global.navigationOptions}/>
-                <LibraryStack.Screen name="LibrarySubscriptions" component={Subscriptions} options={global.navigationOptions}/>
+            <LibraryStack.Navigator initialRouteName="Playlists">
+                <LibraryStack.Screen name="Playlists" component={Playlists} options={global.navigationOptions}/>
+                <LibraryStack.Screen name="Albums" component={Albums} options={global.navigationOptions}/>
+                <LibraryStack.Screen name="Songs" component={Songs} options={global.navigationOptions}/>
+                <LibraryStack.Screen name="Artists" component={Artists} options={global.navigationOptions}/>
+                <LibraryStack.Screen name="Subscriptions" component={Subscriptions} options={global.navigationOptions}/>
             </LibraryStack.Navigator>
             <LibraryNavigator navigation={navigation}/>
         </>

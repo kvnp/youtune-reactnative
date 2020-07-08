@@ -27,9 +27,9 @@ export default function Navigator() {
             <Header style={headerStyle.headerPicture}/>
             <Tab.Navigator initialRouteName="Home" barStyle={appColor.background}>
                 <Tab.Screen name="Home" component={HomeTab} options={getTabOptions("home")}/>
-                <Tab.Screen name="Suche" component={SearchTab} options={getTabOptions("search")}/>
-                <Tab.Screen name="Bibliothek" component={LibraryTab} options={getTabOptions("folder")}/>
-                <Tab.Screen name="Einstellungen" component={SettingsTab} options={getTabOptions("settings")}/>
+                <Tab.Screen name="Search" component={SearchTab} options={getTabOptions("search")}/>
+                <Tab.Screen name="Library" component={LibraryTab} options={getTabOptions("folder")}/>
+                <Tab.Screen name="Settings" component={SettingsTab} options={getTabOptions("settings")}/>
             </Tab.Navigator>
         </>
     );

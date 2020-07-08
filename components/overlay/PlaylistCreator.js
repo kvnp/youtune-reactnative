@@ -8,7 +8,7 @@ import {
     TextInput
 } from "react-native";
 
-export function PlaylistCreator({ callback }) {
+export default function PlaylistCreator({ callback }) {
     let title = "";
     let description = "";
     return (
@@ -18,12 +18,10 @@ export function PlaylistCreator({ callback }) {
                     <View style={styles.headerTopColumn}>
                         <TextInput style={styles.inputText}
                                    onChangeText={ text => title = text }
-                                   placeholderTextColor='white'
                                    placeholder="Titel"/>
 
                         <TextInput style={styles.inputText}
                                    onChangeText={ text => description = text}
-                                   placeholderTextColor='white'
                                    placeholder="Beschreibung"/>
                     </View>
                 </View>
@@ -35,10 +33,9 @@ export function PlaylistCreator({ callback }) {
                     </TouchableOpacity>
                     <TouchableOpacity style={styles.headerButton}
                                       onPress={() =>  {
-                                          if (title.length > 0 && description.length > 0) {
-                                            callback();
-                                            global.createPlaylist(title, description);
-                                          }
+                                            if (title.length > 0 && description.length > 0) {
+                                                callback({title: title, description: description});
+                                            }
                                       }}>
                         <Text style={styles.headerButtonText}>SPEICHERN</Text>
                     </TouchableOpacity>
@@ -60,11 +57,10 @@ const styles = StyleSheet.create({
     },
 
     headerContainer: {
-        backgroundColor: 'gray',
-        width: '100%',
-        height: 150,
-        justifyContent: 'space-around',
-        paddingBottom: 20
+        paddingTop: 20,
+        paddingBottom: 20,
+        marginLeft: 20,
+        marginRight: 20,
     },
 
     headerCenterContainer: {
@@ -72,7 +68,6 @@ const styles = StyleSheet.create({
     },
 
     inputText: {
-        color: 'white',
         textAlign: 'justify',
     },
 

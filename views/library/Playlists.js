@@ -1,16 +1,15 @@
-import React, { PureComponent, useState } from "react";
+import React, { PureComponent } from "react";
 import {
     ScrollView,
     StyleSheet,
     View,
     Text,
-    TouchableOpacity,
-    Alert
+    TouchableOpacity
 } from "react-native";
 
 import Playlist from '../../components/shared/Playlist';
 import { Modal } from "react-native-paper";
-import { PlaylistCreator } from "../../components/overlay/PlaylistCreator";
+import PlaylistCreator from "../../components/overlay/PlaylistCreator";
 
 export default class Playlists extends PureComponent {
     constructor(props) {
@@ -19,17 +18,16 @@ export default class Playlists extends PureComponent {
             modalVisible: false,
             playlists: []
         }
+    }
 
-        global.createPlaylist = (title, subtitle) => {
-            this.createPlaylist(title, subtitle);
-        }
+    setModalVisible = (boolean) => {
+        this.setState({modalVisible: boolean});
     }
 
     componentDidMount() {
         this._unsubscribe = this.props.navigation.addListener('focus', () => {
             global.setLibraryNavigator(0);
             this.setModalVisible(false);
-            this.forceUpdate();
         });
     }
     
@@ -37,44 +35,12 @@ export default class Playlists extends PureComponent {
         this._unsubscribe();
     }
 
-    openCreatePlaylist = () => {
-        this.props.navigation.navigate("CreatePlaylist");
-    }
-
-    createPlaylist = (title, description) => {
+    createPlaylist = ({title, description}) => {
         let temp = this.state.playlists;
         temp.push({title: title, subtitle: description});
 
         this.setState({playlists: temp});
         this.forceUpdate();
-    }
-
-    getPlaylist = (playlistJson) => {
-        return (
-            <View style={styles.playlist}>
-                <Playlist playlist={playlistJson} navigation={this.props.navigation}/>
-            </View>
-        );
-    }
-
-    getPlaylists = () => {
-        return this.state.playlists.map(this.getPlaylist);
-    }
-
-    getAddPlaylist = () => {
-        return (
-            <View style={styles.playlist}>
-                <TouchableOpacity onPress={() => {this.openCreatePlaylist()}}
-                                  style={styles.playlistCover}>
-                    <Text style={styles.newPlaylist}>+</Text>
-                </TouchableOpacity>
-                <Text style={styles.playlistTitle}>Neue Playlist</Text>
-            </View>
-        );
-    }
-
-    setModalVisible = (boolean) => {
-        this.setState({modalVisible: boolean});
     }
 
     render() {
@@ -88,7 +54,15 @@ export default class Playlists extends PureComponent {
                         </TouchableOpacity>
                         <Text style={styles.playlistTitle}>Neue Playlist</Text>
                     </View>
-                    {this.getPlaylists()}
+
+                    {this.state.playlists.map((playlist) => {
+                        return (
+                            <View style={styles.playlist}>
+                                <Playlist playlist={playlist} navigation={this.props.navigation}/>
+                            </View>
+                        );
+                    })}
+
                 </ScrollView>
 
                 <Modal animationType="slide"
@@ -104,8 +78,9 @@ export default class Playlists extends PureComponent {
                 >
                     <View style={styles.modalView}>
                         {PlaylistCreator({
-                            callback: () => {
-                                    this.setModalVisible(false);
+                            callback: (obj) => {
+                                if (obj != undefined) this.createPlaylist(obj);
+                                this.setModalVisible(false);
                             }
                         })}
                     </View>
