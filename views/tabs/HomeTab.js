@@ -18,7 +18,7 @@ export default class HomeTab extends PureComponent {
 
     componentDidMount() {
         this._unsubscribe = this.props.navigation.addListener('focus', () => {
-            global.setHeader("Home");
+            global.setHeader({title: "Home"});
         });
     }
     
@@ -34,7 +34,7 @@ export default class HomeTab extends PureComponent {
 
     setImage = (source) => {
         this.setState({loading: false});
-        global.setHeader("Home", source);
+        global.setHeader({image: source});
     }
 
     render() {

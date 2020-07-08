@@ -1,6 +1,11 @@
 import { StyleSheet } from 'react-native';
 import { appColor } from './App';
 
+export const artistGradient = [
+    "rgba(0, 0, 0, 0.2)",
+    "rgba(0, 0, 0, 0.6)"
+];
+
 export const bottomBarStyle = StyleSheet.create({
     container: {
         backgroundColor: appColor.background.backgroundColor,
@@ -65,6 +70,11 @@ export const bottomBarStyle = StyleSheet.create({
         paddingRight: 40,
         alignSelf: 'flex-end',
         alignItems: 'flex-end',
+    },
+
+    artistGradientStyle: {
+        width: "100%",
+        height: "100%",
     },
 
     artistName: {

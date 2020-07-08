@@ -1,18 +1,22 @@
-import React, { PureComponent } from "react";
+import React, { PureComponent, useState } from "react";
 import {
     ScrollView,
     StyleSheet,
     View,
     Text,
-    TouchableOpacity
+    TouchableOpacity,
+    Alert
 } from "react-native";
 
 import Playlist from '../../components/shared/Playlist';
+import { Modal } from "react-native-paper";
+import { PlaylistCreator } from "../../components/overlay/PlaylistCreator";
 
 export default class Playlists extends PureComponent {
     constructor(props) {
         super(props);
         this.state = {
+            modalVisible: false,
             playlists: []
         }
 
@@ -24,6 +28,7 @@ export default class Playlists extends PureComponent {
     componentDidMount() {
         this._unsubscribe = this.props.navigation.addListener('focus', () => {
             global.setLibraryNavigator(0);
+            this.setModalVisible(false);
             this.forceUpdate();
         });
     }
@@ -68,17 +73,81 @@ export default class Playlists extends PureComponent {
         );
     }
 
+    setModalVisible = (boolean) => {
+        this.setState({modalVisible: boolean});
+    }
+
     render() {
         return (
-            <ScrollView style={styles.playlistCollection} contentContainerStyle={styles.playlistCollectionContainer}>
-                {this.getAddPlaylist()}
-                {this.getPlaylists()}
-            </ScrollView>
+            <>
+                <ScrollView style={styles.playlistCollection} contentContainerStyle={styles.playlistCollectionContainer}>
+                    <View style={styles.playlist}>
+                        <TouchableOpacity onPress={() => this.setModalVisible(true)}
+                                        style={styles.playlistCover}>
+                            <Text style={styles.newPlaylist}>+</Text>
+                        </TouchableOpacity>
+                        <Text style={styles.playlistTitle}>Neue Playlist</Text>
+                    </View>
+                    {this.getPlaylists()}
+                </ScrollView>
+
+                <Modal animationType="slide"
+                    transparent={true}
+                    visible={this.state.modalVisible}
+                    onRequestClose={() => {
+                        this.setModalVisible(false);
+                    }}
+
+                    onDismiss={() => {
+                        this.setModalVisible(false);
+                    }}
+                >
+                    <View style={styles.modalView}>
+                        {PlaylistCreator({
+                            callback: () => {
+                                    this.setModalVisible(false);
+                            }
+                        })}
+                    </View>
+                </Modal>
+            </>
         );
     }
 }
 
 const styles = StyleSheet.create({
+    centeredView: {
+        justifyContent: "center",
+        alignItems: "center",
+        marginTop: 22
+    },
+    
+    modalView: {
+        backgroundColor: "white",
+        borderRadius: 20,
+        justifyContent: "center",
+        shadowColor: "#000",
+    },
+
+    openButton: {
+        backgroundColor: "#F194FF",
+        borderRadius: 20,
+        padding: 10,
+    },
+
+    textStyle: {
+        color: "white",
+        fontWeight: "bold",
+        textAlign: "center",
+    },
+
+    modalText: {
+        marginBottom: 15,
+        textAlign: "center",
+    },
+
+
+
     header: {
         alignSelf: 'center',
         width: '100%',

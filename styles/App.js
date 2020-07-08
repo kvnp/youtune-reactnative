@@ -17,14 +17,15 @@ export const headerStyle = StyleSheet.create({
     image: {
         borderBottomLeftRadius: 25,
         borderBottomRightRadius: 25,
-        backgroundColor: 'transparent'
+        //backgroundColor: appColor.background.backgroundColor,
+        backgroundColor: 'transparent',
     },
 
     container: {
         alignItems: 'center',
         justifyContent: 'center',
         backgroundColor: 'transparent',
-        marginBottom: -20,
+        marginBottom: -25,
         zIndex: 1
     },
 

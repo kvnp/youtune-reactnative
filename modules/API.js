@@ -19,7 +19,6 @@ async function getApiKey() {
 
         text = text.slice(text.indexOf("INNERTUBE_API_KEY\":\"")+20);
         global.apiKey = text.slice(0, text.indexOf("\""));
-        console.log(global.apiKey);
     }
 
     return global.apiKey;

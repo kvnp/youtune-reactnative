@@ -16,7 +16,7 @@ export default class SearchTab extends PureComponent {
 
     componentDidMount() {
         this._unsubscribe = this.props.navigation.addListener('focus', () => {
-            global.setHeader("Search");
+            global.setHeader({title: "Search"});
         });
     }
     

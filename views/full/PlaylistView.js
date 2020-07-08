@@ -12,31 +12,28 @@ import Entry from "../../components/shared/Entry";
 import { bottomBarStyle, bottomBarAlbumStyle } from "../../styles/BottomBar";
 import { resultHomeStyle } from "../../styles/Home";
 
-function getEntry(entry) {
-    return <Entry entry={entry}/>
-}
+export default function PlaylistView({ route, navigation }) {
+    const { entries, title, subtitle, secondSubtitle, thumbnail} = route.params.browse;
 
-function getEntries(entries) {
-    return entries.map(getEntry);
-}
-
-export function PlaylistView({ route, navigation }) {
-    const browse = route.params;
     return (
         <>
             <ScrollView>
-                <Text style={resultHomeStyle.homeText}>{browse.title}</Text>
-                {getEntries(browse.entries)}
+                <Text style={resultHomeStyle.homeText}>{title}</Text>
+                {entries.map(
+                    (entry) => {
+                        return Entry(entry, navigation);
+                    }
+                )}
             </ScrollView>
 
             <ImageBackground style={bottomBarStyle.container}>
                 <View style={bottomBarStyle.centerContainer}>
                     <View style={bottomBarStyle.topRow}>
-                        <Image style={bottomBarAlbumStyle.albumCover} source={{uri: browse.thumbnail}}/>
+                        <Image style={bottomBarAlbumStyle.albumCover} source={{uri: thumbnail}}/>
                         <View style={bottomBarAlbumStyle.topColumn}>
-                            <Text style={bottomBarAlbumStyle.albumTitle}>{browse.title}</Text>
-                            <Text style={bottomBarAlbumStyle.albumSubtitle}>{browse.subtitle}</Text>
-                            <Text style={bottomBarAlbumStyle.albumInfo}>{browse.secondSubtitle}</Text>
+                            <Text style={bottomBarAlbumStyle.albumTitle}>{title}</Text>
+                            <Text style={bottomBarAlbumStyle.albumSubtitle}>{subtitle}</Text>
+                            <Text style={bottomBarAlbumStyle.albumInfo}>{secondSubtitle}</Text>
                         </View>
                         <TouchableOpacity style={bottomBarStyle.closeButton}
                                           onPress={() => {navigation.pop()}}>

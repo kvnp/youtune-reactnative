@@ -12,7 +12,21 @@ export default class Header extends PureComponent {
     constructor(props) {
         super(props);
         this.state = {
+            title: "Home",
+            image: null,
             source: null
+        }
+
+        global.setHeader = ({title, image}) => {
+            if (image != this.state.image) {
+                this.setState({
+                    title: title,
+                    source: { uri: image }
+                });
+            }
+
+            if (title != undefined)
+                this.setState({title: title});
         }
     }
 
@@ -21,17 +35,6 @@ export default class Header extends PureComponent {
             if (this.props.source != previousProps.source) {
                 this.setImage(this.props.source);
             }
-        }
-    }
-
-    setImage = (url) => {
-        if (url == null) {
-            this.setState({source: null});
-        } else {
-            if (typeof url == "string")
-                this.setState({source: {uri: url}});
-            else if (typeof url == "number")
-                this.setState({source: url});
         }
     }
 
@@ -44,7 +47,7 @@ export default class Header extends PureComponent {
                                 colors={gradientColors}>
                                     
                     <Text style={[{color: this.state.headerColor}, headerStyle.text]}>
-                        {this.props.text}
+                        {this.state.title}
                     </Text>
                 </LinearGradient>
             </ImageBackground>

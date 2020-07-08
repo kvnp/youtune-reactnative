@@ -1,4 +1,4 @@
-import React, { PureComponent } from "react";
+import React from "react";
 
 import { createMaterialBottomTabNavigator } from "@react-navigation/material-bottom-tabs";
 
@@ -9,45 +9,28 @@ import HomeTab from "../tabs/HomeTab";
 import LibraryTab from "../tabs/LibraryTab";
 import SettingsTab from "../tabs/SettingsTab";
 
-import Header from "../../components/shared/Header";
+import Header from "../../components/overlay/Header";
 import { headerStyle, appColor } from "../../styles/App";
 
-export default class Navigator extends PureComponent {
-    constructor(props) {
-        super(props);
-        this.state = {
-            title: "Home",
-            image: null
-        };
+function getIcon(title, color) {
+    return <MaterialIcons name={title} color={color} size={24}/>;
+}
 
-        global.setHeader = (title, image) => {
-            if (image != undefined)
-                this.setState({title: title, image: image});
-            else
-                this.setState({title: title});
-        }
-    }
+function getTabOptions(title) {
+    return { tabBarIcon: ({ color }) => getIcon(title, color) };
+}
 
-    getIcon = (title, color) => {
-        return <MaterialIcons name={title} color={color} size={24}/>;
-    }
-
-    getTabOptions = (title) => {
-        return { tabBarIcon: ({ color }) => this.getIcon(title, color) }
-    }
-
-    render() {
-        const Tab = createMaterialBottomTabNavigator();
-        return (
-            <>
-                <Header style={headerStyle.headerPicture} text={this.state.title} source={this.state.image}/>
-                <Tab.Navigator initialRouteName="Home" barStyle={appColor.background}>
-                    <Tab.Screen name="Home" component={HomeTab} options={this.getTabOptions("home")}/>
-                    <Tab.Screen name="Suche" component={SearchTab} options={this.getTabOptions("search")}/>
-                    <Tab.Screen name="Bibliothek" component={LibraryTab} options={this.getTabOptions("folder")}/>
-                    <Tab.Screen name="Einstellungen" component={SettingsTab} options={this.getTabOptions("settings")}/>
-                </Tab.Navigator>
-            </>
-        );
-    }
+export default function Navigator() {
+    const Tab = createMaterialBottomTabNavigator();
+    return (
+        <>
+            <Header style={headerStyle.headerPicture}/>
+            <Tab.Navigator initialRouteName="Home" barStyle={appColor.background}>
+                <Tab.Screen name="Home" component={HomeTab} options={getTabOptions("home")}/>
+                <Tab.Screen name="Suche" component={SearchTab} options={getTabOptions("search")}/>
+                <Tab.Screen name="Bibliothek" component={LibraryTab} options={getTabOptions("folder")}/>
+                <Tab.Screen name="Einstellungen" component={SettingsTab} options={getTabOptions("settings")}/>
+            </Tab.Navigator>
+        </>
+    );
 }

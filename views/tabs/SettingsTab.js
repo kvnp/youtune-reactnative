@@ -1,4 +1,4 @@
-import React, { PureComponent } from 'react';
+import React from 'react';
 
 import {
     Text,
@@ -6,33 +6,20 @@ import {
     TouchableOpacity
 } from 'react-native';
 
-export default class SettingsTab extends PureComponent {
-    constructor(props) {
-        super(props);
-        this.state = {
-            results: null
-        };
-    }
-
-    componentDidMount() {
-        this._unsubscribe = this.props.navigation.addListener('focus', () => {
-            global.setHeader("Settings");
+export default function SettingsTab({ navigation }) {
+    React.useEffect(() => {
+        const unsubscribe = navigation.addListener('focus', () => {
+            global.setHeader({title: "Settings"});
         });
-    }
-    
-    componentWillUnmount() {
-        this._unsubscribe();
-    }
+        
+        return unsubscribe;
+    }, [navigation]);
 
-    resultReceiver = (childData) => this.setState({results: childData});
-
-    render() {
-        return (
-            <TouchableOpacity style={styles.middleView} onPress={() => this.props.navigation.navigate("Artist")}>
-                <Text style={styles.placeholder}>⚙️</Text>
-            </TouchableOpacity>
-        );
-    }
+    return (
+        <TouchableOpacity style={styles.middleView} onPress={() => navigation.navigate("Artist")}>
+            <Text style={styles.placeholder}>⚙️</Text>
+        </TouchableOpacity>
+    );
 };
 
 const styles = StyleSheet.create({

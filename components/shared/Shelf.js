@@ -19,7 +19,7 @@ export default class Shelf extends PureComponent {
     }
 
     displayElement = (entry) => {
-        return <Entry entry={entry} navigation={this.props.navigation}/>;
+        return Entry(entry, this.props.navigation);
     }
 
     render() {

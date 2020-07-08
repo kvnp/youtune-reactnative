@@ -24,7 +24,7 @@ function startMedia(videoId, navigation) {
     });*/
 }
 
-export function handleMedia({browseId, playlistId, videoId, navigation}) {
+export function handleMedia({browseId, playlistId, videoId}, navigation) {
     if (browseId != undefined) {
         if (browseId.slice(0, 2) == "UC") {
             showArtist(browseId, navigation);

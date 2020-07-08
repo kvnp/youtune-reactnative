@@ -37,23 +37,16 @@ export default class LibraryNavigator extends PureComponent {
     update = (value) => {
         if (value != this.state.selection) {
             this.setState({selection: value});
-            switch (value) {
-                case 0:
-                    this.props.navigation.push("LibraryPlaylist");
-                    break;
-                case 1: 
-                    this.props.navigation.push("LibraryAlbums");
-                    break;
-                case 2:
-                    this.props.navigation.push("LibrarySongs");
-                    break;
-                case 3:
-                    this.props.navigation.push("LibraryArtists");
-                    break;
-                case 4:
-                    this.props.navigation.push("LibrarySubscriptions");
-                    break;
-            }
+            if (value == 0)
+                this.props.navigation.push("LibraryPlaylist");
+            else if (value == 1)
+                this.props.navigation.push("LibraryAlbums");
+            else if (value == 2)
+                this.props.navigation.push("LibrarySongs");
+            else if (value == 3)
+                this.props.navigation.push("LibraryArtists");
+            else if (value == 4)
+                this.props.navigation.push("LibrarySubscriptions");
         }
     };
 

@@ -3,24 +3,16 @@ import React from "react";
 import {
     View,
     Text,
-    StatusBar,
     StyleSheet,
-    ImageBackground,
     TouchableOpacity,
     TextInput
 } from "react-native";
 
-export function CreatePlaylistView({ route, navigation }) {
-    StatusBar.setBarStyle('dark-content', true);
-
+export function PlaylistCreator({ callback }) {
     let title = "";
     let description = "";
     return (
-        <>
-        <View style={styles.paddingView}>
-            <Text style={styles.topText}>Playlist erstellen</Text>
-        </View>
-        <ImageBackground style={styles.headerContainer}>
+        <View style={styles.headerContainer}>
             <View style={styles.headerCenterContainer}>
                 <View style={styles.headerTopRow}>
                     <View style={styles.headerTopColumn}>
@@ -34,21 +26,17 @@ export function CreatePlaylistView({ route, navigation }) {
                                    placeholderTextColor='white'
                                    placeholder="Beschreibung"/>
                     </View>
-                    <TouchableOpacity style={styles.closeButton}
-                                      onPress={() => navigation.pop() }>
-                        <Text style={[styles.headerButtonText, styles.closeButtonText]}>X</Text>
-                    </TouchableOpacity>
                 </View>
 
                 <View style={styles.headerButtonView}>
                     <TouchableOpacity style={styles.headerButton}
-                                      onPress={() => navigation.pop() }>
+                                      onPress={() => callback() }>
                         <Text style={styles.headerButtonText}>ABBRECHEN</Text>
                     </TouchableOpacity>
                     <TouchableOpacity style={styles.headerButton}
                                       onPress={() =>  {
                                           if (title.length > 0 && description.length > 0) {
-                                            navigation.goBack();
+                                            callback();
                                             global.createPlaylist(title, description);
                                           }
                                       }}>
@@ -56,8 +44,7 @@ export function CreatePlaylistView({ route, navigation }) {
                     </TouchableOpacity>
                 </View>
             </View>
-        </ImageBackground>
-        </>
+        </View>
     )
 }
 
