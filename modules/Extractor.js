@@ -46,7 +46,7 @@ export function digestSearchResults(json) {
                 title += titlelist[ttl].text;
             }
 
-            let shelf = {title: title, entries: []};
+            let shelf = {title: title, data: []};
 
             let responsiveMusicList = musicShelf.contents;
             for (let rml = 0; rml < responsiveMusicList.length; rml++) {
@@ -107,7 +107,7 @@ export function digestSearchResults(json) {
                 }
 
                 final.results += 1;
-                shelf.entries.push(entry);
+                shelf.data.push(entry);
             }
 
             final.shelves.push(shelf);

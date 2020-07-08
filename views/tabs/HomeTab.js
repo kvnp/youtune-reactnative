@@ -52,16 +52,12 @@ export default class HomeTab extends PureComponent {
             <>
                 <FlatList
                     style={shelvesStyle.scrollView}
-                    progressViewOffset={20}
-                    refreshing={this.state.loading}
-                    onRefresh={() => {
-                        this.startRefresh();
-                    }}
+                    contentContainerStyle={shelvesStyle.scrollContainer}
 
                     ListEmptyComponent={
                         <View>
                             <Text style={[preResultHomeStyle.preHomeBottomText, preResultHomeStyle.preHomeTopText]}>🏠</Text>
-                            <Text style={preResultHomeStyle.preHomeBottomText}>Pull down to refresh</Text>
+                            <Text style={preResultHomeStyle.preHomeBottomText}>Pull down to load</Text>
                         </View>
                     }
 
@@ -71,6 +67,17 @@ export default class HomeTab extends PureComponent {
                         </TouchableOpacity>
                     }
 
+                    progressViewOffset={20}
+
+                    renderItem={
+                        ({item}) => <Shelf shelf={item} navigation={this.props.navigation}/>
+                    }
+
+                    refreshing={this.state.loading}
+                    onRefresh={() => {
+                        this.startRefresh();
+                    }}
+
                     ListFooterComponentStyle={
                         this.state.shelves.length == 0 ? {
                             display: "none"
@@ -79,19 +86,8 @@ export default class HomeTab extends PureComponent {
                         }
                     }
 
-                    contentContainerStyle={
-                        this.state.shelves.length < 1 ? {
-                            flexGrow: 1,
-                            justifyContent: "center",
-                            alignItems: "center"
-                        }: {}
-                    }
-
                     data={this.state.shelves}
                     keyExtractor={item => item.title}
-                    renderItem={
-                        ({item}) => <Shelf shelf={item} navigation={this.props.navigation}/>
-                    }
                 />
             </>
         );

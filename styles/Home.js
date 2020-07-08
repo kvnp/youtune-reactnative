@@ -28,17 +28,20 @@ export const preResultHomeStyle = StyleSheet.create({
     preHomeBottomText: {
         fontSize: 20,
         textAlign: "center",
-        alignSelf: "center",
+        alignSelf: "center"
     },
 });
 
 export const resultHomeStyle = StyleSheet.create({
     homeText: {
         fontWeight: 'bold',
-        alignSelf: 'flex-start',
-        paddingLeft: 20,
-        paddingTop: 20,
         fontSize: 25,
+        textAlign: "left"
+    },
+
+    textView: {
+        paddingLeft: 20,
+        paddingTop: 20
     }
 });
 

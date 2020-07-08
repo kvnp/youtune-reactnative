@@ -36,32 +36,10 @@ export default class SearchBar extends PureComponent {
     search = () => {
         Keyboard.dismiss();
         if (this.state.query.length > 0) {
-            let icon = '|';
-            this.props.sendIcon(icon);
-            let loader = setInterval(() => {
-                switch (icon) {
-                    case '|' :
-                        icon = '/';
-                        return this.props.sendIcon(icon);
-                    case '/' :
-                        icon = '-';
-                        return this.props.sendIcon(icon);
-                    case '-' :
-                        icon = '\\';
-                        return this.props.sendIcon(icon);
-                    case '\\':
-                        icon = '|';
-                        return this.props.sendIcon(icon);
-                }
-            }, 300);
-
             this.setState({buttonDisabled: true});
             fetchResults(this.state.query)
-                .then(data => { clearInterval(loader);
-                                this.props.sendIcon('🔎');
-                                this.setState({results: data});
-                                this.props.resultSender(data);
-                               });
+                .then(data => { this.setState({results: data});
+                                this.props.resultSender(data); });
         }
     }
 

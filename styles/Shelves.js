@@ -4,12 +4,11 @@ export const shelvesStyle = StyleSheet.create({
     scrollView: {
         paddingTop: 20,
         flexGrow: 1,
-        flexDirection: 'column'
+        flexDirection: 'column',
     },
-    
+
     scrollContainer: {
         flexGrow: 1,
-        alignItems: 'center',
-        justifyContent: 'center'
+        justifyContent: "center"
     },
 });

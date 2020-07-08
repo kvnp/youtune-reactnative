@@ -36,7 +36,7 @@ export const topicStyle = StyleSheet.create({
 
 export const resultStyle = StyleSheet.create({
     scrollMargin: {
-        marginBottom: 100
+        marginBottom: 93
     },
 
     resultHeader: {
@@ -83,6 +83,10 @@ export const searchStyle = StyleSheet.create({
     preResults: {
         fontSize: 70,
         alignSelf: 'center'
+    },
+
+    emptyView: {
+        marginBottom: -20
     }
 });
 
