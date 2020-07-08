@@ -21,7 +21,7 @@ export default function PlaylistView({ route, navigation }) {
     return (
         <>
             <Text style={playlistViewStyle.topText}>{title}</Text>
-            {FlatEntries(entries, navigation)}
+            <FlatEntries entries={entries} navigation={navigation}/>
 
             <ImageBackground style={bottomBarStyle.container}>
                 <View style={bottomBarStyle.centerContainer}>

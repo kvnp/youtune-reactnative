@@ -11,7 +11,7 @@ import {
 import { resultStyle } from '../../styles/Search';
 import { handleMedia } from '../../modules/Event';
 
-export default function Entry(entry, navigation) {
+export default ({entry, navigation}) => {
     let { title, subtitle, secondTitle, secondSubtitle, thumbnail } = entry;
     let { videoId, browseId, playlistId } = entry;
 

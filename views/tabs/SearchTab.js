@@ -60,6 +60,8 @@ export default class SearchTab extends PureComponent {
                         this.setState({shelves: data.shelves, loading: false});
                     else
                         this.setState({suggestion: data.suggestion, message: data.reason, loading: false});
+
+                    this.forceUpdate();
                 });
         }
     }
@@ -102,7 +104,7 @@ export default class SearchTab extends PureComponent {
                     }
 
                     keyExtractor={(item, index) => index + item.title}
-                    renderItem={({ item }) =>  Entry(item, this.props.navigation)}
+                    renderItem={({ item }) =>  <Entry entry={item} navigation={this.props.navigation}/>}
                 />
 
                 <View style={[searchBarStyle.container, searchBarStyle.bar]}>

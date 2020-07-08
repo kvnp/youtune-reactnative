@@ -21,8 +21,8 @@ export default class Shelf extends PureComponent {
                 </View>
                 {description != undefined ? <Text style={descriptionStyle.text}>{description}</Text> : null}
                 {subtitle != undefined || subtitle != "" ? <Text>{subtitle}</Text> : null}
-                {entries != undefined ? FlatEntries(entries, this.props.navigation) : null}
-                {albums != undefined ? FlatAlbums(albums, this.props.navigation) : null}
+                {entries != undefined ? <FlatEntries entries={entries} navigation={this.props.navigation}/> : null}
+                {albums != undefined ? <FlatAlbums albums={albums} navigation={this.props.navigation}/> : null}
             </>
         );
     }

@@ -17,7 +17,7 @@ export default function ArtistView({route, navigation}) {
 
     return (
         <>
-            {FlatShelves(shelves, navigation)}
+            <FlatShelves shelves={shelves} navigation={navigation}/>
             <ImageBackground style={bottomBarStyle.container} source={{uri: thumbnail}}>
                 <LinearGradient style={bottomBarStyle.artistGradientStyle} colors={artistGradient}>
                     <View style={bottomBarStyle.centerContainer}>

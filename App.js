@@ -8,10 +8,9 @@ import { createStackNavigator } from "@react-navigation/stack";
 import PlayView from "./views/full/PlayView";
 import PlaylistView from "./views/full/PlaylistView";
 import ArtistView from "./views/full/ArtistView";
-
 import Navigator from "./views/full/Navigator";
 
-export default function App() {
+export default () => {
     StatusBar.setBarStyle("dark-content", true);
     StatusBar.setTranslucent(true);
     StatusBar.setBackgroundColor("transparent", true);

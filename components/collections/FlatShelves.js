@@ -4,7 +4,7 @@ import { shelvesStyle } from "../../styles/Shelves";
 import { FlatList } from "react-native";
 import Shelf from '../shared/Shelf';
 
-export default function FlatShelves(shelves, navigation) {
+export default ({shelves, navigation}) => {
     return <FlatList
                 style={shelvesStyle.scrollView}
                 refreshing={false}
