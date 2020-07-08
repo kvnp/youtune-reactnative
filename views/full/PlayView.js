@@ -1,7 +1,7 @@
 import React from "react";
 import { View, Text, StatusBar, StyleSheet } from "react-native";
 
-export default function PlayView({route, navigation}) {
+export default ({route, navigation}) => {
     StatusBar.setBarStyle('dark-content', true);
     return (
         <View style={styles.mainView}>

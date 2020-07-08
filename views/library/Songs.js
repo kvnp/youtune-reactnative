@@ -4,7 +4,7 @@ import {
     Text,
 } from "react-native";
 
-export default function Songs({ navigation }) {
+export default ({ navigation }) => {
     React.useEffect(() => {
         const unsubscribe = navigation.addListener('focus', () => {
             global.setLibraryNavigator(2);

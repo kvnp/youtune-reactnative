@@ -20,7 +20,7 @@ function getTabOptions(title) {
     return { tabBarIcon: ({ color }) => getIcon(title, color) };
 }
 
-export default function Navigator() {
+export default () => {
     const Tab = createMaterialBottomTabNavigator();
     return (
         <>

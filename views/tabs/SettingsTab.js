@@ -6,7 +6,7 @@ import {
     TouchableOpacity
 } from 'react-native';
 
-export default function SettingsTab({ navigation }) {
+export default ({ navigation }) => {
     React.useEffect(() => {
         const unsubscribe = navigation.addListener('focus', () => {
             global.setHeader({title: "Settings"});

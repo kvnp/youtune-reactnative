@@ -11,7 +11,7 @@ import { bottomBarStyle, artistGradient } from "../../styles/BottomBar";
 
 import FlatShelves from "../../components/collections/FlatShelves";
 
-export default function ArtistView({route, navigation}) {
+export default ({route, navigation}) => {
     const { shelves } = route.params;
     const { title, subscriptions, thumbnail } = route.params.header;
 

@@ -8,7 +8,7 @@ import Songs from '../library/Songs';
 import Artists from '../library/Artists';
 import Subscriptions from '../library/Subscriptions';
 
-export default function LibraryTab({navigation}) {
+export default ({navigation}) => {
     React.useEffect(() => {
         const unsubscribe = navigation.addListener('focus', () => {
             global.setHeader({title: "Library"});

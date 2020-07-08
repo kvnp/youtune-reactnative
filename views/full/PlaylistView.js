@@ -1,21 +1,17 @@
 import React from "react";
 import {
     View,
-    ScrollView,
     Text,
     Image,
     ImageBackground,
     TouchableOpacity
 } from "react-native";
 
-import Entry from "../../components/shared/Entry";
 import { bottomBarStyle, bottomBarAlbumStyle } from "../../styles/BottomBar";
-import { resultHomeStyle } from "../../styles/Home";
-import FlatAlbums from "../../components/collections/FlatAlbums";
 import FlatEntries from "../../components/collections/FlatEntries";
 import { playlistViewStyle } from "../../styles/Playlist";
 
-export default function PlaylistView({ route, navigation }) {
+export default ({ route, navigation }) => {
     const { entries, title, subtitle, secondSubtitle, thumbnail} = route.params;
 
     return (

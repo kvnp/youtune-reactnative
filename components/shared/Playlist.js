@@ -10,34 +10,32 @@ import {
 import { playlistStyle } from '../../styles/Playlist';
 import { handleMedia } from '../../modules/Event';
 
-export default class Playlist extends PureComponent {
-    render() {
-        let { title, subtitle, thumbnail } = this.props.playlist;
-        let { videoId, browseId, playlistId } = this.props.playlist;
+export default ({ playlist, navigation, style }) => {
+    let { title, subtitle, thumbnail } = playlist;
+    let { videoId, browseId, playlistId } = playlist;
 
-        let viewObject = {
-            videoId: videoId,
-            browseId: browseId,
-            playlistId: playlistId,
-            navigation: this.props.navigation
-        };
+    let viewObject = {
+        videoId: videoId,
+        browseId: browseId,
+        playlistId: playlistId,
+        ...navigation
+    };
 
-        return (
-            <View style={[this.props.style, playlistStyle.container]}>
-                <TouchableOpacity onPress={() => handleMedia(viewObject, this.props.navigation)}>
-                    <Image style={playlistStyle.cover} source={{uri: thumbnail}}/>
-                </TouchableOpacity>
+    return (
+        <View style={[style, playlistStyle.container]}>
+            <TouchableOpacity onPress={() => handleMedia(viewObject, navigation)}>
+                <Image style={playlistStyle.cover} source={{uri: thumbnail}}/>
+            </TouchableOpacity>
 
-                <Text style={playlistStyle.title}
-                      numberOfLines={2}>
-                    {title}
-                </Text>
+            <Text style={playlistStyle.title}
+                    numberOfLines={2}>
+                {title}
+            </Text>
 
-                <Text style={playlistStyle.description}
-                      numberOfLines={2}>
-                    {subtitle}
-                </Text>
-            </View>
-        );
-    }
+            <Text style={playlistStyle.description}
+                    numberOfLines={2}>
+                {subtitle}
+            </Text>
+        </View>
+    );
 }

@@ -8,7 +8,7 @@ import {
     TextInput
 } from "react-native";
 
-export default function PlaylistCreator({ callback }) {
+export default ({ callback }) => {
     let title = "";
     let description = "";
     return (
