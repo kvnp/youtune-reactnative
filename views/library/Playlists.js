@@ -4,12 +4,13 @@ import {
     StyleSheet,
     View,
     Text,
-    TouchableOpacity
+    Pressable
 } from "react-native";
 
 import Playlist from '../../components/shared/Playlist';
 import { Modal } from "react-native-paper";
 import PlaylistCreator from "../../components/overlay/PlaylistCreator";
+import { rippleConfig } from "../../styles/Ripple";
 
 export default class Playlists extends PureComponent {
     constructor(props) {
@@ -48,10 +49,10 @@ export default class Playlists extends PureComponent {
             <>
                 <ScrollView style={styles.playlistCollection} contentContainerStyle={styles.playlistCollectionContainer}>
                     <View style={styles.playlist}>
-                        <TouchableOpacity onPress={() => this.setModalVisible(true)}
+                        <Pressable android_ripple={rippleConfig} onPress={() => this.setModalVisible(true)}
                                         style={styles.playlistCover}>
                             <Text style={styles.newPlaylist}>+</Text>
-                        </TouchableOpacity>
+                        </Pressable>
                         <Text style={styles.playlistTitle}>Neue Playlist</Text>
                     </View>
 

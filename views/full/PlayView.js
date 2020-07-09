@@ -1,14 +1,15 @@
 import React from "react";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
-import { View, Text, StyleSheet, Image, TouchableOpacity } from "react-native";
+import { View, Text, StyleSheet, Image, Pressable } from "react-native";
+import { rippleConfig } from "../../styles/Ripple";
 
 export default ({route, navigation}) => {
     return (
         <View style={stylesTop.mainView}>
             <View style={stylesTop.topBit}>
-                <TouchableOpacity style={stylesTop.topFirst}>
+                <Pressable android_ripple={rippleConfig} style={stylesTop.topFirst}>
                     <MaterialIcons name="keyboard-arrow-down" color={"black"} size={30}/>
-                </TouchableOpacity>
+                </Pressable>
                 <View style={stylesTop.topSecond}>
                     <Text style={stylesTop.topSecondTextOne}>Song</Text>
                     <Text style={stylesTop.topSecondTextTwo}>Video</Text>

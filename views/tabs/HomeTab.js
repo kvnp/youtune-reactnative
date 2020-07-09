@@ -2,7 +2,7 @@ import React, { PureComponent } from 'react';
 
 import {
     Text,
-    TouchableOpacity,
+    Pressable,
     FlatList,
     View
 } from 'react-native';
@@ -66,9 +66,9 @@ export default class HomeTab extends PureComponent {
                     }
 
                     ListFooterComponent={
-                        <TouchableOpacity onPress={() => this.startRefresh()} style={refreshStyle.button}>
+                        <Pressable onPress={() => this.startRefresh()} style={refreshStyle.button}>
                             <Text style={refreshStyle.buttonText}>Aktualisieren</Text>
-                        </TouchableOpacity>
+                        </Pressable>
                     }
 
                     progressViewOffset={20}

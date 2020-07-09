@@ -4,9 +4,10 @@ import {
     View,
     Text,
     StyleSheet,
-    TouchableOpacity,
+    Pressable,
     TextInput
 } from "react-native";
+import { rippleConfig } from "../../styles/Ripple";
 
 export default ({ callback }) => {
     let title = "";
@@ -27,18 +28,18 @@ export default ({ callback }) => {
                 </View>
 
                 <View style={styles.headerButtonView}>
-                    <TouchableOpacity style={styles.headerButton}
+                    <Pressable android_ripple={rippleConfig} style={styles.headerButton}
                                       onPress={() => callback() }>
                         <Text style={styles.headerButtonText}>ABBRECHEN</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity style={styles.headerButton}
+                    </Pressable>
+                    <Pressable android_ripple={rippleConfig}style={styles.headerButton}
                                       onPress={() =>  {
                                             if (title.length > 0 && description.length > 0) {
                                                 callback({title: title, description: description});
                                             }
                                       }}>
                         <Text style={styles.headerButtonText}>SPEICHERN</Text>
-                    </TouchableOpacity>
+                    </Pressable>
                 </View>
             </View>
         </View>

@@ -3,7 +3,7 @@ import React from 'react';
 import {
     Text,
     StyleSheet,
-    TouchableOpacity
+    Pressable
 } from 'react-native';
 
 export default ({ navigation }) => {
@@ -16,9 +16,9 @@ export default ({ navigation }) => {
     }, [navigation]);
 
     return (
-        <TouchableOpacity style={styles.middleView} onPress={() => navigation.navigate("Music")}>
+        <Pressable style={styles.middleView} onPress={() => navigation.navigate("Music")}>
             <Text style={styles.placeholder}>⚙️</Text>
-        </TouchableOpacity>
+        </Pressable>
     );
 };
 

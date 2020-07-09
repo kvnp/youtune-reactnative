@@ -6,7 +6,7 @@ import {
     Button,
     TextInput,
     Keyboard,
-    TouchableOpacity
+    Pressable
 } from 'react-native';
 
 import { ActivityIndicator } from 'react-native-paper';
@@ -134,35 +134,35 @@ export default class SearchTab extends PureComponent {
     getSpecificButtons = () => {
         this.state.shelves.length > 0 ?
             <View style={specificStyle.container}>
-                <TouchableOpacity style={specificStyle.button}>
+                <Pressable style={specificStyle.button}>
                     <Text style={specificStyle.text}>
                         Videos
                     </Text>
-                </TouchableOpacity>
+                </Pressable>
 
-                <TouchableOpacity style={specificStyle.button}>
+                <Pressable style={specificStyle.button}>
                     <Text style={specificStyle.text}>
                         Playlists
                     </Text>
-                </TouchableOpacity>
+                </Pressable>
 
-                <TouchableOpacity style={specificStyle.button}>
+                <Pressable style={specificStyle.button}>
                     <Text style={specificStyle.text}>
                         Songs
                     </Text>
-                </TouchableOpacity>
+                </Pressable>
 
-                <TouchableOpacity style={specificStyle.button}>
+                <Pressable style={specificStyle.button}>
                     <Text style={specificStyle.text}>
                         Künstler
                     </Text>
-                </TouchableOpacity>
+                </Pressable>
 
-                <TouchableOpacity style={specificStyle.button}>
+                <Pressable style={specificStyle.button}>
                     <Text style={specificStyle.text}>
                         Alben
                     </Text>
-                </TouchableOpacity>
+                </Pressable>
             </View> 
         : null;
     }

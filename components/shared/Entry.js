@@ -3,13 +3,14 @@ import React, { PureComponent } from 'react';
 import {
     View,
     Image,
-    TouchableOpacity,
+    Pressable,
     Text,
     Button
 } from "react-native";
 
 import { resultStyle } from '../../styles/Search';
 import { handleMedia } from '../../modules/Event';
+import { rippleConfig } from '../../styles/Ripple';
 
 export default ({entry, navigation}) => {
     let { title, subtitle, secondTitle, secondSubtitle, thumbnail } = entry;
@@ -27,9 +28,9 @@ export default ({entry, navigation}) => {
 
     return (
         <View style={resultStyle.resultView}>
-            <TouchableOpacity onPress={() => {handleMedia(view, navigation)}}>
+            <Pressable android_ripple={rippleConfig} onPress={() => {handleMedia(view, navigation)}}>
                 <Image style={resultStyle.resultCover} source={{uri: thumbnail}}/>
-            </TouchableOpacity>
+            </Pressable>
 
             <View style={resultStyle.resultColumnOne}>
                 <Text numberOfLines={1} style={resultStyle.resultText}>{title}</Text>

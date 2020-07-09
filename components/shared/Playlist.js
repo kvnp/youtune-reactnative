@@ -3,12 +3,13 @@ import React, { PureComponent } from 'react';
 import {
     Text,
     Image,
-    TouchableOpacity,
+    Pressable,
     View
 } from "react-native";
 
 import { playlistStyle } from '../../styles/Playlist';
 import { handleMedia } from '../../modules/Event';
+import { rippleConfig } from '../../styles/Ripple';
 
 export default ({ playlist, navigation, style }) => {
     let { title, subtitle, thumbnail } = playlist;
@@ -23,9 +24,9 @@ export default ({ playlist, navigation, style }) => {
 
     return (
         <View style={[style, playlistStyle.container]}>
-            <TouchableOpacity onPress={() => handleMedia(viewObject, navigation)}>
+            <Pressable android_ripple={rippleConfig} onPress={() => handleMedia(viewObject, navigation)}>
                 <Image style={playlistStyle.cover} source={{uri: thumbnail}}/>
-            </TouchableOpacity>
+            </Pressable>
 
             <Text style={playlistStyle.title}
                     numberOfLines={2}>

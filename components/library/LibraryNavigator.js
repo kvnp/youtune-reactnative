@@ -3,10 +3,10 @@ import React, { PureComponent } from 'react';
 import {
     Text,
     FlatList,
+    Pressable
 } from "react-native";
 import { navigatorStyle } from '../../styles/Library';
-
-import { Pressable } from "react-native";
+import { rippleConfig } from "../../styles/Ripple";
 
 export default class LibraryNavigator extends PureComponent {
     constructor(props) {
@@ -50,7 +50,8 @@ export default class LibraryNavigator extends PureComponent {
         const buttons = ["PLAYLISTS", "ALBUMS", "SONGS", "ARTISTS", "SUBSCRIPTIONS"];
         return <FlatList
                     data={buttons}
-                    renderItem={({index, item}) => <Pressable onPress={() => this.update(index)} style={this.getStyle(index)}>
+                    renderItem={({index, item}) => <Pressable onPress={() => this.update(index)} style={this.getStyle(index)}
+                                                              android_ripple={rippleConfig}>
                                                         <Text style={this.getTextStyle(index)}>{item}</Text>
                                                     </Pressable>
                     }

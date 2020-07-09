@@ -4,7 +4,7 @@ import {
     Text,
     Image,
     ImageBackground,
-    TouchableOpacity
+    Pressable
 } from "react-native";
 
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
@@ -15,6 +15,7 @@ import {
 } from "../../styles/BottomBar";
 
 import FlatEntries from "../../components/collections/FlatEntries";
+import { rippleConfig } from "../../styles/Ripple";
 
 export default ({ route, navigation }) => {
     const { entries, title, subtitle, secondSubtitle, thumbnail} = route.params;
@@ -32,22 +33,22 @@ export default ({ route, navigation }) => {
                             <Text style={bottomBarAlbumStyle.albumSubtitle}>{subtitle}</Text>
                             <Text style={bottomBarAlbumStyle.albumInfo}>{secondSubtitle}</Text>
                         </View>
-                        <TouchableOpacity style={bottomBarStyle.closeButton}
+                        <Pressable android_ripple={rippleConfig} style={bottomBarStyle.closeButton}
                                           onPress={() => {navigation.pop()}}>
                             <MaterialIcons name="arrow-back" color="black" size={20}/>
-                        </TouchableOpacity>
+                        </Pressable>
                     </View>
 
                     <View style={bottomBarStyle.buttonView}>
-                        <TouchableOpacity style={bottomBarStyle.button}>
+                        <Pressable android_ripple={rippleConfig} style={bottomBarStyle.button}>
                             <Text style={bottomBarStyle.buttonText}>WIEDERGEBEN</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity style={bottomBarStyle.button}>
+                        </Pressable>
+                        <Pressable android_ripple={rippleConfig} style={bottomBarStyle.button}>
                             <Text style={bottomBarStyle.buttonText}>ZUR MEDIATHEK</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity style={bottomBarStyle.button}>
+                        </Pressable>
+                        <Pressable android_ripple={rippleConfig} style={bottomBarStyle.button}>
                             <Text style={bottomBarStyle.buttonText}>TEILEN</Text>
-                        </TouchableOpacity>
+                        </Pressable>
                     </View>
                 </View>
             </ImageBackground>

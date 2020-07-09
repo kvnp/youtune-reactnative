@@ -3,7 +3,7 @@ import {
     View,
     Text,
     ImageBackground,
-    TouchableOpacity
+    Pressable
 } from "react-native";
 
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
@@ -12,6 +12,7 @@ import LinearGradient from "react-native-linear-gradient";
 import { bottomBarStyle, artistGradient } from "../../styles/BottomBar";
 
 import FlatShelves from "../../components/collections/FlatShelves";
+import { rippleConfig } from "../../styles/Ripple";
 
 export default ({route, navigation}) => {
     const { shelves } = route.params;
@@ -28,26 +29,26 @@ export default ({route, navigation}) => {
                             <View style={bottomBarStyle.topLeftPadding}/>
                             <View style={bottomBarStyle.artistColumn}>
                                 <Text style={bottomBarStyle.artistName}>{title}</Text>
-                                <TouchableOpacity>
+                                <Pressable>
                                     <Text style={bottomBarStyle.subscribeArtist}>ABONNIEREN {subscriptions}</Text>
-                                </TouchableOpacity>
+                                </Pressable>
                             </View>
-                            <TouchableOpacity style={bottomBarStyle.closeButton}
+                            <Pressable android_ripple={rippleConfig} style={bottomBarStyle.closeButton}
                                             onPress={() => {navigation.pop()}}>
                                 <MaterialIcons name="arrow-back" color="black" size={20}/>
-                            </TouchableOpacity>
+                            </Pressable>
                         </View>
 
                         <View style={bottomBarStyle.buttonView}>
-                            <TouchableOpacity style={bottomBarStyle.button}>
+                            <Pressable android_ripple={rippleConfig} style={bottomBarStyle.button}>
                                 <Text style={bottomBarStyle.buttonText}>WIEDERGEBEN</Text>
-                            </TouchableOpacity>
-                            <TouchableOpacity style={bottomBarStyle.button}>
+                            </Pressable>
+                            <Pressable android_ripple={rippleConfig} style={bottomBarStyle.button}>
                                 <Text style={bottomBarStyle.buttonText}>ZUR MEDIATHEK</Text>
-                            </TouchableOpacity>
-                            <TouchableOpacity style={bottomBarStyle.button}>
+                            </Pressable>
+                            <Pressable android_ripple={rippleConfig} style={bottomBarStyle.button}>
                                 <Text style={bottomBarStyle.buttonText}>TEILEN</Text>
-                            </TouchableOpacity>
+                            </Pressable>
                         </View>
                     </View>
                 </LinearGradient>
