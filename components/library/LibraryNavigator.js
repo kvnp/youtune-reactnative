@@ -3,9 +3,10 @@ import React, { PureComponent } from 'react';
 import {
     Text,
     FlatList,
-    TouchableOpacity
 } from "react-native";
 import { navigatorStyle } from '../../styles/Library';
+
+import { Pressable } from "react-native";
 
 export default class LibraryNavigator extends PureComponent {
     constructor(props) {
@@ -49,10 +50,9 @@ export default class LibraryNavigator extends PureComponent {
         const buttons = ["PLAYLISTS", "ALBUMS", "SONGS", "ARTISTS", "SUBSCRIPTIONS"];
         return <FlatList
                     data={buttons}
-                    renderItem={({index, item}) => 
-                        <TouchableOpacity onPress={() => {this.update(index)}} style={this.getStyle(index)}>
-                            <Text style={this.getTextStyle(index)}>{item}</Text>
-                        </TouchableOpacity>
+                    renderItem={({index, item}) => <Pressable onPress={() => this.update(index)} style={this.getStyle(index)}>
+                                                        <Text style={this.getTextStyle(index)}>{item}</Text>
+                                                    </Pressable>
                     }
                     horizontal={true}
                     showsHorizontalScrollIndicator={false}
