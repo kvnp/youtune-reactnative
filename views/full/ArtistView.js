@@ -6,6 +6,8 @@ import {
     TouchableOpacity
 } from "react-native";
 
+import MaterialIcons from "react-native-vector-icons/MaterialIcons";
+
 import LinearGradient from "react-native-linear-gradient";
 import { bottomBarStyle, artistGradient } from "../../styles/BottomBar";
 
@@ -32,7 +34,7 @@ export default ({route, navigation}) => {
                             </View>
                             <TouchableOpacity style={bottomBarStyle.closeButton}
                                             onPress={() => {navigation.pop()}}>
-                                <Text style={[bottomBarStyle.buttonText, bottomBarStyle.closeButtonText]}>X</Text>
+                                <MaterialIcons name="arrow-back" color="black" size={20}/>
                             </TouchableOpacity>
                         </View>
 

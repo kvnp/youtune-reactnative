@@ -2,21 +2,21 @@ import { StyleSheet } from 'react-native';
 import { appColor } from './App';
 
 export const navigatorStyle = StyleSheet.create({
+    navigator: {
+        backgroundColor: appColor.background.backgroundColor,
+        flexGrow: 0,
+        paddingBottom: 6,
+        paddingTop: 6,
+    },
+
     container: {
-        alignSelf: 'center',
-        width: '100%',
-        height: 50,
-        position: 'absolute',
-        bottom: -5,
-        backgroundColor: appColor.background.backgroundColor
+        justifyContent: "center",
+        flexGrow: 1
     },
 
     focus: {
-        height: 50,
-        paddingRight: 15,
-        paddingLeft: 15,
-        alignItems: 'center',
-        justifyContent: 'center'
+        marginRight: 15,
+        marginLeft: 15,
     },
 
     focusText: {
@@ -27,9 +27,8 @@ export const navigatorStyle = StyleSheet.create({
     },
 
     entry: {
-        height: 50,
-        paddingRight: 15,
-        paddingLeft: 15,
+        marginRight: 15,
+        marginLeft: 15,
         alignItems: 'center',
         justifyContent: 'center',
     },

@@ -7,6 +7,8 @@ import {
     TouchableOpacity
 } from "react-native";
 
+import MaterialIcons from "react-native-vector-icons/MaterialIcons";
+
 import {
     bottomBarStyle,
     bottomBarAlbumStyle
@@ -32,7 +34,7 @@ export default ({ route, navigation }) => {
                         </View>
                         <TouchableOpacity style={bottomBarStyle.closeButton}
                                           onPress={() => {navigation.pop()}}>
-                            <Text style={[bottomBarStyle.buttonText, bottomBarStyle.closeButtonText]}>X</Text>
+                            <MaterialIcons name="arrow-back" color="black" size={20}/>
                         </TouchableOpacity>
                     </View>
 

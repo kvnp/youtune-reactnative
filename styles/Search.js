@@ -46,13 +46,14 @@ export const resultStyle = StyleSheet.create({
     },
 
     resultView: {
-        width: '100%',
-        paddingLeft: 15,
-        paddingRight: 15,
+        flexGrow: 1,
+        marginLeft: 15,
+        marginRight: 15,
         marginTop: 10,
         flexDirection: 'row',
-        backgroundColor: 'gray',
-        alignItems: 'center'
+        alignItems: 'center',
+        backgroundColor: "rgba(0,0,0,0.1)",
+        borderWidth: .5
     },
 
     resultCover: {
@@ -75,7 +76,6 @@ export const resultStyle = StyleSheet.create({
     },
 
     resultText: {
-        color: 'white'
     }
 });
 
