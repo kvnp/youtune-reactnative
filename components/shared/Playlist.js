@@ -1,10 +1,9 @@
-import React, { PureComponent } from 'react';
+import React from 'react';
 
 import {
     Text,
     Image,
-    Pressable,
-    View
+    Pressable
 } from "react-native";
 
 import { playlistStyle } from '../../styles/Playlist';
@@ -23,10 +22,8 @@ export default ({ playlist, navigation, style }) => {
     };
 
     return (
-        <View style={[style, playlistStyle.container]}>
-            <Pressable android_ripple={rippleConfig} onPress={() => handleMedia(viewObject, navigation)}>
-                <Image style={playlistStyle.cover} source={{uri: thumbnail}}/>
-            </Pressable>
+        <Pressable android_ripple={rippleConfig} onPress={() => handleMedia(viewObject, navigation)} style={[style, playlistStyle.container]}>
+            <Image style={playlistStyle.cover} source={{uri: thumbnail}}/>
 
             <Text style={playlistStyle.title}
                     numberOfLines={2}>
@@ -37,6 +34,6 @@ export default ({ playlist, navigation, style }) => {
                     numberOfLines={2}>
                 {subtitle}
             </Text>
-        </View>
+        </Pressable>
     );
 }
