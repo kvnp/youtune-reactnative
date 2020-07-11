@@ -5,6 +5,8 @@ import {
     digestBrowseResults
 } from "./Extractor";
 
+import { decodeNestedURI } from "./Utils";
+
 import { getHttpResponse, getUrl } from "./HTTP";
 
 const headers_api = {"User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:77.0) Gecko/20100101 Firefox/77.0"};
@@ -132,4 +134,18 @@ export async function fetchVideo(id) {
     let ytPlayer = JSON.parse(ytJson.args.player_response)
     let videoList = ytPlayer.streamingData.adaptiveFormats;
     return videoList;
+}
+
+export async function fetchVideoInfo(videoId) {
+    let url = "https://youtube.com/get_video_info?video_id=" + videoId +
+              "&el=detailpage&c=WEB_REMIX&cver=0.1&cplayer=UNIPLAYER";
+
+    let response = await getHttpResponse(url, {method: "GET"}, "text");
+    let decode = decodeNestedURI(response);
+
+    let indexone = decode.indexOf("player_response=") + 16;
+    let indextwo = decode.lastIndexOf("}&") + 1;
+    let parse = JSON.parse(decode.slice(indexone, indextwo));
+
+    console.log(parse);
 }
