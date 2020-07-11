@@ -55,6 +55,7 @@ export default class LibraryNavigator extends PureComponent {
                                                         <Text style={this.getTextStyle(index)}>{item}</Text>
                                                     </Pressable>
                     }
+                    keyExtractor={(index) => index}
                     horizontal={true}
                     showsHorizontalScrollIndicator={false}
                     style={navigatorStyle.navigator}

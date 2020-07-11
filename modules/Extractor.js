@@ -1,4 +1,4 @@
-import { msToMin, msToMMSS } from "./Utils";
+import { msToMin, msToMMSS, textToSec } from "./Utils";
 
 export function digestSearchResults(json) {
     let final = {results: 0, suggestion: [], reason: null, shelves: []};
@@ -239,7 +239,7 @@ function getPlaylist(json) {
                 let songLengthlist = responsiveMusicItem.fixedColumns[0].musicResponsiveListItemFixedColumnRenderer.text.runs;
                 let songThumbnaillist = responsiveMusicItem.thumbnail.musicThumbnailRenderer.thumbnail.thumbnails;
 
-                let entry = {title: "", subtitle: "", secondTitle: "", secondSubtitle: "",  videoId: null, thumbnail: null};
+                let entry = {title: "", subtitle: "", secondTitle: "", secondSubtitle: "",  videoId: null, playlistId: null, thumbnail: null};
 
                 for (let stl = 0; stl < songTitlelist.length; stl++) {
                     entry.title += songTitlelist[stl].text;
@@ -276,6 +276,7 @@ function getPlaylist(json) {
     
                             if (navigation.hasOwnProperty("watchEndpoint")) {
                                 entry.videoId = navigation.watchEndpoint.videoId;
+                                entry.playlistId = navigation.watchEndpoint.playlistId;
                             }
                         }
                     }
@@ -516,10 +517,71 @@ function getArtist(json) {
 
 export function digestBrowseResults(json, browseId) {
     if (browseId.slice(0, 2) === "VL") {
-        return getPlaylist(json);
+        let playlistId = browseId.slice(0, 2);
+        return getPlaylist(json, playlistId);
     } else if (browseId.slice(0, 2) === "UC") {
         return getArtist(json);
     } else {
         return getAlbum(json);
     }
+}
+
+export function digestVideoInfoResults(text) {
+    let decode = decodeURI(decodeURI(decodeURI(text)));
+
+    let indexone = decode.indexOf("player_response=") + 16;
+    let indextwo = decode.indexOf("}&") + 1;
+    let parse = JSON.parse(decode.slice(indexone, indextwo));
+
+    let titleInfo = {
+        playable: parse.playabilityStatus.status,
+        videoId: parse.videoDetails.videoId,
+        channelId: parse.videoDetails.channelId,
+        title: parse.videoDetails.title,
+        subtitle: parse.videoDetails.author.replace("+", " ").slice(0, parse.videoDetails.author.indexOf("-") - 1),
+        length: Number.parseInt(parse.videoDetails.lengthSeconds),
+        thumbnail: parse.videoDetails.thumbnail.thumbnails[parse.videoDetails.thumbnail.thumbnails.length - 1].url,
+        streamLink: null
+    }
+
+    return titleInfo;
+}
+
+
+export function digestNextResults(json) {
+    let playlist = {
+        index: 0,
+        list: []
+    }
+    
+    let playlistRenderer = json.contents.singleColumnMusicWatchNextResultsRenderer.playlist.playlistPanelRenderer;
+    
+    playlist.index = playlistRenderer.currentIndex;
+    for (let i = 0; i < playlistRenderer.contents.length; i++) {
+        let panelRenderer = playlistRenderer.contents[i].playlistPanelVideoRenderer;
+    
+        let panel = {title: "", subtitle: "", videoId: "", playlistId: "", thumbnail: "", length: 0};
+        panel.videoId = panelRenderer.navigationEndpoint.watchEndpoint.videoId;
+        panel.playlistId = panelRenderer.navigationEndpoint.watchEndpoint.playlistId;
+    
+        let titleList = panelRenderer.title.runs;
+        for (let titleI = 0; titleI < titleList.length; titleI++) {
+            panel.title += titleList[titleI].text;
+        }
+    
+        let subtitleList = panelRenderer.shortBylineText.runs;
+        for (let subtitleI = 0; subtitleI < subtitleList.length; subtitleI++) {
+            panel.subtitle += subtitleList[subtitleI].text;
+        }
+
+        let length = textToSec(panelRenderer.lengthText.runs[0].text);
+        panel.length = length;
+    
+        let thumbnailList = panelRenderer.thumbnail.thumbnails;
+        panel.thumbnail = thumbnailList[thumbnailList.length - 1].url;
+    
+        playlist.list.push(panel);
+    }
+
+    return playlist;
 }

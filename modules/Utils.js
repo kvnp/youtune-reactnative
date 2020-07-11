@@ -12,6 +12,13 @@ export function msToMMSS(ms) {
     return minutes + ":" + secondString;
 }
 
+export function textToSec(text) {
+    let array = text.split(":");
+    let minutes = Number.parseInt(array[0]) * 60;
+    let seconds = Number.parseInt(array[1]);
+    return minutes + seconds;
+}
+
 export function decodeNestedURI(nestedURI) {
     let oldURI = nestedURI
     let newURI = null

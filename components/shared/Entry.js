@@ -17,14 +17,13 @@ export default ({entry, navigation}) => {
     let { videoId, browseId, playlistId } = entry;
 
     let view = {
+        title: title,
+        subtitle: subtitle,
+        thumbnail: thumbnail,
         videoId: videoId,
         browseId: browseId,
         playlistId: playlistId,
     };
-
-    let start = {
-        videoId: videoId,
-    }
 
     return (
         <View style={resultStyle.resultView}>
@@ -42,7 +41,7 @@ export default ({entry, navigation}) => {
                 <Text numberOfLines={1} style={resultStyle.resultText}>{secondSubtitle}</Text>
             </View>
 
-            <Button title="▶️" onPress={() => {handleMedia(start, navigation)}}/>
+            <Button title="▶️" onPress={() => {handleMedia(view, navigation)}}/>
         </View>
     )
 }

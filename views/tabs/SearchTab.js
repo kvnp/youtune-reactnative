@@ -3,11 +3,12 @@ import {
     SectionList,
     Text,
     View,
-    Button,
     TextInput,
     Keyboard,
     Pressable
 } from 'react-native';
+
+import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 
 import { ActivityIndicator } from 'react-native-paper';
 
@@ -70,65 +71,64 @@ export default class SearchTab extends PureComponent {
 
     render() {
         return <>
-                    <SectionList
-                        style={shelvesStyle.scrollView}
-                        contentContainerStyle={shelvesStyle.scrollContainer}
+            <SectionList
+                style={shelvesStyle.scrollView}
+                contentContainerStyle={shelvesStyle.scrollContainer}
 
-                        ListEmptyComponent={
-                            this.state.loading ? 
-                                <View style={[shelvesStyle.scrollView, shelvesStyle.scrollContainer]}>
-                                    <ActivityIndicator size="large"/>
-                                </View> 
-                            :
-                                <View>
-                                    <Text style={[preResultHomeStyle.preHomeBottomText, preResultHomeStyle.preHomeTopText]}>🔍</Text>
-                                    <Text style={preResultHomeStyle.preHomeBottomText}>Look for music using the search bar</Text>
-                                </View>
-                        }
-
-                        renderSectionHeader={({ section: { title } }) => (
-                            <View style={resultHomeStyle.textView}>
-                                <Text style={resultHomeStyle.homeText}>{title}</Text>
-                            </View>
-                        )}
-
-                        progressViewOffset={20}
-                        sections={this.state.shelves}
-
-                        refreshing={this.state.loading}
-                        onRefresh={
-                            this.state.oldQuery == null ?
-                                undefined :
-                                () => {
-                                    if (this.state.query != this.state.oldQuery) {
-                                        this.setState({query: this.state.oldQuery});
-                                        this.forceUpdate();
-                                    }
-                                    
-                                    this.search();
-                                }
-                        }
-
-                        keyExtractor={(item, index) => index + item.title}
-                        renderItem={({ item }) =>  <Entry entry={item} navigation={this.props.navigation}/>}
-                    />
-
-                    <View style={[searchBarStyle.container, searchBarStyle.bar]}>
-                        {this.getSpecificButtons()}
-                        <TextInput style={[searchBarStyle.content, textStyle.text]}
-                                placeholder="Search"
-                                value={this.state.query}
-                                placeholderTextColor={textStyle.placeholder.color}
-                                onChange={this.setQuery}
-                                onSubmitEditing={this.search}/>
-
-                        <View style={searchBarStyle.content}>
-                            <Button onPress={this.search}
-                                    title='🔎'
-                                    disabled={this.state.buttonDisabled}/>
-                        </View>
+                ListEmptyComponent={
+                    <View>
+                        <Text style={[preResultHomeStyle.preHomeBottomText, preResultHomeStyle.preHomeTopText]}>🔍</Text>
+                        <Text style={preResultHomeStyle.preHomeBottomText}>Look for music using the search bar</Text>
                     </View>
-                </>
+                }
+
+                renderSectionHeader={({ section: { title } }) => (
+                    <View style={resultHomeStyle.textView}>
+                        <Text style={resultHomeStyle.homeText}>{title}</Text>
+                    </View>
+                )}
+
+                progressViewOffset={20}
+                sections={this.state.shelves}
+
+                refreshing={this.state.loading}
+                onRefresh={
+                    this.state.oldQuery == null
+                        ? undefined
+                        : () => {
+                            if (this.state.query != this.state.oldQuery) {
+                                this.setState({query: this.state.oldQuery});
+                                this.forceUpdate();
+                            }
+                            
+                            this.search();
+                        }
+                }
+
+                keyExtractor={(item, index) => index + item.title}
+                renderItem={({ item }) =>  <Entry entry={item} navigation={this.props.navigation}/>}
+            />
+
+            <View style={searchBarStyle.container}>
+                {this.getSpecificButtons()}
+                <TextInput style={searchBarStyle.input}
+                            placeholder="Search"
+                            value={this.state.query}
+                            placeholderTextColor={textStyle.placeholder.color}
+                            onChange={this.setQuery}
+                            onSubmitEditing={this.search}/>
+
+                <Pressable onPress={this.search}
+                            style={searchBarStyle.button}
+                            disabled={this.state.buttonDisabled}>
+                    {
+                    this.state.loading
+                    ? <ActivityIndicator color="white" size="small"/>
+                    : <MaterialIcons name="search" color="white" size={24}/>
+                    }
+                </Pressable>
+            </View>
+        </>
     }
 
     getSpecificButtons = () => {

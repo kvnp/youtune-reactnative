@@ -2,6 +2,9 @@ import React from "react";
 
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import { Pressable, View } from "react-native";
+
+import { ActivityIndicator } from 'react-native-paper';
+
 import { rippleConfig } from "../../styles/Ripple";
 
 export default ({
@@ -12,28 +15,34 @@ export default ({
     onRepeat,
     onShuffle,
     isPlaying,
-    isRepeating
+    isRepeating,
+    isLoading
 }) => {
     return (
         <View style={style}>
             <Pressable onPress={onShuffle} android_ripple={rippleConfig}>
-                <MaterialIcons name="shuffle" color={"black"} size={30}/>
+                <MaterialIcons name="shuffle" color="black" size={30}/>
             </Pressable>
 
             <Pressable onPress={onPrevious} android_ripple={rippleConfig}>
-                <MaterialIcons name="skip-previous" color={"black"} size={40}/>
+                <MaterialIcons name="skip-previous" color="black" size={40}/>
             </Pressable>
 
-            <Pressable onPress={onPlay} android_ripple={rippleConfig}>
-                <MaterialIcons name={isPlaying ? "pause" : "play-arrow"} color={"black"} size={40}/>
+            <Pressable onPress={() => {
+                                    isLoading ? null : onPlay();
+                                }} android_ripple={rippleConfig}>
+                {isLoading ? <ActivityIndicator color="black" size="large"/>
+                           : <MaterialIcons name={isPlaying ? "pause" : "play-arrow"} color="black" size={40}/>
+                }
+                
             </Pressable>
 
             <Pressable onPress={onNext} android_ripple={rippleConfig}>
-                <MaterialIcons name="skip-next" color={"black"} size={40}/>
+                <MaterialIcons name="skip-next" color="black" size={40}/>
             </Pressable>
 
             <Pressable onPress={onRepeat} android_ripple={rippleConfig}>
-                <MaterialIcons name={isRepeating ? "repeat-one" : "repeat"} color={"black"} size={30}/>
+                <MaterialIcons name={isRepeating ? "repeat-one" : "repeat"} color="black" size={30}/>
             </Pressable>
         </View>
     )

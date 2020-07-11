@@ -3,21 +3,34 @@ import { appColor } from './App';
 
 export const searchBarStyle = StyleSheet.create({
     container: {
-        width: '100%',
-        alignItems: 'center'
+        flexDirection: "row",
+        backgroundColor: appColor.background.backgroundColor,
+        paddingLeft: 20,
+        paddingRight: 20,
+        paddingTop: 3,
+        paddingBottom: 3,
     },
 
-    bar: {
-        width: '100%',
-        position: 'absolute',
-        bottom: 0,
-        alignSelf: 'center',
-        backgroundColor: appColor.background.backgroundColor
+    button: {
+        paddingLeft: 20,
+        paddingRight: 20,
+        backgroundColor: "rgba(25, 25, 25, 0.5)",
+        borderTopRightRadius: 25,
+        borderBottomRightRadius: 25,
+        borderWidth: 1,
+        justifyContent: "center",
+        elevation: 1
     },
 
-    content: {
-        marginBottom: 5,
-        width: '80%'
+    input: {
+        flex: 1,
+        color: "white",
+        alignSelf: "center",
+        backgroundColor: "rgba(25, 25, 25, 0.3)",
+        textAlign: "center",
+        borderTopLeftRadius: 25,
+        borderBottomLeftRadius: 25,
+        elevation: 1
     }
 });
 

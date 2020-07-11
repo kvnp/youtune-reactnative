@@ -17,7 +17,7 @@ import { rippleConfig } from "../../styles/Ripple";
 export default ({route, navigation}) => {
     const { shelves } = route.params;
     const { title, subscriptions, thumbnail } = route.params.header;
-    navigation.setOptions({ title: title });
+    //navigation.setOptions({ title: title });
 
     return (
         <>

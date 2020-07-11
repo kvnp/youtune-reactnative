@@ -2,9 +2,7 @@ import { StyleSheet } from 'react-native';
 
 export const shelvesStyle = StyleSheet.create({
     scrollView: {
-        paddingTop: 20,
-        flexGrow: 1,
-        flexDirection: 'column',
+        marginTop: 20
     },
 
     scrollContainer: {

@@ -2,10 +2,10 @@ import { getHL, getGL } from "./Native";
 import {
     digestHomeResults,
     digestSearchResults,
-    digestBrowseResults
+    digestBrowseResults,
+    digestNextResults,
+    digestVideoInfoResults
 } from "./Extractor";
-
-import { decodeNestedURI } from "./Utils";
 
 import { getHttpResponse, getUrl } from "./HTTP";
 
@@ -14,6 +14,11 @@ const headers_ytm = {
     "Referer":      "https://music.youtube.com/",
     "Content-Type": "application/json"
 };
+
+const headers_yt = {
+    "Referer": "",
+    "Content-Type": "*/*"
+}
 
 async function getApiKey() {
     if (global.apiKey == null) {
@@ -124,28 +129,41 @@ export async function fetchVideo(id) {
     const url = "https://www.youtube.com/watch?v=" + id;
 
     let response = await getHttpResponse(url, {method: "GET"}, "text");
+    console.log(response);
 
     let begin = response.indexOf("ytplayer.config = ") + 18;
     let end = response.indexOf(";ytplayer.web_player");
     //let end = response.indexOf(";ytplayer.load");
     
-    let slice = response.substring(begin, end);
-    let ytJson = JSON.parse(slice);
-    let ytPlayer = JSON.parse(ytJson.args.player_response)
-    let videoList = ytPlayer.streamingData.adaptiveFormats;
-    return videoList;
+    //let slice = response.substring(begin, end);
+    //let ytJson = JSON.parse(slice);
+    //let ytPlayer = JSON.parse(ytJson.args.player_response);
+    //let videoList = ytPlayer.streamingData.adaptiveFormats;
+    //return videoList;
 }
 
 export async function fetchVideoInfo(videoId) {
     let url = "https://youtube.com/get_video_info?video_id=" + videoId +
               "&el=detailpage&c=WEB_REMIX&cver=0.1&cplayer=UNIPLAYER";
 
-    let response = await getHttpResponse(url, {method: "GET"}, "text");
-    let decode = decodeNestedURI(response);
+    let response = await getHttpResponse(url, {method: "GET",
+                                               headers: headers_yt}, "text");
 
-    let indexone = decode.indexOf("player_response=") + 16;
-    let indextwo = decode.lastIndexOf("}&") + 1;
-    let parse = JSON.parse(decode.slice(indexone, indextwo));
+    return digestVideoInfoResults(response);
+}
 
-    console.log(parse);
+export async function fetchNext(videoId, playlistId) {
+    const apikey = await getApiKey();
+    const url = getUrl("next", apikey);
+
+    let body = getRequestBody();
+    body["enablePersistentPlaylistPanel"] = true;
+    body["videoId"] = videoId;
+    body["playlistId"] = playlistId;
+
+    let response = await getHttpResponse(url, {method: "POST",
+                                               headers: headers_ytm,
+                                               body: JSON.stringify(body)}, "json");
+
+    return digestNextResults(response);
 }

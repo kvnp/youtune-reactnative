@@ -49,7 +49,7 @@ export default class HomeTab extends PureComponent {
     }
 
     render() {
-        this.props.navigation.navigate("Music");
+        //this.props.navigation.navigate("Search");
         return <FlatList
                     style={shelvesStyle.scrollView}
                     contentContainerStyle={shelvesStyle.scrollContainer}
