@@ -13,7 +13,7 @@ export default class MiniPlayer extends PureComponent {
             onOpen,
             onNext,
             onPlay,
-            onClose
+            onStop
         } = this.props;
 
         if (this.props.media != undefined)
@@ -22,7 +22,7 @@ export default class MiniPlayer extends PureComponent {
         console.log(isStopped);
 
         return isStopped
-            ?   null
+            ?   false
             :   <Animated.View style={style}>
                     <Pressable style={styles.container} onPress={onOpen}>
                         <Image source={{uri: thumbnail}} style={styles.image}/>
@@ -31,7 +31,7 @@ export default class MiniPlayer extends PureComponent {
                             <Text numberOfLines={1} style={[styles.text, styles.subtitleText]}>{subtitle}</Text>
                         </View>
 
-                        <Pressable style={styles.button} onPress={onClose}>
+                        <Pressable style={styles.button} onPress={onStop}>
                             <MaterialIcons name="clear" color="white" size={29}/>
                         </Pressable>
 

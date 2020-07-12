@@ -114,6 +114,10 @@ export default class App extends PureComponent {
 
             this.setIndex(index);
         }
+
+        global.onStop = () => {
+            this.setState({current: null, playlist: null});
+        }
     }
 
     render() {
@@ -122,6 +126,8 @@ export default class App extends PureComponent {
                                         playlist={this.state.playlist}
                                         isPlaying={this.state.isPlaying}
                                         isStopped={this.state.current == null ? true : false}
+
+                                        onStop={global.onStop}
                                         onOpen={global.onOpen}
                                         onClose={global.onClose}
                                         onNext={global.onNext}
