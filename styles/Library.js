@@ -1,41 +1,25 @@
-import { StyleSheet } from 'react-native';
 import { appColor } from './App';
 
-export const navigatorStyle = StyleSheet.create({
-    navigator: {
-        backgroundColor: appColor.background.backgroundColor,
-        flexGrow: 0,
-        paddingBottom: 6,
-        paddingTop: 6,
+export const tabOptions = {
+    scrollEnabled: true,
+    style: {
+        backgroundColor: appColor.background.backgroundColor
     },
-
-    container: {
-        justifyContent: "center",
-        flexGrow: 1
+    indicatorStyle: {
+        color: "white",
+        backgroundColor: "white",
+        position: "absolute",
+        top: 0,
+        height: 5
     },
-
-    focus: {
-        marginRight: 15,
-        marginLeft: 15,
+    labelStyle: {
+        color: "white",
+        fontWeight: "bold",
     },
-
-    focusText: {
-        fontWeight: 'bold',
-        borderBottomWidth: 3,
-        borderBottomColor: 'white',
-        color: 'white'
+    tabStyle: {
+        width: "auto",
+        paddingRight: 14,
+        paddingLeft: 14
     },
-
-    entry: {
-        marginRight: 15,
-        marginLeft: 15,
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
-
-    entryText: {
-        borderBottomWidth: 3,
-        borderBottomColor: 'transparent',
-        color: 'white'
-    }
-});
+    bounces: true
+}
