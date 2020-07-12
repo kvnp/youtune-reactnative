@@ -25,99 +25,137 @@ export default class App extends PureComponent {
             headerShown: false
         };
 
-        global.state = {
+        global.callbackList = [];
+
+        this.state = {
             isPlaying: false,
             isRepeating: false,
             isLiked: false,
             isDisliked: false,
 
-            current: {
-                title: null,
-                subtitle: null,
-                playlistId: null,
-                videoId: null,
-                thumbnail: null,
-                length: 0
-            },
-
-            playlist: {
-                list: [],
-                index: 0
-            }
+            current: null,
+            playlist: null
         }
 
-        global.onPlay = ({title, subtitle, videoId}) => {
-            console.log("play");
-        }
-
-        global.setIndex = (index) => {
-            global.state.playlist.index = index;
-            global.state.isPlaying = true;
-
-            global.state.current = global.state.playlist.list[index];
+        global.onPlay = () => {
+            this.setState({isPlaying: !this.state.isPlaying});
             this.forceUpdate();
         }
 
-        global.setPlaylist = () => {
+        global.onRepeat = () => {
+            this.setState({isRepeating: !this.state.isRepeating})
+        }
 
+        global.onLike = () => {
+            this.setState({isLiked: !this.state.isLiked});
+        }
+
+        global.onDislike = () => {
+            this.setState({isDisliked: !this.state.isDisliked});
+        }
+
+        global.onRepeat = () => {
+            this.setState({isRepeating: !this.state.isRepeating});
+        }
+
+        global.onShuffle = () => {
+            console.log("shuffle playlist");
+        }
+
+        this.setPlaylist = (list, index) => {
+            this.setState({
+                playlist: {
+                    list: list,
+                    index: index
+                },
+                current: list[index]
+            });
+        }
+
+        this.setIndex = (index) => {
+            if (this.state.playlist != null)
+                this.setState({
+                    isPlaying: true,
+                    current: this.state.playlist.list[index],
+                    playlist: {
+                        list: this.state.playlist.list,
+                        index: index
+                    }
+                });
+                this.forceUpdate();
         }
     
         global.onNext = () => {
-            let { list, index } = global.state.playlist;
-            if (index < list.length - 1)
-                index += 1
-            else
-                index = 0
+            if (this.state.playlist != null) {
+                let { list, index } = this.state.playlist;
+                if (index < list.length - 1)
+                    index += 1
+                else
+                    index = 0
 
-            
-            console.log("Nächstes Lied:" + index);
-            console.log(list[index]);
-            console.log("\n");
+                console.log("Nächstes Lied:" + index);
+                console.log(list[index]);
+                console.log("\n");
 
-            global.setIndex(index);
+                this.setIndex(index);
+            }
         }
     
         global.onPrevious = () => {
-            let { list, index } = global.state.playlist;
+            let { list, index } = this.state.playlist;
             if (index > 0)
                 index -= 1
             else
                 index = list.length - 1
 
-            
             console.log("Voriges Lied:" + index);
             console.log(list[index]);
             console.log("\n");
 
-            global.setIndex(index);
+            this.setIndex(index);
         }
-
-        global.miniPlayer = <MiniPlayer style={{backgroundColor: appColor.background.backgroundColor}}/>
-    }
-
-    onPlay = ({title, subtitle, videoId}) => {
-        global.state.currentTitle = title;
-        global.state.currentSubtitle = subtitle;
-        global.state.currentVideoID = videoId;
-        this.forceUpdate();
-    }
-
-    onNext = () => {
-        console.log("next");
-    }
-
-    onPrevious = () => {
-        console.log("previous");
     }
 
     render() {
         const Stack = createStackNavigator();
+        global.miniPlayer = <MiniPlayer media={this.state.current}
+                                        playlist={this.state.playlist}
+                                        isPlaying={this.state.isPlaying}
+                                        isStopped={this.state.current == null ? true : false}
+                                        onOpen={global.onOpen}
+                                        onClose={global.onClose}
+                                        onNext={global.onNext}
+                                        onPlay={global.onPlay}
+                                        style={{backgroundColor: appColor.background.backgroundColor}}/>;
+
         return (
             <NavigationContainer>
                 <Stack.Navigator>
                     <Stack.Screen name="App" component={Navigator} options={global.navigationOptions}/>
                     <Stack.Screen name="Playlist" component={PlaylistView}/>
-                    <Stack.Screen name="Music" component={PlayView} options={global.navigationOptions}/>
+                    <Stack.Screen name="Music" options={global.navigationOptions}>
+                        {({navigation, route}) => <PlayView
+                                                        current={this.state.current}
+                                                        playlist={this.state.playlist}
+                                                        navigation={navigation}
+                                                        route={route}
+                                                        
+                                                        isPlaying={this.state.isPlaying}
+                                                        isRepeating={this.state.isRepeating}
+                                                        isStopped={this.state.isStopped}
+                                                        isDisliked={this.state.isDisliked}
+                                                        isLiked={this.state.isLiked}
+
+                                                        onPlaylist={this.setPlaylist}
+                                                        onLike={global.onLike}
+                                                        onDislike={global.onDislike}
+                                                        onPlay={global.onPlay}
+                                                        onPrevious={global.onPrevious}
+                                                        onNext={global.onNext}
+                                                        onShuffle={global.onShuffle}
+                                                        onRepeat={global.onRepeat}/>
+                        }
+                    </Stack.Screen>
                     <Stack.Screen name="Artist" component={ArtistView}/>
                 </Stack.Navigator>
             </NavigationContainer>

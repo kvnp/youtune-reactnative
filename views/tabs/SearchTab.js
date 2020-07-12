@@ -128,6 +128,7 @@ export default class SearchTab extends PureComponent {
                     }
                 </Pressable>
             </View>
+            {global.miniPlayer}
         </>
     }
 

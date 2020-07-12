@@ -16,9 +16,12 @@ export default ({ navigation }) => {
     }, [navigation]);
 
     return (
+        <>
         <Pressable style={styles.middleView} onPress={() => navigation.navigate("Music")}>
             <Text style={styles.placeholder}>⚙️</Text>
         </Pressable>
+        {global.miniPlayer}
+        </>
     );
 };
 

@@ -31,6 +31,7 @@ export default () => {
                 <Tab.Screen name="Library" component={LibraryTab} options={getTabOptions("folder")}/>
                 <Tab.Screen name="Settings" component={SettingsTab} options={getTabOptions("settings")}/>
             </Tab.Navigator>
+            
         </>
     );
 }

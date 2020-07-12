@@ -21,15 +21,14 @@ export default ({navigation}) => {
 
     return (
         <>
-            <Tab.Navigator tabBarOptions={tabOptions} initialRouteName="Playlists" tabBarPosition="bottom">
-                <Tab.Screen name="Playlists" component={Playlists} options={global.navigationOptions}/>
-                <Tab.Screen name="Albums" component={Albums} options={global.navigationOptions}/>
-                <Tab.Screen name="Songs" component={Songs} options={global.navigationOptions}/>
-                <Tab.Screen name="Artists" component={Artists} options={global.navigationOptions}/>
-                <Tab.Screen name="Subscriptions" component={Subscriptions} options={global.navigationOptions}/>
-            </Tab.Navigator>
+        <Tab.Navigator tabBarOptions={tabOptions} initialRouteName="Playlists" tabBarPosition="bottom">
+            <Tab.Screen name="Playlists" component={Playlists} options={global.navigationOptions}/>
+            <Tab.Screen name="Albums" component={Albums} options={global.navigationOptions}/>
+            <Tab.Screen name="Songs" component={Songs} options={global.navigationOptions}/>
+            <Tab.Screen name="Artists" component={Artists} options={global.navigationOptions}/>
+            <Tab.Screen name="Subscriptions" component={Subscriptions} options={global.navigationOptions}/>
+        </Tab.Navigator>
+        {global.miniPlayer}
         </>
     );
 };
-
-//<LibraryNavigator navigation={navigation}/>

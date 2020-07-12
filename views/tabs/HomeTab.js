@@ -49,8 +49,7 @@ export default class HomeTab extends PureComponent {
     }
 
     render() {
-        //this.props.navigation.navigate("Search");
-        return <FlatList
+        return <><FlatList
                     style={shelvesStyle.scrollView}
                     contentContainerStyle={shelvesStyle.scrollContainer}
 
@@ -94,5 +93,7 @@ export default class HomeTab extends PureComponent {
                     data={this.state.shelves}
                     keyExtractor={item => item.title}
             />
+            {global.miniPlayer}
+            </>
     }
 };

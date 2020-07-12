@@ -7,7 +7,6 @@ import {
 export default ({ navigation }) => {
     React.useEffect(() => {
         const unsubscribe = navigation.addListener('focus', () => {
-            global.setLibraryNavigator(1);
         });
 
         return () => unsubscribe();

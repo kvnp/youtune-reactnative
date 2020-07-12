@@ -12,69 +12,20 @@ export default class PlayView extends PureComponent {
     constructor(props) {
         super(props);
         this.state = {
-            position: 0,
             loading: false,
-            isSeeking: false
+            isSeeking: false,
+            position: 0
         }
     }
 
-    thumbDown = () => {
-        if (global.state.isLiked)
-            global.state.isLiked = false;
-
-        global.state.isDisliked = !global.state.isDisliked;
-        this.forceUpdate();
-    }
-
-    thumbUp = () => {
-        if (global.state.isDisliked)
-            global.state.isDisliked = false;
-
-        global.state.isLiked = !global.state.isLiked;
-        this.forceUpdate();
-    }
-
-    setPlaying = () => {
-        global.state.isPlaying = !global.state.isPlaying;
-        this.forceUpdate();
-    }
-
-    setRepeat = () => {
-        global.state.isRepeating = !global.state.isRepeating;
-        this.forceUpdate();
-    }
-
-    setShuffle = () => {
-        
-    }
-
-    setNext = () => {
-        global.onNext();
-        this.forceUpdate();
-    }
-
-    setPrevious = () => {
-        global.onPrevious();
-        this.forceUpdate();
-    }
-
     finishOpening = (result) => {
-        global.state.playlist.list = result.list;
-        global.state.playlist.index = result.index;
-
-        global.state.current.title = result.list[result.index].title;
-        global.state.current.subtitle = result.list[result.index].subtitle;
-        global.state.current.playlistId = result.list[result.index].playlistId;
-        global.state.current.videoId = result.list[result.index].videoId;
-        global.state.current.thumbnail = result.list[result.index].thumbnail;
-        global.state.current.length = result.list[result.index].length;
         this.setState({loading: false});
-
+        this.props.onPlaylist(result.list, result.index);
     }
 
     render() {
-        const { route, navigation} = this.props;
-        const { title, subtitle, thumbnail, length } = global.state.current;
+        const { route, navigation } = this.props;
+        const { current } = this.props;
 
         if (route.params != undefined && !this.state.loading) {
             this.setState({loading: true});
@@ -88,32 +39,32 @@ export default class PlayView extends PureComponent {
             <View style={stylesTop.mainView}>
                 <View style={stylesTop.vertContainer}>
                     <View style={stylesMid.midBit}>
-                        <Image style={stylesMid.midImage} source={{uri: thumbnail}}/>
+                        <Image style={stylesMid.midImage} source={{uri: this.props.current != null ?current.thumbnail :null}}/>
                     </View>
 
                     <View style={stylesBottom.bottomBit}>
                         <View style={stylesBottom.songContainer}>
-                            <Pressable onPress={this.thumbDown} android_ripple={rippleConfig}>
-                                <MaterialIcons name="thumb-down" color={global.state.isDisliked ? "black" : "darkgray"} size={30}/>
+                            <Pressable onPress={this.props.onDislike} android_ripple={rippleConfig}>
+                                <MaterialIcons name="thumb-down" color={this.props.isDisliked ? "black" : "darkgray"} size={30}/>
                             </Pressable>
 
-                            <Text style={stylesBottom.titleText}>{title}</Text>
+                            <Text numberOfLines={1} style={stylesBottom.titleText}>{this.props.current != null ?current.title :""}</Text>
 
-                            <Pressable onPress={this.thumbUp} android_ripple={rippleConfig}>
-                                <MaterialIcons name="thumb-up" color={global.state.isLiked ? "black" : "darkgray"} size={30}/>
+                            <Pressable onPress={this.props.onLike} android_ripple={rippleConfig}>
+                                <MaterialIcons name="thumb-up" color={this.props.isLiked ? "black" : "darkgray"} size={30}/>
                             </Pressable>
                         </View>
 
-                        <Text style={stylesBottom.subtitleText}>{subtitle}</Text>
+                        <Text numberOfLines={1} style={stylesBottom.subtitleText}>{this.props.current != null ?current.subtitle :""}</Text>
 
-                        <SeekBar trackLength={length} currentPosition={this.state.position} onSeek={() => {console.log("onSeek")}} onSlidingStart={() => {console.log("onSlidingStart")}}/>
-                        <ButtonArray isRepeating={global.state.isRepeating}
-                                     isPlaying={global.state.isPlaying}
-                                     onPlay={this.setPlaying}
-                                     onPrevious={this.setPrevious}
-                                     onNext={this.setNext}
-                                     onShuffle={this.setShuffle}
-                                     onRepeat={this.setRepeat}
+                        <SeekBar trackLength={this.props.current != null ?current.length :0} currentPosition={this.state.position} onSeek={() => {console.log("onSeek")}} onSlidingStart={() => {console.log("onSlidingStart")}}/>
+                        <ButtonArray isRepeating={this.props.isRepeating}
+                                     isPlaying={this.props.isPlaying}
+                                     onPlay={this.props.onPlay}
+                                     onPrevious={this.props.onPrevious}
+                                     onNext={this.props.onNext}
+                                     onShuffle={this.props.onShuffle}
+                                     onRepeat={this.props.onRepeat}
                                      isLoading={this.state.loading}
                                      
                                      style={stylesBottom.buttonContainer}/>
@@ -171,12 +122,22 @@ const stylesBottom = StyleSheet.create({
 
     subtitleText: {
         paddingTop: 5,
-        alignSelf: "center"
+        alignSelf: "center",
+        overflow: "hidden",
+        paddingLeft: 10,
+        paddingRight: 10,
+        width: "80%",
+        textAlign: "center",
     },
 
     titleText: {
         fontSize: 25,
-        fontWeight: "bold"
+        fontWeight: "bold",
+        overflow: "hidden",
+        paddingLeft: 10,
+        paddingRight: 10,
+        width: "80%",
+        textAlign: "center",
     },
 
     buttonContainer: {
