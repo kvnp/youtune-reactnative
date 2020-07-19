@@ -76,10 +76,10 @@ export default class SearchTab extends PureComponent {
                 contentContainerStyle={shelvesStyle.scrollContainer}
 
                 ListEmptyComponent={
-                    <View>
-                        <Text style={[preResultHomeStyle.preHomeBottomText, preResultHomeStyle.preHomeTopText]}>🔍</Text>
-                        <Text style={preResultHomeStyle.preHomeBottomText}>Look for music using the search bar</Text>
-                    </View>
+                    <>
+                    <Text style={[preResultHomeStyle.preHomeBottomText, preResultHomeStyle.preHomeTopText]}>🔍</Text>
+                    <Text style={preResultHomeStyle.preHomeBottomText}>Look for music using the search bar</Text>
+                    </>
                 }
 
                 renderSectionHeader={({ section: { title } }) => (
@@ -128,7 +128,6 @@ export default class SearchTab extends PureComponent {
                     }
                 </Pressable>
             </View>
-            {global.miniPlayer}
         </>
     }
 

@@ -49,20 +49,20 @@ export default class HomeTab extends PureComponent {
     }
 
     render() {
-        return <><FlatList
+        return <FlatList
                     style={shelvesStyle.scrollView}
                     contentContainerStyle={shelvesStyle.scrollContainer}
 
                     ListEmptyComponent={
-                        this.state.loading ? 
-                            <View style={[shelvesStyle.scrollView, shelvesStyle.scrollContainer]}>
+                        this.state.loading
+                        ?   <View style={[shelvesStyle.scrollView, shelvesStyle.scrollContainer]}>
                                 <ActivityIndicator size="large"/>
                             </View>
-                        :
-                            <View>
-                                <Text style={[preResultHomeStyle.preHomeBottomText, preResultHomeStyle.preHomeTopText]}>🏠</Text>
-                                <Text style={preResultHomeStyle.preHomeBottomText}>Pull down to load</Text>
-                            </View>
+
+                        :   <>
+                            <Text style={[preResultHomeStyle.preHomeBottomText, preResultHomeStyle.preHomeTopText]}>🏠</Text>
+                            <Text style={preResultHomeStyle.preHomeBottomText}>Pull down to load</Text>
+                            </>
                     }
 
                     ListFooterComponent={
@@ -71,29 +71,23 @@ export default class HomeTab extends PureComponent {
                         </Pressable>
                     }
 
-                    progressViewOffset={20}
+                    progressViewOffset={0}
 
                     renderItem={
                         ({item}) => <Shelf shelf={item} navigation={this.props.navigation}/>
                     }
 
                     refreshing={this.state.loading}
-                    onRefresh={() => {
-                        this.startRefresh();
-                    }}
+                    onRefresh={() => this.startRefresh()}
 
                     ListFooterComponentStyle={
-                        this.state.shelves.length == 0 ? {
-                            display: "none"
-                        }: {
-                            paddingBottom: 20
-                        }
+                        this.state.shelves.length == 0 
+                        ? {display: "none"}
+                        : {paddingBottom: 20}
                     }
 
                     data={this.state.shelves}
                     keyExtractor={item => item.title}
             />
-            {global.miniPlayer}
-            </>
     }
 };

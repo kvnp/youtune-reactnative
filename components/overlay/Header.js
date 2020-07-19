@@ -13,18 +13,16 @@ export default class Header extends PureComponent {
         super(props);
         this.state = {
             title: "Home",
-            image: null,
             source: null
         }
 
         global.setHeader = ({title, image}) => {
-            if (image != this.state.image) {
+            if (image != undefined)
                 this.setState({
                     source: {
                         uri: image
                     }
                 });
-            }
 
             if (title != undefined) {
                 this.setState({title: title});
@@ -42,10 +40,10 @@ export default class Header extends PureComponent {
 
     render() {
         return (
-            <ImageBackground imageStyle={headerStyle.image}
-                             style={[headerStyle.container, this.props.style]}
+            <ImageBackground imageStyle={null}
+                             style={[headerStyle.container, headerStyle.headerHeight, this.props.style]}
                              source={this.state.source}>
-                <LinearGradient style={[headerStyle.gradient, headerStyle.image]}
+                <LinearGradient style={[headerStyle.gradient, this.state.source == null ?headerStyle.image :headerStyle.imageFound]}
                                 colors={gradientColors}>
                                     
                     <Text style={[{color: this.state.headerColor}, headerStyle.text]}>

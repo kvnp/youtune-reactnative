@@ -88,10 +88,10 @@ export default class App extends PureComponent {
         global.onNext = () => {
             if (this.state.playlist != null) {
                 let { list, index } = this.state.playlist;
-                if (index < list.length - 1)
-                    index += 1
-                else
-                    index = 0
+                
+                index < list.length - 1
+                    ? index += 1
+                    : index = 0
 
                 console.log("Nächstes Lied:" + index);
                 console.log(list[index]);
@@ -103,10 +103,9 @@ export default class App extends PureComponent {
     
         global.onPrevious = () => {
             let { list, index } = this.state.playlist;
-            if (index > 0)
-                index -= 1
-            else
-                index = list.length - 1
+            index > 0
+                ? index -= 1
+                : index = list.length - 1
 
             console.log("Voriges Lied:" + index);
             console.log(list[index]);
