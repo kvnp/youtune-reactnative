@@ -119,12 +119,11 @@ export default class SearchTab extends PureComponent {
                             onSubmitEditing={this.search}/>
 
                 <Pressable onPress={this.search}
-                            style={searchBarStyle.button}
-                            disabled={this.state.buttonDisabled}>
-                    {
-                    this.state.loading
-                    ? <ActivityIndicator color="white" size="small"/>
-                    : <MaterialIcons name="search" color="white" size={24}/>
+                           style={searchBarStyle.button}
+                           disabled={this.state.buttonDisabled}>
+                    { this.state.loading
+                        ? <ActivityIndicator color="white" size="small"/>
+                        : <MaterialIcons name="search" color="white" size={24}/>
                     }
                 </Pressable>
             </View>
@@ -132,8 +131,8 @@ export default class SearchTab extends PureComponent {
     }
 
     getSpecificButtons = () => {
-        this.state.shelves.length > 0 ?
-            <View style={specificStyle.container}>
+        this.state.shelves.length > 0 
+            ? <View style={specificStyle.container}>
                 <Pressable style={specificStyle.button}>
                     <Text style={specificStyle.text}>
                         Videos
@@ -163,7 +162,8 @@ export default class SearchTab extends PureComponent {
                         Alben
                     </Text>
                 </Pressable>
-            </View> 
-        : null;
+            </View>
+
+            : null;
     }
 };

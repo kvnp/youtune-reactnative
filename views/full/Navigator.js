@@ -10,7 +10,6 @@ import LibraryTab from "../tabs/LibraryTab";
 
 import Header from "../../components/overlay/Header";
 import { headerStyle, appColor } from "../../styles/App";
-import { View, Text } from "react-native";
 
 function getIcon(title, color) {
     return <MaterialIcons name={title} color={color} size={24}/>;
@@ -20,19 +19,17 @@ function getTabOptions(title) {
     return { tabBarIcon: ({ color }) => getIcon(title, color) };
 }
 
-export default () => {
-    const Tab = createMaterialBottomTabNavigator();
+const Nav = createMaterialBottomTabNavigator();
+export default ({miniPlayer}) => {
     return (
         <>
             <Header style={[headerStyle.headerPicture, {}]}/>
-            <Tab.Navigator initialRouteName="Home" barStyle={appColor.background}>
-                <Tab.Screen name="Home" component={HomeTab} options={getTabOptions("home")}/>
-                <Tab.Screen name="Search" component={SearchTab} options={getTabOptions("search")}/>
-                <Tab.Screen name="Library" component={LibraryTab} options={getTabOptions("folder")}/>
-            </Tab.Navigator>
-            <View style={{overflow: "hidden", height: 0}}>
-                <Text>asodakpksdpaok</Text>
-            </View>
+            <Nav.Navigator initialRouteName="Home" barStyle={appColor.background}>
+                <Nav.Screen name="Home" component={HomeTab} options={getTabOptions("home")}/>
+                <Nav.Screen name="Search" component={SearchTab} options={getTabOptions("search")}/>
+                <Nav.Screen name="Library" component={LibraryTab} options={getTabOptions("folder")}/>
+            </Nav.Navigator>
+            {miniPlayer}
         </>
     );
 }

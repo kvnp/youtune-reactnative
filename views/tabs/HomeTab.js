@@ -73,9 +73,7 @@ export default class HomeTab extends PureComponent {
 
                     progressViewOffset={0}
 
-                    renderItem={
-                        ({item}) => <Shelf shelf={item} navigation={this.props.navigation}/>
-                    }
+                    renderItem={({item}) => <Shelf shelf={item} navigation={this.props.navigation}/>}
 
                     refreshing={this.state.loading}
                     onRefresh={() => this.startRefresh()}
