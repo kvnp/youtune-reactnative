@@ -108,34 +108,35 @@ export default class PlayView extends PureComponent {
     }
 
     handleSkip = (array, forward) => {
-        TrackPlayer.getCurrentTrack().then(id => array.map((track, index) => {
-            if (track.id == id) {
-                let next;
-                if (forward && index + 1 < array.length)
-                    next = index + 1;
-                else if (!forward && index > 0)
-                    next = index - 1;
-                else
-                    next = 0;
+        TrackPlayer.getCurrentTrack().then(id => {
+            for (let i = 0; i < array.length; i++) {
+                if (array[i].id == id) {
+                    let next;
+                    if (forward && i + 1 < array.length)
+                        next = i + 1;
+                    else if (!forward && i > 0)
+                        next = i - 1;
+                    else
+                        next = 0;
 
-                this.getUrl(array[next].id).then( async(url) => {
-                    var track = array.splice(next, 1)[0];
-                    track.url = url;
+                    this.getUrl(array[next].id).then( async(url) => {
+                        let track = array.splice(next, 1)[0];
+                        track.url = url;
 
-                    await TrackPlayer.remove(track.id);
+                        await TrackPlayer.remove(track.id);
 
-                    let afterId = null;
-                    if (next < array.length)
-                        afterId = array[next].id;
+                        let afterId = null;
+                        if (next < array.length)
+                            afterId = array[next].id;
 
-                    await TrackPlayer.add(track, afterId);
-                    await TrackPlayer.skip(track.id);
-                });
-                
-                return;
+                        await TrackPlayer.add(track, afterId);
+                        await TrackPlayer.skip(track.id);
+                    });
+
+                    return;
+                }
             }
-        }));
-        
+        });   
     }
 
     skip = forward => {
@@ -159,43 +160,6 @@ export default class PlayView extends PureComponent {
             else
                 TrackPlayer.seekTo(0);
         });
-    }
-
-
-    skipNext = () => {
-        TrackPlayer.getQueue().then(array => {
-            console.log(array);
-            TrackPlayer.getCurrentTrack().then(id => {
-                array.map((track, index) => {
-                    if (track.id == id) {
-                        let next;
-                        if (index + 1 >= array.length)
-                            next = 0;
-                        else
-                            next = index + 1;
-
-                        array[next].url = LinkBridge.getString(
-                            YOUTUBE_WATCH + array[next].id,
-                            url => {
-                                array[next].url = url;
-                                TrackPlayer.skipToNext();
-                            }
-                        );
-                    }
-                });
-            })
-        });
-    }
-      
-    skipPrevious = () => {
-        try {
-            TrackPlayer.getPosition().then(async(position) => {
-                if (position > 10)
-                    await TrackPlayer.seekTo(0);
-                else
-                    await TrackPlayer.skipToPrevious();
-            });
-        } catch (_) {}
     }
   
     startPlayback = () => {
