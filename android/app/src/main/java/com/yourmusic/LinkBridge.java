@@ -36,11 +36,6 @@ public class LinkBridge extends ReactContextBaseJavaModule {
             youtubeStreamExtractor.fetchPage();
             List<AudioStream> audioStreams = youtubeStreamExtractor.getAudioStreams();
 
-            for (AudioStream audio : youtubeStreamExtractor.getAudioStreams()) {
-                System.out.println(audio.getAverageBitrate());
-                System.out.println(audio.url);
-            }
-
             return audioStreams.get(audioStreams.size() - 1).url;
 
         } catch(Exception e) {
