@@ -57,16 +57,15 @@ export default class PlayView extends PureComponent {
         });
 
         TrackPlayer.addEventListener("playback-track-changed", params => {
-            console.log("track changed: ");
-            this.refreshUI();
+            //console.log("track changed: ");
         });
 
         TrackPlayer.addEventListener("playback-queue-ended", params => {
-            console.log("queue ended");
+            //console.log("queue ended");
         });
 
         TrackPlayer.addEventListener("playback-error", params => {
-            console.log("error");
+            //console.log("error");
         });
 
         this.state = {
@@ -119,7 +118,6 @@ export default class PlayView extends PureComponent {
                     else
                         next = 0;
 
-                    console.log(array[next].url);
                     if (array[next].url == null)
                         this.getUrl(array[next].id).then(
                             async(url) => {
@@ -135,17 +133,17 @@ export default class PlayView extends PureComponent {
                                 await TrackPlayer.add(track, afterId);
 
                                 if (forward)
-                                    await TrackPlayer.skipToNext();
+                                    TrackPlayer.skipToNext().then(() => this.refreshUI());
                                 else
-                                    await TrackPlayer.skipToPrevious();
+                                    TrackPlayer.skipToPrevious().then(() => this.refreshUI());
                                 //await TrackPlayer.skip(track.id);
                             }
                         );
                     else {
                         if (forward)
-                            TrackPlayer.skipToNext();
+                            TrackPlayer.skipToNext().then(() => this.refreshUI());
                         else
-                            TrackPlayer.skipToPrevious();
+                            TrackPlayer.skipToPrevious().then(() => this.refreshUI());
                     }
 
                     return;
@@ -190,7 +188,7 @@ export default class PlayView extends PureComponent {
                         await TrackPlayer.reset();
                         await TrackPlayer.add(playlist.list);
                         await TrackPlayer.skip(playlist.list[playlist.index].id);
-                        await TrackPlayer.play();
+                        TrackPlayer.play().then(() => this.refreshUI());
                     })
             );
         } else {
