@@ -119,19 +119,34 @@ export default class PlayView extends PureComponent {
                     else
                         next = 0;
 
-                    this.getUrl(array[next].id).then( async(url) => {
-                        let track = array.splice(next, 1)[0];
-                        track.url = url;
+                    console.log(array[next].url);
+                    if (array[next].url == null)
+                        this.getUrl(array[next].id).then(
+                            async(url) => {
+                                let track = array.splice(next, 1)[0];
+                                track.url = url;
 
-                        await TrackPlayer.remove(track.id);
+                                await TrackPlayer.remove(track.id);
 
-                        let afterId = null;
-                        if (next < array.length)
-                            afterId = array[next].id;
+                                let afterId = null;
+                                if (next < array.length)
+                                    afterId = array[next].id;
 
-                        await TrackPlayer.add(track, afterId);
-                        await TrackPlayer.skip(track.id);
-                    });
+                                await TrackPlayer.add(track, afterId);
+
+                                if (forward)
+                                    await TrackPlayer.skipToNext();
+                                else
+                                    await TrackPlayer.skipToPrevious();
+                                //await TrackPlayer.skip(track.id);
+                            }
+                        );
+                    else {
+                        if (forward)
+                            TrackPlayer.skipToNext();
+                        else
+                            TrackPlayer.skipToPrevious();
+                    }
 
                     return;
                 }
