@@ -17,7 +17,7 @@ import { resultHomeStyle, preResultHomeStyle } from '../../styles/Home';
 import Entry from '../../components/shared/Entry';
 import { shelvesStyle } from '../../styles/Shelves';
 import { textStyle } from '../../styles/App';
-import { fetchResults } from '../../modules/API';
+import { fetchResults } from '../../modules/remote/API';
 
 export default class SearchTab extends PureComponent {
     constructor(props) {

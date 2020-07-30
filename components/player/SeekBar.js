@@ -6,6 +6,7 @@ import {
     StyleSheet
 } from 'react-native';
 
+import TrackPlayer, { useTrackPlayerProgress } from 'react-native-track-player';
 import Slider from "@react-native-community/slider";
 
 function pad(n, width, z = 0) {
@@ -15,7 +16,7 @@ function pad(n, width, z = 0) {
 
 const minutesAndSeconds = (position) => ([
     pad(Math.floor(position / 60), 2),
-    pad(position % 60, 2),
+    pad(Math.floor(position % 60), 2),
 ]);
 
 const defaultString = {
@@ -23,21 +24,21 @@ const defaultString = {
     lightGrayColor:  "rgb(25, 25, 25)",
 }
 
-export default ({
-    trackLength,
-    currentPosition,
-    onSeek,
-    onSlidingStart,
-}) => {
-    const elapsed = minutesAndSeconds(currentPosition);
-    const remaining = minutesAndSeconds(trackLength - currentPosition);
+const doSeek = async(value) => {
+    await TrackPlayer.seekTo(value);
+}
+
+export default () => {
+    const { position, bufferedPosition, duration } = useTrackPlayerProgress()
+    const elapsed = minutesAndSeconds(position);
+    const remaining = minutesAndSeconds(duration - position);
     return (
         <View style={styles.container}>
             <Slider
-                maximumValue={Math.max(trackLength, 1, currentPosition + 1)}
-                onSlidingStart={onSlidingStart}
-                onSlidingComplete={onSeek}
-                value={currentPosition}
+                maximumValue={Math.max(duration, 1, position + 1)}
+                onSlidingComplete={async(value) => await doSeek(value)}
+                value={position}
+                bufferedPosition={bufferedPosition}
                 minimumTrackTintColor={defaultString.darkColor}
                 maximumTrackTintColor={defaultString.lightGrayColor}
                 thumbStyle={styles.thumb}
@@ -50,7 +51,7 @@ export default ({
                 </Text>
                 <View style={{ flex: 1 }} />
                 <Text style={[styles.text, { width: 40, color: defaultString.darkColor }]}>
-                    {trackLength > 1 && "-" + remaining[0] + ":" + remaining[1]}
+                    {"-" + remaining[0] + ":" + remaining[1]}
                 </Text>
             </View>
         </View>
@@ -58,32 +59,32 @@ export default ({
 };
 
 const styles = StyleSheet.create({
-  slider: {
-    marginTop: -12,
-  },
+    slider: {
+        marginTop: -12
+    },
 
-  container: {
-    paddingTop: 16,
-    marginLeft: -15,
-    marginRight: -15,
-  },
+    container: {
+        paddingTop: 16,
+        marginLeft: -15,
+        marginRight: -15
+    },
 
-  track: {
-    height: 2,
-    borderRadius: 1,
-  },
+    track: {
+        height: 2,
+        borderRadius: 1
+    },
 
-  thumb: {
-    width: 10,
-    height: 10,
-    borderRadius: 5,
-    backgroundColor: "black",
-    color: "black"
-  },
+    thumb: {
+        width: 10,
+        height: 10,
+        borderRadius: 5,
+        backgroundColor: "black",
+        color: "black"
+    },
 
-  text: {
-    color: 'rgba(255, 255, 255, 0.72)',
-    fontSize: 12,
-    textAlign: 'center',
-  }
+    text: {
+        color: 'rgba(255, 255, 255, 0.72)',
+        fontSize: 12,
+        textAlign: 'center'
+    }
 });

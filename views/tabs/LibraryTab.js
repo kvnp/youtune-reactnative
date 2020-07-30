@@ -1,8 +1,6 @@
 import React from 'react';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
-
-//import ViewPagerAdapter from 'react-native-tab-view-viewpager-adapter';
-// .. pager={props => <ViewPagerAdapter {...props} />}
+import ViewPagerAdapter from 'react-native-tab-view-viewpager-adapter';
 
 import Playlists from '../library/Playlists';
 import Albums from '../library/Albums';
@@ -23,7 +21,7 @@ export default ({navigation}) => {
     }, [navigation]);
 
     return (
-        <Tab.Navigator tabBarOptions={tabOptions} initialRouteName="Playlists" tabBarPosition="bottom">
+        <Tab.Navigator tabBarOptions={tabOptions} initialRouteName="Playlists" tabBarPosition="bottom" pager={props => <ViewPagerAdapter {...props}/>}>
             <Tab.Screen name="Playlists" component={Playlists} options={global.navigationOptions}/>
             <Tab.Screen name="Albums" component={Albums} options={global.navigationOptions}/>
             <Tab.Screen name="Songs" component={Songs} options={global.navigationOptions}/>

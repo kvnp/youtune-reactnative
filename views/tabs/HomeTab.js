@@ -8,7 +8,7 @@ import {
 } from 'react-native';
 
 import { refreshStyle, preResultHomeStyle } from '../../styles/Home';
-import { fetchHome } from "../../modules/API";
+import { fetchHome } from "../../modules/remote/API";
 import { shelvesStyle } from '../../styles/Shelves';
 import Shelf from '../../components/shared/Shelf';
 import { ActivityIndicator } from 'react-native-paper';

@@ -1,4 +1,4 @@
-import { fetchBrowse } from "./API";
+import { fetchBrowse } from "../remote/API";
 
 function showPlaylist(id, navigation) {
     fetchBrowse(id).then((playlist) => 
@@ -14,7 +14,7 @@ function showArtist(browseId, navigation) {
 
 export function handleMedia({browseId, playlistId, videoId}, navigation) {
     if (videoId != undefined) {
-        navigation.push("Music", {videoId, playlistId});
+        navigation.navigate("Music", {videoId, playlistId});
         return;
     }
 

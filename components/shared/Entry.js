@@ -9,7 +9,7 @@ import {
 } from "react-native";
 
 import { resultStyle } from '../../styles/Search';
-import { handleMedia } from '../../modules/Event';
+import { handleMedia } from '../../modules/event/mediaNavigator';
 import { rippleConfig } from '../../styles/Ripple';
 
 export default ({entry, navigation}) => {

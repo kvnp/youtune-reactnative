@@ -1,4 +1,4 @@
-import { getHL, getGL } from "./Native";
+import { getHL, getGL } from "../utils/Native";
 import {
     digestHomeResults,
     digestSearchResults,
@@ -62,9 +62,11 @@ export async function fetchResults(query) {
     let body = getRequestBody();
     body["query"] = query;
 
-    let response = await getHttpResponse(url, {method: "POST",
-                                               headers: headers_ytm,
-                                               body: JSON.stringify(body)}, "json");
+    let response = await getHttpResponse(url, {
+        method: "POST",
+        headers: headers_ytm,
+        body: JSON.stringify(body)
+    }, "json");
     
     return digestSearchResults(response);
 }
@@ -76,9 +78,11 @@ export async function fetchSpecificResults(kind) {
     let body = getRequestBody();
     body["input"] = input;
 
-    let response = await getHttpResponse(url, {method: "POST",
-                                               headers: headers_ytm,
-                                               body: JSON.stringify(body)}, "json");
+    let response = await getHttpResponse(url, {
+        method: "POST",
+        headers: headers_ytm,
+        body: JSON.stringify(body)
+    }, "json");
 
     return digestSearchResults(response);
 }
@@ -90,9 +94,11 @@ export async function fetchHome() {
     let body = getRequestBody();
     body["browseId"] = "FEmusic_home";
 
-    let response = await getHttpResponse(url, {method: "POST",
-                                               headers: headers_ytm,
-                                               body: JSON.stringify(body)}, "json");
+    let response = await getHttpResponse(url, {
+        method: "POST",
+        headers: headers_ytm,
+        body: JSON.stringify(body)
+    }, "json");
 
     return digestHomeResults(response);
 }
@@ -104,9 +110,11 @@ export async function fetchSuggestions(input) {
     let body = getRequestBody();
     body["input"] = input;
 
-    let response = await getHttpResponse(url, {method: "POST",
-                                               headers: headers_ytm,
-                                               body: JSON.stringify(body)}, "json");
+    let response = await getHttpResponse(url, {
+        method: "POST",
+        headers: headers_ytm,
+        body: JSON.stringify(body)
+    }, "json");
 
     return null;
 }
@@ -118,9 +126,11 @@ export async function fetchBrowse(browseId) {
     let body = getRequestBody();
     body["browseId"] = browseId;
 
-    let response = await getHttpResponse(url, {method: "POST",
-                                               headers: headers_ytm,
-                                               body: JSON.stringify(body)}, "json");
+    let response = await getHttpResponse(url, {
+        method: "POST",
+        headers: headers_ytm,
+        body: JSON.stringify(body)
+    }, "json");
 
     return digestBrowseResults(response, browseId);
 }
@@ -146,8 +156,10 @@ export async function fetchVideoInfo(videoId) {
     let url = "https://youtube.com/get_video_info?video_id=" + videoId +
               "&el=detailpage&c=WEB_REMIX&cver=0.1&cplayer=UNIPLAYER";
 
-    let response = await getHttpResponse(url, {method: "GET",
-                                               headers: headers_yt}, "text");
+    let response = await getHttpResponse(url, {
+        method: "GET",
+        headers: headers_yt
+    }, "text");
 
     return digestVideoInfoResults(response);
 }
@@ -161,9 +173,11 @@ export async function fetchNext(videoId, playlistId) {
     body["videoId"] = videoId;
     body["playlistId"] = playlistId;
 
-    let response = await getHttpResponse(url, {method: "POST",
-                                               headers: headers_ytm,
-                                               body: JSON.stringify(body)}, "json");
+    let response = await getHttpResponse(url, {
+        method: "POST",
+        headers: headers_ytm,
+        body: JSON.stringify(body)
+    }, "json");
 
     return digestNextResults(response);
 }

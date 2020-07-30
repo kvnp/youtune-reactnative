@@ -31,7 +31,7 @@ export default ({
             <Pressable onPress={() => {
                                     isLoading ? null : onPlay();
                                 }} android_ripple={rippleConfig}>
-                {isLoading ? <ActivityIndicator color="black" size="large"/>
+                {isLoading ? <ActivityIndicator color="black" size="small"/>
                            : <MaterialIcons name={isPlaying ? "pause" : "play-arrow"} color="black" size={40}/>
                 }
                 

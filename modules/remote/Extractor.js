@@ -1,4 +1,6 @@
-import { msToMin, msToMMSS, textToSec } from "./Utils";
+import { msToMin, msToMMSS, textToSec } from "../utils/Time";
+import Track from "../models/music/track";
+import Playlist from "../models/music/playlist";
 
 export function digestSearchResults(json) {
     let final = {results: 0, suggestion: [], reason: null, shelves: []};
@@ -549,38 +551,40 @@ export function digestVideoInfoResults(text) {
 
 
 export function digestNextResults(json) {
-    let playlist = {
-        index: 0,
-        list: []
-    }
+    let playlist = new Playlist();
     
     let playlistRenderer = json.contents.singleColumnMusicWatchNextResultsRenderer.playlist.playlistPanelRenderer;
+    playlist.index = json.currentVideoEndpoint.watchEndpoint.index;
     
-    playlist.index = playlistRenderer.currentIndex;
+    /*playlist.index = playlistRenderer.currentIndex;
+    console.log(playlistRenderer.currentIndex);
+    console.log(json.currentVideoEndpoint.watchEndpoint.index+"\n\n\n");*/
+
     for (let i = 0; i < playlistRenderer.contents.length; i++) {
         let panelRenderer = playlistRenderer.contents[i].playlistPanelVideoRenderer;
-    
-        let panel = {title: "", subtitle: "", videoId: "", playlistId: "", thumbnail: "", length: 0};
-        panel.videoId = panelRenderer.navigationEndpoint.watchEndpoint.videoId;
-        panel.playlistId = panelRenderer.navigationEndpoint.watchEndpoint.playlistId;
+
+        let videoId = panelRenderer.navigationEndpoint.watchEndpoint.videoId;
+        let playlistId = panelRenderer.navigationEndpoint.watchEndpoint.playlistId;
     
         let titleList = panelRenderer.title.runs;
+        let title = "";
         for (let titleI = 0; titleI < titleList.length; titleI++) {
-            panel.title += titleList[titleI].text;
+            title += titleList[titleI].text;
         }
     
         let subtitleList = panelRenderer.shortBylineText.runs;
+        let artist = "";
         for (let subtitleI = 0; subtitleI < subtitleList.length; subtitleI++) {
-            panel.subtitle += subtitleList[subtitleI].text;
+            artist += subtitleList[subtitleI].text;
         }
 
-        let length = textToSec(panelRenderer.lengthText.runs[0].text);
-        panel.length = length;
-    
         let thumbnailList = panelRenderer.thumbnail.thumbnails;
-        panel.thumbnail = thumbnailList[thumbnailList.length - 1].url;
-    
-        playlist.list.push(panel);
+
+        let artwork = thumbnailList[thumbnailList.length - 1].url;
+        let duration = textToSec(panelRenderer.lengthText.runs[0].text);
+
+        let track = new Track(videoId, playlistId, title, artist, artwork, duration);
+        playlist.list.push(track);
     }
 
     return playlist;

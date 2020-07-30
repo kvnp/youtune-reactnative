@@ -1,75 +1,200 @@
 import React, { PureComponent } from "react";
-import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import { View, Text, StyleSheet, Image, Pressable } from "react-native";
-import { rippleConfig } from "../../styles/Ripple";
+import TrackPlayer from 'react-native-track-player';
+import MaterialIcons from "react-native-vector-icons/MaterialIcons";
+import { ActivityIndicator } from "react-native-paper";
+
 import SeekBar from "../../components/player/SeekBar";
-import ButtonArray from "../../components/player/ButtonArray";
 import SwipePlaylist from "../../components/player/SwipePlaylist";
+
+import { fetchNext } from "../../modules/remote/API";
+import { rippleConfig } from "../../styles/Ripple";
 import { appColor } from "../../styles/App";
-import { fetchNext } from "../../modules/API";
 
 export default class PlayView extends PureComponent {
     constructor(props) {
         super(props);
+        TrackPlayer.setupPlayer();
+        TrackPlayer.updateOptions({
+            stopWithApp: true,
+            alwaysPauseOnInterruption: true,
+
+            capabilities: [
+                TrackPlayer.CAPABILITY_PLAY,
+                TrackPlayer.CAPABILITY_PAUSE,
+                TrackPlayer.CAPABILITY_SKIP_TO_NEXT,
+                TrackPlayer.CAPABILITY_SKIP_TO_PREVIOUS,
+                TrackPlayer.CAPABILITY_STOP
+            ],
+
+            compactCapabilities: [
+                TrackPlayer.CAPABILITY_PLAY,
+                TrackPlayer.CAPABILITY_PAUSE,
+                TrackPlayer.CAPABILITY_SKIP_TO_NEXT
+            ]
+        });
+
+        TrackPlayer.addEventListener("playback-state", async(params) => {
+            switch (params["state"]) {
+                case TrackPlayer.STATE_NONE:
+                    break;
+                case TrackPlayer.STATE_PLAYING:
+                    this.refreshUI();
+                    break;
+                case TrackPlayer.STATE_PAUSED:
+                    this.setState({isPlaying: false});
+                    break;
+                case TrackPlayer.STATE_STOPPED:
+                    this.setState({isPlaying: false});
+                    break;
+                case TrackPlayer.STATE_BUFFERING:
+                    this.setState({isPlaying: false, isLoading: true});
+            }
+        });
+
+        TrackPlayer.addEventListener("playback-track-changed", params => {
+            console.log("track changed: ");
+            this.refreshUI();
+        });
+
+        TrackPlayer.addEventListener("playback-queue-ended", params => {
+            console.log("queue ended");
+        });
+
+        TrackPlayer.addEventListener("playback-error", params => {
+            console.log("error");
+        });
+
         this.state = {
-            loading: false,
-            isSeeking: false,
-            position: 0
+            isPlaying: false,
+            isLoading: false,
+            isRepeating: false,
+
+            id: null,
+            artwork: null,
+            title: null,
+            artist: null
         }
     }
 
-    finishOpening = (result) => {
-        this.setState({loading: false});
-        this.props.onPlaylist(result.list, result.index);
+    refreshUI = () => {
+        if (!this.state.isPlaying)
+        TrackPlayer.getCurrentTrack().then(id => {
+            TrackPlayer.getTrack(id).then(track => {
+                this.setState({
+                    id: id,
+                    artwork: track.artwork,
+                    title: track.title,
+                    artist: track.artist,
+                    isPlaying: true,
+                    isLoading: false
+                });
+            });
+        });
+    }
+
+    skipNext = async() => {
+        try {
+            await TrackPlayer.skipToNext();
+        } catch (_) {}
+    }
+      
+    skipPrevious = () => {
+        try {
+            TrackPlayer.getPosition().then(async(position) => {
+                if (position > 10)
+                    await TrackPlayer.seekTo(0);
+                else
+                    await TrackPlayer.skipToPrevious();
+            });
+        } catch (_) {}
+    }
+  
+    startPlayback = async() => {
+        if (this.props.route.params != undefined) {
+            this.setState({isLoading: true});
+            const { playlistId, videoId } = this.props.route.params;
+            this.props.route.params = undefined;
+    
+            fetchNext(videoId, playlistId).then(
+                async(playlist) => {
+                    playlist.list.map(track => track.getUrl());
+                    await TrackPlayer.reset();
+                    await TrackPlayer.add(playlist.list);
+                    await TrackPlayer.skip(playlist.list[playlist.index].id);
+                    await TrackPlayer.play();
+                }
+            );
+            
+        } else {
+            if (this.state.isPlaying)
+                await TrackPlayer.play();
+            else
+                await TrackPlayer.pause();
+        }
     }
 
     render() {
-        const { route, navigation } = this.props;
-        const { current } = this.props;
+        if (this.props.route.params != undefined)
+            this.startPlayback();
 
-        if (route.params != undefined && !this.state.loading) {
-            this.setState({loading: true});
-            const { playlistId, videoId } = route.params;
-            route.params = undefined;
-
-            fetchNext(videoId, playlistId).then((result) => this.finishOpening(result));
-        }
+        //const { position, bufferedPosition, duration } = useTrackPlayerProgress();
+        //{this.props.isDisliked ? "black" : "darkgray"}
+        //{this.props.isLiked ? "black" : "darkgray"}
+        //{isRepeating ? "repeat-one" : "repeat"}
 
         return (
             <View style={stylesTop.mainView}>
                 <View style={stylesTop.vertContainer}>
                     <View style={stylesMid.midBit}>
-                        <Image style={stylesMid.midImage} source={{uri: this.props.current != null ?current.thumbnail :null}}/>
+                        <Image style={stylesMid.midImage} source={{uri: this.state.artwork}}/>
                     </View>
 
                     <View style={stylesBottom.bottomBit}>
                         <View style={stylesBottom.songContainer}>
-                            <Pressable onPress={this.props.onDislike} android_ripple={rippleConfig}>
-                                <MaterialIcons name="thumb-down" color={this.props.isDisliked ? "black" : "darkgray"} size={30}/>
+                            <Pressable onPress={() => {}} android_ripple={rippleConfig}>
+                                <MaterialIcons name="thumb-down" color="darkgray" size={30}/>
                             </Pressable>
 
-                            <Text numberOfLines={1} style={stylesBottom.titleText}>{this.props.current != null ?current.title :""}</Text>
+                            <Text numberOfLines={1} style={stylesBottom.titleText}>{this.state.title}</Text>
 
-                            <Pressable onPress={this.props.onLike} android_ripple={rippleConfig}>
-                                <MaterialIcons name="thumb-up" color={this.props.isLiked ? "black" : "darkgray"} size={30}/>
+                            <Pressable onPress={() => {}} android_ripple={rippleConfig}>
+                                <MaterialIcons name="thumb-up" color="darkgray" size={30}/>
                             </Pressable>
                         </View>
 
-                        <Text numberOfLines={1} style={stylesBottom.subtitleText}>{this.props.current != null ?current.subtitle :""}</Text>
+                        <Text numberOfLines={1} style={stylesBottom.subtitleText}>{this.state.artist}</Text>
 
-                        <SeekBar trackLength={this.props.current != null ?current.length :0} currentPosition={this.state.position} onSeek={() => {console.log("onSeek")}} onSlidingStart={() => {console.log("onSlidingStart")}}/>
-                        <ButtonArray isRepeating={this.props.isRepeating}
-                                     isPlaying={this.props.isPlaying}
-                                     onPlay={this.props.onPlay}
-                                     onPrevious={this.props.onPrevious}
-                                     onNext={this.props.onNext}
-                                     onShuffle={this.props.onShuffle}
-                                     onRepeat={this.props.onRepeat}
-                                     isLoading={this.state.loading}
-                                     
-                                     style={stylesBottom.buttonContainer}/>
+                        <SeekBar/>
+                        
+                        <View style={stylesBottom.buttonContainer}>
+                        <Pressable onPress={() => {}} android_ripple={rippleConfig}>
+                            <MaterialIcons name="shuffle" color="black" size={30}/>
+                        </Pressable>
+
+                        <Pressable onPress={this.skipPrevious} android_ripple={rippleConfig}>
+                            <MaterialIcons name="skip-previous" color="black" size={40}/>
+                        </Pressable>
+
+                        <Pressable onPress={this.state.isLoading ?null :this.startPlayback}
+                                android_ripple={rippleConfig}>
+                            {this.state.isLoading
+                                ? <ActivityIndicator color="black" size="small"/>
+                                : <MaterialIcons name={this.state.isPlaying ? "pause" : "play-arrow"} color="black" size={40}/>
+                            }
+                        </Pressable>
+
+                        <Pressable onPress={this.skipNext} android_ripple={rippleConfig}>
+                            <MaterialIcons name="skip-next" color="black" size={40}/>
+                        </Pressable>
+
+                        <Pressable onPress={() => {}} android_ripple={rippleConfig}>
+                            <MaterialIcons name="repeat" color="black" size={30}/>
+                        </Pressable>
+                    </View>
+                        
                         <View style={stylesTop.topBit}>
-                            <Pressable onPress={() => navigation.goBack()} android_ripple={rippleConfig} style={stylesTop.topFirst}>
+                            <Pressable onPress={() => this.props.navigation.goBack()} android_ripple={rippleConfig} style={stylesTop.topFirst}>
                                 <MaterialIcons name="keyboard-arrow-down" color={"black"} size={30}/>
                             </Pressable>
 
@@ -79,16 +204,34 @@ export default class PlayView extends PureComponent {
                         </View>
                     </View>
                 </View>
-                
 
                 <SwipePlaylist minimumHeight={50}
-                               onMinimize={() => {}}
-                               onMaximize={() => {}}
-                               style={stylesRest.container}/>
+                                onMinimize={() => {}}
+                                onMaximize={() => {}}
+                                style={stylesRest.container}/>
             </View>
         )
     }
 }
+  
+const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        alignItems: "center",
+        backgroundColor: "#F5FCFF"
+    },
+    description: {
+        width: "80%",
+        marginTop: 20,
+        textAlign: "center"
+    },
+    player: {
+        marginTop: 40
+    },
+    state: {
+        marginTop: 20
+    }
+});
 
 const stylesRest = StyleSheet.create({
     container: {
