@@ -11,6 +11,10 @@ import { fetchNext } from "../../modules/remote/API";
 import { rippleConfig } from "../../styles/Ripple";
 import { appColor } from "../../styles/App";
 
+import {NativeModules} from 'react-native';
+const LinkBridge = NativeModules.LinkBridge;
+const YOUTUBE_WATCH = "https://www.youtube.com/watch?v=";
+
 export default class PlayView extends PureComponent {
     constructor(props) {
         super(props);
@@ -74,15 +78,14 @@ export default class PlayView extends PureComponent {
             artwork: null,
             title: null,
             artist: null
-        }
+        };
     }
 
     refreshUI = () => {
-        if (!this.state.isPlaying)
         TrackPlayer.getCurrentTrack().then(id => {
             TrackPlayer.getTrack(id).then(track => {
                 this.setState({
-                    id: id,
+                    id: track.id,
                     artwork: track.artwork,
                     title: track.title,
                     artist: track.artist,
@@ -93,10 +96,95 @@ export default class PlayView extends PureComponent {
         });
     }
 
-    skipNext = async() => {
-        try {
-            await TrackPlayer.skipToNext();
-        } catch (_) {}
+    getUrl = id => {
+        return new Promise(
+            function(resolve, reject) {
+                LinkBridge.getString(
+                    YOUTUBE_WATCH + id,
+                    url => resolve(url)
+                );
+            }
+        );
+    }
+
+    handleSkip = (array, forward) => {
+        TrackPlayer.getCurrentTrack().then(id => array.map((track, index) => {
+            if (track.id == id) {
+                let next;
+                if (forward && index + 1 < array.length)
+                    next = index + 1;
+                else if (!forward && index > 0)
+                    next = index - 1;
+                else
+                    next = 0;
+
+                this.getUrl(array[next].id).then( async(url) => {
+                    var track = array.splice(next, 1)[0];
+                    track.url = url;
+
+                    await TrackPlayer.remove(track.id);
+
+                    let afterId = null;
+                    if (next < array.length)
+                        afterId = array[next].id;
+
+                    await TrackPlayer.add(track, afterId);
+                    await TrackPlayer.skip(track.id);
+                });
+                
+                return;
+            }
+        }));
+        
+    }
+
+    skip = forward => {
+        let skipOrSeek = new Promise(
+            function(resolve, reject) {
+                if (!forward)
+                    TrackPlayer.getPosition().then(position => {
+                        if (position > 10) {
+                            resolve(true);
+                        } else
+                            resolve(false);
+                    });
+                else
+                    resolve(false);
+            }
+        );
+            
+        skipOrSeek.then(skipping => {
+            if (!skipping)
+                TrackPlayer.getQueue().then(array => this.handleSkip(array, forward));
+            else
+                TrackPlayer.seekTo(0);
+        });
+    }
+
+
+    skipNext = () => {
+        TrackPlayer.getQueue().then(array => {
+            console.log(array);
+            TrackPlayer.getCurrentTrack().then(id => {
+                array.map((track, index) => {
+                    if (track.id == id) {
+                        let next;
+                        if (index + 1 >= array.length)
+                            next = 0;
+                        else
+                            next = index + 1;
+
+                        array[next].url = LinkBridge.getString(
+                            YOUTUBE_WATCH + array[next].id,
+                            url => {
+                                array[next].url = url;
+                                TrackPlayer.skipToNext();
+                            }
+                        );
+                    }
+                });
+            })
+        });
     }
       
     skipPrevious = () => {
@@ -110,38 +198,33 @@ export default class PlayView extends PureComponent {
         } catch (_) {}
     }
   
-    startPlayback = async() => {
+    startPlayback = () => {
         if (this.props.route.params != undefined) {
             this.setState({isLoading: true});
             const { playlistId, videoId } = this.props.route.params;
             this.props.route.params = undefined;
     
             fetchNext(videoId, playlistId).then(
-                async(playlist) => {
-                    playlist.list.map(track => track.getUrl());
-                    await TrackPlayer.reset();
-                    await TrackPlayer.add(playlist.list);
-                    await TrackPlayer.skip(playlist.list[playlist.index].id);
-                    await TrackPlayer.play();
-                }
+                playlist => this.getUrl(playlist.list[playlist.index].id)
+                    .then(async(url) => {
+                        playlist.list[playlist.index].url = url;
+                        await TrackPlayer.reset();
+                        await TrackPlayer.add(playlist.list);
+                        await TrackPlayer.skip(playlist.list[playlist.index].id);
+                        await TrackPlayer.play();
+                    })
             );
-            
         } else {
-            if (this.state.isPlaying)
-                await TrackPlayer.play();
+            if (!this.state.isPlaying)
+                TrackPlayer.play().then(() => this.setState({isPlaying: true}));
             else
-                await TrackPlayer.pause();
+                TrackPlayer.pause().then(() => this.setState({isPlaying: false}));
         }
     }
 
     render() {
         if (this.props.route.params != undefined)
             this.startPlayback();
-
-        //const { position, bufferedPosition, duration } = useTrackPlayerProgress();
-        //{this.props.isDisliked ? "black" : "darkgray"}
-        //{this.props.isLiked ? "black" : "darkgray"}
-        //{isRepeating ? "repeat-one" : "repeat"}
 
         return (
             <View style={stylesTop.mainView}>
@@ -172,7 +255,7 @@ export default class PlayView extends PureComponent {
                             <MaterialIcons name="shuffle" color="black" size={30}/>
                         </Pressable>
 
-                        <Pressable onPress={this.skipPrevious} android_ripple={rippleConfig}>
+                        <Pressable onPress={() => this.skip(false)} android_ripple={rippleConfig}>
                             <MaterialIcons name="skip-previous" color="black" size={40}/>
                         </Pressable>
 
@@ -184,7 +267,7 @@ export default class PlayView extends PureComponent {
                             }
                         </Pressable>
 
-                        <Pressable onPress={this.skipNext} android_ripple={rippleConfig}>
+                        <Pressable onPress={() => this.skip(true)} android_ripple={rippleConfig}>
                             <MaterialIcons name="skip-next" color="black" size={40}/>
                         </Pressable>
 
@@ -206,32 +289,13 @@ export default class PlayView extends PureComponent {
                 </View>
 
                 <SwipePlaylist minimumHeight={50}
-                                onMinimize={() => {}}
-                                onMaximize={() => {}}
-                                style={stylesRest.container}/>
+                               onMinimize={() => {}}
+                               onMaximize={() => {}}
+                               style={stylesRest.container}/>
             </View>
         )
     }
 }
-  
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        alignItems: "center",
-        backgroundColor: "#F5FCFF"
-    },
-    description: {
-        width: "80%",
-        marginTop: 20,
-        textAlign: "center"
-    },
-    player: {
-        marginTop: 40
-    },
-    state: {
-        marginTop: 20
-    }
-});
 
 const stylesRest = StyleSheet.create({
     container: {
