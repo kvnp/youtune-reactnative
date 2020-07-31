@@ -35,12 +35,14 @@ export default class HomeTab extends PureComponent {
     startRefresh = () => {
         this.setState({loading: true})
         fetchHome().then((result) => {
-            if (result.background != undefined) {
+            console.log(result);
+            if (result.background != undefined)
                 this.setImage(result.background);
-                this.setState({shelves: result.shelves});
-            }
 
-            this.setState({loading: false});
+            this.setState({
+                shelves: result.shelves,
+                loading: false
+            });
         });
     }
 
@@ -76,7 +78,7 @@ export default class HomeTab extends PureComponent {
                     renderItem={({item}) => <Shelf shelf={item} navigation={this.props.navigation}/>}
 
                     refreshing={this.state.loading}
-                    onRefresh={() => this.startRefresh()}
+                    onRefresh={this.startRefresh}
 
                     ListFooterComponentStyle={
                         this.state.shelves.length == 0 
