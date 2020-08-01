@@ -1,7 +1,0 @@
-var ytm_string = "s=CAOq0QJ8wRQIgSFHv4PhL8HaBSGtBq7yohQcpH0o5eERgjemNgXcg5GwAIQDOnk4j6iPOlUUDBLSVWmEoNmdg45UaWR9d6rw4NOEhHA%3D%3DA%3D%3D&sp=sig&url=https://r3---sn-5hnekn7z.googlevideo.com/videoplayback%3Fexpire%3D1595916920%26ei%3DGG4fX5jcI4WaDPjhpIgO%26ip%3D2a02%253A8109%253Aabf%253Ac31c%253Aa2f3%253Ac1ff%253Afe01%253Ae801%26id%3Do-AMId_YBAlaXq33K9LmokYL7ywqU78QeEnDbJNlzuQLKd%26itag%3D137%26source%3Dyoutube%26requiressl%3Dyes%26mh%3D5N%26mm%3D31%252C29%26mn%3Dsn-5hnekn7z%252Csn-5hne6nsk%26ms%3Dau%252Crdu%26mv%3Dm%26mvi%3D3%26pl%3D39%26ctier%3DA%26pfa%3D5%26gcr%3Dde%26initcwndbps%3D1570000%26hightc%3Dyes%26vprv%3D1%26mime%3Dvideo%252Fmp4%26gir%3Dyes%26clen%3D1942585%26dur%3D210.000%26lmt%3D1588294481559301%26mt%3D1595895212%26fvip%3D3%26keepalive%3Dyes%26fexp%3D23883098%26c%3DWEB_REMIX%26txp%3D2316222%26sparams%3Dexpire%252Cei%252Cip%252Cid%252Citag%252Csource%252Crequiressl%252Cctier%252Cpfa%252Cgcr%252Chightc%252Cvprv%252Cmime%252Cgir%252Cclen%252Cdur%252Clmt%26lsparams%3Dmh%252Cmm%252Cmn%252Cms%252Cmv%252Cmvi%252Cpl%252Cinitcwndbps%26lsig%3DAG3C_xAwRAIgIFb4i7mIOGfLGsxsO_dIeahvtGPmr_hFMUv3RajDtCoCIAyKgHt37tdf3UUtkRgPUq7RONsUOZBRM9qB-cOcFBay";
-
-var sig = ytm_string.split("&")[0].split("=")[1];
-var decode = decodeURIComponent(sig.replace(/\+/g, ' '));
-
-console.log(decode);
-console.log("AOq0QJ8wRgIhAM-FV8Oc1h2l0YDTsGsOCVq5V8QMuT8aXJnkFBi65DqbAiEA72jNJeKqVN-idqZLG_gt7qYvpsV5Mc-dODhzYhUv4y4");
