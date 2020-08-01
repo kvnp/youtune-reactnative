@@ -18,16 +18,16 @@ export default class MiniPlayer extends PureComponent{
                 case TrackPlayer.STATE_NONE:
                     break;
                 case TrackPlayer.STATE_PLAYING:
-                    this.setState({isPlaying: true, isLoading: false});
+                    this.setState({isPlaying: true, isStopped: false, isLoading: false});
                     break;
                 case TrackPlayer.STATE_PAUSED:
-                    this.setState({isPlaying: false, isLoading: false});
+                    this.setState({isPlaying: false, isStopped: false, isLoading: false});
                     break;
                 case TrackPlayer.STATE_STOPPED:
                     this.setState({isPlaying: false, isStopped: true, isLoading: false});
                     break;
                 case TrackPlayer.STATE_BUFFERING:
-                    this.setState({isPlaying: false, isLoading: true});
+                    this.setState({isPlaying: false, isStopped: false, isLoading: true});
             }
         });
 
