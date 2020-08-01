@@ -1,6 +1,7 @@
 import { msToMin, msToMMSS, textToSec } from "../utils/Time";
 import Track from "../models/music/track";
 import Playlist from "../models/music/playlist";
+import { decodeNestedURI } from "../utils/Decoder";
 
 export function digestSearchResults(json) {
     let final = {results: 0, suggestion: [], reason: null, shelves: []};
@@ -529,7 +530,7 @@ export function digestBrowseResults(json, browseId) {
 }
 
 export function digestVideoInfoResults(text) {
-    let decode = decodeURI(decodeURI(decodeURI(text)));
+    let decode = decodeNestedURI(text);
 
     let indexone = decode.indexOf("player_response=") + 16;
     let indextwo = decode.indexOf("}&") + 1;

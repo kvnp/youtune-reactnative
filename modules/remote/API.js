@@ -135,23 +135,6 @@ export async function fetchBrowse(browseId) {
     return digestBrowseResults(response, browseId);
 }
 
-export async function fetchVideo(id) {
-    const url = "https://www.youtube.com/watch?v=" + id;
-
-    let response = await getHttpResponse(url, {method: "GET"}, "text");
-    console.log(response);
-
-    let begin = response.indexOf("ytplayer.config = ") + 18;
-    let end = response.indexOf(";ytplayer.web_player");
-    //let end = response.indexOf(";ytplayer.load");
-    
-    //let slice = response.substring(begin, end);
-    //let ytJson = JSON.parse(slice);
-    //let ytPlayer = JSON.parse(ytJson.args.player_response);
-    //let videoList = ytPlayer.streamingData.adaptiveFormats;
-    //return videoList;
-}
-
 export async function fetchVideoInfo(videoId) {
     let url = "https://youtube.com/get_video_info?video_id=" + videoId +
               "&el=detailpage&c=WEB_REMIX&cver=0.1&cplayer=UNIPLAYER";
