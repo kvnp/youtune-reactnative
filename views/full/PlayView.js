@@ -1,6 +1,6 @@
 import React, { PureComponent } from "react";
 import { View, Text, StyleSheet, Image, Pressable } from "react-native";
-import TrackPlayer from 'react-native-track-player';
+import TrackPlayer, { TrackMetadata } from 'react-native-track-player';
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import { ActivityIndicator } from "react-native-paper";
 
@@ -12,32 +12,13 @@ import { rippleConfig } from "../../styles/Ripple";
 import { appColor } from "../../styles/App";
 
 import { NativeModules } from 'react-native';
+
 const LinkBridge = NativeModules.LinkBridge;
 const YOUTUBE_WATCH = "https://www.youtube.com/watch?v=";
 
 export default class PlayView extends PureComponent {
     constructor(props) {
         super(props);
-        TrackPlayer.setupPlayer();
-        TrackPlayer.updateOptions({
-            stopWithApp: true,
-            alwaysPauseOnInterruption: true,
-
-            capabilities: [
-                TrackPlayer.CAPABILITY_PLAY,
-                TrackPlayer.CAPABILITY_PAUSE,
-                TrackPlayer.CAPABILITY_SKIP_TO_NEXT,
-                TrackPlayer.CAPABILITY_SKIP_TO_PREVIOUS,
-                TrackPlayer.CAPABILITY_STOP,
-                TrackPlayer.CAPABILITY_SEEK_TO
-            ],
-
-            compactCapabilities: [
-                TrackPlayer.CAPABILITY_PLAY,
-                TrackPlayer.CAPABILITY_PAUSE,
-                TrackPlayer.CAPABILITY_SKIP_TO_NEXT
-            ]
-        });
 
         this.state = {
             isPlaying: false,
@@ -45,16 +26,10 @@ export default class PlayView extends PureComponent {
             isRepeating: false,
             isStopped: true,
 
-            id: null,
-            artwork: null,
-            title: null,
-            artist: null
+            track: null
         };
-    }
 
-    componentDidMount() {
-        this._subs = [];
-        this._subs.push(TrackPlayer.addEventListener("playback-state", async(params) => {
+        TrackPlayer.addEventListener("playback-state", async(params) => {
             switch (params["state"]) {
                 case TrackPlayer.STATE_NONE:
                     break;
@@ -70,61 +45,84 @@ export default class PlayView extends PureComponent {
                 case TrackPlayer.STATE_BUFFERING:
                     this.setState({isPlaying: false, isLoading: true});
             }
-        }));
+        });
 
-        this._subs.push(TrackPlayer.addEventListener("playback-track-changed", params => {
+        TrackPlayer.addEventListener("playback-track-changed", params => {
             this.refreshUI();
-        }));
+        });
 
-        this._subs.push(TrackPlayer.addEventListener("playback-queue-ended", params => {
+        TrackPlayer.addEventListener("playback-queue-ended", params => {
             //console.log("queue ended");
-        }));
+        });
 
-        this._subs.push(TrackPlayer.addEventListener("playback-error", params => {
+        TrackPlayer.addEventListener("playback-error", params => {
             //console.log("error");
-        }));
+        });
 
-        this._subs.push(TrackPlayer.addEventListener("remote-next", params => {
+        TrackPlayer.addEventListener("remote-next", params => {
             TrackPlayer.skipToNext();
-        }));
+        });
 
-        this._subs.push(TrackPlayer.addEventListener("remote-previous", params => {
+        TrackPlayer.addEventListener("remote-previous", params => {
             TrackPlayer.skipToPrevious();
-        }));
+        });
 
-        this._subs.push(TrackPlayer.addEventListener("remote-play", params => {
+        TrackPlayer.addEventListener("remote-play", params => {
             TrackPlayer.play();
-        }));
+        });
 
-        this._subs.push(TrackPlayer.addEventListener("remote-pause", params => {
+        TrackPlayer.addEventListener("remote-pause", params => {
             TrackPlayer.pause();
-        }));
+        });
 
-        this._subs.push(TrackPlayer.addEventListener("remote-stop", params => {
-            this.setState({isStopped: true});
+        TrackPlayer.addEventListener("remote-stop", params => {
             TrackPlayer.stop();
             this.props.navigation.goBack();
-        }));
-    }
-    
-    componentWillUnmount() {
-        this._subs.forEach(sub => sub.remove());
+            this.setState({isStopped: true});
+        });
+
+        TrackPlayer.addEventListener("remote-seek", params => {
+            TrackPlayer.seekTo(Math.floor(params["position"]));
+        });
     }
 
-    refreshUI = () => {
-        TrackPlayer.getCurrentTrack().then(id => {
-            if (id != null)
-            TrackPlayer.getTrack(id).then(async(track) => {
-                this.setState({
-                    id: track.id,
-                    artwork: track.artwork,
-                    title: track.title,
-                    artist: track.artist,
-                    isPlaying: true,
-                    isLoading: false
-                });
-            });
-        });
+    componentDidMount() {
+        this.refreshUI();
+    }
+
+    refreshUI = async() => {
+        let id = await TrackPlayer.getCurrentTrack();
+        if (id != null) {
+            let newstate = {};
+            let track = await TrackPlayer.getTrack(id);
+            let state = await TrackPlayer.getState();
+
+            newstate.track = track;
+            switch (state) {
+                case TrackPlayer.STATE_NONE:
+                    break;
+                case TrackPlayer.STATE_PLAYING:
+                    newstate.isPlaying = true;
+                    newstate.isLoading = false;
+                    break;
+                case TrackPlayer.STATE_PAUSED:
+                    newstate.isPlaying = false;
+                    newstate.isLoading = false;
+                    break;
+                case TrackPlayer.STATE_STOPPED:
+                    newstate.isPlaying = false;
+                    newstate.isLoading = false;
+                    newstate.isStopped = true;
+                    this.props.navigation.goBack();
+                    break;
+                case TrackPlayer.STATE_BUFFERING:
+                    newstate.isPlaying = false;
+                    newstate.isLoading = true;
+                    break;
+            }
+
+            this.setState(newstate);
+        }
     }
 
     getUrl = id => {
@@ -138,72 +136,61 @@ export default class PlayView extends PureComponent {
         );
     }
 
-    handleSkip = (array, forward) => {
-        TrackPlayer.getCurrentTrack().then(id => {
-            for (let i = 0; i < array.length; i++) {
-                if (array[i].id == id) {
-                    let next;
-                    if (forward && i + 1 < array.length)
-                        next = i + 1;
-                    else if (!forward && i > 0)
-                        next = i - 1;
-                    else
-                        next = 0;
+    handleSkip = async(array, index, forward) => {
+        if (forward && index + 1 < array.length)
+            next = index + 1;
+        else if (!forward && index > 0)
+            next = index - 1;
+        else
+            next = 0;
 
-                    if (array[next].url == null)
-                        this.getUrl(array[next].id).then(
-                            async(url) => {
-                                let track = array[next];
-                                track.url = url;
+        if (array[next].url == null) {
+            let track = array[next];
+            track.url = await this.getUrl(array[next].id);
+            
+            await TrackPlayer.remove(track.id);
+            let afterId = null;
+            if (next < array.length)
+                afterId = array[next + 1].id;
 
-                                await TrackPlayer.remove(track.id);
+            await TrackPlayer.add(track, afterId);
+        }
 
-                                let afterId = null;
-                                if (next < array.length)
-                                    afterId = array[next + 1].id;
-
-                                await TrackPlayer.add(track, afterId);
-
-                                if (forward)
-                                    TrackPlayer.skipToNext();
-                                else
-                                    TrackPlayer.skipToPrevious();
-                                //await TrackPlayer.skip(track.id);
-                            }
-                        );
-
-                    else {
-                        if (forward)
-                            TrackPlayer.skipToNext();
-                        else
-                            TrackPlayer.skipToPrevious();
-                    }
-                }
-            }
-        });   
+        if (forward)
+            TrackPlayer.skipToNext();
+        else
+            TrackPlayer.skipToPrevious();
     }
 
-    skip = forward => {
-        let skipOrSeek = new Promise(
-            (resolve, reject) => {
-                if (!forward)
-                    TrackPlayer.getPosition().then(position => {
-                        if (position > 10) {
-                            resolve(true);
-                        } else
-                            resolve(false);
-                    });
-                else
-                    resolve(false);
+    skip = async(forward) => {
+        let id = await TrackPlayer.getCurrentTrack();
+        let index;
+        let track = await TrackPlayer.getTrack(id);
+        let array = await TrackPlayer.getQueue();
+
+        for (let i = 0; i < array.length; i++) {
+            if (track.id == id) {
+                index = i;
+                break;
             }
-        );
-            
-        skipOrSeek.then(skipping => {
-            if (!skipping)
-                TrackPlayer.getQueue().then(array => this.handleSkip(array, forward));
-            else
+        }
+
+        if (forward)
+            if (index < array.length)
+                this.handleSkip(array, index, forward);
+
+        else {
+            let position = await TrackPlayer.getPosition();
+
+            if (position > 10)
                 TrackPlayer.seekTo(0);
-        });
+            else {
+                if (id == 0)
+                    TrackPlayer.seekTo(0);
+                else
+                    this.handleSkip(array, index, forward);
+            }
+        }
     }
   
     startPlayback = () => {
@@ -225,7 +212,6 @@ export default class PlayView extends PureComponent {
                             let track = playlist.list[i];
                             track.url = await this.getUrl(track.id);
 
-                            console.log(this.state.isStopped);
                             if (this.state.isStopped)
                                 return;
                             
@@ -249,11 +235,18 @@ export default class PlayView extends PureComponent {
         if (this.props.route.params != undefined)
             this.startPlayback();
 
+        if (this.state.track == null) {
+            var title = null;
+            var artist = null;
+            var artwork = null;
+        } else
+            var {title, artist, artwork} = this.state.track;
+
         return (
             <View style={stylesTop.mainView}>
                 <View style={stylesTop.vertContainer}>
                     <View style={stylesMid.midBit}>
-                        <Image style={stylesMid.midImage} source={{uri: this.state.artwork}}/>
+                        <Image style={stylesMid.midImage} source={{uri: artwork}}/>
                     </View>
 
                     <View style={stylesBottom.bottomBit}>
@@ -262,16 +255,16 @@ export default class PlayView extends PureComponent {
                                 <MaterialIcons name="thumb-down" color="darkgray" size={30}/>
                             </Pressable>
 
-                            <Text numberOfLines={1} style={stylesBottom.titleText}>{this.state.title}</Text>
+                            <Text numberOfLines={1} style={stylesBottom.titleText}>{title}</Text>
 
                             <Pressable onPress={() => {}} android_ripple={rippleConfig}>
                                 <MaterialIcons name="thumb-up" color="darkgray" size={30}/>
                             </Pressable>
                         </View>
 
-                        <Text numberOfLines={1} style={stylesBottom.subtitleText}>{this.state.artist}</Text>
+                        <Text numberOfLines={1} style={stylesBottom.subtitleText}>{artist}</Text>
 
-                        <SeekBar/>
+                        <SeekBar navigation={this.props.navigation}/>
                         
                         <View style={stylesBottom.buttonContainer}>
                         <Pressable onPress={() => {}} android_ripple={rippleConfig}>

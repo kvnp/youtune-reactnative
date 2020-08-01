@@ -10,6 +10,7 @@ import LibraryTab from "../tabs/LibraryTab";
 
 import Header from "../../components/overlay/Header";
 import { headerStyle, appColor } from "../../styles/App";
+import MiniPlayer from "../../components/player/MiniPlayer";
 
 function getIcon(title, color) {
     return <MaterialIcons name={title} color={color} size={24}/>;
@@ -20,16 +21,16 @@ function getTabOptions(title) {
 }
 
 const Nav = createMaterialBottomTabNavigator();
-export default ({miniPlayer}) => {
+export default ({navigation}) => {
     return (
         <>
-            <Header style={[headerStyle.headerPicture, {}]}/>
-            <Nav.Navigator initialRouteName="Home" barStyle={appColor.background}>
-                <Nav.Screen name="Home" component={HomeTab} options={getTabOptions("home")}/>
-                <Nav.Screen name="Search" component={SearchTab} options={getTabOptions("search")}/>
-                <Nav.Screen name="Library" component={LibraryTab} options={getTabOptions("folder")}/>
-            </Nav.Navigator>
-            {miniPlayer}
+        <Header style={[headerStyle.headerPicture, {}]}/>
+        <Nav.Navigator initialRouteName="Home" barStyle={appColor.background}>
+            <Nav.Screen name="Home" component={HomeTab} options={getTabOptions("home")}/>
+            <Nav.Screen name="Search" component={SearchTab} options={getTabOptions("search")}/>
+            <Nav.Screen name="Library" component={LibraryTab} options={getTabOptions("folder")}/>
+        </Nav.Navigator>
+        <MiniPlayer navigation={navigation} style={appColor.background}/>
         </>
     );
 }

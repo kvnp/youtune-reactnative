@@ -28,8 +28,17 @@ const doSeek = async(value) => {
     await TrackPlayer.seekTo(value);
 }
 
-export default () => {
-    const { position, bufferedPosition, duration } = useTrackPlayerProgress()
+export default ({navigation}) => {
+    var { position, bufferedPosition, duration } = useTrackPlayerProgress();
+    React.useEffect(() => {
+        const unsub = navigation.addListener('focus', async() => {
+            position = await TrackPlayer.getPosition();
+            duration = await TrackPlayer.getDuration();
+        });
+    
+        return unsub;
+      }, [navigation]);
+
     const elapsed = minutesAndSeconds(position);
     const remaining = minutesAndSeconds(duration - position);
     return (
