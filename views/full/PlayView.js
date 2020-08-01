@@ -11,7 +11,7 @@ import { fetchNext } from "../../modules/remote/API";
 import { rippleConfig } from "../../styles/Ripple";
 import { appColor } from "../../styles/App";
 
-import {NativeModules} from 'react-native';
+import { NativeModules } from 'react-native';
 const LinkBridge = NativeModules.LinkBridge;
 const YOUTUBE_WATCH = "https://www.youtube.com/watch?v=";
 
@@ -28,7 +28,8 @@ export default class PlayView extends PureComponent {
                 TrackPlayer.CAPABILITY_PAUSE,
                 TrackPlayer.CAPABILITY_SKIP_TO_NEXT,
                 TrackPlayer.CAPABILITY_SKIP_TO_PREVIOUS,
-                TrackPlayer.CAPABILITY_STOP
+                TrackPlayer.CAPABILITY_STOP,
+                TrackPlayer.CAPABILITY_SEEK_TO
             ],
 
             compactCapabilities: [
@@ -38,7 +39,22 @@ export default class PlayView extends PureComponent {
             ]
         });
 
-        TrackPlayer.addEventListener("playback-state", async(params) => {
+        this.state = {
+            isPlaying: false,
+            isLoading: false,
+            isRepeating: false,
+            isStopped: true,
+
+            id: null,
+            artwork: null,
+            title: null,
+            artist: null
+        };
+    }
+
+    componentDidMount() {
+        this._subs = [];
+        this._subs.push(TrackPlayer.addEventListener("playback-state", async(params) => {
             switch (params["state"]) {
                 case TrackPlayer.STATE_NONE:
                     break;
@@ -54,35 +70,51 @@ export default class PlayView extends PureComponent {
                 case TrackPlayer.STATE_BUFFERING:
                     this.setState({isPlaying: false, isLoading: true});
             }
-        });
+        }));
 
-        TrackPlayer.addEventListener("playback-track-changed", params => {
-            //console.log("track changed: ");
-        });
+        this._subs.push(TrackPlayer.addEventListener("playback-track-changed", params => {
+            this.refreshUI();
+        }));
 
-        TrackPlayer.addEventListener("playback-queue-ended", params => {
+        this._subs.push(TrackPlayer.addEventListener("playback-queue-ended", params => {
             //console.log("queue ended");
-        });
+        }));
 
-        TrackPlayer.addEventListener("playback-error", params => {
+        this._subs.push(TrackPlayer.addEventListener("playback-error", params => {
             //console.log("error");
-        });
+        }));
 
-        this.state = {
-            isPlaying: false,
-            isLoading: false,
-            isRepeating: false,
+        this._subs.push(TrackPlayer.addEventListener("remote-next", params => {
+            TrackPlayer.skipToNext();
+        }));
 
-            id: null,
-            artwork: null,
-            title: null,
-            artist: null
-        };
+        this._subs.push(TrackPlayer.addEventListener("remote-previous", params => {
+            TrackPlayer.skipToPrevious();
+        }));
+
+        this._subs.push(TrackPlayer.addEventListener("remote-play", params => {
+            TrackPlayer.play();
+        }));
+
+        this._subs.push(TrackPlayer.addEventListener("remote-pause", params => {
+            TrackPlayer.pause();
+        }));
+
+        this._subs.push(TrackPlayer.addEventListener("remote-stop", params => {
+            this.setState({isStopped: true});
+            TrackPlayer.stop();
+            this.props.navigation.goBack();
+        }));
+    }
+    
+    componentWillUnmount() {
+        this._subs.forEach(sub => sub.remove());
     }
 
     refreshUI = () => {
         TrackPlayer.getCurrentTrack().then(id => {
-            TrackPlayer.getTrack(id).then(track => {
+            if (id != null)
+            TrackPlayer.getTrack(id).then(async(track) => {
                 this.setState({
                     id: track.id,
                     artwork: track.artwork,
@@ -97,7 +129,7 @@ export default class PlayView extends PureComponent {
 
     getUrl = id => {
         return new Promise(
-            function(resolve, reject) {
+            (resolve, reject) => {
                 LinkBridge.getString(
                     YOUTUBE_WATCH + id,
                     url => resolve(url)
@@ -121,32 +153,31 @@ export default class PlayView extends PureComponent {
                     if (array[next].url == null)
                         this.getUrl(array[next].id).then(
                             async(url) => {
-                                let track = array.splice(next, 1)[0];
+                                let track = array[next];
                                 track.url = url;
 
                                 await TrackPlayer.remove(track.id);
 
                                 let afterId = null;
                                 if (next < array.length)
-                                    afterId = array[next].id;
+                                    afterId = array[next + 1].id;
 
                                 await TrackPlayer.add(track, afterId);
 
                                 if (forward)
-                                    TrackPlayer.skipToNext().then(() => this.refreshUI());
+                                    TrackPlayer.skipToNext();
                                 else
-                                    TrackPlayer.skipToPrevious().then(() => this.refreshUI());
+                                    TrackPlayer.skipToPrevious();
                                 //await TrackPlayer.skip(track.id);
                             }
                         );
+
                     else {
                         if (forward)
-                            TrackPlayer.skipToNext().then(() => this.refreshUI());
+                            TrackPlayer.skipToNext();
                         else
-                            TrackPlayer.skipToPrevious().then(() => this.refreshUI());
+                            TrackPlayer.skipToPrevious();
                     }
-
-                    return;
                 }
             }
         });   
@@ -154,7 +185,7 @@ export default class PlayView extends PureComponent {
 
     skip = forward => {
         let skipOrSeek = new Promise(
-            function(resolve, reject) {
+            (resolve, reject) => {
                 if (!forward)
                     TrackPlayer.getPosition().then(position => {
                         if (position > 10) {
@@ -177,7 +208,11 @@ export default class PlayView extends PureComponent {
   
     startPlayback = () => {
         if (this.props.route.params != undefined) {
-            this.setState({isLoading: true});
+            this.setState({
+                isLoading: true,
+                isStopped: false
+            });
+
             const { playlistId, videoId } = this.props.route.params;
             this.props.route.params = undefined;
     
@@ -186,16 +221,27 @@ export default class PlayView extends PureComponent {
                     .then(async(url) => {
                         playlist.list[playlist.index].url = url;
                         await TrackPlayer.reset();
-                        await TrackPlayer.add(playlist.list);
-                        await TrackPlayer.skip(playlist.list[playlist.index].id);
-                        TrackPlayer.play().then(() => this.refreshUI());
+                        for (let i = 0; i < playlist.list.length; i++) {
+                            let track = playlist.list[i];
+                            track.url = await this.getUrl(track.id);
+
+                            console.log(this.state.isStopped);
+                            if (this.state.isStopped)
+                                return;
+                            
+                            await TrackPlayer.add(track);
+
+                            if (i == playlist.index)
+                                await TrackPlayer.skip(playlist.list[playlist.index].id);
+                                TrackPlayer.play();
+                        }
                     })
             );
         } else {
             if (!this.state.isPlaying)
-                TrackPlayer.play().then(() => this.setState({isPlaying: true}));
+                TrackPlayer.play();
             else
-                TrackPlayer.pause().then(() => this.setState({isPlaying: false}));
+                TrackPlayer.pause();
         }
     }
 
