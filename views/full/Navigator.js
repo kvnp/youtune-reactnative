@@ -21,7 +21,7 @@ function getTabOptions(title) {
 }
 
 const Nav = createMaterialBottomTabNavigator();
-export default ({navigation}) => {
+export default () => {
     return (
         <>
         <Header style={[headerStyle.headerPicture, {}]}/>
@@ -30,7 +30,6 @@ export default ({navigation}) => {
             <Nav.Screen name="Search" component={SearchTab} options={getTabOptions("search")}/>
             <Nav.Screen name="Library" component={LibraryTab} options={getTabOptions("folder")}/>
         </Nav.Navigator>
-        <MiniPlayer navigation={navigation} style={appColor.background}/>
         </>
     );
 }

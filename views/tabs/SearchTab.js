@@ -16,8 +16,9 @@ import { searchBarStyle, specificStyle } from '../../styles/Search';
 import { resultHomeStyle, preResultHomeStyle } from '../../styles/Home';
 import Entry from '../../components/shared/Entry';
 import { shelvesStyle } from '../../styles/Shelves';
-import { textStyle } from '../../styles/App';
+import { textStyle, appColor } from '../../styles/App';
 import { fetchResults } from '../../modules/remote/API';
+import MiniPlayer from '../../components/player/MiniPlayer';
 
 export default class SearchTab extends PureComponent {
     constructor(props) {
@@ -70,7 +71,8 @@ export default class SearchTab extends PureComponent {
     }
 
     render() {
-        return <>
+        return (
+            <>
             <SectionList
                 style={shelvesStyle.scrollView}
                 contentContainerStyle={shelvesStyle.scrollContainer}
@@ -127,7 +129,10 @@ export default class SearchTab extends PureComponent {
                     }
                 </Pressable>
             </View>
-        </>
+
+            <MiniPlayer navigation={this.props.navigation} style={appColor.background}/>
+            </>
+        )
     }
 
     getSpecificButtons = () => {

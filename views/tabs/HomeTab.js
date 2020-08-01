@@ -12,6 +12,8 @@ import { fetchHome } from "../../modules/remote/API";
 import { shelvesStyle } from '../../styles/Shelves';
 import Shelf from '../../components/shared/Shelf';
 import { ActivityIndicator } from 'react-native-paper';
+import MiniPlayer from '../../components/player/MiniPlayer';
+import { appColor } from '../../styles/App';
 
 export default class HomeTab extends PureComponent {
     constructor(props) {
@@ -35,7 +37,6 @@ export default class HomeTab extends PureComponent {
     startRefresh = () => {
         this.setState({loading: true})
         fetchHome().then((result) => {
-            console.log(result);
             if (result.background != undefined)
                 this.setImage(result.background);
 
@@ -51,43 +52,48 @@ export default class HomeTab extends PureComponent {
     }
 
     render() {
-        return <FlatList
-                    style={shelvesStyle.scrollView}
-                    contentContainerStyle={shelvesStyle.scrollContainer}
+        return (
+            <>
+            <FlatList
+                style={shelvesStyle.scrollView}
+                contentContainerStyle={shelvesStyle.scrollContainer}
 
-                    ListEmptyComponent={
-                        this.state.loading
-                        ?   <View style={[shelvesStyle.scrollView, shelvesStyle.scrollContainer]}>
-                                <ActivityIndicator size="large"/>
-                            </View>
+                ListEmptyComponent={
+                    this.state.loading
+                    ?   <View style={[shelvesStyle.scrollView, shelvesStyle.scrollContainer]}>
+                            <ActivityIndicator size="large"/>
+                        </View>
 
-                        :   <>
-                            <Text style={[preResultHomeStyle.preHomeBottomText, preResultHomeStyle.preHomeTopText]}>🏠</Text>
-                            <Text style={preResultHomeStyle.preHomeBottomText}>Pull down to load</Text>
-                            </>
-                    }
+                    :   <>
+                        <Text style={[preResultHomeStyle.preHomeBottomText, preResultHomeStyle.preHomeTopText]}>🏠</Text>
+                        <Text style={preResultHomeStyle.preHomeBottomText}>Pull down to load</Text>
+                        </>
+                }
 
-                    ListFooterComponent={
-                        <Pressable onPress={() => this.startRefresh()} style={refreshStyle.button}>
-                            <Text style={refreshStyle.buttonText}>Aktualisieren</Text>
-                        </Pressable>
-                    }
+                ListFooterComponent={
+                    <Pressable onPress={() => this.startRefresh()} style={refreshStyle.button}>
+                        <Text style={refreshStyle.buttonText}>Aktualisieren</Text>
+                    </Pressable>
+                }
 
-                    progressViewOffset={0}
+                progressViewOffset={0}
 
-                    renderItem={({item}) => <Shelf shelf={item} navigation={this.props.navigation}/>}
+                renderItem={({item}) => <Shelf shelf={item} navigation={this.props.navigation}/>}
 
-                    refreshing={this.state.loading}
-                    onRefresh={this.startRefresh}
+                refreshing={this.state.loading}
+                onRefresh={this.startRefresh}
 
-                    ListFooterComponentStyle={
-                        this.state.shelves.length == 0 
-                        ? {display: "none"}
-                        : {paddingBottom: 20}
-                    }
+                ListFooterComponentStyle={
+                    this.state.shelves.length == 0 
+                    ? {display: "none"}
+                    : {paddingBottom: 20}
+                }
 
-                    data={this.state.shelves}
-                    keyExtractor={item => item.title}
+                data={this.state.shelves}
+                keyExtractor={item => item.title}
             />
+            <MiniPlayer navigation={this.props.navigation} style={appColor.background}/>
+            </>
+        );
     }
 };

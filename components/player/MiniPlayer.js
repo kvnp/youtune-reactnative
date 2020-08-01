@@ -2,6 +2,7 @@ import React, { PureComponent } from "react";
 import { StyleSheet, Animated, View, Pressable, Image, Text } from "react-native";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import TrackPlayer from 'react-native-track-player';
+import { skip, setPlay } from "../../service";
 
 export default class MiniPlayer extends PureComponent{
     constructor(props) {
@@ -12,65 +13,65 @@ export default class MiniPlayer extends PureComponent{
             isLoading: false,
             track: null
         };
-
-        TrackPlayer.addEventListener("playback-state", async(params) => {
-            switch (params["state"]) {
-                case TrackPlayer.STATE_NONE:
-                    break;
-                case TrackPlayer.STATE_PLAYING:
-                    this.setState({isPlaying: true, isStopped: false, isLoading: false});
-                    break;
-                case TrackPlayer.STATE_PAUSED:
-                    this.setState({isPlaying: false, isStopped: false, isLoading: false});
-                    break;
-                case TrackPlayer.STATE_STOPPED:
-                    this.setState({isPlaying: false, isStopped: true, isLoading: false});
-                    break;
-                case TrackPlayer.STATE_BUFFERING:
-                    this.setState({isPlaying: false, isStopped: false, isLoading: true});
-            }
-        });
-
-        TrackPlayer.addEventListener("playback-track-changed", params => {
-            this.refreshUI();
-        });
     }
 
     componentDidMount() {
         this.refreshUI();
+
+        this._unsub = [];
+        this._unsub.push(
+            TrackPlayer.addEventListener("playback-state", params => {
+                this.refreshUI();
+            })
+        );
+
+        this._unsub.push(
+            TrackPlayer.addEventListener("playback-track-changed", params => {
+                this.refreshUI();
+            })
+        );
+    }
+
+    componentWillUnmount() {
+        for (let i = 0; i < this._unsub.length; i++)
+            this._unsub[i].remove();
     }
 
     refreshUI = async() => {
         let id = await TrackPlayer.getCurrentTrack();
         if (id != null) {
-            let thisstate = {};
+            let newstate = {};
             let track = await TrackPlayer.getTrack(id);
             let state = await TrackPlayer.getState();
 
-            thisstate.track = track;
+            newstate.track = track;
             switch (state) {
                 case TrackPlayer.STATE_NONE:
                     break;
                 case TrackPlayer.STATE_PLAYING:
-                    thisstate.isPlaying = true;
-                    thisstate.isLoading = false;
+                    newstate.isPlaying = true;
+                    newstate.isLoading = false;
+                    newstate.isStopped = false;
                     break;
                 case TrackPlayer.STATE_PAUSED:
-                    thisstate.isPlaying = false;
-                    thisstate.isLoading = false;
+                    newstate.isPlaying = false;
+                    newstate.isLoading = false;
+                    newstate.isStopped = false;
                     break;
                 case TrackPlayer.STATE_STOPPED:
-                    thisstate.isStopped = true;
-                    thisstate.isPlaying = false;
-                    thisstate.isLoading = false;
-                    break;
+                    newstate.isPlaying = false;
+                    newstate.isLoading = false;
+                    newstate.isStopped = true;
+                    this.props.navigation.goBack();
+                    return;
                 case TrackPlayer.STATE_BUFFERING:
-                    thisstate.isPlaying = false;
-                    thisstate.isLoading = true;
+                    newstate.isPlaying = false;
+                    newstate.isLoading = true;
+                    newstate.isStopped = false;
                     break;
             }
 
-            this.setState(thisstate);
+            this.setState(newstate);
         }
     }
 
@@ -79,14 +80,11 @@ export default class MiniPlayer extends PureComponent{
     }
 
     onNext = () => {
-        TrackPlayer.skipToNext().then(this.refreshUI);
+        skip(true);
     }
 
     onPlay = () => {
-        if (this.state.isPlaying)
-            TrackPlayer.pause().then(this.refreshUI);
-        else
-            TrackPlayer.play().then(this.refreshUI);
+        setPlay(this.state.isPlaying);
     }
 
     onStop = () => {

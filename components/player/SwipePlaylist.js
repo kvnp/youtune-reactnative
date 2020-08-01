@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import { View, Text, StyleSheet, Pressable, Animated, Dimensions } from "react-native";
+import { FlatList } from "react-native-gesture-handler";
 
 export default class SwipePlaylist extends Component {
     constructor(props) {
@@ -32,41 +33,29 @@ export default class SwipePlaylist extends Component {
 
 
     render() {
-        const {
-            style,
-            minimumHeight,
-            maximumHeight,
-            onMinimize,
-            onMaximize,
-        } = this.props;
-        
         return (
-            <Animated.View style={[style, {height: this.state.scrollAnim}]}>
-                {this.state.isMinimized
-                    ?   <Pressable onPress={() => {
-                                        this.scrollUp();
-                                        onMaximize();
-                                    }} style={stylesRest.topAlign}>
-                            <View style={stylesRest.smallBar}/>
-                            <Text>WIEDERGABELISTE</Text>
-                        </Pressable>
+            <Animated.View style={[this.props.style, {height: this.state.scrollAnim}]}>
+                <Pressable onPress={this.scrollUp} style={this.state.isMinimized ?stylesRest.topAlign :{ display: "none"}}>
+                    <View style={stylesRest.smallBar}/>
+                    <Text>WIEDERGABELISTE</Text>
+                </Pressable>
 
-                    :   null
-                }
+                <FlatList
+                    style={stylesRest.playlistContainer}
 
-                <View style={stylesRest.playlistContainer}>
+                />
 
-                </View>
+                
 
 
-                <Pressable  onPress={() => {
-                                        this.scrollDown();
-                                        onMinimize();
-                                    }}
-
-                            style={this.state.isMinimized
-                                    ? {display: "none"}
-                                    : stylesRest.topAlign}
+                <Pressable
+                    onPress={this.scrollDown}
+                    
+                    style={
+                        this.state.isMinimized
+                            ? { display: "none" }
+                            : stylesRest.topAlign
+                    }
                 >
                     <Text>WIEDERGABELISTE</Text>
                     <View style={stylesRest.smallBar}/>
