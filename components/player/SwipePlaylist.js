@@ -1,6 +1,7 @@
 import React, { Component } from "react";
-import { View, Text, StyleSheet, Pressable, Animated, Dimensions } from "react-native";
-import { FlatList } from "react-native-gesture-handler";
+import { Image, View, Text, FlatList, StyleSheet, Pressable, Animated, Dimensions } from "react-native";
+import TrackPlayer from 'react-native-track-player';
+import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 
 export default class SwipePlaylist extends Component {
     constructor(props) {
@@ -8,7 +9,7 @@ export default class SwipePlaylist extends Component {
         this.state = {
             isMinimized: true,
             scrollAnim: new Animated.Value(this.props.minimumHeight)
-        }
+        };
     }
 
     scrollUp = () => {
@@ -19,7 +20,7 @@ export default class SwipePlaylist extends Component {
         }).start(({finished}) => {
             this.setState({isMinimized: false});
         });
-      };
+    };
     
     scrollDown = () => {
         Animated.timing(this.state.scrollAnim, {
@@ -35,14 +36,45 @@ export default class SwipePlaylist extends Component {
     render() {
         return (
             <Animated.View style={[this.props.style, {height: this.state.scrollAnim}]}>
-                <Pressable onPress={this.scrollUp} style={this.state.isMinimized ?stylesRest.topAlign :{ display: "none"}}>
+                <Pressable onPress={this.scrollUp} style={stylesRest.topAlign}>
                     <View style={stylesRest.smallBar}/>
                     <Text>WIEDERGABELISTE</Text>
                 </Pressable>
 
                 <FlatList
-                    style={stylesRest.playlistContainer}
+                    data={this.props.playlist}
+                    contentContainerStyle={{alignSelf: "flex-end"}}
+                    renderItem={
+                        ({item, index}) => <Pressable style={
+                                                    {
+                                                        height: 50,
+                                                        flexDirection: "row",
+                                                        alignItems: "center",
+                                                        marginBottom: 5,
+                                                        marginTop: 5
+                                                    }
+                                                }
+                                                 onPress={() => TrackPlayer.skip(item.id)}>
+                                                {this.props.track.id == item.id
+                                                    ? <MaterialIcons style={{width: 50, textAlign: "center"}} name="play-arrow" color="black" size={15}/>
+                                                    : <Text style={{width: 50, textAlign: "center"}}>{index}</Text>
+                                                }
+                                                <Image style={{height: 50, width: 50}} source={{uri: item.artwork}}/>
+                                                <View style={{width: 300}}>
+                                                    <Text>{item.title}</Text>
+                                                    <Text>{item.artist}</Text>
+                                                </View>
+                                            </Pressable>
+                    }
 
+                    ListEmptyComponent={
+                        <View style={{height: "100%", backgroundColor: "red", width: "100%"}}></View>
+                    }
+
+                    onRefresh={() => {}}
+                    refreshing={false}
+
+                    keyExtractor={item => item.id}
                 />
 
                 
@@ -57,7 +89,6 @@ export default class SwipePlaylist extends Component {
                             : stylesRest.topAlign
                     }
                 >
-                    <Text>WIEDERGABELISTE</Text>
                     <View style={stylesRest.smallBar}/>
                 </Pressable>
             </Animated.View>
@@ -67,9 +98,7 @@ export default class SwipePlaylist extends Component {
 
 
 const stylesRest = StyleSheet.create({
-    playlistContainer: {
-        flex: 1
-    },
+    playlistContainer: {height: 50, flexDirection: "row", backgroundColor: "red", width: "100%"},
 
     topAlign: {
         alignItems: "center",

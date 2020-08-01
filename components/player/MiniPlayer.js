@@ -62,8 +62,7 @@ export default class MiniPlayer extends PureComponent{
                     newstate.isPlaying = false;
                     newstate.isLoading = false;
                     newstate.isStopped = true;
-                    this.props.navigation.goBack();
-                    return;
+                    break;
                 case TrackPlayer.STATE_BUFFERING:
                     newstate.isPlaying = false;
                     newstate.isLoading = true;

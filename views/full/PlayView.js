@@ -21,7 +21,8 @@ export default class PlayView extends PureComponent {
             isRepeating: false,
             isStopped: true,
 
-            track: null
+            track: null,
+            playlist: null,
         };
     }
 
@@ -51,9 +52,12 @@ export default class PlayView extends PureComponent {
         let id = await TrackPlayer.getCurrentTrack();
         if (id != null) {
             let newstate = {};
+
+            let playlist = await TrackPlayer.getQueue();
             let track = await TrackPlayer.getTrack(id);
             let state = await TrackPlayer.getState();
 
+            newstate.playlist = playlist;
             newstate.track = track;
             switch (state) {
                 case TrackPlayer.STATE_NONE:
@@ -165,8 +169,8 @@ export default class PlayView extends PureComponent {
                 </View>
 
                 <SwipePlaylist minimumHeight={50}
-                               onMinimize={() => {}}
-                               onMaximize={() => {}}
+                               playlist={this.state.playlist}
+                               track={this.state.track}
                                style={stylesRest.container}/>
             </View>
         )
