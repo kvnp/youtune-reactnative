@@ -6,7 +6,8 @@ import TrackPlayer from "react-native-track-player";
 AppRegistry.registerComponent(name, () => App);
 
 TrackPlayer.registerPlaybackService();
-TrackPlayer.setupPlayer({
+TrackPlayer.setupPlayer();
+TrackPlayer.updateOptions({
     stopWithApp: true,
     alwaysPauseOnInterruption: true,
 
