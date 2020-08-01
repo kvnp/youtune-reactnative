@@ -137,6 +137,7 @@ export default class PlayView extends PureComponent {
     }
 
     handleSkip = async(array, index, forward) => {
+        let next;
         if (forward && index + 1 < array.length)
             next = index + 1;
         else if (!forward && index > 0)
@@ -159,7 +160,7 @@ export default class PlayView extends PureComponent {
         if (forward)
             TrackPlayer.skipToNext();
         else
-            TrackPlayer.skipToPrevious();
+            TrackPlayer.skipToPrevious().catch(() => TrackPlayer.seekTo(0));
     }
 
     skip = async(forward) => {
@@ -175,21 +176,17 @@ export default class PlayView extends PureComponent {
             }
         }
 
-        if (forward)
+        if (forward) {
             if (index < array.length)
                 this.handleSkip(array, index, forward);
 
-        else {
+        } else {
             let position = await TrackPlayer.getPosition();
 
             if (position > 10)
                 TrackPlayer.seekTo(0);
-            else {
-                if (id == 0)
-                    TrackPlayer.seekTo(0);
-                else
-                    this.handleSkip(array, index, forward);
-            }
+            else
+                this.handleSkip(array, index, forward);
         }
     }
   
