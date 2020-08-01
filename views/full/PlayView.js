@@ -131,30 +131,30 @@ export default class PlayView extends PureComponent {
                         <SeekBar navigation={this.props.navigation}/>
                         
                         <View style={stylesBottom.buttonContainer}>
-                        <Pressable onPress={() => {}} android_ripple={rippleConfig}>
-                            <MaterialIcons name="shuffle" color="black" size={30}/>
-                        </Pressable>
+                            <Pressable onPress={() => {}} android_ripple={rippleConfig}>
+                                <MaterialIcons name="shuffle" color="black" size={30}/>
+                            </Pressable>
 
-                        <Pressable onPress={() => skip(false)} android_ripple={rippleConfig}>
-                            <MaterialIcons name="skip-previous" color="black" size={40}/>
-                        </Pressable>
+                            <Pressable onPress={() => skip(false)} android_ripple={rippleConfig}>
+                                <MaterialIcons name="skip-previous" color="black" size={40}/>
+                            </Pressable>
 
-                        <Pressable onPress={this.state.isLoading ?null :() => setPlay(this.state.isPlaying)}
-                                android_ripple={rippleConfig}>
-                            {this.state.isLoading
-                                ? <ActivityIndicator color="black" size="small"/>
-                                : <MaterialIcons name={this.state.isPlaying ? "pause" : "play-arrow"} color="black" size={40}/>
-                            }
-                        </Pressable>
+                            <Pressable onPress={this.state.isLoading ?null :() => setPlay(this.state.isPlaying)}
+                                    android_ripple={rippleConfig}>
+                                {this.state.isLoading
+                                    ? <ActivityIndicator color="black" size="small"/>
+                                    : <MaterialIcons name={this.state.isPlaying ? "pause" : "play-arrow"} color="black" size={40}/>
+                                }
+                            </Pressable>
 
-                        <Pressable onPress={() => skip(true)} android_ripple={rippleConfig}>
-                            <MaterialIcons name="skip-next" color="black" size={40}/>
-                        </Pressable>
+                            <Pressable onPress={() => skip(true)} android_ripple={rippleConfig}>
+                                <MaterialIcons name="skip-next" color="black" size={40}/>
+                            </Pressable>
 
-                        <Pressable onPress={() => {}} android_ripple={rippleConfig}>
-                            <MaterialIcons name="repeat" color="black" size={30}/>
-                        </Pressable>
-                    </View>
+                            <Pressable onPress={() => {}} android_ripple={rippleConfig}>
+                                <MaterialIcons name="repeat" color="black" size={30}/>
+                            </Pressable>
+                        </View>
                         
                         <View style={stylesTop.topBit}>
                             <Pressable onPress={this.props.navigation.goBack} android_ripple={rippleConfig} style={stylesTop.topFirst}>
