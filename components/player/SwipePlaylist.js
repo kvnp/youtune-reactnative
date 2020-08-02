@@ -13,23 +13,26 @@ export default class SwipePlaylist extends Component {
     }
 
     scrollUp = () => {
-        Animated.timing(this.state.scrollAnim, {
-            toValue: Dimensions.get('window').height - 50,
-            duration: 150,
-            useNativeDriver: false
-        }).start(({finished}) => {
+        if (this.state.isMinimized) {
             this.setState({isMinimized: false});
-        });
+            Animated.timing(this.state.scrollAnim, {
+                toValue: Dimensions.get('window').height - 50,
+                duration: 150,
+                useNativeDriver: false
+            }).start();
+        }
+        
     };
     
     scrollDown = () => {
-        Animated.timing(this.state.scrollAnim, {
-            toValue: this.props.minimumHeight,
-            duration: 150,
-            useNativeDriver: false
-        }).start(({finished}) => {
-                this.setState({isMinimized: true});
-        });
+        if (!this.state.isMinimized) {
+            this.setState({isMinimized: true});
+            Animated.timing(this.state.scrollAnim, {
+                toValue: this.props.minimumHeight,
+                duration: 150,
+                useNativeDriver: false
+            }).start();
+        }
     };
 
 
@@ -37,13 +40,22 @@ export default class SwipePlaylist extends Component {
         return (
             <Animated.FlatList
                 style={[{height: this.state.scrollAnim}, this.props.style]}
-                contentContainerStyle={{}}
+                scrollEventThrottle={16}
+                onScroll={event => {
+                    const currentOffset = event.nativeEvent.contentOffset.y;
+                    const dif = currentOffset - (this.offset || 0);
+
+                    if (dif < 0 && currentOffset < 10)
+                        this.scrollDown();
+                }}
+
+                onScrollToTop={this.scrollDown}
 
                 data={this.props.playlist}
 
                 ListHeaderComponentStyle={stylesRest.topAlign}
                 ListHeaderComponent={
-                    <Pressable style={{alignSelf: "center", alignItems: "center", width: "100%"}} onPress={this.scrollUp}>
+                    <Pressable onPress={this.scrollUp}>
                         <View style={stylesRest.smallBar}/>
                         <Text>WIEDERGABELISTE</Text>
                     </Pressable>
@@ -56,35 +68,31 @@ export default class SwipePlaylist extends Component {
                     </Pressable>
                 }
 
-                onRefresh={() => {}}
-                refreshing={false}
-
                 keyExtractor={item => item.id}
-                contentContainerStyle={{alignSelf: "flex-end"}}
-                renderItem={
-                    this.state.isMinimized
-                        ? null
-                        : ({item, index}) => <Pressable style={
-                                                    {
-                                                        height: 50,
-                                                        flexDirection: "row",
-                                                        alignItems: "center",
-                                                        marginBottom: 5,
-                                                        marginTop: 5
-                                                    }
-                                                }
+                contentContainerStyle={{width: "100%", paddingHorizontal: 10}}
+                renderItem={({item, index}) => 
+                    <Pressable style={{
+                                    height: 50,
+                                    flexDirection: "row",
+                                    alignItems: "center",
+                                    marginVertical: 5
+                                }}
 
-                                                onPress={() => TrackPlayer.skip(item.id)}>
-                                                {this.props.track.id == item.id
-                                                    ? <MaterialIcons style={{width: 50, textAlign: "center"}} name="play-arrow" color="black" size={15}/>
-                                                    : <Text style={{width: 50, textAlign: "center"}}>{index}</Text>
-                                                }
-                                                <Image style={{height: 50, width: 50}} source={{uri: item.artwork}}/>
-                                                <View style={{width: 300}}>
-                                                    <Text>{item.title}</Text>
-                                                    <Text>{item.artist}</Text>
-                                                </View>
-                                            </Pressable>
+                                onPress={() => TrackPlayer.skip(item.id).then(() => TrackPlayer.play())}
+                    >
+                        {
+                            this.props.track.id == item.id
+                                ? <MaterialIcons style={{width: 30, textAlign: "center", textAlignVertical: "center"}} name="play-arrow" color="black" size={20}/>
+                                : <Text style={{width: 30, textAlign: "center", fontSize: 15}}>{index + 1}</Text>
+                        }
+
+                        <Image style={{height: 50, width: 50, marginRight: 10}} source={{uri: item.artwork}}/>
+
+                        <View style={{width: 0, flexGrow: 1, flex: 1}}>
+                            <Text>{item.title}</Text>
+                            <Text>{item.artist}</Text>
+                        </View>
+                    </Pressable>
                 }
             />
         );
@@ -93,10 +101,11 @@ export default class SwipePlaylist extends Component {
 
 
 const stylesRest = StyleSheet.create({
-    playlistContainer: {height: 50, flexDirection: "row", backgroundColor: "red", width: "100%"},
+    playlistContainer: {height: 50, flexDirection: "row", width: "100%"},
 
     topAlign: {
-        alignItems: "center",
+        alignSelf: "center",
+        marginBottom: 10
     },
 
     smallBar: {

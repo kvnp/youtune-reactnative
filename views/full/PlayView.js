@@ -182,14 +182,12 @@ export default class PlayView extends PureComponent {
 const stylesRest = StyleSheet.create({
     container: {
         backgroundColor: "darkgray",
-        flexDirection: "column",
-        width: "100%",
         paddingBottom: 10,
         borderTopRightRadius: 15,
         borderTopLeftRadius: 15,
-        alignSelf: "flex-end",
         position: "absolute",
         bottom: 0,
+        width: "100%",
     },
 });
 
