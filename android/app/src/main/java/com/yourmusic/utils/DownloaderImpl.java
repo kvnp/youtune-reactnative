@@ -17,7 +17,7 @@ import org.schabi.newpipe.extractor.downloader.Response;
 import org.schabi.newpipe.extractor.exceptions.ReCaptchaException;
 
 public class DownloaderImpl extends Downloader {
-    private static final String USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101 Firefox/68.0";
+    private static final String USER_AGENT = "Mozilla/5.0 (X11; Linux x86_64; rv:79.0) Gecko/20100101 Firefox/79.0";
     private static DownloaderImpl instance;
 
     private DownloaderImpl() {}
@@ -49,10 +49,7 @@ public class DownloaderImpl extends Downloader {
 
         httpURLConnection.setRequestMethod(httpMethod);
         httpURLConnection.setRequestProperty("User-Agent", USER_AGENT);
-        httpURLConnection.setUseCaches(false);
         httpURLConnection.setDoInput(true);
-        if (dataToSend != null)
-            httpURLConnection.setDoOutput(true);
 
         for (Map.Entry<String, List<String>> pair : headers.entrySet()) {
             final String headerName = pair.getKey();
@@ -74,6 +71,7 @@ public class DownloaderImpl extends Downloader {
         }
 
         if (dataToSend != null) {
+            httpURLConnection.setDoOutput(true);
             OutputStream outStream = httpURLConnection.getOutputStream();
             outStream.write(dataToSend);
             outStream.flush();
@@ -81,15 +79,24 @@ public class DownloaderImpl extends Downloader {
         }
 
         if (httpURLConnection.getResponseCode() == 429)
-            throw new ReCaptchaException("reCaptcha Challenge requested", url);
+            throw new ReCaptchaException("reCaptcha Challenge requested", httpURLConnection.getURL().toString());
 
         BufferedReader in = new BufferedReader(new InputStreamReader(httpURLConnection.getInputStream()));
         String inputLine;
 
-        StringBuffer responseBody = new StringBuffer();
+        StringBuilder responseBody = new StringBuilder();
         while ((inputLine = in.readLine()) != null) {
             responseBody.append(inputLine);
         } in.close();
+
+        System.out.println(
+            "moooin" + "\n" +
+            httpURLConnection.getResponseCode() + "\n" +
+            httpURLConnection.getResponseMessage() + "\n" +
+            httpURLConnection.getHeaderFields().toString() + "\n" +
+            responseBody.toString() + "\n" +
+            httpURLConnection.getURL().toString() + "\n"
+        );
 
         return new Response(
             httpURLConnection.getResponseCode(),

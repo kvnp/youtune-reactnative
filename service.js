@@ -1,12 +1,3 @@
-/**
- * This is the code that will run tied to the player.
- *
- * The code here might keep running in the background.
- *
- * You should put everything here that should be tied to the playback but not the UI
- * such as processing media buttons or analytics
- */
-
 import TrackPlayer from 'react-native-track-player';
 import { NativeModules } from 'react-native';
 import { fetchNext } from "./modules/remote/API";
@@ -19,7 +10,7 @@ var isRepeating = false;
 function resolveUrl(id) {
     return new Promise(
         (resolve, reject) => {
-            LinkBridge.getString(
+            LinkBridge.getLink(
                 YOUTUBE_WATCH + id,
                 url => resolve(url)
             );
@@ -91,30 +82,34 @@ export const skip = async(forward) => {
     }
 }
 
-export function startPlayback({ playlistId, videoId }) {
-    fetchNext(videoId, playlistId).then(
-        playlist => getUrl(playlist.list[playlist.index].id)
-            .then(async(url) => {
+export async function startPlayback({ playlistId, videoId }) {
+    return new Promise(
+        async(resolve, reject) => {
+            let playlist = await fetchNext(videoId, playlistId);
+            let url = await getUrl(playlist.list[playlist.index].id);
+            console.log(url);
+            if (url != null) {
                 playlist.list[playlist.index].url = url;
                 await TrackPlayer.reset();
+
                 for (let i = 0; i < playlist.list.length; i++) {
                     let track = playlist.list[i];
                     track.url = await getUrl(track.id);
                     
                     await TrackPlayer.add(track);
-
                     if (i == playlist.index)
                         await TrackPlayer.skip(playlist.list[playlist.index].id);
                         TrackPlayer.play();
                 }
-            })
+                resolve(true);
+            } else
+                reject({playlistId, videoId});
+        }
     );
-    return;
+    
 }
 
 export function setPlay(isPlaying) {
-    if (isPlaying)
-        TrackPlayer.pause();
-    else
-        TrackPlayer.play();
+    if (isPlaying)  TrackPlayer.pause();
+    else            TrackPlayer.play();
 }

@@ -95,7 +95,9 @@ export default class PlayView extends PureComponent {
                 isLoading: true,
                 isStopped: false
             });
-            startPlayback(this.props.route.params);
+            startPlayback(this.props.route.params)
+                .catch(params => this.props.navigation.navigate("Captcha", params));
+
             this.props.route.params = undefined;
         }
 
@@ -181,15 +183,13 @@ const stylesRest = StyleSheet.create({
     container: {
         backgroundColor: "darkgray",
         flexDirection: "column",
-        justifyContent: "center",
         width: "100%",
         paddingBottom: 10,
-        alignItems: "center",
         borderTopRightRadius: 15,
         borderTopLeftRadius: 15,
-
+        alignSelf: "flex-end",
         position: "absolute",
-        bottom: 0
+        bottom: 0,
     },
 });
 
