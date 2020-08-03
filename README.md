@@ -1,6 +1,6 @@
-- YourMusic on Android
+- YouTune on Android
 
-git clone https://git.kvnp.eu/kevinpfeifer/yourmusic-reactnative
+git clone https://git.kvnp.eu/kevinpfeifer/youtune-reactnative
 cd yourmusic-reactnative && npm install && react-native start
 
-Open ./yourmusic-reactnative/android in Android Studio and start the app with AVD
+Open ./youtune-reactnative/android in Android Studio and start the app with AVD

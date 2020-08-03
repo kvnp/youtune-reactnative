@@ -1,5 +1,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-  package="com.yourmusic">
+        xmlns:tools="http://schemas.android.com/tools"
+        package="com.youtune">
 
     <uses-permission android:name="android.permission.INTERNET" />
 
