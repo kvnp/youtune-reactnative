@@ -1,5 +1,4 @@
 export const rippleConfig = {
-    color: "white",
+    color: "darkgray",
     borderless: true,
-    radius: 50
 };

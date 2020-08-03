@@ -5,12 +5,11 @@ import {
     View,
     TextInput,
     Keyboard,
-    Pressable
+    Pressable,
+    ActivityIndicator
 } from 'react-native';
 
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
-
-import { ActivityIndicator } from 'react-native-paper';
 
 import { searchBarStyle, specificStyle } from '../../styles/Search';
 import { resultHomeStyle, preResultHomeStyle } from '../../styles/Home';

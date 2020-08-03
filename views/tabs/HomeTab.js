@@ -4,16 +4,18 @@ import {
     Text,
     Pressable,
     FlatList,
-    View
+    View,
+    ActivityIndicator
 } from 'react-native';
 
-import { refreshStyle, preResultHomeStyle } from '../../styles/Home';
 import { fetchHome } from "../../modules/remote/API";
-import { shelvesStyle } from '../../styles/Shelves';
+
 import Shelf from '../../components/shared/Shelf';
-import { ActivityIndicator } from 'react-native-paper';
 import MiniPlayer from '../../components/player/MiniPlayer';
+
 import { appColor } from '../../styles/App';
+import { shelvesStyle } from '../../styles/Shelves';
+import { refreshStyle, preResultHomeStyle } from '../../styles/Home';
 
 export default class HomeTab extends PureComponent {
     constructor(props) {

@@ -1,9 +1,7 @@
 import React from "react";
 
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
-import { Pressable, View } from "react-native";
-
-import { ActivityIndicator } from 'react-native-paper';
+import { Pressable, View, ActivityIndicator } from "react-native";
 
 import { rippleConfig } from "../../styles/Ripple";
 

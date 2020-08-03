@@ -4,11 +4,11 @@ import {
     StyleSheet,
     View,
     Text,
-    Pressable
+    Pressable,
+    Modal
 } from "react-native";
 
 import Playlist from '../../components/shared/Playlist';
-import { Modal } from "react-native-paper";
 import PlaylistCreator from "../../components/overlay/PlaylistCreator";
 import { rippleConfig } from "../../styles/Ripple";
 

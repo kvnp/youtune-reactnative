@@ -32,7 +32,7 @@ export default ({ callback }) => {
                                       onPress={() => callback() }>
                         <Text style={styles.headerButtonText}>ABBRECHEN</Text>
                     </Pressable>
-                    <Pressable android_ripple={rippleConfig}style={styles.headerButton}
+                    <Pressable android_ripple={rippleConfig} style={styles.headerButton}
                                       onPress={() =>  {
                                             if (title.length > 0 && description.length > 0) {
                                                 callback({title: title, description: description});

@@ -1,8 +1,7 @@
 import React, { PureComponent } from "react";
-import { View, Text, StyleSheet, Image, Pressable } from "react-native";
+import { View, Text, StyleSheet, Image, Pressable, ActivityIndicator, Dimensions } from "react-native";
 import TrackPlayer from 'react-native-track-player';
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
-import { ActivityIndicator } from "react-native-paper";
 
 import SeekBar from "../../components/player/SeekBar";
 import SwipePlaylist from "../../components/player/SwipePlaylist";
@@ -109,63 +108,66 @@ export default class PlayView extends PureComponent {
             var {title, artist, artwork} = this.state.track;
 
         return (
-            <View style={stylesTop.mainView}>
+            <>
                 <View style={stylesTop.vertContainer}>
-                    <View style={stylesMid.midBit}>
-                        <Image style={stylesMid.midImage} source={{uri: artwork}}/>
+                    <View style={imageStyles.view}>
+                        <Image style={imageStyles.image} source={{uri: artwork}}/>
                     </View>
 
                     <View style={stylesBottom.bottomBit}>
-                        <View style={stylesBottom.songContainer}>
-                            <Pressable onPress={() => {}} android_ripple={rippleConfig}>
-                                <MaterialIcons name="thumb-down" color="darkgray" size={30}/>
-                            </Pressable>
+                        <View style={{width: Dimensions.get("screen").height * 0.39}}>
+                            <View style={controlStyles.container}>
+                                <Pressable onPress={() => {}} android_ripple={rippleConfig}>
+                                    <MaterialIcons name="thumb-down" color="darkgray" size={30}/>
+                                </Pressable>
 
-                            <Text numberOfLines={1} style={stylesBottom.titleText}>{title}</Text>
+                                <View style={{alignItems: "center", flex: 1}}>
+                                    <Text numberOfLines={1} style={stylesBottom.titleText}>{title}</Text>
+                                    <Text numberOfLines={1} style={stylesBottom.subtitleText}>{artist}</Text>
+                                </View>
 
-                            <Pressable onPress={() => {}} android_ripple={rippleConfig}>
-                                <MaterialIcons name="thumb-up" color="darkgray" size={30}/>
-                            </Pressable>
-                        </View>
+                                <Pressable onPress={() => {}} android_ripple={rippleConfig}>
+                                    <MaterialIcons name="thumb-up" color="darkgray" size={30}/>
+                                </Pressable>
+                            </View>
 
-                        <Text numberOfLines={1} style={stylesBottom.subtitleText}>{artist}</Text>
+                            <SeekBar navigation={this.props.navigation}/>
+                            
+                            <View style={stylesBottom.buttonContainer}>
+                                <Pressable onPress={() => {}} android_ripple={rippleConfig}>
+                                    <MaterialIcons name="shuffle" color="black" size={30}/>
+                                </Pressable>
 
-                        <SeekBar navigation={this.props.navigation}/>
-                        
-                        <View style={stylesBottom.buttonContainer}>
-                            <Pressable onPress={() => {}} android_ripple={rippleConfig}>
-                                <MaterialIcons name="shuffle" color="black" size={30}/>
-                            </Pressable>
+                                <Pressable onPress={() => skip(false)} android_ripple={rippleConfig}>
+                                    <MaterialIcons name="skip-previous" color="black" size={40}/>
+                                </Pressable>
 
-                            <Pressable onPress={() => skip(false)} android_ripple={rippleConfig}>
-                                <MaterialIcons name="skip-previous" color="black" size={40}/>
-                            </Pressable>
-
-                            <Pressable onPress={this.state.isLoading ?null :() => setPlay(this.state.isPlaying)}
-                                    android_ripple={rippleConfig}>
                                 {this.state.isLoading
-                                    ? <ActivityIndicator color="black" size="small"/>
-                                    : <MaterialIcons name={this.state.isPlaying ? "pause" : "play-arrow"} color="black" size={40}/>
+                                    ?   <ActivityIndicator color="black" size="large"/>
+
+                                    :   <Pressable onPress={() => setPlay(this.state.isPlaying)} android_ripple={rippleConfig}>
+                                            <MaterialIcons name={this.state.isPlaying ? "pause" : "play-arrow"} color="black" size={40}/>
+                                        </Pressable>
                                 }
-                            </Pressable>
 
-                            <Pressable onPress={() => skip(true)} android_ripple={rippleConfig}>
-                                <MaterialIcons name="skip-next" color="black" size={40}/>
-                            </Pressable>
+                                <Pressable onPress={() => skip(true)} android_ripple={rippleConfig}>
+                                    <MaterialIcons name="skip-next" color="black" size={40}/>
+                                </Pressable>
 
-                            <Pressable onPress={() => {}} android_ripple={rippleConfig}>
-                                <MaterialIcons name="repeat" color="black" size={30}/>
-                            </Pressable>
-                        </View>
-                        
-                        <View style={stylesTop.topBit}>
-                            <Pressable onPress={this.props.navigation.goBack} android_ripple={rippleConfig} style={stylesTop.topFirst}>
-                                <MaterialIcons name="keyboard-arrow-down" color={"black"} size={30}/>
-                            </Pressable>
+                                <Pressable onPress={() => {}} android_ripple={rippleConfig}>
+                                    <MaterialIcons name="repeat" color="black" size={30}/>
+                                </Pressable>
+                            </View>
 
-                            <Pressable android_ripple={rippleConfig} style={stylesTop.topThird}>
-                                <MaterialIcons name="more-vert" color={"black"} size={30}/>
-                            </Pressable>
+                            <View style={{justifyContent: "space-between", flexDirection: "row", paddingTop: 30}}>
+                                <Pressable onPress={this.props.navigation.goBack} android_ripple={rippleConfig} style={stylesTop.topFirst}>
+                                    <MaterialIcons name="keyboard-arrow-down" color={"black"} size={30}/>
+                                </Pressable>
+
+                                <Pressable android_ripple={rippleConfig} style={stylesTop.topThird}>
+                                    <MaterialIcons name="more-vert" color={"black"} size={30}/>
+                                </Pressable>
+                            </View>
                         </View>
                     </View>
                 </View>
@@ -174,14 +176,14 @@ export default class PlayView extends PureComponent {
                                playlist={this.state.playlist}
                                track={this.state.track}
                                style={stylesRest.container}/>
-            </View>
+            </>
         )
     }
 }
 
 const stylesRest = StyleSheet.create({
     container: {
-        backgroundColor: "darkgray",
+        backgroundColor: appColor.background.backgroundColor,
         paddingBottom: 10,
         borderTopRightRadius: 15,
         borderTopLeftRadius: 15,
@@ -193,24 +195,16 @@ const stylesRest = StyleSheet.create({
 
 const stylesBottom = StyleSheet.create({
     bottomBit: {
-        paddingTop: 20,
-        flexGrow: 1,
-        flex: 1,
-    },
-
-    songContainer: {
-        paddingTop: 20,
-        flexDirection: "row",
-        justifyContent: "space-between",
-        alignItems: "center"
+        height: Dimensions.get("screen").height * 0.39,
+        alignItems: "center",
+        justifyContent: "center",
+        alignSelf: "stretch",
     },
 
     subtitleText: {
         paddingTop: 5,
         alignSelf: "center",
         overflow: "hidden",
-        paddingLeft: 10,
-        paddingRight: 10,
         width: "80%",
         textAlign: "center",
     },
@@ -219,76 +213,64 @@ const stylesBottom = StyleSheet.create({
         fontSize: 25,
         fontWeight: "bold",
         overflow: "hidden",
-        paddingLeft: 10,
-        paddingRight: 10,
         width: "80%",
         textAlign: "center",
     },
 
     buttonContainer: {
-        paddingTop: 20,
         flexDirection: "row",
         alignItems: "center",
-        justifyContent: "space-between"
+        justifyContent: "space-between",
+        paddingTop: 20
     }
 });
 
-const stylesMid = StyleSheet.create({
-    midBit: {
-        flex: 1,
-        justifyContent: "center",
-        alignItems: "center"
+const imageStyles = StyleSheet.create({
+    view: {
+        alignItems: "center",
+        alignSelf: "stretch",
+        height: Dimensions.get("screen").height * 0.39
     },
 
-    midImage: {
-        width: "100%",
-        height: undefined,
+    image: {
+        //width: Dimensions.get("screen").height * 0.39,
+        height: "100%",
         aspectRatio: 1,
         backgroundColor: appColor.background.backgroundColor
     }
 });
 
+const controlStyles = StyleSheet.create({
+    container: {
+        flexDirection: "row",
+        justifyContent: "space-between",
+        alignItems: "center"
+    },
+});
+
 
 const stylesTop = StyleSheet.create({
-    mainView: {
-        paddingTop: 50,
-        flex: 1
-    },
-
-    topBit: {
-        height: 90,
-        flexDirection: "row",
-        alignItems: "center",
-        justifyContent: "space-between",
-    },
-
     topSecond: {
         flexDirection: "row",
         backgroundColor: "brown",
-        paddingLeft: 10,
-        paddingRight: 10,
-        paddingBottom: 5,
-        paddingTop: 5,
-        borderRadius: 25,
     },
 
     topSecondTextOne: {
         fontWeight: "bold",
         color: "white",
-        paddingLeft: 15,
-        paddingRight: 15,
     },
 
     topSecondTextTwo: {
         fontWeight: "bold",
         color: "white",
-        paddingLeft: 15,
-        paddingRight: 15,
     },
 
     vertContainer: {
-        flex: 1,
-        marginLeft: 50,
-        marginRight: 50,
+        height: "100%",
+        width: "100%",
+        flexWrap: "wrap",
+        alignContent: "stretch",
+        justifyContent: "center",
+        paddingBottom: 30
     }
 });
