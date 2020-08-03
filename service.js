@@ -24,7 +24,6 @@ export async function getUrl(id) {
 }
 
 export const setRepeat = boolean => {
-    console.log("repeat: " + isRepeating);
     isRepeating = boolean;
 }
 
@@ -87,7 +86,6 @@ export async function startPlayback({ playlistId, videoId }) {
         async(resolve, reject) => {
             let playlist = await fetchNext(videoId, playlistId);
             let url = await getUrl(playlist.list[playlist.index].id);
-            console.log(url);
             if (url != null) {
                 playlist.list[playlist.index].url = url;
                 await TrackPlayer.reset();

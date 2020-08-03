@@ -28,7 +28,7 @@ const doSeek = async(value) => {
     await TrackPlayer.seekTo(value);
 }
 
-export default ({navigation}) => {
+export default ({navigation, style}) => {
     var { position, bufferedPosition, duration } = useTrackPlayerProgress();
     React.useEffect(() => {
         const unsub = navigation.addListener('focus', async() => {
@@ -42,7 +42,7 @@ export default ({navigation}) => {
     const elapsed = minutesAndSeconds(position);
     const remaining = minutesAndSeconds(duration - position);
     return (
-        <View style={styles.container}>
+        <View style={[styles.container, style]}>
             <Slider
                 maximumValue={Math.max(duration, 1, position + 1)}
                 onSlidingComplete={async(value) => await doSeek(value)}

@@ -199,6 +199,7 @@ const stylesBottom = StyleSheet.create({
         alignItems: "center",
         justifyContent: "center",
         alignSelf: "stretch",
+        paddingTop: 30
     },
 
     subtitleText: {
