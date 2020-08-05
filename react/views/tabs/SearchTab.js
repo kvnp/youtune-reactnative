@@ -23,14 +23,16 @@ export default class SearchTab extends PureComponent {
     constructor(props) {
         super(props);
         this.state = {
-            message: "",
-            suggestion: [],
             shelves: [],
 
             query: null,
             oldQuery: null,
+            buttonDisabled: true,
             loading: false,
-            buttonDisabled: true
+
+            message: "",
+            suggestion: null,
+            instead: null,
         };
     }
 
@@ -57,16 +59,22 @@ export default class SearchTab extends PureComponent {
         Keyboard.dismiss();
         if (this.state.query.length > 0) {
             this.setState({buttonDisabled: true, loading: true, oldQuery: this.state.query});
+            console.log("suche nach " + this.state.query);
             fetchResults(this.state.query)
-                .then(data => {
-                    if (data.results > 0)
-                        this.setState({shelves: data.shelves, loading: false});
-                    else
-                        this.setState({suggestion: data.suggestion, message: data.reason, loading: false});
-
-                    this.forceUpdate();
-                });
+                .then(data => this.setState(
+                    {
+                        shelves: data.shelves,
+                        suggestion: data.suggestion,
+                        instead: data.insteadOption,
+                        suggestion: data.suggestionOption,
+                        loading: false
+                    }));
         }
+    }
+
+    searchInstead = async(query) => {
+        await this.setState({query: query, message: null, instead: null, suggestion: null});
+        this.search();
     }
 
     render() {
@@ -97,10 +105,8 @@ export default class SearchTab extends PureComponent {
                     this.state.oldQuery == null
                         ? undefined
                         : () => {
-                            if (this.state.query != this.state.oldQuery) {
+                            if (this.state.query != this.state.oldQuery)
                                 this.setState({query: this.state.oldQuery});
-                                this.forceUpdate();
-                            }
                             
                             this.search();
                         }
@@ -110,8 +116,48 @@ export default class SearchTab extends PureComponent {
                 renderItem={({ item }) =>  <Entry entry={item} navigation={this.props.navigation}/>}
             />
 
+            {this.state.instead != null
+                ? <View style={searchBarStyle.suggestion}>
+                    <Pressable style={searchBarStyle.suggestionContainer} onPress={() => this.searchInstead(this.state.instead.endpoints.corrected.query)}>
+                        <Text style={{color: "white"}}>{this.state.instead.endpoints.corrected.text}</Text>
+                        <Text style={{color: "white"}}>
+                        {this.state.instead.correctedList
+                                .map(entry => <Text style={entry.italics ? {fontWeight: "bold"} :null}>{entry.text}</Text>)}
+                        </Text>
+                    </Pressable>
+
+                    <Pressable style={searchBarStyle.suggestionContainer} onPress={() => this.searchInstead(this.state.instead.endpoints.original.query)}>
+                        <Text style={{color: "white"}}>{this.state.instead.endpoints.original.text}</Text>
+                        <Text style={{color: "white"}}>
+                            {this.state.instead.originalList
+                                .map(entry => <Text style={entry.italics ? {fontWeight: "bold"} :null}>{entry.text}</Text>)}
+                        </Text>
+                    </Pressable>
+
+                </View>
+
+                : null
+            }
+
+            {this.state.suggestion != null
+                ? <View style={searchBarStyle.suggestion}>
+                    <Pressable style={[searchBarStyle.suggestionContainer, {width: "25%"}]} onPress={() => this.searchInstead(this.state.suggestion.endpoints.query)}>
+                        <Text style={{color: "white"}}>{this.state.suggestion.endpoints.text}</Text>
+                        <Text style={{color: "white"}}>
+                            {this.state.suggestion.correctedList
+                                .map(entry => <Text style={entry.italics ? {fontWeight: "bold"} :null}>{entry.text}</Text>)}
+                        </Text>
+                    </Pressable>
+
+                </View>
+
+                : null
+            }
+
+            
+
+            {this.getSpecificButtons()}
             <View style={searchBarStyle.container}>
-                {this.getSpecificButtons()}
                 <TextInput style={searchBarStyle.input}
                             placeholder="Search"
                             value={this.state.query}

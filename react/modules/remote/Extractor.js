@@ -4,35 +4,58 @@ import Playlist from "../models/music/playlist";
 import { decodeNestedURI } from "../utils/Decoder";
 
 export function digestSearchResults(json) {
-    let final = {results: 0, suggestion: [], reason: null, shelves: []};
+    let final = {
+        results: 0,
+        shelves: [],
+        insteadOption: null,
+        suggestionOption: null,
+        reason: null
+    };
 
     let sectionList = json.contents.sectionListRenderer.contents;
-
     if (sectionList[0].hasOwnProperty("itemSectionRenderer")) {
 
-        let itemSection = sectionList[0].itemSectionRenderer.contents;
-        if (itemSection[0].hasOwnProperty("messageRenderer")) {
-            let message = itemSection[0].messageRenderer.text.runs[0].text;
+        let itemSection = sectionList[0].itemSectionRenderer.contents[0];
+        
+        if (itemSection.hasOwnProperty("messageRenderer")) {
+            let message = itemSection.messageRenderer.text.runs[0].text;
             final.reason = message;
             return final;
 
-        } else if (itemSection[0].hasOwnProperty("didYouMeanRenderer")) {
-            let suggestionlist = itemSection[0].didYouMeanRenderer.correctedQuery.runs;
+        } else if (itemSection.hasOwnProperty("didYouMeanRenderer")) {
+            final.suggestionOption = {correctedList: [], endpoints: {text: "", query: ""}};
+            let renderer = itemSection.didYouMeanRenderer;
 
-            for (let sgg = 0; sgg < suggestionlist.length; sgg++) {
-                let suggestion = {text: null, italics: null};
+            final.suggestionOption.endpoints.query = renderer.correctedQueryEndpoint.searchEndpoint.query;
+            for (let dym = 0; dym < renderer.didYouMean.runs.length; dym++)
+                final.suggestionOption.endpoints.text += renderer.didYouMean.runs[dym].text;
+            
+            
+            for (let crq = 0; crq < renderer.correctedQuery.runs.length; crq++)
+                final.suggestionOption.correctedList.push(renderer.correctedQuery.runs[crq]);
+            
 
-                let text = suggestionlist[sgg].text;
-                let correction = false;
+        } else if (itemSection.hasOwnProperty("showingResultsForRenderer")) {
+            final.insteadOption = {correctedList: [], originalList: [], endpoints: {corrected: {text: "", query: ""}, original: {text: "", query: ""}}};
 
-                if (suggestionlist[sgg].hasOwnProperty("italics"))
-                    correction = suggestionlist[sgg].italics
+            let renderer = itemSection.showingResultsForRenderer;
 
-                suggestion.text = text;
-                suggestion.italics = correction;
+            for (let srf = 0; srf < renderer.showingResultsFor.runs.length; srf++)
+                final.insteadOption.endpoints.corrected.text += renderer.showingResultsFor.runs[srf].text;
 
-                final.suggestion.push(suggestion);
+            for (let sif = 0; sif < renderer.searchInsteadFor.runs.length; sif++)
+                final.insteadOption.endpoints.original.text += renderer.searchInsteadFor.runs[sif].text;
+
+            for (let cq = 0; cq < renderer.correctedQuery.runs.length; cq++) {
+                final.insteadOption.correctedList.push(renderer.correctedQuery.runs[cq]);
+                final.insteadOption.endpoints.corrected.query += renderer.correctedQuery.runs[cq].text;
             }
+
+            for (let oq = 0; oq < renderer.originalQuery.runs.length; oq++) {
+                final.insteadOption.originalList.push(renderer.originalQuery.runs[oq]);
+                final.insteadOption.endpoints.original.query += renderer.originalQuery.runs[oq].text;
+            }
+
         }
     }
 

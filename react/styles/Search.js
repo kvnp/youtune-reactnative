@@ -31,6 +31,27 @@ export const searchBarStyle = StyleSheet.create({
         borderTopLeftRadius: 25,
         borderBottomLeftRadius: 25,
         elevation: 1
+    },
+
+    suggestion: {
+        height: 50,
+        width: "100%",
+        backgroundColor: appColor.background.backgroundColor,
+        justifyContent: "center",
+        flexDirection: "row"
+    },
+
+    suggestionContainer: {
+        flex: 1,
+        backgroundColor: "rgba(25, 25, 25, 0.5)",
+        borderRadius: 25,
+        margin: 5,
+        borderWidth: 1,
+        flexDirection: "column",
+        justifyContent: "center",
+        alignItems: "center",
+        alignSelf: "stretch",
+        elevation: 1
     }
 });
 
