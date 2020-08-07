@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { Image, View, Text, StyleSheet, Pressable, Animated, Dimensions } from "react-native";
-import TrackPlayer from 'react-native-track-player';
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
+import { skipTo } from "../../service";
 
 export default class SwipePlaylist extends Component {
     constructor(props) {
@@ -82,7 +82,7 @@ export default class SwipePlaylist extends Component {
                                                 marginVertical: 5
                                             }}
 
-                                            onPress={() => TrackPlayer.skip(item.id).then(() => TrackPlayer.play())}
+                                            onPress={() => skipTo(item.id)}
                                 >
                                     {
                                         this.props.track.id == item.id

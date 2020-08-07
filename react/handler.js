@@ -8,9 +8,17 @@
  */
 
 import TrackPlayer from 'react-native-track-player';
-import { skip } from './service';
+import { skip, isRepeating } from './service';
 
 module.exports = async function() {
+    TrackPlayer.addEventListener("playback-track-changed", params => {
+        console.log(params);
+        if (typeof params.nextTrack == "string" && typeof params.track == "string" && isRepeating) {
+            console.log("skipped");
+            TrackPlayer.skipToPrevious();
+        }
+    });
+
     TrackPlayer.addEventListener("playback-queue-ended", params => {
         //console.log("queue ended");
     });

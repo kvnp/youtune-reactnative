@@ -8,7 +8,8 @@ import SwipePlaylist from "../../components/player/SwipePlaylist";
 
 import { rippleConfig } from "../../styles/Ripple";
 import { appColor } from "../../styles/App";
-import { startPlayback, skip, setPlay } from "../../service";
+import { startPlayback, skip, setPlay, setRepeat } from "../../service";
+import { isRepeating } from "../../service";
 
 export default class PlayView extends PureComponent {
     constructor(props) {
@@ -84,8 +85,18 @@ export default class PlayView extends PureComponent {
                     break;
             }
 
+            if (isRepeating)
+                newstate.isRepeating = true;
+            else
+                newstate.isRepeating = false;
+
             this.setState(newstate);
         }
+    }
+
+    setRepeat = () => {
+        setRepeat(!isRepeating);
+        this.setState({isRepeating: isRepeating});
     }
 
     render() {
@@ -154,8 +165,8 @@ export default class PlayView extends PureComponent {
                                     <MaterialIcons name="skip-next" color="black" size={40}/>
                                 </Pressable>
 
-                                <Pressable onPress={() => {}} android_ripple={rippleConfig}>
-                                    <MaterialIcons name="repeat" color="black" size={30}/>
+                                <Pressable onPress={this.setRepeat} android_ripple={rippleConfig}>
+                                    <MaterialIcons name={this.state.isRepeating ?"repeat-one" :"repeat"} color="black" size={30}/>
                                 </Pressable>
                             </View>
 

@@ -55,7 +55,6 @@ export function digestSearchResults(json) {
                 final.insteadOption.originalList.push(renderer.originalQuery.runs[oq]);
                 final.insteadOption.endpoints.original.query += renderer.originalQuery.runs[oq].text;
             }
-
         }
     }
 
@@ -96,9 +95,8 @@ export function digestSearchResults(json) {
                     let textList = flexColumn.text.runs;
 
                     let text = "";
-                    for (let txt = 0; txt < textList.length; txt++) {
+                    for (let txt = 0; txt < textList.length; txt++)
                         text += textList[txt].text;
-                    }
 
                     if (fcl == 0)
                         entry.title = text;

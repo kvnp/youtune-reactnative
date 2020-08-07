@@ -9,6 +9,7 @@ import {
 import TrackPlayer, { useTrackPlayerProgress } from 'react-native-track-player';
 import Slider from "@react-native-community/slider";
 import { appColor } from '../../styles/App';
+import { isRepeating } from '../../service';
 
 function pad(n, width, z = 0) {
     n = n + '';
@@ -42,6 +43,7 @@ export default ({navigation, style}) => {
 
     const elapsed = minutesAndSeconds(position);
     const remaining = minutesAndSeconds(duration - position);
+
     return (
         <View style={[styles.container, style]}>
             <Slider

@@ -5,7 +5,7 @@ import com.youtune.pipe.LinkPackage;
 import android.app.Application;
 import android.content.Context;
 
-//import androidx.multidex.MultiDex;
+import androidx.multidex.MultiDex;
 
 import com.facebook.react.PackageList;
 import com.facebook.react.ReactApplication;
@@ -76,9 +76,9 @@ public class MainApplication extends Application implements ReactApplication {
         }
     }
 
-    /*@Override
+    @Override
     protected void attachBaseContext(Context base) {
         super.attachBaseContext(base);
         MultiDex.install(this);
-    }*/
+    }
 }

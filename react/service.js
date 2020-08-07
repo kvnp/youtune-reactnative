@@ -5,7 +5,7 @@ import { fetchNext } from "./modules/remote/API";
 const LinkBridge = NativeModules.LinkBridge;
 const YOUTUBE_WATCH = "https://www.youtube.com/watch?v=";
 
-var isRepeating = false;
+export var isRepeating = false;
 
 function resolveUrl(id) {
     return new Promise(
@@ -23,62 +23,80 @@ export async function getUrl(id) {
     return url;
 }
 
-export const setRepeat = boolean => {
-    isRepeating = boolean;
+export const setRepeat = boolean => isRepeating = boolean;
+
+export const skipAuto = async() => {
+    if (isRepeating)
+        TrackPlayer.seekTo(0);
+    else
+        skip(true);
 }
 
-async function handleSkip(array, index, forward) {
-    let next;
-    if (forward && index + 1 < array.length)
-        next = index + 1;
-    else if (!forward && index > 0)
-        next = index - 1;
-    else
-        next = 0;
+export const skipTo = (id) => {
+    return new Promise(
+        async(resolve, reject) => {
+            let array = await TrackPlayer.getQueue();
+            let index;
+            let track;
 
-    if (array[next].url == null) {
-        let track = array[next];
-        track.url = await this.getUrl(array[next].id);
-        
-        await TrackPlayer.remove(track.id);
-        let afterId = null;
-        if (next < array.length)
-            afterId = array[next + 1].id;
+            for (let i = 0; i < array.length; i++) {
+                if (array[i].id == id) {
+                    index = i;
+                    track = array[i];
+                    break;
+                }
+            }
 
-        await TrackPlayer.add(track, afterId);
-    }
+            if (track.url == undefined)
+                track.url = await getUrl(id);
+            else {
+                TrackPlayer.skip(id);
 
-    if (forward)
-        TrackPlayer.skipToNext();
-    else
-        TrackPlayer.skipToPrevious().catch(() => TrackPlayer.seekTo(0));
+                resolve(true);
+                return;
+            }
+
+            let next;
+            if (index == array.length - 1)
+                next = null;
+            else
+                next = array[index + 1].id;
+
+            await TrackPlayer.remove(id);
+            await TrackPlayer.add(track, next);
+            TrackPlayer.skip(id);
+
+            resolve(true);
+            return;
+        }
+    );
 }
 
 export const skip = async(forward) => {
     let id = await TrackPlayer.getCurrentTrack();
-    let index;
-    let track = await TrackPlayer.getTrack(id);
     let array = await TrackPlayer.getQueue();
 
+    let position = await TrackPlayer.getPosition();
+    let index;
+
     for (let i = 0; i < array.length; i++) {
-        if (track.id == id) {
+        if (array[i].id == id) {
+            console.log(i);
             index = i;
             break;
         }
     }
 
-    if (forward) {
-        if (index < array.length)
-            handleSkip(array, index, forward);
+    if (forward && index == array.length - 1 || !forward && position > 10)
+        return TrackPlayer.seekTo(0);
 
-    } else {
-        let position = await TrackPlayer.getPosition();
+    let next;
+    if (forward)
+        next = array[index + 1].id;
+    else
+        next = array[index - 1].id;
 
-        if (position > 10)
-            TrackPlayer.seekTo(0);
-        else
-            handleSkip(array, index, forward);
-    }
+    return skipTo(next);
 }
 
 export async function startPlayback({ playlistId, videoId }) {
@@ -92,13 +110,18 @@ export async function startPlayback({ playlistId, videoId }) {
 
                 for (let i = 0; i < playlist.list.length; i++) {
                     let track = playlist.list[i];
-                    track.url = await getUrl(track.id);
                     
-                    await TrackPlayer.add(track);
                     if (i == playlist.index)
+                        track.url = await getUrl(track.id);
+
+                    await TrackPlayer.add(track);
+
+                    if (i == playlist.index) {
                         await TrackPlayer.skip(playlist.list[playlist.index].id);
                         TrackPlayer.play();
+                    }
                 }
+
                 resolve(true);
             } else
                 reject({playlistId, videoId});
