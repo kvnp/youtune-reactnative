@@ -1,10 +1,9 @@
 import TrackPlayer from 'react-native-track-player';
 import { NativeModules } from 'react-native';
 import { fetchNext } from "./modules/remote/API";
-import Track from './modules/models/music/track';
 
 const LinkBridge = NativeModules.LinkBridge;
-const YOUTUBE_WATCH = "https://www.youtube.com/watch?v=";
+export const YOUTUBE_WATCH = "https://www.youtube.com/watch?v=";
 
 export var isRepeating = false;
 export var focusedId = null;
@@ -124,6 +123,7 @@ export async function startPlayback({ playlistId, videoId }) {
                     await TrackPlayer.add(track);
 
                     if (i == playlist.index) {
+                        focusedId = playlist.list[playlist.index].id;
                         await TrackPlayer.skip(playlist.list[playlist.index].id);
                         TrackPlayer.play();
                     }
