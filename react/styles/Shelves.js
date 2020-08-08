@@ -6,6 +6,7 @@ export const shelvesStyle = StyleSheet.create({
 
     scrollContainer: {
         flexGrow: 1,
-        justifyContent: "center"
+        justifyContent: "center",
+        paddingBottom: 20
     },
 });

@@ -59,7 +59,6 @@ export default class SearchTab extends PureComponent {
         Keyboard.dismiss();
         if (this.state.query.length > 0) {
             this.setState({buttonDisabled: true, loading: true, oldQuery: this.state.query});
-            console.log("suche nach " + this.state.query);
             fetchResults(this.state.query)
                 .then(data => this.setState(
                     {
@@ -68,12 +67,13 @@ export default class SearchTab extends PureComponent {
                         instead: data.insteadOption,
                         suggestion: data.suggestionOption,
                         loading: false
-                    }));
+                    }
+            ));
         }
     }
 
     searchInstead = async(query) => {
-        await this.setState({query: query, message: null, instead: null, suggestion: null});
+        this.setState({query: query, message: null, instead: null, suggestion: null});
         this.search();
     }
 

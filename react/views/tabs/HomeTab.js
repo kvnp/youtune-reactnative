@@ -36,21 +36,17 @@ export default class HomeTab extends PureComponent {
         this._unsubscribe();
     }
 
-    startRefresh = () => {
-        this.setState({loading: true})
-        fetchHome().then((result) => {
-            if (result.background != undefined)
-                this.setImage(result.background);
+    startRefresh = async() => {
+        this.setState({loading: true});
+        let result = await fetchHome();
 
-            this.setState({
-                shelves: result.shelves,
-                loading: false
-            });
+        if (result.background != undefined)
+            global.setHeader({image: result.background});
+
+        this.setState({
+            shelves: result.shelves,
+            loading: false
         });
-    }
-
-    setImage = (source) => {
-        global.setHeader({image: source});
     }
 
     render() {

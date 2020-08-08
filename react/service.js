@@ -55,7 +55,6 @@ export const skipTo = (id) => {
             if (track.url == undefined)
                 track.url = await getUrl(id);
             else {
-                focusedId = id;
                 TrackPlayer.skip(id);
 
                 resolve(true);

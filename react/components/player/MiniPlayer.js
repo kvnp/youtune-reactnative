@@ -20,15 +20,11 @@ export default class MiniPlayer extends PureComponent{
 
         this._unsub = [];
         this._unsub.push(
-            TrackPlayer.addEventListener("playback-state", params => {
-                this.refreshUI();
-            })
+            TrackPlayer.addEventListener("playback-state", params => this.refreshUI)
         );
 
         this._unsub.push(
-            TrackPlayer.addEventListener("playback-track-changed", params => {
-                this.refreshUI();
-            })
+            TrackPlayer.addEventListener("playback-track-changed", params => this.refreshUI)
         );
     }
 
@@ -40,11 +36,10 @@ export default class MiniPlayer extends PureComponent{
     refreshUI = async() => {
         let id = await TrackPlayer.getCurrentTrack();
         if (id != null) {
-            let newstate = {};
             let track = await TrackPlayer.getTrack(id);
             let state = await TrackPlayer.getState();
+            let newstate = {track: track};
 
-            newstate.track = track;
             switch (state) {
                 case TrackPlayer.STATE_NONE:
                     break;
@@ -71,24 +66,17 @@ export default class MiniPlayer extends PureComponent{
             }
 
             this.setState(newstate);
-        }
+        } else
+            this.setState({isPlaying: false, isLoading: false, isStopped: true});
     }
 
-    onOpen = () => {
-        this.props.navigation.navigate("Music");
-    }
+    onOpen = () => this.props.navigation.navigate("Music");
 
-    onNext = () => {
-        skip(true);
-    }
+    onNext = () => skip(true);
 
-    onPlay = () => {
-        setPlay(this.state.isPlaying);
-    }
+    onPlay = () => setPlay(this.state.isPlaying);
 
-    onStop = () => {
-        TrackPlayer.stop().then(this.refreshUI);
-    }
+    onStop = () => TrackPlayer.reset().then(this.refreshUI);
 
     render() {
         var title = null;

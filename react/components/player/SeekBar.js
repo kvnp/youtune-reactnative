@@ -9,7 +9,6 @@ import {
 import TrackPlayer, { useTrackPlayerProgress } from 'react-native-track-player';
 import Slider from "@react-native-community/slider";
 import { appColor } from '../../styles/App';
-import { isRepeating } from '../../service';
 
 function pad(n, width, z = 0) {
     n = n + '';
@@ -30,16 +29,8 @@ const doSeek = async(value) => {
     await TrackPlayer.seekTo(value);
 }
 
-export default ({navigation, style}) => {
+export default ({ style }) => {
     var { position, bufferedPosition, duration } = useTrackPlayerProgress();
-    React.useEffect(() => {
-        const unsub = navigation.addListener('focus', async() => {
-            position = await TrackPlayer.getPosition();
-            duration = await TrackPlayer.getDuration();
-        });
-    
-        return unsub;
-      }, [navigation]);
 
     const elapsed = minutesAndSeconds(position);
     const remaining = minutesAndSeconds(duration - position);

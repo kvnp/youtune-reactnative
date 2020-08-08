@@ -1,16 +1,35 @@
-import React, { PureComponent } from 'react';
+import React from 'react';
 
 import {
     View,
     Image,
     Pressable,
-    Text,
-    Button
+    Text
 } from "react-native";
+
+import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 
 import { resultStyle } from '../../styles/Search';
 import { handleMedia } from '../../modules/event/mediaNavigator';
 import { rippleConfig } from '../../styles/Ripple';
+import Track from '../../modules/models/music/track';
+
+const handle = (obj, navigation) => {
+    /*if (obj.videoId != null) {
+        let track = new Track(
+            obj.videoId,
+            obj.playlistId,
+            obj.subtitle,
+            obj.title,
+            obj.thumbnail,
+            obj.duration
+        );
+    } else {
+        handleMedia(obj, navigation);
+    }*/
+
+    handleMedia(obj, navigation);
+}
 
 export default ({entry, navigation}) => {
     let { title, subtitle, secondTitle, secondSubtitle, thumbnail } = entry;
@@ -26,8 +45,8 @@ export default ({entry, navigation}) => {
     };
 
     return (
-        <View style={resultStyle.resultView}>
-            <Pressable android_ripple={rippleConfig} onPress={() => {handleMedia(view, navigation)}}>
+        <Pressable onPress={() => {handle(view, navigation)}} style={resultStyle.resultView}>
+            <Pressable android_ripple={rippleConfig} onPress={() => {handle(view, navigation)}}>
                 <Image style={resultStyle.resultCover} source={{uri: thumbnail}}/>
             </Pressable>
 
@@ -41,7 +60,9 @@ export default ({entry, navigation}) => {
                 <Text numberOfLines={1} style={resultStyle.resultText}>{secondSubtitle}</Text>
             </View>
 
-            <Button title="▶️" onPress={() => {handleMedia(view, navigation)}}/>
-        </View>
+            <Pressable onPress={() => {handle(view, navigation)}}>
+                <MaterialIcons name="more-vert" color="dark" size={24}/>
+            </Pressable>
+        </Pressable>
     )
 }

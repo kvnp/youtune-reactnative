@@ -101,9 +101,9 @@ export function digestSearchResults(json) {
                     if (fcl == 0)
                         entry.title = text;
                     else if (fcl == 1)
-                        entry.subtitle = text;
-                    else if (fcl == 2)
                         entry.secondTitle = text;
+                    else if (fcl == 2)
+                        entry.subtitle = text;
                     else if (fcl == 3)
                         entry.secondSubtitle = text;
                     else if (fcl == 4)
