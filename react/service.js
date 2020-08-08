@@ -52,6 +52,7 @@ export const skipTo = (id) => {
                 }
             }
 
+            focusedId = id;
             if (track.url == undefined)
                 track.url = await getUrl(id);
             else {
