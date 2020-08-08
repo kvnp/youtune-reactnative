@@ -54,3 +54,31 @@ export const textStyle = StyleSheet.create({
         color: 'darkgray'
     }
 });
+
+export const navOptions = {
+    optimizationsEnabled: true,
+    lazy: true,
+
+    style: {
+        backgroundColor: appColor.background.backgroundColor
+    },
+
+    indicatorStyle: {
+        color: "white",
+        backgroundColor: "white",
+        position: "absolute",
+        bottom: 0,
+        height: 3
+    },
+
+    activeTintColor: "white",
+    inactiveTintColor: "darkgray",
+
+    keyboardHidesTabBar: true,
+
+    pressColor: "darkgray",
+    pressOpacity: "darkgray",
+
+    showIcon: true,
+    showLabel: false
+}
