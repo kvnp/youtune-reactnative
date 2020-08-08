@@ -8,12 +8,12 @@
  */
 
 import TrackPlayer from 'react-native-track-player';
-import { skip, isRepeating } from './service';
+import { skip, isRepeating, focusedId } from './service';
 
 module.exports = async function() {
     TrackPlayer.addEventListener("playback-track-changed", params => {
         console.log(params);
-        if (typeof params.nextTrack == "string" && typeof params.track == "string" && isRepeating) {
+        if (isRepeating && params["nextTrack"] != focusedId) {
             console.log("skipped");
             TrackPlayer.skipToPrevious();
         }
@@ -23,9 +23,7 @@ module.exports = async function() {
         //console.log("queue ended");
     });
 
-    TrackPlayer.addEventListener("playback-error", params => {
-        //console.log("error");
-    });
+    TrackPlayer.addEventListener("playback-error", params => skip(true));
 
     TrackPlayer.addEventListener("remote-next", params => skip(true));
 

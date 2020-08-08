@@ -1,11 +1,13 @@
 import TrackPlayer from 'react-native-track-player';
 import { NativeModules } from 'react-native';
 import { fetchNext } from "./modules/remote/API";
+import Track from './modules/models/music/track';
 
 const LinkBridge = NativeModules.LinkBridge;
 const YOUTUBE_WATCH = "https://www.youtube.com/watch?v=";
 
 export var isRepeating = false;
+export var focusedId = null;
 
 function resolveUrl(id) {
     return new Promise(
@@ -19,11 +21,14 @@ function resolveUrl(id) {
 }
 
 export async function getUrl(id) {
-    let url = await resolveUrl(id);
-    return url;
+    return await resolveUrl(id);
 }
 
-export const setRepeat = boolean => isRepeating = boolean;
+export const setRepeat = async(boolean) => {
+    isRepeating = boolean;
+    if (isRepeating)
+        focusedId = await TrackPlayer.getCurrentTrack();
+}
 
 export const skipAuto = async() => {
     if (isRepeating)
@@ -50,6 +55,7 @@ export const skipTo = (id) => {
             if (track.url == undefined)
                 track.url = await getUrl(id);
             else {
+                focusedId = id;
                 TrackPlayer.skip(id);
 
                 resolve(true);
@@ -64,7 +70,8 @@ export const skipTo = (id) => {
 
             await TrackPlayer.remove(id);
             await TrackPlayer.add(track, next);
-            TrackPlayer.skip(id);
+            await TrackPlayer.skip(id);
+            TrackPlayer.seekTo(0);
 
             resolve(true);
             return;
@@ -81,7 +88,6 @@ export const skip = async(forward) => {
 
     for (let i = 0; i < array.length; i++) {
         if (array[i].id == id) {
-            console.log(i);
             index = i;
             break;
         }
