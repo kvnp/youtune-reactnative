@@ -1,6 +1,4 @@
-import React, { PureComponent } from "react";
-
-import { StatusBar } from "react-native";
+import React from "react";
 
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
@@ -12,31 +10,16 @@ import Navigator from "./views/full/Navigator";
 import CaptchaView from "./views/full/CaptchaView";
 
 const Stack = createStackNavigator();
-export default class App extends PureComponent {
-    constructor(props) {
-        super(props);
-
-        StatusBar.setBarStyle("dark-content", true);
-        StatusBar.setTranslucent(true);
-        StatusBar.setBackgroundColor("transparent", true);
-
-        global.navigationOptions = {
-            headerTitle: null,
-            headerShown: false
-        };
-    }
-
-    render() {
-        return (
-            <NavigationContainer>
-                <Stack.Navigator>
-                    <Stack.Screen name="App" component={Navigator} options={global.navigationOptions}/>
-                    <Stack.Screen name="Playlist" component={PlaylistView}/>
-                    <Stack.Screen name="Music" component={PlayView} options={global.navigationOptions}/>
-                    <Stack.Screen name="Artist" component={ArtistView}/>
-                    <Stack.Screen name="Captcha" component={CaptchaView}/>
-                </Stack.Navigator>
-            </NavigationContainer>
-        );
-    }
+export default () => {
+    return (
+        <NavigationContainer>
+            <Stack.Navigator>
+                <Stack.Screen name="App" component={Navigator} options={global.navigationOptions}/>
+                <Stack.Screen name="Playlist" component={PlaylistView}/>
+                <Stack.Screen name="Music" component={PlayView} options={global.navigationOptions}/>
+                <Stack.Screen name="Artist" component={ArtistView}/>
+                <Stack.Screen name="Captcha" component={CaptchaView}/>
+            </Stack.Navigator>
+        </NavigationContainer>
+    );
 }

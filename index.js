@@ -1,9 +1,18 @@
-import {AppRegistry} from 'react-native';
+import {AppRegistry, StatusBar} from 'react-native';
 import App from './react/App';
 import {name} from './react/app.json';
 import TrackPlayer from "react-native-track-player";
 
 AppRegistry.registerComponent(name, () => App);
+
+StatusBar.setBarStyle("dark-content", true);
+StatusBar.setTranslucent(true);
+StatusBar.setBackgroundColor("transparent", true);
+
+global.navigationOptions = {
+    headerTitle: null,
+    headerShown: false
+};
 
 TrackPlayer.registerPlaybackService(() => require("./react/handler"));
 
