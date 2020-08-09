@@ -39,6 +39,7 @@
     "react-native-web": "^0.13.5",
     "react-native-web-linear-gradient": "^1.1.1",
     "react-native-webpack": "^0.1.1",
+    "rn-sliding-up-panel": "^2.4.3",
     "webpack": "^4.44.1",
     "webpack-cli": "^3.3.12"
   },
