@@ -6,7 +6,7 @@ import { skip, setPlay } from "../../service";
 
 export default class MiniPlayer extends PureComponent{
     constructor(props) {
-        super(props)
+        super(props);
         this.state = {
             isPlaying: false,
             isStopped: true,
@@ -20,11 +20,11 @@ export default class MiniPlayer extends PureComponent{
 
         this._unsub = [];
         this._unsub.push(
-            TrackPlayer.addEventListener("playback-state", params => this.refreshUI)
+            TrackPlayer.addEventListener("playback-state", params => this.refreshUI())
         );
 
         this._unsub.push(
-            TrackPlayer.addEventListener("playback-track-changed", params => this.refreshUI)
+            TrackPlayer.addEventListener("playback-track-changed", params => this.refreshUI())
         );
     }
 
