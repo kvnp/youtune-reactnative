@@ -33,8 +33,7 @@ export const register = () => {
             TrackPlayer.CAPABILITY_PAUSE,
             TrackPlayer.CAPABILITY_SKIP_TO_NEXT,
             TrackPlayer.CAPABILITY_SKIP_TO_PREVIOUS,
-            TrackPlayer.CAPABILITY_STOP,
-            TrackPlayer.CAPABILITY_SEEK_TO
+            TrackPlayer.CAPABILITY_STOP
         ],
 
         compactCapabilities: [
