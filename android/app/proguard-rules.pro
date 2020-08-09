@@ -91,6 +91,7 @@
 -keep,includedescriptorclasses class com.facebook.react.bridge.** { *; }
 
 # hermes
+
 -keep class com.facebook.jni.** { *; }
 
 # okhttp
@@ -107,8 +108,3 @@
 -dontwarn java.nio.file.*
 -dontwarn org.codehaus.mojo.animal_sniffer.IgnoreJRERequirement
 -dontwarn okio.**
-
-# NewPipeExtractor
-
--keep class org.mozilla.javascript.** { *; }
--keep class com.grack.nanojson.** { *; }

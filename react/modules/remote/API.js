@@ -4,7 +4,8 @@ import {
     digestSearchResults,
     digestBrowseResults,
     digestNextResults,
-    digestVideoInfoResults
+    digestVideoInfoResults,
+    digestStreams
 } from "./Extractor";
 
 import { getHttpResponse, getUrl } from "./HTTP";
@@ -16,7 +17,7 @@ const headers_ytm = {
     "User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:79.0) Gecko/20100101 Firefox/79.0"
 };
 
-const headers_yt = {
+export const headers_yt = {
     "Referer": "",
     "Content-Type": "*/*"
 }
@@ -146,6 +147,18 @@ export async function fetchVideoInfo(videoId) {
     }, "text");
 
     return digestVideoInfoResults(response);
+}
+
+export async function fetchAudioStream(videoId) {
+    let url = "https://youtube.com/get_video_info?video_id=" + videoId +
+              "&el=detailpage&c=WEB_REMIX&cver=0.1&cplayer=UNIPLAYER";
+
+    let response = await getHttpResponse(url, {
+        method: "GET",
+        headers: headers_yt
+    }, "text");
+
+    return await digestStreams(response);
 }
 
 export async function fetchNext(videoId, playlistId) {

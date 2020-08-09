@@ -2,6 +2,7 @@ import { msToMin, msToMMSS, textToSec } from "../utils/Time";
 import Track from "../models/music/track";
 import Playlist from "../models/music/playlist";
 import { decodeNestedURI } from "../utils/Decoder";
+import { getSignature } from "./Decrypt";
 
 export function digestSearchResults(json) {
     let final = {
@@ -566,9 +567,48 @@ export function digestVideoInfoResults(text) {
         length: Number.parseInt(parse.videoDetails.lengthSeconds),
         thumbnail: parse.videoDetails.thumbnail.thumbnails[parse.videoDetails.thumbnail.thumbnails.length - 1].url,
         streamLink: null
-    }
+    };
+
+    console.log(parse);
 
     return titleInfo;
+}
+
+export function digestStreams(text) {
+    return new Promise(async(resolve, reject) => {
+        let decode = decodeURIComponent(text);
+        let indexone = decode.indexOf("player_response=") + 16;
+        let indextwo = decode.indexOf("}&") + 1;
+        let parse = JSON.parse(decode.substring(indexone, indextwo));
+
+        let videoId = parse.videoDetails.videoId;
+
+        for (let i = 0; i < parse.streamingData.adaptiveFormats.length; i++) {
+            if (parse.streamingData.adaptiveFormats[i].mimeType.split("/")[0] == "audio") {
+                let signatureCipher = decodeNestedURI(parse.streamingData.adaptiveFormats[i].signatureCipher);
+
+                let stream = "";
+                let sigArray = signatureCipher.split("&");
+
+                let s;
+                for (let j = 0; j < sigArray.length; j++) {
+                    if (j == 0)
+                        s = await getSignature(videoId, sigArray[0].substring(2));
+
+                    else if (j == 1) {}
+
+                    else if (j == 2)
+                        stream = sigArray[2].substring(4);
+
+                    else 
+                        stream += "&" + sigArray[j];
+                }
+                stream += "&sig=" + s;
+                resolve(stream);
+                return;
+            }
+        }
+    });
 }
 
 

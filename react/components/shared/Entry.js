@@ -12,24 +12,8 @@ import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import { resultStyle } from '../../styles/Search';
 import { handleMedia } from '../../modules/event/mediaNavigator';
 import { rippleConfig } from '../../styles/Ripple';
-import Track from '../../modules/models/music/track';
 
-const handle = (obj, navigation) => {
-    /*if (obj.videoId != null) {
-        let track = new Track(
-            obj.videoId,
-            obj.playlistId,
-            obj.subtitle,
-            obj.title,
-            obj.thumbnail,
-            obj.duration
-        );
-    } else {
-        handleMedia(obj, navigation);
-    }*/
-
-    handleMedia(obj, navigation);
-}
+const handle = (obj, navigation) => handleMedia(obj, navigation);
 
 export default ({entry, navigation}) => {
     let { title, subtitle, secondTitle, secondSubtitle, thumbnail } = entry;
@@ -60,7 +44,7 @@ export default ({entry, navigation}) => {
                 <Text numberOfLines={1} style={resultStyle.resultText}>{secondSubtitle}</Text>
             </View>
 
-            <Pressable onPress={() => {handle(view, navigation)}}>
+            <Pressable onPress={() => handle(view, navigation)}>
                 <MaterialIcons name="more-vert" color="dark" size={24}/>
             </Pressable>
         </Pressable>
