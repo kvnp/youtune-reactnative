@@ -93,22 +93,24 @@ export function digestSearchResults(json) {
                 for (let fcl = 0; fcl < flexColumnList.length; fcl++) {
                     let flexColumn = flexColumnList[fcl].musicResponsiveListItemFlexColumnRenderer;
 
-                    let textList = flexColumn.text.runs;
+                    if (flexColumn.text != undefined) {
+                        let textList = flexColumn.text.runs;
 
-                    let text = "";
-                    for (let txt = 0; txt < textList.length; txt++)
-                        text += textList[txt].text;
+                        let text = "";
+                        for (let txt = 0; txt < textList.length; txt++)
+                            text += textList[txt].text;
 
-                    if (fcl == 0)
-                        entry.title = text;
-                    else if (fcl == 1)
-                        entry.secondTitle = text;
-                    else if (fcl == 2)
-                        entry.subtitle = text;
-                    else if (fcl == 3)
-                        entry.secondSubtitle = text;
-                    else if (fcl == 4)
-                        entry.additionalInfo = text;
+                        if (fcl == 0)
+                            entry.title = text;
+                        else if (fcl == 1)
+                            entry.secondTitle = text;
+                        else if (fcl == 2)
+                            entry.subtitle = text;
+                        else if (fcl == 3)
+                            entry.secondSubtitle = text;
+                        else if (fcl == 4)
+                            entry.additionalInfo = text;
+                    }
                 }
                 
                 let thumbnaillist = responsiveMusicItem.thumbnail.musicThumbnailRenderer.thumbnail.thumbnails;
@@ -565,8 +567,7 @@ export function digestVideoInfoResults(text) {
         title: parse.videoDetails.title,
         subtitle: parse.videoDetails.author.replace("+", " ").slice(0, parse.videoDetails.author.indexOf("-") - 1),
         length: Number.parseInt(parse.videoDetails.lengthSeconds),
-        thumbnail: parse.videoDetails.thumbnail.thumbnails[parse.videoDetails.thumbnail.thumbnails.length - 1].url,
-        streamLink: null
+        thumbnail: parse.videoDetails.thumbnail.thumbnails[parse.videoDetails.thumbnail.thumbnails.length - 1].url
     };
 
     return titleInfo;
