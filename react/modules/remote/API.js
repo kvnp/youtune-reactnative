@@ -9,6 +9,7 @@ import {
 } from "./Extractor";
 
 import { getHttpResponse, getUrl } from "./HTTP";
+import { safetyMode, transmitLanguage } from "../../service";
 
 const headers_api = {"User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:79.0) Gecko/20100101 Firefox/79.0"};
 const headers_ytm = {
@@ -34,9 +35,6 @@ async function getApiKey() {
 }
 
 function getRequestBody() {
-    let enableSafetyMode = false;
-    let enableLanguagePreference = false;
-
     let body = {
         context: {
             client: {
@@ -46,13 +44,16 @@ function getRequestBody() {
         }
     };
 
-    if (enableLanguagePreference) {
+    if (transmitLanguage) {
         body.context.client["gl"] = getGL();
         body.context.client["hl"] = getHL();
     }
 
-    if (!enableSafetyMode)
-        body.context["user"] = {enableSafetyMode: false}
+    body.context["user"] = { enableSafetyMode: safetyMode }
+
+
+    console.log("language " + transmitLanguage);
+    console.log("safety " + safetyMode);
 
     return body;
 }

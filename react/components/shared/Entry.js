@@ -45,7 +45,7 @@ export default ({entry, navigation}) => {
             </View>
 
             <Pressable onPress={() => handle(view, navigation)}>
-                <MaterialIcons name="more-vert" color="dark" size={24}/>
+                <MaterialIcons name="more-vert" color="black" size={24}/>
             </Pressable>
         </Pressable>
     )

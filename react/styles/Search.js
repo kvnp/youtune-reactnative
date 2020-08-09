@@ -151,7 +151,6 @@ export const specificStyle = StyleSheet.create({
     },
 
     text: {
-        color: 'black',
         alignSelf: 'center',
     },
 });

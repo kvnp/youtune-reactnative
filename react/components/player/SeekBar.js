@@ -49,11 +49,11 @@ export default ({ style }) => {
             />
 
             <View style={{ flexDirection: 'row', paddingRight: 15, paddingLeft: 15 }}>
-                <Text style={[styles.text, { color: defaultString.darkColor }]}>
+                <Text style={styles.text}>
                     {elapsed[0] + ":" + elapsed[1]}
                 </Text>
                 <View style={{ flex: 1 }} />
-                <Text style={[styles.text, { width: 40, color: defaultString.darkColor }]}>
+                <Text style={[styles.text, { width: 40}]}>
                     {"-" + remaining[0] + ":" + remaining[1]}
                 </Text>
             </View>

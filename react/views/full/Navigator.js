@@ -8,6 +8,7 @@ import LibraryTab from "../tabs/LibraryTab";
 
 import Header from "../../components/overlay/Header";
 import { headerStyle, navOptions } from "../../styles/App";
+import SettingsTab from "../tabs/SettingsTab";
 
 function getIcon(title, color) {
     return <MaterialIcons name={title} color={color} size={25}/>;
@@ -26,6 +27,7 @@ export default () => {
             <Nav.Screen name="Home" component={HomeTab} options={getTabOptions("home")}/>
             <Nav.Screen name="Search" component={SearchTab} options={getTabOptions("search")}/>
             <Nav.Screen name="Library" component={LibraryTab} options={getTabOptions("folder")}/>
+            <Nav.Screen name="Settings" component={SettingsTab} options={getTabOptions("settings")}/>
         </Nav.Navigator>
         </>
     )};

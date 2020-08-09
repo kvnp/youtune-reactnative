@@ -569,8 +569,6 @@ export function digestVideoInfoResults(text) {
         streamLink: null
     };
 
-    console.log(parse);
-
     return titleInfo;
 }
 

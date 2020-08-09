@@ -1,8 +1,23 @@
 import TrackPlayer from 'react-native-track-player';
-import { NativeModules } from 'react-native';
 import { fetchNext, fetchAudioStream } from "./modules/remote/API";
 
 export const YOUTUBE_WATCH = "https://www.youtube.com/watch?v=";
+
+export var transmitLanguage = false;
+export var proxyYTM = false;
+export var safetyMode = false;
+
+export const setTransmitLanguage = boolean => {
+    transmitLanguage = boolean;
+}
+
+export const setProxyYTM = boolean => {
+    proxyYTM = boolean;
+}
+
+export const setSafetyMode = boolean => {
+    safetyMode = boolean;
+}
 
 export var isRepeating = false;
 export var focusedId = null;

@@ -36,7 +36,7 @@ export default class Header extends PureComponent {
                 <LinearGradient style={[headerStyle.gradient, this.state.source == null ?headerStyle.image :headerStyle.imageFound]}
                                 colors={gradientColors}>
                                     
-                    <Text style={[{color: this.state.headerColor}, headerStyle.text]}>
+                    <Text style={headerStyle.text}>
                         {this.state.title}
                     </Text>
                 </LinearGradient>
