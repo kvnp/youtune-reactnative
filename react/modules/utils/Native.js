@@ -22,15 +22,11 @@ function getSystemLocale() {
 
 export function getGL() {
     if (gl == null) gl = getSystemLocale().slice(3, 5);
-
-    console.log(gl);
     return gl;
 }
 
 export function getHL() {
     if (hl == null) hl = getSystemLocale().slice(0, 2);
-
-    console.log(hl);
     return hl;
     
 }

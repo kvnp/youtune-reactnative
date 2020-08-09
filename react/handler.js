@@ -33,6 +33,6 @@ module.exports = async function() {
     TrackPlayer.addEventListener("remote-stop", params => TrackPlayer.stop());
 
     TrackPlayer.addEventListener("remote-seek", params => {
-        TrackPlayer.seekTo(Math.floor(params["position"]));
+        TrackPlayer.seekTo( ~~(params["position"]) );
     });
 };

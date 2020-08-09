@@ -51,10 +51,6 @@ function getRequestBody() {
 
     body.context["user"] = { enableSafetyMode: safetyMode }
 
-
-    console.log("language " + transmitLanguage);
-    console.log("safety " + safetyMode);
-
     return body;
 }
 

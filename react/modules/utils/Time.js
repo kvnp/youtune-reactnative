@@ -1,9 +1,9 @@
 export function msToMin(ms) {
-    return Math.floor((ms / 1000 / 60) % 60);
+    return ~~((ms / 1000 / 60) % 60);
 }
 
 export function msToMMSS(ms) {
-    const seconds = Math.floor((ms / 1000) % 60);
+    const seconds = ~~((ms / 1000) % 60);
     const minutes = msToMin(ms);
 
     let secondString = seconds + "";

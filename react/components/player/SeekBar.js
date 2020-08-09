@@ -16,8 +16,8 @@ function pad(n, width, z = 0) {
 }
 
 const minutesAndSeconds = (position) => ([
-    pad(Math.floor(position / 60), 2),
-    pad(Math.floor(position % 60), 2),
+    pad( ~~(position / 60), 2),
+    pad( ~~(position % 60), 2),
 ]);
 
 const defaultString = {
@@ -85,8 +85,8 @@ const styles = StyleSheet.create({
     },
 
     text: {
-        color: 'rgba(255, 255, 255, 0.72)',
+        color: 'black',
         fontSize: 12,
-        textAlign: 'center'
+        textAlign: 'center',
     }
 });
