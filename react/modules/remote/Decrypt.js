@@ -9,7 +9,7 @@ const REGEXES = [
 ];
 
 const function_name = "decryptionFunction";
-var decryptionFunctionString = null;
+var functionString = null;
 
 function getPlayer(response) {
     let jsIndex = response.indexOf('"js":');
@@ -68,12 +68,10 @@ async function fetchFunction(videoId) {
 }
 
 export async function getSignature(videoId, signature) {
-    if (decryptionFunctionString == null) {
-        decryptionFunctionString = await fetchFunction(videoId);
-        decryptionFunctionString = decryptionFunctionString.replace(";,", ";");
-        eval(decryptionFunctionString);
-    } else {
-        eval(decryptionFunctionString);
+    if (functionString == null) {
+        functionString = await fetchFunction(videoId);
+        gEval = function(){ (1, eval)(functionString.replace(";,", ";")); };
+        gEval();
     }
 
     return decryptionFunction(signature);
