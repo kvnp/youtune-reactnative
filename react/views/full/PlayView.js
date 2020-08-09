@@ -1,5 +1,14 @@
 import React, { PureComponent } from "react";
-import { View, Text, StyleSheet, Image, Pressable, ActivityIndicator, Dimensions } from "react-native";
+import {
+    View,
+    Text,
+    StyleSheet,
+    Image,
+    Pressable,
+    ActivityIndicator,
+    Dimensions
+} from "react-native";
+
 import TrackPlayer from 'react-native-track-player';
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 
@@ -100,23 +109,29 @@ export default class PlayView extends PureComponent {
     }
 
     render() {
+        var isLoading;
         if (this.props.route.params != undefined) {
-            this.setState({
-                isLoading: true,
-                isStopped: false
-            });
+            isLoading = true;
+            var {title, subtitle, thumbnail} = this.props.route.params;
+            var artist = title;
+            var title = subtitle;
+            var artwork = thumbnail;
+
+            TrackPlayer.reset();
             startPlayback(this.props.route.params)
                 .catch(params => this.props.navigation.navigate("Captcha", params));
 
             this.props.route.params = undefined;
+        } else {
+            isLoading = this.state.isLoading;
+            if (this.state.track != null)
+                var {title, artist, artwork} = this.state.track;
+            else {
+                var title = null;
+                var artist = null;
+                var artwork = null;
+            }
         }
-
-        if (this.state.track == null) {
-            var title = null;
-            var artist = null;
-            var artwork = null;
-        } else
-            var {title, artist, artwork} = this.state.track;
 
         return (
             <>
@@ -153,13 +168,16 @@ export default class PlayView extends PureComponent {
                                     <MaterialIcons name="skip-previous" color="black" size={40}/>
                                 </Pressable>
 
-                                {this.state.isLoading
-                                    ?   <ActivityIndicator color="black" size="large"/>
+                                <View style={{alignItems: "center", justifyContent: "center", backgroundColor: appColor.background.backgroundColor, width: 60, height: 60, borderRadius: 30}}>
+                                    {isLoading
+                                        ?   <ActivityIndicator color="white" size="large"/>
 
-                                    :   <Pressable onPress={() => setPlay(this.state.isPlaying)} android_ripple={rippleConfig}>
-                                            <MaterialIcons name={this.state.isPlaying ? "pause" : "play-arrow"} color="black" size={40}/>
-                                        </Pressable>
-                                }
+                                        :   <Pressable onPress={() => setPlay(this.state.isPlaying)} android_ripple={rippleConfig}>
+                                                <MaterialIcons name={this.state.isPlaying ? "pause" : "play-arrow"} color="white" size={40}/>
+                                            </Pressable>
+                                    }
+                                </View>
+                                
 
                                 <Pressable onPress={() => skip(true)} android_ripple={rippleConfig}>
                                     <MaterialIcons name="skip-next" color="black" size={40}/>

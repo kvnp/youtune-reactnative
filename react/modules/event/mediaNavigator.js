@@ -12,9 +12,11 @@ function showArtist(browseId, navigation) {
     );
 }
 
-export function handleMedia({browseId, playlistId, videoId}, navigation) {
+export function handleMedia(media, navigation) {
+    const {browseId, playlistId, videoId} = media;
+    
     if (videoId != undefined) {
-        navigation.navigate("Music", {videoId, playlistId});
+        navigation.navigate("Music", media);
         return;
     }
 
