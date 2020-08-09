@@ -1,5 +1,49 @@
 import TrackPlayer from 'react-native-track-player';
 import { fetchNext, fetchAudioStream } from "./modules/remote/API";
+import { StatusBar } from 'react-native';
+
+export const register = () => {
+    StatusBar.setBarStyle("dark-content", true);
+    StatusBar.setTranslucent(true);
+    StatusBar.setBackgroundColor("transparent", true);
+
+    global.navigationOptions = {
+        headerTitle: null,
+        headerShown: false
+    };
+
+    TrackPlayer.registerPlaybackService(() => require("./handler"));
+
+    TrackPlayer.setupPlayer();
+    TrackPlayer.updateOptions({
+        stopWithApp: true,
+        alwaysPauseOnInterruption: true,
+
+        capabilities: [
+            TrackPlayer.CAPABILITY_PLAY,
+            TrackPlayer.CAPABILITY_PAUSE,
+            TrackPlayer.CAPABILITY_SKIP_TO_NEXT,
+            TrackPlayer.CAPABILITY_SKIP_TO_PREVIOUS,
+            TrackPlayer.CAPABILITY_STOP,
+            TrackPlayer.CAPABILITY_SEEK_TO
+        ],
+
+        notificationCapabilities: [
+            TrackPlayer.CAPABILITY_PLAY,
+            TrackPlayer.CAPABILITY_PAUSE,
+            TrackPlayer.CAPABILITY_SKIP_TO_NEXT,
+            TrackPlayer.CAPABILITY_SKIP_TO_PREVIOUS,
+            TrackPlayer.CAPABILITY_STOP,
+            TrackPlayer.CAPABILITY_SEEK_TO
+        ],
+
+        compactCapabilities: [
+            TrackPlayer.CAPABILITY_PLAY,
+            TrackPlayer.CAPABILITY_PAUSE,
+            TrackPlayer.CAPABILITY_SKIP_TO_NEXT
+        ],
+    });
+}
 
 export const YOUTUBE_WATCH = "https://www.youtube.com/watch?v=";
 
@@ -72,7 +116,6 @@ export const skipTo = (id) => {
             TrackPlayer.seekTo(0);
 
             resolve(true);
-            return;
         }
     );
 }
@@ -132,7 +175,6 @@ export async function startPlayback({ playlistId, videoId }) {
                 reject({playlistId, videoId});
         }
     );
-    
 }
 
 export function setPlay(isPlaying) {

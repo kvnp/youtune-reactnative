@@ -29,8 +29,8 @@ export default ({entry, navigation}) => {
     };
 
     return (
-        <Pressable onPress={() => {handle(view, navigation)}} style={resultStyle.resultView}>
-            <Pressable android_ripple={rippleConfig} onPress={() => {handle(view, navigation)}}>
+        <Pressable onPress={() => handle(view, navigation)} style={resultStyle.resultView}>
+            <Pressable android_ripple={rippleConfig} onPress={() => handle(view, navigation)}>
                 <Image style={resultStyle.resultCover} source={{uri: thumbnail}}/>
             </Pressable>
 
@@ -48,5 +48,5 @@ export default ({entry, navigation}) => {
                 <MaterialIcons name="more-vert" color="black" size={24}/>
             </Pressable>
         </Pressable>
-    )
+    );
 }
