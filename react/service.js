@@ -14,7 +14,6 @@ export const register = () => {
 
     TrackPlayer.registerPlaybackService(() => require("./handler"));
 
-    TrackPlayer.setupPlayer();
     TrackPlayer.updateOptions({
         stopWithApp: true,
         alwaysPauseOnInterruption: true,
