@@ -577,7 +577,13 @@ export async function digestStreams(text) {
     let decode = decodeURIComponent(text);
     let indexone = decode.indexOf("player_response=") + 16;
     let indextwo = decode.indexOf("}&") + 1;
-    let parse = JSON.parse(decode.substring(indexone, indextwo));
+
+    let parse = null;
+    try {
+        parse = JSON.parse(decode.substring(indexone, indextwo));
+    } catch {
+        return null;
+    }
 
     let videoId = parse.videoDetails.videoId;
 

@@ -147,15 +147,20 @@ export async function fetchVideoInfo(videoId) {
 }
 
 export async function fetchAudioStream(videoId) {
-    let url = "https://youtube.com/get_video_info?video_id=" + videoId +
-              "&el=detailpage&c=WEB_REMIX&cver=0.1&cplayer=UNIPLAYER";
+    while (true) {
+        let url = "https://youtube.com/get_video_info?video_id=" + videoId +
+                "&el=detailpage&c=WEB_REMIX&cver=0.1&cplayer=UNIPLAYER";
 
-    let response = await getHttpResponse(url, {
-        method: "GET",
-        headers: headers_yt
-    }, "text");
+        let response = await getHttpResponse(url, {
+            method: "GET",
+            headers: headers_yt
+        }, "text");
 
-    return await digestStreams(response);
+        let stream = await digestStreams(response);
+
+        if (stream != null)
+            return stream;
+    }
 }
 
 export async function fetchNext(videoId, playlistId) {
