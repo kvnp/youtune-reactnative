@@ -33,9 +33,10 @@ function getFunction(code) {
         let pattern = new RegExp(REGEXES[i]);
         let result = pattern.exec(code);
 
-        if (result[1] != undefined)
+        if (result[1] != undefined) {
             decryptionFunctionName = result[1];
             break;
+        }
     }
 
     let functionPattern = new RegExp("(" + decryptionFunctionName.split("$").join("\\$") + "=function\\([a-zA-Z0-9_]+\\)\\{.+?\\})");
