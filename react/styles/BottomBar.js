@@ -33,13 +33,16 @@ export const bottomBarStyle = StyleSheet.create({
     },
 
     closeButton: {
-        backgroundColor: 'white',
-        paddingTop: 10,
-        paddingBottom: 10,
-        paddingLeft: 15,
-        paddingRight: 15,
-        borderRadius: 25,
+        backgroundColor: "white",
+        color: "black",
+        width: 40,
+        height: 40,
+        marginLeft: 15,
+        
+        borderRadius: 20,
         alignSelf: 'center',
+        alignItems: "center",
+        justifyContent: "center"
     },
 
     closeButtonText: {
@@ -58,8 +61,9 @@ export const bottomBarStyle = StyleSheet.create({
         paddingRight: 13,
         paddingTop: 2,
         paddingBottom: 2,
-        backgroundColor: 'white',
-        borderRadius: 5
+        backgroundColor: "white",
+        borderRadius: 5,
+        zIndex: 10
     },
 
     buttonText: {
