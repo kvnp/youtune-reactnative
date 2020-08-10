@@ -18,7 +18,7 @@ import { appColor } from "../../styles/App";
 const { height } = Dimensions.get("window");
 export default class SwipePlaylist extends PureComponent {
     static defaultProps = {
-        draggableRange: { top: height-50, bottom: 50}
+        draggableRange: { top: height - 50, bottom: 50}
     };
   
     _draggedValue = new Animated.Value(50);
@@ -29,7 +29,7 @@ export default class SwipePlaylist extends PureComponent {
                 ref={(c) => (this._panel = c)}
                 draggableRange={this.props.draggableRange}
                 animatedValue={this._draggedValue}
-                snappingPoints={[50]}
+                snappingPoints={[51]}
                 height={height}
                 friction={0.5}
             >
@@ -44,13 +44,6 @@ export default class SwipePlaylist extends PureComponent {
                         contentContainerStyle={stylesRest.playlistContainer}
 
                         data={this.props.playlist}
-
-                        /*ListFooterComponentStyle={this.state.isMinimized ?{display: "none"} :stylesRest.topAlign}
-                        ListFooterComponent={
-                            <Pressable onPress={this.scrollDown}>
-                                <View style={stylesRest.smallBar}/>
-                            </Pressable>
-                        }*/
 
                         keyExtractor={item => item.id}
                         renderItem={({item, index}) => 
@@ -78,7 +71,6 @@ export default class SwipePlaylist extends PureComponent {
                             </Pressable>
                         }
                     />
-                    
                 </View>
             </SlidingUpPanel>
         );
@@ -108,6 +100,7 @@ const styles = StyleSheet.create({
         backgroundColor: appColor.background.backgroundColor,
         borderTopLeftRadius: 25,
         borderTopRightRadius: 25,
+        paddingBottom: 10
     },
 
     textHeader: {

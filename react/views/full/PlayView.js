@@ -113,8 +113,7 @@ export default class PlayView extends PureComponent {
         if (this.props.route.params != undefined) {
             isLoading = true;
             var {title, subtitle, thumbnail} = this.props.route.params;
-            var artist = title;
-            var title = subtitle;
+            var artist = subtitle;
             var artwork = thumbnail;
 
             TrackPlayer.reset();
