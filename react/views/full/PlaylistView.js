@@ -18,9 +18,10 @@ import FlatEntries from "../../components/collections/FlatEntries";
 import { rippleConfig } from "../../styles/Ripple";
 import { appColor } from "../../styles/App";
 
-export default ({ route, navigation }) => {
+export default PlaylistView = ({ route, navigation }) => {
     const { entries, title, subtitle, secondSubtitle, thumbnail} = route.params;
     navigation.setOptions({ title: title });
+    
     return (
         <>
             <FlatEntries entries={entries} navigation={navigation}/>
@@ -54,3 +55,5 @@ export default ({ route, navigation }) => {
         </>
     )
 }
+
+PlaylistView.setOptions

@@ -471,8 +471,10 @@ function getArtist(json) {
                     }
 
                     let subtitleList = music.subtitle.runs;
-                    for (let pstl = 0; pstl < subtitleList.length; pstl++) {
-                        album.subtitle += subtitleList[pstl].text;
+                    if (subtitleList != undefined) {   
+                        for (let pstl = 0; pstl < subtitleList.length; pstl++) {
+                            album.subtitle += subtitleList[pstl].text;
+                        }
                     }
 
                     let thumbnailList = music.thumbnailRenderer.musicThumbnailRenderer.thumbnail.thumbnails;
