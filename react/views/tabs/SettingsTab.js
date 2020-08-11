@@ -59,7 +59,7 @@ export default class SettingsTab extends PureComponent {
     render() {
         return <>
             <ScrollView bounces={true} contentContainerStyle={{flexGrow: 1, justifyContent: "flex-end"}}>
-                <Pressable onPress={() => this.toggleLanguage(!this.state.language)} style={{flexDirection: "row", width: "100%", alignItems: "center", justifyContent: "space-evenly", backgroundColor: "darkgray", borderWidth: 1, marginTop: 7, marginBottom: 7}}>
+                <Pressable onPress={() => this.toggleLanguage(!this.state.language)} style={{flexDirection: "row", width: "100%", alignItems: "center", justifyContent: "space-evenly", backgroundColor: "darkgray", borderWidth: 1, height: 65, marginTop: 7, marginBottom: 7}}>
                     <MaterialIcons name="language" color="black" size={30}/>
                     <Text style={{flexWrap: "wrap", width: "50%"}}>Transmit device language to YouTube</Text>
                     <Switch
@@ -71,7 +71,7 @@ export default class SettingsTab extends PureComponent {
                     />
                 </Pressable>
 
-                <Pressable onPress={() => this.toggleProxy(!this.state.proxy)} style={{flexDirection: "row", width: "100%", alignItems: "center", justifyContent: "space-evenly", backgroundColor: "darkgray", borderWidth: 1, marginTop: 7, marginBottom: 7}}>
+                <Pressable onPress={() => this.toggleProxy(!this.state.proxy)} style={{flexDirection: "row", width: "100%", alignItems: "center", justifyContent: "space-evenly", backgroundColor: "darkgray", borderWidth: 1, height: 65, marginTop: 7, marginBottom: 7}}>
                     <MaterialIcons name="public" color="black" size={30}/>
                     <Text style={{flexWrap: "wrap", width: "50%"}}>Proxy YouTube Music (Search/Home/Browse) requests</Text>
                     <Switch
@@ -83,7 +83,7 @@ export default class SettingsTab extends PureComponent {
                     />
                 </Pressable>
 
-                <Pressable onPress={() => this.toggleSafetyMode(!this.state.safety)} style={{flexDirection: "row", width: "100%", alignItems: "center", justifyContent: "space-evenly", backgroundColor: "darkgray", borderWidth: 1, marginTop: 7, marginBottom: 7}}>
+                <Pressable onPress={() => this.toggleSafetyMode(!this.state.safety)} style={{flexDirection: "row", width: "100%", alignItems: "center", justifyContent: "space-evenly", backgroundColor: "darkgray", borderWidth: 1, height: 65, marginTop: 7, marginBottom: 7}}>
                     <MaterialIcons name="child-friendly" color="black" size={30}/>
                     <Text style={{flexWrap: "wrap", width: "50%"}}>Enable safety mode</Text>
                     <Switch

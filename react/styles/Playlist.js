@@ -2,7 +2,7 @@ import { StyleSheet } from 'react-native';
 
 export const playlistStyle = StyleSheet.create({
     container: {
-        height: 230,
+        height: 200,
         width: 150,
     },
 

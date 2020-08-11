@@ -31,7 +31,6 @@ export function digestSearchResults(json) {
             for (let dym = 0; dym < renderer.didYouMean.runs.length; dym++)
                 final.suggestionOption.endpoints.text += renderer.didYouMean.runs[dym].text;
             
-            
             for (let crq = 0; crq < renderer.correctedQuery.runs.length; crq++)
                 final.suggestionOption.correctedList.push(renderer.correctedQuery.runs[crq]);
             
@@ -68,9 +67,8 @@ export function digestSearchResults(json) {
             let titlelist = musicShelf.title.runs;
             let title = "";
 
-            for (let ttl = 0; ttl < titlelist.length; ttl++) {
+            for (let ttl = 0; ttl < titlelist.length; ttl++)
                 title += titlelist[ttl].text;
-            }
 
             let shelf = {title: title, data: []};
 
@@ -163,9 +161,8 @@ export function digestHomeResults(json) {
 
         } else continue;
 
-        for (let l = 0; l < shelfRenderer.header.musicCarouselShelfBasicHeaderRenderer.title.runs.length; l++) {
+        for (let l = 0; l < shelfRenderer.header.musicCarouselShelfBasicHeaderRenderer.title.runs.length; l++)
             shelf.title += shelfRenderer.header.musicCarouselShelfBasicHeaderRenderer.title.runs[l].text;
-        }
 
         for (let m = 0; m < shelfRenderer.contents.length; m++) {
             let album = {title: "", subtitle: ""};
@@ -615,7 +612,6 @@ export async function digestStreams(text) {
     }
 }
 
-
 export function digestNextResults(json) {
     let playlist = new Playlist();
     
@@ -634,15 +630,13 @@ export function digestNextResults(json) {
     
         let titleList = panelRenderer.title.runs;
         let title = "";
-        for (let titleI = 0; titleI < titleList.length; titleI++) {
+        for (let titleI = 0; titleI < titleList.length; titleI++)
             title += titleList[titleI].text;
-        }
     
         let subtitleList = panelRenderer.shortBylineText.runs;
         let artist = "";
-        for (let subtitleI = 0; subtitleI < subtitleList.length; subtitleI++) {
+        for (let subtitleI = 0; subtitleI < subtitleList.length; subtitleI++)
             artist += subtitleList[subtitleI].text;
-        }
 
         let thumbnailList = panelRenderer.thumbnail.thumbnails;
 

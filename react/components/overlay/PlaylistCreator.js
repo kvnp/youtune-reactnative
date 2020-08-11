@@ -8,29 +8,29 @@ import {
     TextInput
 } from "react-native";
 import { rippleConfig } from "../../styles/Ripple";
+import { appColor } from "../../styles/App";
 
-export default ({ callback }) => {
+export default ({ callback, style }) => {
     let title = "";
     let description = "";
     return (
-        <View style={styles.headerContainer}>
+        <View style={[style, styles.headerContainer]}>
             <View style={styles.headerCenterContainer}>
                 <View style={styles.headerTopRow}>
-                    <View style={styles.headerTopColumn}>
-                        <TextInput style={styles.inputText}
-                                   onChangeText={ text => title = text }
-                                   placeholder="Titel"/>
+                    <TextInput style={styles.inputText}
+                               onChangeText={ text => title = text }
+                               placeholder="Title"/>
 
-                        <TextInput style={styles.inputText}
-                                   onChangeText={ text => description = text}
-                                   placeholder="Beschreibung"/>
-                    </View>
+                    <TextInput style={styles.inputText}
+                               onChangeText={ text => description = text}
+                               placeholder="Description"/>
+                    
                 </View>
 
                 <View style={styles.headerButtonView}>
                     <Pressable android_ripple={rippleConfig} style={styles.headerButton}
                                       onPress={() => callback() }>
-                        <Text style={styles.headerButtonText}>ABBRECHEN</Text>
+                        <Text style={styles.headerButtonText}>CANCEL</Text>
                     </Pressable>
                     <Pressable android_ripple={rippleConfig} style={styles.headerButton}
                                       onPress={() =>  {
@@ -38,7 +38,7 @@ export default ({ callback }) => {
                                                 callback({title: title, description: description});
                                             }
                                       }}>
-                        <Text style={styles.headerButtonText}>SPEICHERN</Text>
+                        <Text style={styles.headerButtonText}>CREATE</Text>
                     </Pressable>
                 </View>
             </View>
@@ -70,13 +70,15 @@ const styles = StyleSheet.create({
 
     inputText: {
         textAlign: 'justify',
+        width: "100%",
+        fontSize: 15
     },
 
     headerTopRow: {
         justifyContent: 'space-between',
         alignItems: 'center',
-        flexDirection: 'row',
-
+        flexDirection: 'column',
+        width: 200,
         paddingRight: 5,
         paddingLeft: 5
     },
@@ -117,7 +119,12 @@ const styles = StyleSheet.create({
     },
 
     headerButtonText: {
-        fontWeight: 'bold'
+        fontWeight: 'bold',
+        color: "white",
+        backgroundColor: appColor.background.backgroundColor,
+        paddingHorizontal: 10,
+        paddingVertical: 2,
+        borderRadius: 20
     },
 
     closeButtonText: {

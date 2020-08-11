@@ -2,7 +2,11 @@ import React from "react";
 import {
     ScrollView,
     Text,
+    View,
+    Pressable
 } from "react-native";
+import MaterialIcons from "react-native-vector-icons/MaterialIcons";
+import { appColor } from "../../styles/App";
 
 export default ({ navigation }) => {
     React.useEffect(() => {
@@ -13,8 +17,14 @@ export default ({ navigation }) => {
     });
 
     return (
-        <ScrollView>
-            <Text>Alben</Text>
+        <ScrollView style={{}} contentContainerStyle={{flex: 1, alignItems: "center", justifyContent: "center"}}>
+            <View style={{height: 300, justifyContent: "space-evenly", alignItems: "center"}}>
+                <MaterialIcons name="album" color="black" size={50}/>
+                <Text style={{fontSize: 20}}>Liked albums are displayed here</Text>
+                <Pressable onPress={() => navigation.navigate("Search")} style={{padding: 10, borderRadius: 20, backgroundColor: appColor.background.backgroundColor}}>
+                    <Text style={{color: "white", fontWeight: "bold"}}>Look for music</Text>
+                </Pressable>
+            </View>
         </ScrollView>
     );
 }

@@ -25,13 +25,11 @@ export default ({ playlist, navigation, style }) => {
         <Pressable android_ripple={rippleConfig} onPress={() => handleMedia(viewObject, navigation)} style={[style, playlistStyle.container]}>
             <Image style={playlistStyle.cover} source={{uri: thumbnail}}/>
 
-            <Text style={playlistStyle.title}
-                    numberOfLines={2}>
+            <Text style={playlistStyle.title} numberOfLines={2}>
                 {title}
             </Text>
 
-            <Text style={playlistStyle.description}
-                    numberOfLines={2}>
+            <Text style={playlistStyle.description} numberOfLines={2}>
                 {subtitle}
             </Text>
         </Pressable>

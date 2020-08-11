@@ -46,21 +46,14 @@ export default class Playlists extends PureComponent {
     render() {
         return (
             <>
-                <ScrollView style={styles.playlistCollection} contentContainerStyle={styles.playlistCollectionContainer}>
-                    <View style={styles.playlist}>
-                        <Pressable android_ripple={rippleConfig} onPress={() => this.setModalVisible(true)}
-                                        style={styles.playlistCover}>
-                            <Text style={styles.newPlaylist}>+</Text>
-                        </Pressable>
-                        <Text style={styles.playlistTitle}>Neue Playlist</Text>
-                    </View>
+                <ScrollView contentContainerStyle={styles.playlistCollectionContainer}>
+                    <Pressable style={styles.playlist} android_ripple={rippleConfig} onPress={() => this.setModalVisible(true)}>
+                        <Text style={styles.newPlaylist}>+</Text>
+                        <Text style={styles.playlistTitle}>Add Playlist</Text>
+                    </Pressable>
 
                     {this.state.playlists.map((playlist) => {
-                        return (
-                            <View style={styles.playlist}>
-                                <Playlist playlist={playlist} navigation={this.props.navigation}/>
-                            </View>
-                        );
+                        return <Playlist playlist={playlist} navigation={this.props.navigation} style={styles.playlist}/>
                     })}
 
                 </ScrollView>
@@ -76,17 +69,22 @@ export default class Playlists extends PureComponent {
                     onDismiss={() => {
                         this.setModalVisible(false);
                     }}
+
+                    hardwareAccelerated={true}
                 >
-                    <View style={styles.modalView}>
-                        <View style={styles.modalChild}>
-                        {PlaylistCreator({
-                            callback: (obj) => {
-                                if (obj != undefined) this.createPlaylist(obj);
-                                this.setModalVisible(false);
-                            }
-                        })}
-                        </View>
-                    </View>
+                    <Pressable onPress={() => this.setModalVisible(false)} style={{height: "100%", width: "100%", justifyContent: "flex-end", backgroundColor: "rgba(0, 0, 0, 0.3)"}}>
+                        <Pressable style={{marginBottom: 100}}>
+                            <PlaylistCreator
+                                style={styles.modalChild}
+                                callback={
+                                    obj => {
+                                        if (obj != undefined) this.createPlaylist(obj);
+                                        this.setModalVisible(false);
+                                    }
+                                }
+                            />
+                        </Pressable>
+                    </Pressable>
                 </Modal>
             </>
         );
@@ -101,13 +99,12 @@ const styles = StyleSheet.create({
     },
     
     modalView: {
-        backgroundColor: "transparent",
         alignSelf: "center",
     },
 
     modalChild: {
         backgroundColor: "white",
-        borderRadius: 10,
+        borderRadius: 10
     },
 
     openButton: {
@@ -126,8 +123,6 @@ const styles = StyleSheet.create({
         marginBottom: 15,
         textAlign: "center",
     },
-
-
 
     header: {
         alignSelf: 'center',
@@ -164,32 +159,18 @@ const styles = StyleSheet.create({
         borderBottomColor: 'gray',
     },
 
-    playlistCollection: {
-        width: '100%'
-    },
-
     playlistCollectionContainer: {
         flexGrow: 1,
         justifyContent: 'center',
         flexDirection: 'row',
-        flexWrap: 'wrap-reverse'
+        alignItems: "flex-end",
+        flexWrap: "wrap-reverse"
     },
 
     playlist: {
-        alignItems: 'center',
-        marginTop: 140,
-        marginLeft: 30,
-        marginRight: 30,
-        width: 100,
-        height: 100
-    },
-
-    playlistCover: {
-        alignItems:'center',
-        justifyContent:'center',
-        height: 150,
+        margin: 10,
         width: 150,
-        backgroundColor: 'gray'
+        height: 200
     },
 
     playlistTitle: {
@@ -204,8 +185,12 @@ const styles = StyleSheet.create({
     },
 
     newPlaylist: {
+        width: 150,
+        height: 150,
+        textAlign: "center",
+        fontSize: 100,
         color: 'white',
-        fontSize: 80,
+        backgroundColor: "gray"
     },
 
     addPlaylist: {
