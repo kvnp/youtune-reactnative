@@ -3,6 +3,7 @@ import React, { PureComponent } from 'react';
 import {
     ImageBackground,
     Text,
+    Pressable,
 } from "react-native";
 
 import LinearGradient from 'react-native-linear-gradient';
@@ -35,10 +36,11 @@ export default class Header extends PureComponent {
                              source={this.state.source}>
                 <LinearGradient style={[headerStyle.gradient, this.state.source == null ?headerStyle.image :headerStyle.imageFound]}
                                 colors={gradientColors}>
-                                    
-                    <Text style={headerStyle.text}>
-                        {this.state.title}
-                    </Text>
+                    <Pressable onPress={this.props.onPress}>             
+                        <Text style={headerStyle.text}>
+                            {this.state.title}
+                        </Text>
+                    </Pressable>
                 </LinearGradient>
             </ImageBackground>
         )

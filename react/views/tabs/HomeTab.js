@@ -5,7 +5,8 @@ import {
     Pressable,
     FlatList,
     View,
-    ActivityIndicator
+    ActivityIndicator,
+    Modal
 } from 'react-native';
 
 import { fetchHome } from "../../modules/remote/API";
@@ -21,9 +22,14 @@ export default class HomeTab extends PureComponent {
     constructor(props) {
         super(props);
         this.state = {
+            modalVisible: false,
             shelves: [],
             loading: false,
         }
+    }
+
+    setModalVisible = (boolean) => {
+        this.setState({modalVisible: boolean});
     }
 
     componentDidMount() {

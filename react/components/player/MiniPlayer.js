@@ -1,8 +1,10 @@
 import React, { PureComponent } from "react";
-import { StyleSheet, Animated, View, Pressable, Image, Text } from "react-native";
+import { StyleSheet, View, Pressable, Image, Text } from "react-native";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import TrackPlayer from 'react-native-track-player';
 import { skip, setPlay } from "../../service";
+import { rippleConfig } from "../../styles/Ripple";
+import { appColor } from "../../styles/App";
 
 export default class MiniPlayer extends PureComponent{
     constructor(props) {
@@ -87,27 +89,33 @@ export default class MiniPlayer extends PureComponent{
             var {title, artist, artwork} = this.state.track;
 
         return (
-            <Animated.View style={[this.props.style, {height: this.state.isStopped ?0 :50}]}>
-                <Pressable style={styles.container} onPress={this.onOpen}>
-                    <Image source={{uri: artwork}} style={styles.image}/>
-                    <View style={styles.textContainer}>
+            <View style={[this.props.style, {height: this.state.isStopped ?0 :50}, styles.container]}>
+                <Image source={{uri: artwork}} style={styles.image}/>
+                <View style={styles.textContainer}>
+                    <Pressable android_ripple={rippleConfig} onPress={this.onOpen}>
                         <Text numberOfLines={1} style={[styles.text, styles.titleText]}>{title}</Text>
                         <Text numberOfLines={1} style={[styles.text, styles.subtitleText]}>{artist}</Text>
-                    </View>
+                    </Pressable>
+                </View>
 
-                    <Pressable style={styles.button} onPress={this.onStop}>
+                <View style={styles.button}>
+                    <Pressable android_ripple={rippleConfig} onPress={this.onStop}>
                         <MaterialIcons name="clear" color="white" size={29}/>
                     </Pressable>
+                </View>
 
-                    <Pressable style={styles.button} onPress={this.onPlay}>
+                <View style={styles.button}>
+                    <Pressable android_ripple={rippleConfig} onPress={this.onPlay}>
                         <MaterialIcons name={this.state.isPlaying ?"pause" :"play-arrow"} color="white" size={29}/>
                     </Pressable>
+                </View>
 
-                    <Pressable style={styles.button} onPress={this.onNext}>
+                <View style={styles.button}>
+                    <Pressable android_ripple={rippleConfig} onPress={this.onNext}>
                         <MaterialIcons name="skip-next" color="white" size={29}/>
                     </Pressable>
-                </Pressable>
-            </Animated.View>
+                </View>
+            </View>
         );
     }
 }
@@ -116,11 +124,8 @@ const styles = StyleSheet.create({
     container: {
         flexDirection: "row",
         overflow: "hidden",
-        height: 50,
         paddingRight: 15,
         paddingLeft: 15,
-        paddingBottom: 2,
-        paddingTop: 2,
         alignItems: "center",
         alignSelf: "center",
     },
@@ -134,7 +139,8 @@ const styles = StyleSheet.create({
     textContainer: {
         flex: 1,
         overflow: "hidden",
-        paddingLeft: 10
+        paddingLeft: 10,
+        paddingRight: 10,
     },
 
     text: {
@@ -150,6 +156,11 @@ const styles = StyleSheet.create({
     },
 
     button: {
+        justifyContent: "center",
+        alignItems: "center",
+        backgroundColor: appColor.background.backgroundColor,
+        width: 40,
+        height: 40,
         paddingLeft: 2,
         paddingRight: 2
     }

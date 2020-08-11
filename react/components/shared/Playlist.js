@@ -22,7 +22,12 @@ export default ({ playlist, navigation, style }) => {
     };
 
     return (
-        <Pressable android_ripple={rippleConfig} onPress={() => handleMedia(viewObject, navigation)} style={[style, playlistStyle.container]}>
+        <Pressable
+            android_ripple={rippleConfig}
+            onLongPress={() => global.showModal({title: title, subtitle: subtitle, thumbnail: thumbnail})}
+            onPress={() => handleMedia(viewObject, navigation)}
+            style={[style, playlistStyle.container]}
+        >
             <Image style={playlistStyle.cover} source={{uri: thumbnail}}/>
 
             <Text style={playlistStyle.title} numberOfLines={2}>

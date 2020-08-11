@@ -29,7 +29,11 @@ export default ({entry, navigation}) => {
     };
 
     return (
-        <Pressable onPress={() => handle(view, navigation)} style={resultStyle.resultView}>
+        <Pressable
+            onPress={() => handle(view, navigation)}
+            onLongPress={() => global.showModal({title: title, subtitle: subtitle, thumbnail: thumbnail})}
+            style={resultStyle.resultView}
+        >
             <Pressable android_ripple={rippleConfig} onPress={() => handle(view, navigation)}>
                 <Image style={resultStyle.resultCover} source={{uri: thumbnail}}/>
             </Pressable>
@@ -44,7 +48,7 @@ export default ({entry, navigation}) => {
                 <Text numberOfLines={1} style={resultStyle.resultText}>{secondSubtitle}</Text>
             </View>
 
-            <Pressable onPress={() => handle(view, navigation)}>
+            <Pressable onPress={() => global.showModal({title: title, subtitle: subtitle, thumbnail: thumbnail})}>
                 <MaterialIcons name="more-vert" color="black" size={24}/>
             </Pressable>
         </Pressable>

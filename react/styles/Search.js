@@ -5,26 +5,25 @@ export const searchBarStyle = StyleSheet.create({
     container: {
         flexDirection: "row",
         backgroundColor: appColor.background.backgroundColor,
-        //backgroundColor: "transparent",
-        paddingLeft: 20,
-        paddingRight: 20,
-        paddingTop: 3,
-        paddingBottom: 3,
+        paddingHorizontal: 20,
+        paddingVertical: 3,
         height: 50
     },
 
     button: {
-        paddingLeft: 20,
-        paddingRight: 20,
+        width: 60,
+        height: 45,
         backgroundColor: "rgba(25, 25, 25, 0.5)",
+        justifyContent: "center",
+        alignItems: "center",
+        borderWidth: 1,
         borderTopRightRadius: 25,
         borderBottomRightRadius: 25,
-        borderWidth: 1,
-        justifyContent: "center",
         elevation: 1
     },
 
     input: {
+        height: 45,
         flex: 1,
         color: "white",
         alignSelf: "center",

@@ -18,6 +18,7 @@ import { shelvesStyle } from '../../styles/Shelves';
 import { textStyle, appColor } from '../../styles/App';
 import { fetchResults } from '../../modules/remote/API';
 import MiniPlayer from '../../components/player/MiniPlayer';
+import { rippleConfig } from '../../styles/Ripple';
 
 export default class SearchTab extends PureComponent {
     constructor(props) {
@@ -158,16 +159,16 @@ export default class SearchTab extends PureComponent {
 
             {this.getSpecificButtons()}
             <View style={searchBarStyle.container}>
-                <TextInput style={searchBarStyle.input}
+                <TextInput  style={searchBarStyle.input}
                             placeholder="Search"
                             value={this.state.query}
                             placeholderTextColor={textStyle.placeholder.color}
                             onChange={this.setQuery}
                             onSubmitEditing={this.search}/>
-
-                <Pressable onPress={this.search}
-                           style={searchBarStyle.button}
-                           disabled={this.state.buttonDisabled}>
+                <Pressable  onPress={this.search}
+                            android_ripple={rippleConfig}
+                            style={searchBarStyle.button}
+                            disabled={this.state.buttonDisabled}>
                     { this.state.loading
                         ? <ActivityIndicator color="white" size="small"/>
                         : <MaterialIcons name="search" color="white" size={24}/>

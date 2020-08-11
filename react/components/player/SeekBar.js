@@ -20,11 +20,6 @@ const minutesAndSeconds = (position) => ([
     pad( ~~(position % 60), 2),
 ]);
 
-const defaultString = {
-    darkColor: "rgb(0, 0, 0)",
-    lightGrayColor:  "rgb(25, 25, 25)",
-}
-
 const doSeek = async(value) => {
     await TrackPlayer.seekTo(value);
 }
@@ -42,8 +37,9 @@ export default ({ style }) => {
                 onSlidingComplete={async(value) => await doSeek(value)}
                 value={position}
                 bufferedPosition={bufferedPosition}
-                minimumTrackTintColor={defaultString.darkColor}
-                maximumTrackTintColor={defaultString.lightGrayColor}
+                minimumTrackTintColor="black"
+                maximumTrackTintColor="darkgray"
+                thumbTintColor={appColor.background.backgroundColor}
                 thumbStyle={styles.thumb}
                 trackStyle={styles.track}
             />
