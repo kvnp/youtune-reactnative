@@ -188,7 +188,20 @@ export default class PlayView extends PureComponent {
                                     <MaterialIcons name="keyboard-arrow-down" color={"black"} size={30}/>
                                 </Pressable>
 
-                                <Pressable onPress={() => global.showModal({title: title, subtitle: artist, thumbnail: artwork})} android_ripple={rippleConfig} style={stylesTop.topThird}>
+                                <Pressable
+                                    onPress={() => {
+                                        let view = {
+                                            title: this.state.track.title,
+                                            subtitle: this.state.track.artist,
+                                            thumbnail: this.state.track.artwork,
+                                            videoId: this.state.track.id
+                                        };
+
+                                        global.showModal(view);
+                                    }}
+                                    android_ripple={rippleConfig}
+                                    style={stylesTop.topThird}
+                                >
                                     <MaterialIcons name="more-vert" color={"black"} size={30}/>
                                 </Pressable>
                             </View>

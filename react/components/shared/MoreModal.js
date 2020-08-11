@@ -5,12 +5,14 @@ import {
     View,
     Text,
     Image,
-    StyleSheet
+    StyleSheet,
+    Share
 } from "react-native";
 
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 
 import { appColor } from "../../styles/App";
+import { handleMedia } from "../../modules/event/mediaNavigator";
 
 export default class MoreModal extends PureComponent {
     constructor(props) {
@@ -20,7 +22,10 @@ export default class MoreModal extends PureComponent {
             modalContent: {
                 title: null,
                 subtitle: null,
-                thumbnail: null
+                thumbnail: null,
+                videoId: null,
+                browseId: null,
+                playlistId: null,
             }
         }
 
@@ -31,13 +36,40 @@ export default class MoreModal extends PureComponent {
 
     setModalVisible = (
         boolean,
-        content = {title: null, subtitle: null, thumbnail: null}
+        content = {title: null, subtitle: null, thumbnail: null, videoId: null, browseId: null, playlistId: null}
     ) => {
         this.setState({
             modalVisible: boolean,
             modalContent: content
         });
     }
+
+    onShare = async (type, url, message) => {
+        try {
+            const title = "YouTune - " + type;
+            const result = await Share.share({
+                title: title,
+                url: url,
+                message: message + ":\n" + url
+            }, {
+                dialogTitle: title
+            });
+
+            this.setModalVisible(false);
+            
+            if (result.action === Share.sharedAction) {
+                if (result.activityType) {
+                // shared with activity type of result.activityType
+                } else {
+                // shared
+                }
+            } else if (result.action === Share.dismissedAction) {
+                // dismissed
+            }
+        } catch (error) {
+            alert(error.message);
+        }
+    };
 
     render() {
         return (
@@ -73,11 +105,29 @@ export default class MoreModal extends PureComponent {
                         </View>
 
                         <View style={modalStyles.entryView}>
-                        <Pressable onPress={() => {}} style={modalStyles.entry} android_ripple={{color: "gray"}}>
-                            <MaterialIcons name="play-arrow" color="black" size={25}/>
-                            <Text style={{paddingLeft: 20}}>Play</Text>
-                        </Pressable>
-                        </View>
+                                <Pressable 
+                                    onPress={
+                                        () => {
+                                            handleMedia(this.state.modalContent, this.props.navigation);
+                                            this.setModalVisible(false);
+                                        }
+                                    }
+                                    style={modalStyles.entry}
+                                    android_ripple={{color: "gray"}}
+                                >
+                                    {this.state.modalContent.videoId != null
+                                        ? <>
+                                            <MaterialIcons name="play-arrow" color="black" size={25}/>
+                                            <Text style={{paddingLeft: 20}}>Play</Text>
+                                        </>
+                                        
+                                        : <>
+                                            <MaterialIcons name="launch" color="black" size={25}/>
+                                            <Text style={{paddingLeft: 20}}>Open</Text>
+                                        </>
+                                    }
+                                </Pressable>
+                            </View>
                         
                         <View style={modalStyles.entryView}>
                         <Pressable onPress={() => {}} style={modalStyles.entry} android_ripple={{color: "gray"}}>
@@ -88,20 +138,45 @@ export default class MoreModal extends PureComponent {
 
                         <View style={modalStyles.entryView}>
                         <Pressable onPress={() => {}} style={modalStyles.entry} android_ripple={{color: "gray"}}>
-                            <MaterialIcons name="playlist-add" color="black" size={25}/>
-                            <Text style={{paddingLeft: 20}}>Add to playlist</Text>
+                            {this.state.modalContent.videoId != null
+                                ? <>
+                                    <MaterialIcons name="playlist-add" color="black" size={25}/>
+                                    <Text style={{paddingLeft: 20}}>Add to playlist</Text>
+                                </>
+
+                                : <>
+                                    <MaterialIcons name="library-add" color="black" size={25}/>
+                                    <Text style={{paddingLeft: 20}}>Add to library</Text>
+                                </>
+                            }
                         </Pressable>
                         </View>
 
                         <View style={modalStyles.entryView}>
-                        <Pressable onPress={() => {}} style={modalStyles.entry} android_ripple={{color: "gray"}}>
+                        <Pressable
+                            onPress={
+                                () => {
+                                    console.log(this.state.modalContent);
+
+                                    let file;
+                                    let type;
+                                    let message = this.state.modalContent.title + " - " + this.state.modalContent.subtitle;
+                                    if (this.state.modalContent.videoId != null) {
+                                        file = "watch?v=" + this.state.modalContent.videoId;
+                                        type = "Song";
+                                    } else
+                                        file = "playlist?list=" + this.state.modalContent.playlistId;
+                                        type = "Playlist"
+
+                                    this.onShare(type, "https://music.youtube.com/" + file, message);
+                                }
+                            }
+
+                            style={modalStyles.entry} android_ripple={{color: "gray"}}
+                        >
                             <MaterialIcons name="share" color="black" size={25}/>
                             <Text style={{paddingLeft: 20}}>Share</Text>
                         </Pressable>
-                        </View>
-
-                        <View style={modalStyles.entryView}>
-
                         </View>
                     </Pressable>
                 </Pressable>

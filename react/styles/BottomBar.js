@@ -107,7 +107,7 @@ export const bottomBarAlbumStyle = StyleSheet.create({
     },
 
     topColumn: {
-
+        width: 200
     },
 
     albumTitle: {
@@ -120,6 +120,11 @@ export const bottomBarAlbumStyle = StyleSheet.create({
 
     albumInfo: {
         
+    },
+
+    albumText: {
+        color: "white",
+        fontWeight: "bold"
     }
 });
 

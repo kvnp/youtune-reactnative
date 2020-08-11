@@ -3,7 +3,6 @@ import {
     View,
     Text,
     Image,
-    ImageBackground,
     Pressable
 } from "react-native";
 
@@ -30,30 +29,37 @@ export default PlaylistView = ({ route, navigation }) => {
                 <View style={bottomBarStyle.topRow}>
                     <Image style={bottomBarAlbumStyle.albumCover} source={{uri: thumbnail}}/>
                     <View style={bottomBarAlbumStyle.topColumn}>
-                        <Text style={bottomBarAlbumStyle.albumTitle}>{title}</Text>
-                        <Text style={bottomBarAlbumStyle.albumSubtitle}>{subtitle}</Text>
-                        <Text style={bottomBarAlbumStyle.albumInfo}>{secondSubtitle}</Text>
+                        <Text numberOfLines={1} style={[bottomBarAlbumStyle.albumTitle, bottomBarAlbumStyle.albumText]}>
+                            {title}
+                        </Text>
+
+                        <Text numberOfLines={1} style={[bottomBarAlbumStyle.albumSubtitle, bottomBarAlbumStyle.albumText]}>
+                            {subtitle}
+                        </Text>
+
+                        <Text numberOfLines={1} style={[bottomBarAlbumStyle.albumInfo, bottomBarAlbumStyle.albumText]}>
+                            {secondSubtitle}
+                        </Text>
+
                     </View>
                     <Pressable android_ripple={rippleConfig} style={bottomBarStyle.closeButton}
-                                        onPress={() => {navigation.pop()}}>
+                               onPress={() => {navigation.pop()}}>
                         <MaterialIcons name="arrow-back" color="black" size={20}/>
                     </Pressable>
                 </View>
 
                 <View style={[bottomBarStyle.buttonView, {alignSelf: "center", paddingBottom: 10}]}>
                     <Pressable android_ripple={rippleConfig} style={bottomBarStyle.button}>
-                        <Text style={bottomBarStyle.buttonText}>WIEDERGEBEN</Text>
+                        <Text style={bottomBarStyle.buttonText}>PLAY</Text>
                     </Pressable>
                     <Pressable android_ripple={rippleConfig} style={bottomBarStyle.button}>
-                        <Text style={bottomBarStyle.buttonText}>ZUR MEDIATHEK</Text>
+                        <Text style={bottomBarStyle.buttonText}>ADD TO LIBRARY</Text>
                     </Pressable>
                     <Pressable android_ripple={rippleConfig} style={bottomBarStyle.button}>
-                        <Text style={bottomBarStyle.buttonText}>TEILEN</Text>
+                        <Text style={bottomBarStyle.buttonText}>SHARE</Text>
                     </Pressable>
                 </View>
             </View>
         </>
     )
 }
-
-PlaylistView.setOptions

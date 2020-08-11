@@ -14,6 +14,7 @@ function showArtist(browseId, navigation) {
 
 export function handleMedia(media, navigation) {
     const {browseId, playlistId, videoId} = media;
+    console.log({browseId, playlistId, videoId});
     
     if (videoId != undefined) {
         navigation.navigate("Music", media);

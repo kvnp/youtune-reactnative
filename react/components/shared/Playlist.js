@@ -14,7 +14,10 @@ export default ({ playlist, navigation, style }) => {
     let { title, subtitle, thumbnail } = playlist;
     let { videoId, browseId, playlistId } = playlist;
 
-    let viewObject = {
+    let view = {
+        title: title,
+        subtitle: subtitle,
+        thumbnail: thumbnail,
         videoId: videoId,
         browseId: browseId,
         playlistId: playlistId,
@@ -24,8 +27,8 @@ export default ({ playlist, navigation, style }) => {
     return (
         <Pressable
             android_ripple={rippleConfig}
-            onLongPress={() => global.showModal({title: title, subtitle: subtitle, thumbnail: thumbnail})}
-            onPress={() => handleMedia(viewObject, navigation)}
+            onLongPress={() => global.showModal(view)}
+            onPress={() => handleMedia(view, navigation)}
             style={[style, playlistStyle.container]}
         >
             <Image style={playlistStyle.cover} source={{uri: thumbnail}}/>

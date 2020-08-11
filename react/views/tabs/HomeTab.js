@@ -5,8 +5,7 @@ import {
     Pressable,
     FlatList,
     View,
-    ActivityIndicator,
-    Modal
+    ActivityIndicator
 } from 'react-native';
 
 import { fetchHome } from "../../modules/remote/API";
