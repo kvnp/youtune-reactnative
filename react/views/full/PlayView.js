@@ -40,15 +40,11 @@ export default class PlayView extends PureComponent {
         this._unsub = [];
 
         this._unsub.push(
-            TrackPlayer.addEventListener("playback-state", params => {
-                this.refreshUI();
-            })
+            TrackPlayer.addEventListener("playback-state", params => this.refreshUI())
         );
 
         this._unsub.push(
-            TrackPlayer.addEventListener("playback-track-changed", params => {
-                this.refreshUI();
-            })
+            TrackPlayer.addEventListener("playback-track-changed", params => this.refreshUI())
         );
     }
 
@@ -192,7 +188,7 @@ export default class PlayView extends PureComponent {
                                     <MaterialIcons name="keyboard-arrow-down" color={"black"} size={30}/>
                                 </Pressable>
 
-                                <Pressable android_ripple={rippleConfig} style={stylesTop.topThird}>
+                                <Pressable onPress={() => global.showModal({title: title, subtitle: artist, thumbnail: artwork})} android_ripple={rippleConfig} style={stylesTop.topThird}>
                                     <MaterialIcons name="more-vert" color={"black"} size={30}/>
                                 </Pressable>
                             </View>
