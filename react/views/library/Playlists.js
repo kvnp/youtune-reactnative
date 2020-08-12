@@ -2,7 +2,6 @@ import React, { PureComponent } from "react";
 import {
     ScrollView,
     StyleSheet,
-    View,
     Text,
     Pressable,
     Modal

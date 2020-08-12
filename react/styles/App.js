@@ -47,11 +47,11 @@ export const headerStyle = StyleSheet.create({
 
 export const textStyle = StyleSheet.create({
     text: {
-        color: 'white'
+        color: colorStyle.white.color
     },
 
     placeholder: {
-        color: 'darkgray'
+        color: colorStyle.darkgray.color
     }
 });
 
@@ -64,21 +64,27 @@ export const navOptions = {
     },
 
     indicatorStyle: {
-        color: "white",
-        backgroundColor: "white",
+        color: colorStyle.white.color,
+        backgroundColor: colorStyle.white.color,
         position: "absolute",
         bottom: 0,
         height: 3
     },
 
-    activeTintColor: "white",
-    inactiveTintColor: "darkgray",
+    activeTintColor: colorStyle.white.color,
+    inactiveTintColor: colorStyle.darkgray.color,
 
     keyboardHidesTabBar: true,
 
-    pressColor: "darkgray",
-    pressOpacity: "darkgray",
+    pressColor: colorStyle.darkgray.color,
+    pressOpacity: colorStyle.darkgray.color,
 
     showIcon: true,
     showLabel: false
 }
+
+const colorStyle = StyleSheet.create({
+    darkgray: {color: "darkgray"},
+    white: {color: "white"},
+
+});
