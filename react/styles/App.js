@@ -1,8 +1,14 @@
 import { StyleSheet } from 'react-native';
 
+const colorStyle = StyleSheet.create({
+    darkgray: {color: "darkgray"},
+    white: {color: "white"},
+});
+
 export const appColor = StyleSheet.create({
     background: {
-        backgroundColor: '#694fad'
+        //backgroundColor: '#694fad'
+        backgroundColor: 'darkslategray'
     }
 });
 
@@ -81,10 +87,4 @@ export const navOptions = {
 
     showIcon: true,
     showLabel: false
-}
-
-const colorStyle = StyleSheet.create({
-    darkgray: {color: "darkgray"},
-    white: {color: "white"},
-
-});
+};

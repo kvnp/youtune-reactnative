@@ -54,33 +54,25 @@ export default class Playlists extends PureComponent {
                     {this.state.playlists.map((playlist) => {
                         return <Playlist playlist={playlist} navigation={this.props.navigation} style={styles.playlist}/>
                     })}
-
                 </ScrollView>
 
                 <Modal
                     animationType="slide"
                     transparent={true}
                     visible={this.state.modalVisible}
-                    onRequestClose={() => {
-                        this.setModalVisible(false);
-                    }}
-
-                    onDismiss={() => {
-                        this.setModalVisible(false);
-                    }}
-
                     hardwareAccelerated={true}
+
+                    onRequestClose={() => this.setModalVisible(false)}
+                    onDismiss={() => this.setModalVisible(false)}
                 >
                     <Pressable onPress={() => this.setModalVisible(false)} style={{height: "100%", width: "100%", justifyContent: "flex-end", backgroundColor: "rgba(0, 0, 0, 0.3)"}}>
                         <Pressable style={{marginBottom: 100}}>
                             <PlaylistCreator
                                 style={styles.modalChild}
-                                callback={
-                                    obj => {
-                                        if (obj != undefined) this.createPlaylist(obj);
-                                        this.setModalVisible(false);
-                                    }
-                                }
+                                callback={ obj => {
+                                    if (obj != undefined) this.createPlaylist(obj);
+                                    this.setModalVisible(false);
+                                }}
                             />
                         </Pressable>
                     </Pressable>
