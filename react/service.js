@@ -145,34 +145,23 @@ export const skip = async(forward) => {
 }
 
 export async function startPlayback({ playlistId, videoId }) {
-    return new Promise(
-        async(resolve, reject) => {
-            let playlist = await fetchNext(videoId, playlistId);
-            let url = await fetchAudioStream(playlist.list[playlist.index].id);
-            if (url != null) {
-                playlist.list[playlist.index].url = url;
-                await TrackPlayer.reset();
+    let playlist = await fetchNext(videoId, playlistId);
+    await TrackPlayer.reset();
 
-                for (let i = 0; i < playlist.list.length; i++) {
-                    let track = playlist.list[i];
-                    
-                    if (i == playlist.index)
-                        track.url = await fetchAudioStream(track.id);
+    for (let i = 0; i < playlist.list.length; i++) {
+        let track = playlist.list[i];
 
-                    await TrackPlayer.add(track);
+        if (i <= playlist.index)
+            track.url = await fetchAudioStream(track.id);
 
-                    if (i == playlist.index) {
-                        focusedId = playlist.list[playlist.index].id;
-                        await TrackPlayer.skip(playlist.list[playlist.index].id);
-                        TrackPlayer.play();
-                    }
-                }
+        await TrackPlayer.add(track);
 
-                resolve(true);
-            } else
-                reject({playlistId, videoId});
+        if (i == playlist.index) {
+            focusedId = playlist.list[i].id;
+            await TrackPlayer.skip(playlist.list[i].id);
+            TrackPlayer.play();
         }
-    );
+    }
 }
 
 export function setPlay(isPlaying) {
