@@ -14,8 +14,21 @@ export function msToMMSS(ms) {
 
 export function textToSec(text) {
     let array = text.split(":");
-    let minutes = Number.parseInt(array[0]) * 60;
-    let seconds = Number.parseInt(array[1]);
-    return minutes + seconds;
+
+    let hours;
+    let minutes;
+    let seconds;
+
+    if (array.length == 3) {
+        hours = Number.parseInt(array[0] * 3600);
+        minutes = Number.parseInt(array[1]) * 60;
+        seconds = Number.parseInt(array[2]);
+    } else {
+        hours = 0;
+        minutes = Number.parseInt(array[0]) * 60;
+        seconds = Number.parseInt(array[1]);
+    }
+
+    return minutes + seconds + hours;
 }
 
