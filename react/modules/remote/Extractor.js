@@ -588,6 +588,7 @@ export async function digestStreams(text) {
 
     for (let i = 0; i < parse.streamingData.adaptiveFormats.length; i++) {
         if (parse.streamingData.adaptiveFormats[i].mimeType.split("/")[0] == "audio") {
+            console.log(parse.streamingData.adaptiveFormats[i].mimeType.split("/"));
             if (parse.streamingData.adaptiveFormats[i].signatureCipher != undefined) {
                 let signatureCipher = decodeNestedURI(parse.streamingData.adaptiveFormats[i].signatureCipher);
 
@@ -626,6 +627,10 @@ export function digestNextResults(json) {
     console.log(json.currentVideoEndpoint.watchEndpoint.index+"\n\n\n");*/
 
     for (let i = 0; i < playlistRenderer.contents.length; i++) {
+        if (playlistRenderer.contents[i].hasOwnProperty("automixPreviewVideoRenderer")) {
+            continue;
+        }
+
         let panelRenderer = playlistRenderer.contents[i].playlistPanelVideoRenderer;
 
         let videoId = panelRenderer.navigationEndpoint.watchEndpoint.videoId;
