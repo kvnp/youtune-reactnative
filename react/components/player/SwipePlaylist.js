@@ -65,8 +65,8 @@ export default class SwipePlaylist extends PureComponent {
                                 <Image style={{height: 50, width: 50, marginRight: 10}} source={{uri: item.artwork}}/>
 
                                 <View style={{width: 0, flexGrow: 1, flex: 1}}>
-                                    <Text style={{color: "white"}}>{item.title}</Text>
-                                    <Text style={{color: "white"}}>{item.artist}</Text>
+                                    <Text style={{color: "white"}} numberOfLines={2}>{item.title}</Text>
+                                    <Text style={{color: "white"}} numberOfLines={1}>{item.artist}</Text>
                                 </View>
                             </Pressable>
                         }

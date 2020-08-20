@@ -3,7 +3,8 @@ import React from 'react';
 import {
     View,
     Text,
-    StyleSheet
+    StyleSheet,
+    Platform
 } from 'react-native';
 
 import TrackPlayer, { useTrackPlayerProgress } from 'react-native-track-player';
@@ -49,7 +50,7 @@ export default ({ style }) => {
                     {elapsed[0] + ":" + elapsed[1]}
                 </Text>
                 <View style={{ flex: 1 }} />
-                <Text style={[styles.text, { width: 40}]}>
+                <Text style={[styles.text, {textAlign: "right"}]}>
                     {"-" + remaining[0] + ":" + remaining[1]}
                 </Text>
             </View>
@@ -62,7 +63,12 @@ const styles = StyleSheet.create({
         marginTop: -12
     },
 
-    container: {
+    container: Platform.OS == "ios"
+    ? {
+        paddingTop: 16
+    }
+
+    : {
         paddingTop: 16,
         marginLeft: -15,
         marginRight: -15
@@ -74,15 +80,21 @@ const styles = StyleSheet.create({
     },
 
     thumb: {
-        width: 10,
-        height: 10,
-        borderRadius: 5,
         color: appColor.background.backgroundColor
     },
 
-    text: {
+    text: Platform.OS == "ios" 
+    ? {
         color: 'black',
         fontSize: 12,
         textAlign: 'center',
+        marginLeft: -14,
+        marginRight: -14
+    }
+
+    : {
+        color: 'black',
+        fontSize: 13,
+        textAlign: 'center'
     }
 });

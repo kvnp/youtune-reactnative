@@ -1,4 +1,4 @@
-import { StyleSheet } from 'react-native';
+import { StyleSheet, Platform } from 'react-native';
 
 const colorStyle = StyleSheet.create({
     darkgray: {color: "darkgray"},
@@ -61,30 +61,56 @@ export const textStyle = StyleSheet.create({
     }
 });
 
-export const navOptions = {
-    optimizationsEnabled: true,
-    lazy: true,
+export const navOptions = Platform.OS == "android" 
+    ? {
+        optimizationsEnabled: true,
+        lazy: true,
 
-    style: {
-        backgroundColor: appColor.background.backgroundColor
-    },
+        style: {
+            backgroundColor: appColor.background.backgroundColor
+        },
 
-    indicatorStyle: {
-        color: colorStyle.white.color,
-        backgroundColor: colorStyle.white.color,
-        position: "absolute",
-        bottom: 0,
-        height: 3
-    },
+        indicatorStyle: {
+            color: colorStyle.white.color,
+            backgroundColor: colorStyle.white.color,
+            position: "absolute",
+            bottom: 0,
+            height: 3
+        },
 
-    activeTintColor: colorStyle.white.color,
-    inactiveTintColor: colorStyle.darkgray.color,
+        activeTintColor: colorStyle.white.color,
+        inactiveTintColor: colorStyle.darkgray.color,
 
-    keyboardHidesTabBar: true,
+        keyboardHidesTabBar: true,
 
-    pressColor: colorStyle.darkgray.color,
-    pressOpacity: colorStyle.darkgray.color,
+        pressColor: colorStyle.darkgray.color,
+        pressOpacity: colorStyle.darkgray.color,
 
-    showIcon: true,
-    showLabel: false
-};
+        showIcon: true,
+        showLabel: false
+    }
+
+    : {
+        optimizationsEnabled: true,
+        lazy: true,
+
+        style: {
+            backgroundColor: appColor.background.backgroundColor
+        },
+
+        indicatorStyle: {
+            color: colorStyle.white.color,
+            backgroundColor: colorStyle.white.color,
+            position: "absolute",
+            bottom: 0,
+            height: 3
+        },
+
+        activeTintColor: colorStyle.white.color,
+        inactiveTintColor: colorStyle.darkgray.color,
+
+        keyboardHidesTabBar: true,
+
+        showIcon: true,
+        showLabel: false
+    };

@@ -6,7 +6,9 @@ import {
     TextInput,
     Keyboard,
     Pressable,
-    ActivityIndicator
+    ActivityIndicator,
+    KeyboardAvoidingView,
+    Platform
 } from 'react-native';
 
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
@@ -140,43 +142,44 @@ export default class SearchTab extends PureComponent {
                 : null
             }
 
-            {this.state.suggestion != null
-                ? <View style={searchBarStyle.suggestion}>
-                    <Pressable style={[searchBarStyle.suggestionContainer, {width: "25%"}]} onPress={() => this.searchInstead(this.state.suggestion.endpoints.query)}>
-                        <Text style={{color: "white"}}>{this.state.suggestion.endpoints.text}</Text>
-                        <Text style={{color: "white"}}>
-                            {this.state.suggestion.correctedList
-                                .map(entry => <Text style={entry.italics ? {fontWeight: "bold"} :null}>{entry.text}</Text>)}
-                        </Text>
-                    </Pressable>
+            <KeyboardAvoidingView enabled={Platform.OS == "ios" ? true : false} behavior="padding" keyboardVerticalOffset={170}>
+                {this.state.suggestion != null
+                    ? <View style={searchBarStyle.suggestion}>
+                        <Pressable style={[searchBarStyle.suggestionContainer, {width: "25%"}]} onPress={() => this.searchInstead(this.state.suggestion.endpoints.query)}>
+                            <Text style={{color: "white"}}>{this.state.suggestion.endpoints.text}</Text>
+                            <Text style={{color: "white"}}>
+                                {this.state.suggestion.correctedList
+                                    .map(entry => <Text style={entry.italics ? {fontWeight: "bold"} :null}>{entry.text}</Text>)}
+                            </Text>
+                        </Pressable>
 
+                    </View>
+
+                    : null
+                }
+
+                
+                {this.getSpecificButtons()}
+                <View style={searchBarStyle.container}>
+                    <TextInput  style={searchBarStyle.input}
+                                placeholder="Search"
+                                value={this.state.query}
+                                placeholderTextColor={textStyle.placeholder.color}
+                                onChange={this.setQuery}
+                                onSubmitEditing={this.search}/>
+                    <Pressable  onPress={this.search}
+                                android_ripple={rippleConfig}
+                                style={searchBarStyle.button}
+                                disabled={this.state.buttonDisabled}>
+                        { this.state.loading
+                            ? <ActivityIndicator color="white" size="small"/>
+                            : <MaterialIcons name="search" color="white" size={24}/>
+                        }
+                    </Pressable>
                 </View>
 
-                : null
-            }
-
-            
-
-            {this.getSpecificButtons()}
-            <View style={searchBarStyle.container}>
-                <TextInput  style={searchBarStyle.input}
-                            placeholder="Search"
-                            value={this.state.query}
-                            placeholderTextColor={textStyle.placeholder.color}
-                            onChange={this.setQuery}
-                            onSubmitEditing={this.search}/>
-                <Pressable  onPress={this.search}
-                            android_ripple={rippleConfig}
-                            style={searchBarStyle.button}
-                            disabled={this.state.buttonDisabled}>
-                    { this.state.loading
-                        ? <ActivityIndicator color="white" size="small"/>
-                        : <MaterialIcons name="search" color="white" size={24}/>
-                    }
-                </Pressable>
-            </View>
-
-            <MiniPlayer navigation={this.props.navigation} style={appColor.background}/>
+                <MiniPlayer navigation={this.props.navigation} style={appColor.background}/>
+            </KeyboardAvoidingView>
             </>
         )
     }
