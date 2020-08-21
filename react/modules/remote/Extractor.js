@@ -336,7 +336,7 @@ function getAlbum(json) {
             entry.subtitle = musicTrack.artistNames;
             entry.videoId = musicTrack.videoId;
             entry.thumbnail = thumbnaillist[0].url;
-            entry.secondSubtitle = msToMMSS(musicTrack.lengthMs);
+            entry.secondTitle = msToMMSS(musicTrack.lengthMs);
             browse.entries.push(entry);
         }
 

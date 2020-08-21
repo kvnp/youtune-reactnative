@@ -153,15 +153,14 @@ export async function startPlaylist(playlist) {
     await TrackPlayer.reset();
     for (let i = 0; i < playlist.list.length; i++) {
         let track = playlist.list[i];
-
         if (i == playlist.index || i == 0)
             track.url = await fetchAudioStream(track.id);
 
         await TrackPlayer.add(track);
 
         if (i == playlist.index) {
-            focusedId = playlist.list[i].id;
-            await TrackPlayer.skip(playlist.list[i].id);
+            focusedId = track.id;
+            await TrackPlayer.skip(track.id);
             TrackPlayer.play();
         }
     }
