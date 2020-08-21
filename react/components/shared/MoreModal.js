@@ -156,8 +156,6 @@ export default class MoreModal extends PureComponent {
                         <Pressable
                             onPress={
                                 () => {
-                                    console.log(this.state.modalContent);
-
                                     let file;
                                     let type;
                                     let message = this.state.modalContent.title + " - " + this.state.modalContent.subtitle;

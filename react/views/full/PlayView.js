@@ -17,7 +17,7 @@ import SwipePlaylist from "../../components/player/SwipePlaylist";
 
 import { rippleConfig } from "../../styles/Ripple";
 import { appColor } from "../../styles/App";
-import { startPlayback, skip, setPlay, setRepeat } from "../../service";
+import { startPlayback, skip, setPlay, setRepeat, startPlaylist } from "../../service";
 import { isRepeating } from "../../service";
 
 export default class PlayView extends PureComponent {
@@ -108,13 +108,21 @@ export default class PlayView extends PureComponent {
         var isLoading;
         if (this.props.route.params != undefined) {
             isLoading = true;
-            var {title, subtitle, thumbnail} = this.props.route.params;
-            var artist = subtitle;
-            var artwork = thumbnail;
 
-            TrackPlayer.reset();
-            startPlayback(this.props.route.params)
-                .catch(params => this.props.navigation.navigate("Captcha", params));
+            if (this.props.route.params.list != undefined) {
+                var index = this.props.route.params.index;
+                var list = this.props.route.params.list;
+                var { title, artist, artwork } = list[index];
+
+                startPlaylist(this.props.route.params);
+            } else {
+                var { title, subtitle, thumbnail } = this.props.route.params;
+                var artist = subtitle;
+                var artwork = thumbnail;
+
+                startPlayback(this.props.route.params)
+                    .catch(params => this.props.navigation.navigate("Captcha", params));
+            }
 
             this.props.route.params = undefined;
         } else {

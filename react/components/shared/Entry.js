@@ -13,9 +13,9 @@ import { resultStyle } from '../../styles/Search';
 import { handleMedia } from '../../modules/event/mediaNavigator';
 import { rippleConfig } from '../../styles/Ripple';
 
-const handle = (obj, navigation) => handleMedia(obj, navigation);
+const handle = (obj, navigation, index) => handleMedia(obj, navigation, index);
 
-export default ({entry, navigation}) => {
+export default ({ entry, navigation, index, playPlaylist }) => {
     let { title, subtitle, secondTitle, secondSubtitle, thumbnail } = entry;
     let { videoId, browseId, playlistId } = entry;
 
@@ -30,11 +30,37 @@ export default ({entry, navigation}) => {
 
     return (
         <Pressable
-            onPress={() => handle(view, navigation)}
+            onPress={
+                () => {
+                    if (playPlaylist != undefined)
+                        playPlaylist();
+                    else
+                        handle(view, navigation, 0);
+                }
+            }
+
             onLongPress={() => global.showModal(view)}
             style={resultStyle.resultView}
         >
-            <Pressable android_ripple={rippleConfig} onPress={() => handle(view, navigation)}>
+            {
+                index != undefined
+                    ? <Text style={{width: 30, textAlign: "left"}}>
+                        {index}
+                    </Text>
+
+                    : null
+            }
+
+            <Pressable 
+                android_ripple={rippleConfig} 
+                onPress={
+                    () => {
+                        if (playPlaylist != undefined)
+                            playPlaylist(view);
+                        else
+                            handle(view, navigation, index);
+                    }
+            }>
                 <Image style={resultStyle.resultCover} source={{uri: thumbnail}}/>
             </Pressable>
 

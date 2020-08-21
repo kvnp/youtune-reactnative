@@ -12,11 +12,16 @@ function showArtist(browseId, navigation) {
     );
 }
 
-export function handleMedia(media, navigation) {
-    const {browseId, playlistId, videoId} = media;
-    console.log({browseId, playlistId, videoId});
+export function handleMedia(media, navigation, index, playlist) {
+    if (media == null) {
+        navigation.navigate("Music", playlist);
+        return;
+    }
+
+    const { browseId, playlistId, videoId } = media;
     
     if (videoId != undefined) {
+        media.index = index;
         navigation.navigate("Music", media);
         return;
     }

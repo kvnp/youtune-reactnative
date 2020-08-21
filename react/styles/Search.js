@@ -82,8 +82,6 @@ export const resultStyle = StyleSheet.create({
 
     resultView: {
         flexGrow: 1,
-        marginLeft: 15,
-        marginRight: 15,
         paddingLeft: 15,
         paddingRight: 15,
         marginTop: 10,
@@ -91,7 +89,6 @@ export const resultStyle = StyleSheet.create({
         alignItems: 'center',
         backgroundColor: "rgba(0,0,0,0.1)",
         borderWidth: .5,
-        borderRadius: 20
     },
 
     resultCover: {

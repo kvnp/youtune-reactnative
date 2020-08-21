@@ -23,7 +23,7 @@ export default PlaylistView = ({ route, navigation }) => {
     
     return (
         <>
-            <FlatEntries entries={entries} navigation={navigation}/>
+            <FlatEntries entries={entries} isPlaylist={true} navigation={navigation}/>
 
             <View style={[bottomBarStyle.centerContainer, {alignSelf: "stretch", backgroundColor: appColor.background.backgroundColor}]}>
                 <View style={bottomBarStyle.topRow}>

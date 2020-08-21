@@ -3,6 +3,7 @@ import Track from "../models/music/track";
 import Playlist from "../models/music/playlist";
 import { decodeNestedURI } from "../utils/Decoder";
 import { getSignature } from "./Decrypt";
+import { play } from "react-native-track-player";
 
 export function digestSearchResults(json) {
     let final = {
@@ -216,7 +217,7 @@ export function digestHomeResults(json) {
     return final;
 }
 
-function getPlaylist(json) {
+function getPlaylist(json, playlistId) {
     let browse = {title: "", subtitle: "", secondSubtitle: "", description: "", thumbnail: null, entries: []};
     let musicHeader = json.header.musicDetailHeaderRenderer;
 
@@ -300,7 +301,11 @@ function getPlaylist(json) {
     
                             if (navigation.hasOwnProperty("watchEndpoint")) {
                                 entry.videoId = navigation.watchEndpoint.videoId;
-                                entry.playlistId = navigation.watchEndpoint.playlistId;
+
+                                if (playlistId != undefined)
+                                    entry.playlistId = playlistId;
+                                else
+                                    entry.playlistId = navigation.watchEndpoint.playlistId;
                             }
                         }
                     }
@@ -543,13 +548,12 @@ function getArtist(json) {
 
 export function digestBrowseResults(json, browseId) {
     if (browseId.slice(0, 2) === "VL") {
-        let playlistId = browseId.slice(0, 2);
+        let playlistId = browseId.slice(2);
         return getPlaylist(json, playlistId);
-    } else if (browseId.slice(0, 2) === "UC") {
+    } else if (browseId.slice(0, 2) === "UC")
         return getArtist(json);
-    } else {
+    else
         return getAlbum(json);
-    }
 }
 
 export function digestVideoInfoResults(text) {
@@ -588,7 +592,6 @@ export async function digestStreams(text) {
 
     for (let i = 0; i < parse.streamingData.adaptiveFormats.length; i++) {
         if (parse.streamingData.adaptiveFormats[i].mimeType.split("/")[0] == "audio") {
-            console.log(parse.streamingData.adaptiveFormats[i].mimeType.split("/"));
             if (parse.streamingData.adaptiveFormats[i].signatureCipher != undefined) {
                 let signatureCipher = decodeNestedURI(parse.streamingData.adaptiveFormats[i].signatureCipher);
 

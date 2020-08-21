@@ -146,12 +146,15 @@ export const skip = async(forward) => {
 
 export async function startPlayback({ playlistId, videoId }) {
     let playlist = await fetchNext(videoId, playlistId);
-    await TrackPlayer.reset();
+    startPlaylist(playlist);
+}
 
+export async function startPlaylist(playlist) {
+    await TrackPlayer.reset();
     for (let i = 0; i < playlist.list.length; i++) {
         let track = playlist.list[i];
 
-        if (i <= playlist.index)
+        if (i == playlist.index || i == 0)
             track.url = await fetchAudioStream(track.id);
 
         await TrackPlayer.add(track);
