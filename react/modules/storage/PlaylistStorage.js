@@ -7,11 +7,11 @@ export async function getPlaylists() {
         if(value !== null)
             return JSON.parse(value);
         else
-            return null;
+            return [];
     
     } catch(e) {
         console.log("reading playlists error");
-        return null;
+        return [];
     }
 }
 
