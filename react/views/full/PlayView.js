@@ -19,6 +19,7 @@ import { rippleConfig } from "../../styles/Ripple";
 import { appColor } from "../../styles/App";
 import { startPlayback, skip, setPlay, setRepeat, startPlaylist } from "../../service";
 import { isRepeating } from "../../service";
+import { getSongLike, likeSong } from "../../modules/storage/MediaStorage";
 
 export default class PlayView extends PureComponent {
     constructor(props) {
@@ -32,6 +33,7 @@ export default class PlayView extends PureComponent {
 
             track: null,
             playlist: null,
+            isLiked: null
         };
     }
 
@@ -61,9 +63,11 @@ export default class PlayView extends PureComponent {
             let playlist = await TrackPlayer.getQueue();
             let track = await TrackPlayer.getTrack(id);
             let state = await TrackPlayer.getState();
+            let isLiked = await getSongLike(id);
 
             newstate.playlist = playlist;
             newstate.track = track;
+            newstate.isLiked = isLiked;
             switch (state) {
                 case TrackPlayer.STATE_NONE:
                     break;
@@ -112,11 +116,11 @@ export default class PlayView extends PureComponent {
             if (this.props.route.params.list != undefined) {
                 var index = this.props.route.params.index;
                 var list = this.props.route.params.list;
-                var { title, artist, artwork } = list[index];
+                var { title, artist, artwork, id } = list[index];
 
                 startPlaylist(this.props.route.params);
             } else {
-                var { title, subtitle, thumbnail } = this.props.route.params;
+                var { title, subtitle, thumbnail, id } = this.props.route.params;
                 var artist = subtitle;
                 var artwork = thumbnail;
 
@@ -128,8 +132,9 @@ export default class PlayView extends PureComponent {
         } else {
             isLoading = this.state.isLoading;
             if (this.state.track != null)
-                var {title, artist, artwork} = this.state.track;
+                var {title, artist, artwork, id } = this.state.track;
             else {
+                var id = null;
                 var title = null;
                 var artist = null;
                 var artwork = null;
@@ -146,8 +151,20 @@ export default class PlayView extends PureComponent {
                     <View style={stylesBottom.bottomBit}>
                         <View style={{width: Dimensions.get("screen").height * 0.39}}>
                             <View style={controlStyles.container}>
-                                <Pressable onPress={() => {}} android_ripple={rippleConfig}>
-                                    <MaterialIcons name="thumb-down" color="darkgray" size={30}/>
+                                <Pressable onPress={() => {likeSong(id, false); this.refreshUI();}} android_ripple={rippleConfig}>
+                                    <MaterialIcons
+                                        name="thumb-down"
+
+                                        color={
+                                            this.state.isLiked == null
+                                                ? "darkgray"
+                                                : !this.state.isLiked
+                                                    ? "black"
+                                                    : "darkgray"
+                                        }
+
+                                        size={30}
+                                    />
                                 </Pressable>
 
                                 <View style={{alignItems: "center", flex: 1}}>
@@ -155,8 +172,20 @@ export default class PlayView extends PureComponent {
                                     <Text numberOfLines={1} style={stylesBottom.subtitleText}>{artist}</Text>
                                 </View>
 
-                                <Pressable onPress={() => {}} android_ripple={rippleConfig}>
-                                    <MaterialIcons name="thumb-up" color="darkgray" size={30}/>
+                                <Pressable onPress={() => {likeSong(id, true); this.refreshUI();}} android_ripple={rippleConfig}>
+                                    <MaterialIcons
+                                        name="thumb-up"
+
+                                        color={
+                                            this.state.isLiked == null
+                                                ? "darkgray"
+                                                : this.state.isLiked
+                                                    ? "black"
+                                                    : "darkgray"
+                                        }
+
+                                        size={30}
+                                    />
                                 </Pressable>
                             </View>
 
@@ -171,9 +200,9 @@ export default class PlayView extends PureComponent {
                                     <MaterialIcons name="skip-previous" color="black" size={40}/>
                                 </Pressable>
 
-                                <View style={{alignItems: "center", justifyContent: "center", backgroundColor: appColor.background.backgroundColor, width: 60, height: 60, borderRadius: 30}}>
+                                <View style={{alignSelf: "center", alignItems: "center", justifyContent: "center", backgroundColor: appColor.background.backgroundColor, width: 60, height: 60, borderRadius: 30}}>
                                     {isLoading
-                                        ?   <ActivityIndicator color="white" size="large"/>
+                                        ?   <ActivityIndicator style={{alignSelf: "center"}} color="white" size="large"/>
 
                                         :   <Pressable onPress={() => setPlay(this.state.isPlaying)} android_ripple={rippleConfig}>
                                                 <MaterialIcons name={this.state.isPlaying ? "pause" : "play-arrow"} color="white" size={40}/>

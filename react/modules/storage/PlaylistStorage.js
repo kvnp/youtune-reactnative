@@ -10,7 +10,7 @@ export async function getPlaylists() {
             return [];
     
     } catch(e) {
-        console.log("reading playlists error");
+        alert("Loading playlists failed");
         return [];
     }
 }
@@ -21,6 +21,6 @@ export async function storePlaylists(json) {
         await AsyncStorage.setItem('@storage_Playlists', string);
 
     } catch (e) {
-        console.log("saving playlists error");
+        alert("Saving playlists failed");
     }
 }
