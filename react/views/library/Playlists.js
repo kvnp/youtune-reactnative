@@ -7,6 +7,7 @@ import {
     Modal
 } from "react-native";
 
+import { storePlaylists, getPlaylists } from "../../modules/storage/PlaylistStorage";
 import Playlist from '../../components/shared/Playlist';
 import PlaylistCreator from "../../components/overlay/PlaylistCreator";
 import { rippleConfig } from "../../styles/Ripple";
@@ -28,6 +29,9 @@ export default class Playlists extends PureComponent {
         this._unsubscribe = this.props.navigation.addListener('focus', () => {
             this.setModalVisible(false);
         });
+
+        getPlaylists()
+            .then(playlists => this.setState({playlists: playlists}));
     }
     
     componentWillUnmount() {
@@ -37,10 +41,12 @@ export default class Playlists extends PureComponent {
     createPlaylist = ({title, description}) => {
         let temp = this.state.playlists;
         temp.push({title: title, subtitle: description});
+        storePlaylists(temp);
 
         this.setState({playlists: temp});
         this.forceUpdate();
     }
+      
 
     render() {
         return (
@@ -65,7 +71,10 @@ export default class Playlists extends PureComponent {
                     onRequestClose={() => this.setModalVisible(false)}
                     onDismiss={() => this.setModalVisible(false)}
                 >
-                    <Pressable onPress={() => this.setModalVisible(false)} style={{height: "100%", width: "100%", justifyContent: "flex-end", backgroundColor: "rgba(0, 0, 0, 0.3)"}}>
+                    <Pressable 
+                        onPress={() => this.setModalVisible(false)}
+                        style={{height: "100%", width: "100%", justifyContent: "flex-end", backgroundColor: "rgba(0, 0, 0, 0.3)"}}
+                    >
                         <Pressable style={{marginBottom: 100}}>
                             <PlaylistCreator
                                 style={styles.modalChild}

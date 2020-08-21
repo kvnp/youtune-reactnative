@@ -3,7 +3,6 @@ import React, { PureComponent } from 'react';
 import {
     StyleSheet,
     Switch,
-    View,
     Text,
     Pressable
 } from 'react-native';
@@ -12,7 +11,7 @@ import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import { appColor } from '../../styles/App';
 import { ScrollView } from 'react-native-gesture-handler';
 import MiniPlayer from '../../components/player/MiniPlayer';
-import { setTransmitLanguage, setProxyYTM, transmitLanguage, proxyYTM, setSafetyMode, safetyMode } from '../../service';
+import { setTransmitLanguage, setProxyYTM, setSafetyMode, settings} from '../../modules/storage/SettingsStorage';
 
 export default class SettingsTab extends PureComponent {
     constructor(props) {
@@ -28,11 +27,10 @@ export default class SettingsTab extends PureComponent {
         this._unsubscribe = this.props.navigation.addListener('focus', () => {
             global.setHeader({title: "Settings"});
 
-
             this.setState({
-                language: transmitLanguage,
-                proxy: proxyYTM,
-                safety: safetyMode
+                language: settings.transmitLanguage,
+                proxy: settings.proxyYTM,
+                safety: settings.safetyMode
             });
         });
     }

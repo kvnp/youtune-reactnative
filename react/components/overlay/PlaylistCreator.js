@@ -34,7 +34,7 @@ export default ({ callback, style }) => {
                     </Pressable>
                     <Pressable android_ripple={rippleConfig} style={styles.headerButton}
                                       onPress={() =>  {
-                                            if (title.length > 0 && description.length > 0) {
+                                            if (title.length > 0) {
                                                 callback({title: title, description: description});
                                             }
                                       }}>

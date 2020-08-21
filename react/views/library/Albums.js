@@ -24,7 +24,10 @@ export default ({ navigation }) => {
                 <Text style={{fontSize: 20}}>Liked albums are displayed here</Text>
                 
                 <View style={{borderRadius: 20, backgroundColor: appColor.background.backgroundColor}}>
-                    <Pressable style={{paddingHorizontal: 20, paddingVertical: 10,}} onPress={() => navigation.navigate("Search")} android_ripple={rippleConfig}>
+                    <Pressable
+                        style={{paddingHorizontal: 20, paddingVertical: 10,}}
+                        onPress={() => navigation.navigate("Search")} android_ripple={rippleConfig}
+                    >
                         <Text style={{color: "white", fontWeight: "bold"}}>Look for music</Text>
                     </Pressable>
                 </View>

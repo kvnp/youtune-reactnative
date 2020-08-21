@@ -9,7 +9,7 @@ import {
 } from "./Extractor";
 
 import { getHttpResponse, getUrl } from "./HTTP";
-import { safetyMode, transmitLanguage } from "../../service";
+import { settings } from "../../modules/storage/SettingsStorage";
 
 const headers_api = {"User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:79.0) Gecko/20100101 Firefox/79.0"};
 const headers_ytm = {
@@ -44,12 +44,12 @@ function getRequestBody() {
         }
     };
 
-    if (transmitLanguage) {
+    if (settings.transmitLanguage) {
         body.context.client["gl"] = getGL();
         body.context.client["hl"] = getHL();
     }
 
-    body.context["user"] = { enableSafetyMode: safetyMode }
+    body.context["user"] = { enableSafetyMode: settings.safetyMode }
 
     return body;
 }
