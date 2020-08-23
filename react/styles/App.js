@@ -1,22 +1,23 @@
 import { StyleSheet, Platform } from 'react-native';
 
-const colorStyle = StyleSheet.create({
+const colorStyle = {
     darkgray: {color: "darkgray"},
     white: {color: "white"},
-});
+};
 
-export const appColor = StyleSheet.create({
+export const appColor = {
     background: {
         //backgroundColor: '#694fad'
         backgroundColor: 'darkslategray'
     }
-});
+};
 
 export const gradientColors = ['rgba(255, 255, 255, 0.2)', 'rgba(255, 255, 255, 0.5)'];
 
 export const headerStyle = StyleSheet.create({
     headerPicture: {
-        width: '100%'
+        width: '100%',
+        height: "20%"
     },
 
     headerHeight: {

@@ -31,8 +31,8 @@ export default class Header extends PureComponent {
 
     render() {
         return (
-            <ImageBackground imageStyle={null}
-                             style={[headerStyle.container, headerStyle.headerHeight, this.props.style]}
+            <ImageBackground style={[headerStyle.container, this.props.style]}
+                             imageStyle={{height: "100%", position: "absolute"}}
                              source={this.state.source}>
                 <LinearGradient style={[headerStyle.gradient, this.state.source == null ?headerStyle.image :headerStyle.imageFound]}
                                 colors={gradientColors}>

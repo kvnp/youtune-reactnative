@@ -1,5 +1,5 @@
 import React, { PureComponent } from "react";
-import { StyleSheet, View, Pressable, Image, Text } from "react-native";
+import { StyleSheet, View, Pressable, Image, Text, Platform } from "react-native";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import TrackPlayer from 'react-native-track-player';
 import { skip, setPlay } from "../../service";
@@ -20,19 +20,23 @@ export default class MiniPlayer extends PureComponent{
     componentDidMount() {
         this.refreshUI();
 
-        this._unsub = [];
-        this._unsub.push(
-            TrackPlayer.addEventListener("playback-state", params => this.refreshUI())
-        );
+        if (Platform.OS != "web") {
+            this._unsub = [];
+            this._unsub.push(
+                TrackPlayer.addEventListener("playback-state", params => this.refreshUI())
+            );
 
-        this._unsub.push(
-            TrackPlayer.addEventListener("playback-track-changed", params => this.refreshUI())
-        );
+            this._unsub.push(
+                TrackPlayer.addEventListener("playback-track-changed", params => this.refreshUI())
+            );
+        }
     }
 
     componentWillUnmount() {
-        for (let i = 0; i < this._unsub.length; i++)
-            this._unsub[i].remove();
+        if (Platform.OS != "web") {
+            for (let i = 0; i < this._unsub.length; i++)
+                this._unsub[i].remove();
+        }
     }
 
     refreshUI = async() => {

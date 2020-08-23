@@ -1,10 +1,36 @@
-const path = require('path');
 const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const webpackEnv = process.env.NODE_ENV || 'development';
 
 module.exports = (defaults) => ({
     ...defaults,
+
+    devServer: {
+        proxy: {
+            '/start': {
+                target: "https://music.youtube.com",
+                secure: true,
+                changeOrigin: true,
+                pathRewrite: {'^/start' : ''},
+            },
+
+            '/youtubei': {
+                target: "https://music.youtube.com",
+                secure: true,
+                changeOrigin: true,
+
+                headers: {
+                    "Referer": "https://music.youtube.com",
+                    "Origin": "https://music.youtube.com"
+                },
+            }
+        },
+
+        allowedHosts: [
+            '127.0.0.1',
+        ],
+
+        https: true
+    },
 
     entry: {
         app: './index.web.js',
@@ -61,6 +87,14 @@ module.exports = (defaults) => ({
     },    
 
     plugins: [
+        // `process.env.NODE_ENV === 'production'` must be `true` for production
+        // builds to eliminate development checks and reduce build size. You may
+        // wish to include additional optimizations.
+        new webpack.DefinePlugin({
+            'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || 'development'),
+            __DEV__: process.env.NODE_ENV === 'production' || true,
+        }),
+
         new HtmlWebpackPlugin({
             template: './index.html'
         }),
@@ -70,14 +104,18 @@ module.exports = (defaults) => ({
     resolve: {
         alias: {
             'react-native': 'react-native-web',
-            'react-native-linear-gradient': 'react-native-web-linear-gradient'
+            'react-native-linear-gradient': 'react-native-web-linear-gradient',
         },
 
         extensions: [
             '.web.jsx',
             '.web.js',
+            '.web.tsx',
+            '.web.ts',
             '.jsx',
             '.js',
+            '.tsx',
+            '.ts',
             '.json'
         ],
     },

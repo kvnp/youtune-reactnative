@@ -39,6 +39,7 @@
     "react-native-vector-icons": "^7.0.0",
     "react-native-web": "^0.13.8",
     "react-native-web-linear-gradient": "^1.1.1",
+    "react-native-web-track-player": "git+https://git.kvnp.eu/kevinpfeifer/react-native-web-track-player.git",
     "react-native-webpack": "^0.1.1",
     "rn-sliding-up-panel": "^2.4.3",
     "webpack": "^4.44.1",

@@ -28,7 +28,7 @@ export default class SearchTab extends PureComponent {
         this.state = {
             shelves: [],
 
-            query: null,
+            query: "",
             oldQuery: null,
             buttonDisabled: true,
             loading: false,

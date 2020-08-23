@@ -4,7 +4,8 @@ import {
     StyleSheet,
     Text,
     Pressable,
-    Modal
+    Modal,
+    Platform
 } from "react-native";
 
 import { storePlaylists, getPlaylists } from "../../modules/storage/PlaylistStorage";
@@ -65,6 +66,7 @@ export default class Playlists extends PureComponent {
                 <Modal
                     animationType="slide"
                     transparent={true}
+                    style={ Platform.OS == "web" ? {display: "none"} : null }
                     visible={this.state.modalVisible}
                     hardwareAccelerated={true}
 

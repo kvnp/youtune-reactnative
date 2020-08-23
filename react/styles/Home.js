@@ -1,4 +1,4 @@
-import { StyleSheet } from 'react-native';
+import { StyleSheet, Platform } from 'react-native';
 import { appColor } from './App';
 
 export const refreshStyle = StyleSheet.create({
@@ -41,7 +41,10 @@ export const resultHomeStyle = StyleSheet.create({
 
     textView: {
         paddingLeft: 20,
-        paddingTop: 20
+        paddingTop: 20,
+        paddingBottom: Platform.OS != "web"
+            ? 0
+            : 25
     }
 });
 

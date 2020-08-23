@@ -6,7 +6,8 @@ import {
     Text,
     Image,
     StyleSheet,
-    Share
+    Share,
+    Platform
 } from "react-native";
 
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
@@ -143,6 +144,7 @@ export default class MoreModal extends PureComponent {
         return (
             <Modal
                 animationType="slide"
+                style={ Platform.OS == "web" ? {display: "none"} : null }
                 transparent={true}
                 visible={this.state.modalVisible}
                 onRequestClose={() => this.setModalVisible(false)}
