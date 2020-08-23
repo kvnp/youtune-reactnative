@@ -40,7 +40,7 @@
     "react-native-web-linear-gradient": "^1.1.1",
     "react-native-web-track-player": "git+https://git.kvnp.eu/kevinpfeifer/react-native-web-track-player.git",
     "react-native-webpack": "^0.1.1",
-    "rn-sliding-up-panel": "^2.4.3",
+    "rn-sliding-up-panel": "git+https://git.kvnp.eu/kevinpfeifer/react-native-web-slidinguppanel.git",
     "webpack": "^4.44.1",
     "webpack-cli": "^3.3.12"
   },
