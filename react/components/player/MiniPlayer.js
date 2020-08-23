@@ -1,7 +1,7 @@
 import React, { PureComponent } from "react";
 import { StyleSheet, View, Pressable, Image, Text, Platform } from "react-native";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
-import TrackPlayer from 'react-native-track-player';
+import TrackPlayer from 'react-native-web-track-player';
 import { skip, setPlay } from "../../service";
 import { rippleConfig } from "../../styles/Ripple";
 import { appColor } from "../../styles/App";

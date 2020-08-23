@@ -7,7 +7,7 @@ import {
     Platform
 } from 'react-native';
 
-import TrackPlayer, { useTrackPlayerProgress } from 'react-native-track-player';
+import TrackPlayer, { useTrackPlayerProgress } from 'react-native-web-track-player';
 import Slider from "@react-native-community/slider";
 import { appColor } from '../../styles/App';
 

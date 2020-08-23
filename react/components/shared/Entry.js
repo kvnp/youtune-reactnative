@@ -51,8 +51,8 @@ export default ({ entry, navigation, index, playPlaylist }) => {
                     : null
             }
 
-            <Pressable 
-                android_ripple={rippleConfig} 
+            <Pressable
+                android_ripple={rippleConfig}
                 onPress={
                     () => {
                         if (playPlaylist != undefined)

@@ -93,7 +93,8 @@ export const resultStyle = StyleSheet.create({
 
     resultCover: {
         width: 45,
-        aspectRatio: 1
+        height: 45,
+        //aspectRatio: 1
     },
 
     resultColumnOne: {

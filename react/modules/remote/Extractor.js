@@ -586,6 +586,7 @@ export async function digestStreams(text) {
     } catch {
         return null;
     }
+    console.log(parse);
 
     let videoId = parse.videoDetails.videoId;
 
@@ -611,6 +612,7 @@ export async function digestStreams(text) {
                         stream += "&" + sigArray[j];
                 }
                 stream += "&sig=" + s;
+                console.log(stream);
                 return stream;
             } else
                 return parse.streamingData.adaptiveFormats[i].url;

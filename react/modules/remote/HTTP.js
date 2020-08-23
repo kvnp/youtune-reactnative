@@ -10,10 +10,14 @@ export function getUrl(endpoint, apiKey) {
 
 export const getHttpResponse = async (url, input, type) => {
     if (Platform.OS == "web") {
-        if (url.length == 26)
-            url = window.location + "start";
-        else if (url.length > 26)
-            url = window.location + url.slice(26);
+        if (url[23] == "/")
+            url = window.location + url.slice(24);
+        else {
+            if (url.length == 26)
+                url = window.location + "start";
+            else if (url.length > 26)
+                url = window.location + url.slice(26);
+        }
     }
 
     const response = await fetch(url, input);

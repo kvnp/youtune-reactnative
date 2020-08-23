@@ -42,9 +42,6 @@ export const resultHomeStyle = StyleSheet.create({
     textView: {
         paddingLeft: 20,
         paddingTop: 20,
-        paddingBottom: Platform.OS != "web"
-            ? 0
-            : 25
     }
 });
 
@@ -52,6 +49,7 @@ export const albumStyle = StyleSheet.create({
     albumCollection: {
         paddingLeft: 20,
         paddingRight: 20,
+        paddingTop: Platform.OS == "web" ?10 :0,
         paddingBottom: 5,
         marginBottom: 25
     },

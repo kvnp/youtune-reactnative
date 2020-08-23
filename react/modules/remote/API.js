@@ -135,7 +135,7 @@ export async function fetchBrowse(browseId) {
 }
 
 export async function fetchVideoInfo(videoId) {
-    let url = "https://youtube.com/get_video_info?video_id=" + videoId +
+    let url = "https://www.youtube.com/get_video_info?video_id=" + videoId +
               "&el=detailpage&c=WEB_REMIX&cver=0.1&cplayer=UNIPLAYER";
 
     let response = await getHttpResponse(url, {
@@ -148,7 +148,7 @@ export async function fetchVideoInfo(videoId) {
 
 export async function fetchAudioStream(videoId) {
     while (true) {
-        let url = "https://youtube.com/get_video_info?video_id=" + videoId +
+        let url = "https://www.youtube.com/get_video_info?video_id=" + videoId +
                 "&el=detailpage&c=WEB_REMIX&cver=0.1&cplayer=UNIPLAYER";
 
         let response = await getHttpResponse(url, {

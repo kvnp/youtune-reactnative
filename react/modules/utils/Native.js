@@ -9,21 +9,16 @@ const deviceLanguage = Platform.OS == "web"
 
             : NativeModules.I18nManager.localeIdentifier;
 
-var gl = Platform.OS != "web" 
+var gl = Platform.OS != "web"
     ? deviceLanguage.split("_")[1]
-    : "US";
+    : navigator.language.split("-")[1];
 
-var hl = Platform.OS != "web" 
+var hl = Platform.OS != "web"
     ? deviceLanguage.split("_")[0]
-    : "en"
+    : navigator.language.split("-")[0]
 
-if (gl == "CN") {
-    gl = "TW"
-}
-
-if (hl == "yue") {
-    hl = "zh"
-}
+if (gl == "CN") gl = "TW"
+if (hl == "yue") hl = "zh"
 
 export function getGL() {
     return gl;

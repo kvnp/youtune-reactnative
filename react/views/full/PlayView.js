@@ -6,10 +6,11 @@ import {
     Image,
     Pressable,
     ActivityIndicator,
-    Dimensions
+    Dimensions,
+    Platform
 } from "react-native";
 
-import TrackPlayer from 'react-native-track-player';
+import TrackPlayer from 'react-native-web-track-player';
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 
 import SeekBar from "../../components/player/SeekBar";
@@ -39,20 +40,24 @@ export default class PlayView extends PureComponent {
 
     componentDidMount() {
         this.refreshUI();
-        this._unsub = [];
+        if (Platform.OS != "web") {
+            this._unsub = [];
 
-        this._unsub.push(
-            TrackPlayer.addEventListener("playback-state", params => this.refreshUI())
-        );
+            this._unsub.push(
+                TrackPlayer.addEventListener("playback-state", params => this.refreshUI())
+            );
 
-        this._unsub.push(
-            TrackPlayer.addEventListener("playback-track-changed", params => this.refreshUI())
-        );
+            this._unsub.push(
+                TrackPlayer.addEventListener("playback-track-changed", params => this.refreshUI())
+            );
+        }
     }
 
     componentWillUnmount() {
-        for (let i = 0; i < this._unsub.length; i++)
-            this._unsub[i].remove();
+        if (Platform.OS != "web") {
+            for (let i = 0; i < this._unsub.length; i++)
+                this._unsub[i].remove();
+        }
     }
 
     refreshUI = async() => {
@@ -189,7 +194,10 @@ export default class PlayView extends PureComponent {
                                 </Pressable>
                             </View>
 
-                            <SeekBar navigation={this.props.navigation}/>
+                            {Platform.OS != "web"
+                                ?<SeekBar navigation={this.props.navigation}/>
+                                :null
+                            }
                             
                             <View style={stylesBottom.buttonContainer}>
                                 <Pressable onPress={() => {}} android_ripple={rippleConfig}>

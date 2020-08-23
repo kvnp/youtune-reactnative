@@ -4,7 +4,8 @@ import {
     StyleSheet,
     Switch,
     Text,
-    Pressable
+    Pressable,
+    Platform
 } from 'react-native';
 
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
@@ -69,15 +70,16 @@ export default class SettingsTab extends PureComponent {
                     />
                 </Pressable>
 
-                <Pressable onPress={() => this.toggleProxy(!this.state.proxy)} style={{flexDirection: "row", width: "100%", alignItems: "center", justifyContent: "space-evenly", backgroundColor: "darkgray", borderWidth: 1, height: 65, marginTop: 7, marginBottom: 7}}>
+                <Pressable onPress={Platform.OS == "web" ?null :() => this.toggleProxy(!this.state.proxy)} style={{flexDirection: "row", width: "100%", alignItems: "center", justifyContent: "space-evenly", backgroundColor: "darkgray", borderWidth: 1, height: 65, marginTop: 7, marginBottom: 7}}>
                     <MaterialIcons name="public" color="black" size={30}/>
-                    <Text style={{flexWrap: "wrap", width: "50%"}}>Proxy YouTube Music (Search/Home/Browse) requests</Text>
+                    <Text style={{flexWrap: "wrap", width: "50%"}}>Proxy YouTube Music (Search/Browse) requests</Text>
                     <Switch
                         trackColor={{ false: "#767577", true: "#81b0ff" }}
                         thumbColor={this.state.proxy ? appColor.background.backgroundColor : "darkgray"}
                         ios_backgroundColor="#3e3e3e"
-                        onValueChange={this.toggleProxy}
-                        value={this.state.proxy}
+                        onValueChange={Platform.OS == "web" ?null :this.toggleProxy}
+                        value={Platform.OS == "web" ?true :this.state.proxy}
+                        disabled={Platform.OS == "web" ?true :false}
                     />
                 </Pressable>
 

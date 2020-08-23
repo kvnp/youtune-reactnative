@@ -50,7 +50,7 @@ function getFunction(code) {
 }
 
 async function fetchFunction(videoId) {
-    let domain = "https://youtube.com"
+    let domain = "https://www.youtube.com"
     let watch = domain + "/watch?v=" + videoId;
     let watchResponse = await getHttpResponse(watch, {
         method: "GET",

@@ -22,6 +22,39 @@ module.exports = (defaults) => ({
                     "Referer": "https://music.youtube.com",
                     "Origin": "https://music.youtube.com"
                 },
+            },
+
+            '/get_video_info': {
+                target: "https://www.youtube.com/",
+                secure: true,
+                changeOrigin: true,
+
+                headers: {
+                    "Referer": "https://www.youtube.com",
+                    "Origin": "https://www.youtube.com",
+                },
+            },
+
+            '/watch': {
+                target: "https://www.youtube.com/",
+                secure: true,
+                changeOrigin: true,
+
+                headers: {
+                    "Referer": "https://www.youtube.com",
+                    "Origin": "https://www.youtube.com",
+                },
+            },
+
+            '/s': {
+                target: "https://www.youtube.com/",
+                secure: true,
+                changeOrigin: true,
+
+                headers: {
+                    "Referer": "https://www.youtube.com",
+                    "Origin": "https://www.youtube.com",
+                },
             }
         },
 

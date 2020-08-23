@@ -1,4 +1,4 @@
-import TrackPlayer from 'react-native-track-player';
+import TrackPlayer from 'react-native-web-track-player';
 import { fetchNext, fetchAudioStream } from "./modules/remote/API";
 import { StatusBar } from 'react-native';
 

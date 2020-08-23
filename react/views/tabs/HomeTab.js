@@ -5,7 +5,8 @@ import {
     Pressable,
     FlatList,
     View,
-    ActivityIndicator
+    ActivityIndicator,
+    Platform
 } from 'react-native';
 
 import { fetchHome } from "../../modules/remote/API";
@@ -32,7 +33,6 @@ export default class HomeTab extends PureComponent {
     }
 
     componentDidMount() {
-        this.startRefresh();
         this._unsubscribe = this.props.navigation.addListener('focus', () => {
             global.setHeader({title: "Home"});
         });
@@ -68,10 +68,10 @@ export default class HomeTab extends PureComponent {
                             <ActivityIndicator size="large"/>
                         </View>
 
-                    :   <>
-                        <Text style={[preResultHomeStyle.preHomeBottomText, preResultHomeStyle.preHomeTopText]}>🏠</Text>
-                        <Text style={preResultHomeStyle.preHomeBottomText}>Pull down to load</Text>
-                        </>
+                    :   <Pressable onPress={Platform.OS == "web" ?this.startRefresh :null}>
+                            <Text style={[preResultHomeStyle.preHomeBottomText, preResultHomeStyle.preHomeTopText]}>🏠</Text>
+                            <Text style={preResultHomeStyle.preHomeBottomText}>{Platform.OS =="web" ?"Press the home icon to load" :"Pull down to load"}</Text>
+                        </Pressable>
                 }
 
                 ListFooterComponent={

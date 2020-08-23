@@ -29,6 +29,6 @@ export default () => {
                 {stackNavigator}
             </SafeAreaView>
 
-        :   <>{stackNavigator}</>
+        :   stackNavigator
             
 }
