@@ -60,7 +60,12 @@ module.exports = (defaults) => ({
 
         allowedHosts: [
             '127.0.0.1',
-        ]
+        ],
+
+        historyApiFallback: true,
+
+        public: "https://youtune.kvnp.eu:443/",
+        compress: true
     },
 
     entry: {
