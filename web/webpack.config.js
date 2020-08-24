@@ -64,7 +64,8 @@ module.exports = (defaults) => ({
 
         historyApiFallback: true,
 
-        public: "https://youtune.kvnp.eu:443/",
+        public: "https://youtune.kvnp.eu:443",
+        disableHostCheck: true,
         compress: true
     },
 

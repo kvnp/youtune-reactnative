@@ -32,7 +32,7 @@ export default ({route, navigation}) => {
                                 <Text style={bottomBarStyle.artistName}>{title}</Text>
 
                                 <Pressable style={bottomBarStyle.subscribeArtist}>
-                                    <Text style={{fontWeight: "bold"}}>ABONNIEREN {subscriptions}</Text>
+                                    <Text style={{fontWeight: "bold"}}>SUBSCRIBE {subscriptions}</Text>
                                 </Pressable>
                             </View>
                             <Pressable android_ripple={rippleConfig} onPress={() => {navigation.pop()}}>
@@ -44,13 +44,13 @@ export default ({route, navigation}) => {
 
                         <View style={bottomBarStyle.buttonView}>
                             <Pressable android_ripple={rippleConfig}>
-                                <Text style={[bottomBarStyle.buttonText, bottomBarStyle.button]}>WIEDERGEBEN</Text>
+                                <Text style={[bottomBarStyle.buttonText, bottomBarStyle.button]}>PLAY</Text>
                             </Pressable>
                             <Pressable android_ripple={rippleConfig}>
-                                <Text style={[bottomBarStyle.buttonText, bottomBarStyle.button]}>ZUR MEDIATHEK</Text>
+                                <Text style={[bottomBarStyle.buttonText, bottomBarStyle.button]}>ADD TO LIBRARY</Text>
                             </Pressable>
                             <Pressable android_ripple={rippleConfig}>
-                                <Text style={[bottomBarStyle.buttonText, bottomBarStyle.button]}>TEILEN</Text>
+                                <Text style={[bottomBarStyle.buttonText, bottomBarStyle.button]}>SHARE</Text>
                             </Pressable>
                         </View>
                     </View>

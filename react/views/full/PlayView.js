@@ -6,7 +6,6 @@ import {
     Image,
     Pressable,
     ActivityIndicator,
-    Dimensions,
     Platform
 } from "react-native";
 
@@ -21,6 +20,7 @@ import { appColor } from "../../styles/App";
 import { startPlayback, skip, setPlay, setRepeat, startPlaylist } from "../../service";
 import { isRepeating } from "../../service";
 import { getSongLike, likeSong } from "../../modules/storage/MediaStorage";
+import { ScrollView } from "react-native-gesture-handler";
 
 export default class PlayView extends PureComponent {
     constructor(props) {
@@ -150,106 +150,119 @@ export default class PlayView extends PureComponent {
             <>
                 <View style={stylesTop.vertContainer}>
                     <View style={imageStyles.view}>
-                        <Image style={imageStyles.image} source={{uri: artwork}}/>
+                        <Image resizeMode="contain" style={imageStyles.image} source={{uri: artwork}}/>
                     </View>
 
-                    <View style={stylesBottom.bottomBit}>
-                        <View style={{width: Dimensions.get("screen").height * 0.39}}>
-                            <View style={controlStyles.container}>
-                                <Pressable onPress={() => {likeSong(id, false); this.refreshUI();}} android_ripple={rippleConfig}>
-                                    <MaterialIcons
-                                        name="thumb-down"
+                    <View style={{alignSelf: "stretch", justifyContent: "space-around", alignItems: "stretch", paddingRight: "2%", paddingLeft: "2%", justifyContent: "center"}}>
+                        <View style={controlStyles.container}>
+                            <Pressable onPress={() => {likeSong(id, false); this.refreshUI();}} android_ripple={rippleConfig}>
+                                <MaterialIcons
+                                    name="thumb-down"
 
-                                        color={
-                                            this.state.isLiked == null
-                                                ? "darkgray"
-                                                : !this.state.isLiked
-                                                    ? "black"
-                                                    : "darkgray"
-                                        }
-
-                                        size={30}
-                                    />
-                                </Pressable>
-
-                                <View style={{alignItems: "center", flex: 1}}>
-                                    <Text numberOfLines={1} style={stylesBottom.titleText}>{title}</Text>
-                                    <Text numberOfLines={1} style={stylesBottom.subtitleText}>{artist}</Text>
-                                </View>
-
-                                <Pressable onPress={() => {likeSong(id, true); this.refreshUI();}} android_ripple={rippleConfig}>
-                                    <MaterialIcons
-                                        name="thumb-up"
-
-                                        color={
-                                            this.state.isLiked == null
-                                                ? "darkgray"
-                                                : this.state.isLiked
-                                                    ? "black"
-                                                    : "darkgray"
-                                        }
-
-                                        size={30}
-                                    />
-                                </Pressable>
-                            </View>
-
-                            {Platform.OS != "web"
-                                ?<SeekBar navigation={this.props.navigation}/>
-                                :null
-                            }
-                            
-                            <View style={stylesBottom.buttonContainer}>
-                                <Pressable onPress={() => {}} android_ripple={rippleConfig}>
-                                    <MaterialIcons name="shuffle" color="black" size={30}/>
-                                </Pressable>
-
-                                <Pressable onPress={() => skip(false)} android_ripple={rippleConfig}>
-                                    <MaterialIcons name="skip-previous" color="black" size={40}/>
-                                </Pressable>
-
-                                <View style={{alignSelf: "center", alignItems: "center", justifyContent: "center", backgroundColor: appColor.background.backgroundColor, width: 60, height: 60, borderRadius: 30}}>
-                                    {isLoading
-                                        ?   <ActivityIndicator style={{alignSelf: "center"}} color="white" size="large"/>
-
-                                        :   <Pressable onPress={() => setPlay(this.state.isPlaying)} android_ripple={rippleConfig}>
-                                                <MaterialIcons name={this.state.isPlaying ? "pause" : "play-arrow"} color="white" size={40}/>
-                                            </Pressable>
+                                    color={
+                                        this.state.isLiked == null
+                                            ? "darkgray"
+                                            : !this.state.isLiked
+                                                ? "black"
+                                                : "darkgray"
                                     }
-                                </View>
+
+                                    size={30}
+                                />
+                            </Pressable>
+
+                            <View style={{alignItems: "center", flex: 1}}>
+                                {Platform.OS != "web"
+                                    ? <>
+                                        <ScrollView horizontal={true} style={{marginHorizontal: 10}}>
+                                            <Text numberOfLines={1} style={stylesBottom.titleText}>{title}</Text>
+                                        </ScrollView>
+
+                                        <ScrollView horizontal={true} style={{marginHorizontal: 10}}>
+                                            <Text numberOfLines={1} style={stylesBottom.subtitleText}>{artist}</Text>
+                                        </ScrollView>
+                                    </>
+
+                                    : <>
+                                        <Text numberOfLines={1} style={[stylesBottom.titleText, {marginHorizontal: 10, overflow: "hidden", width: "80%"}]}>{title}</Text>
+                                        <Text numberOfLines={1} style={[stylesBottom.subtitleText, {marginHorizontal: 10, overflow: "hidden", width: "80%"}]}>{artist}</Text>
+                                    </>
+                                }
                                 
-
-                                <Pressable onPress={() => skip(true)} android_ripple={rippleConfig}>
-                                    <MaterialIcons name="skip-next" color="black" size={40}/>
-                                </Pressable>
-
-                                <Pressable onPress={this.setRepeat} android_ripple={rippleConfig}>
-                                    <MaterialIcons name={this.state.isRepeating ?"repeat-one" :"repeat"} color="black" size={30}/>
-                                </Pressable>
                             </View>
 
-                            <View style={{justifyContent: "space-between", flexDirection: "row", paddingTop: 30}}>
-                                <Pressable onPress={this.props.navigation.goBack} android_ripple={rippleConfig} style={stylesTop.topFirst}>
-                                    <MaterialIcons name="keyboard-arrow-down" color={"black"} size={30}/>
-                                </Pressable>
+                            <Pressable onPress={() => {likeSong(id, true); this.refreshUI();}} android_ripple={rippleConfig}>
+                                <MaterialIcons
+                                    name="thumb-up"
 
-                                <Pressable
-                                    onPress={() => {
-                                        let view = {
-                                            title: this.state.track.title,
-                                            subtitle: this.state.track.artist,
-                                            thumbnail: this.state.track.artwork,
-                                            videoId: this.state.track.id
-                                        };
+                                    color={
+                                        this.state.isLiked == null
+                                            ? "darkgray"
+                                            : this.state.isLiked
+                                                ? "black"
+                                                : "darkgray"
+                                    }
 
-                                        global.showModal(view);
-                                    }}
-                                    android_ripple={rippleConfig}
-                                    style={stylesTop.topThird}
-                                >
-                                    <MaterialIcons name="more-vert" color={"black"} size={30}/>
-                                </Pressable>
+                                    size={30}
+                                />
+                            </Pressable>
+                        </View>
+
+                        {Platform.OS != "web"
+                            ?<SeekBar navigation={this.props.navigation}/>
+                            :null
+                        }
+                        
+                        <View style={stylesBottom.buttonContainer}>
+                            <Pressable onPress={() => {}} android_ripple={rippleConfig}>
+                                <MaterialIcons name="shuffle" color="black" size={30}/>
+                            </Pressable>
+
+                            <Pressable onPress={() => skip(false)} android_ripple={rippleConfig}>
+                                <MaterialIcons name="skip-previous" color="black" size={40}/>
+                            </Pressable>
+
+                            <View style={{alignSelf: "center", alignItems: "center", justifyContent: "center", backgroundColor: appColor.background.backgroundColor, width: 60, height: 60, borderRadius: 30}}>
+                                {isLoading
+                                    ?   <ActivityIndicator style={{alignSelf: "center"}} color="white" size="large"/>
+
+                                    :   <Pressable onPress={() => setPlay(this.state.isPlaying)} android_ripple={rippleConfig}>
+                                            <MaterialIcons name={this.state.isPlaying ? "pause" : "play-arrow"} color="white" size={40}/>
+                                        </Pressable>
+                                }
                             </View>
+                            
+
+                            <Pressable onPress={() => skip(true)} android_ripple={rippleConfig}>
+                                <MaterialIcons name="skip-next" color="black" size={40}/>
+                            </Pressable>
+
+                            <Pressable onPress={this.setRepeat} android_ripple={rippleConfig}>
+                                <MaterialIcons name={this.state.isRepeating ?"repeat-one" :"repeat"} color="black" size={30}/>
+                            </Pressable>
+                        </View>
+
+                        <View style={{justifyContent: "space-between", flexDirection: "row", paddingTop: 30}}>
+                            <Pressable onPress={this.props.navigation.goBack} android_ripple={rippleConfig} style={stylesTop.topFirst}>
+                                <MaterialIcons name="keyboard-arrow-down" color={"black"} size={30}/>
+                            </Pressable>
+
+                            <Pressable
+                                onPress={() => {
+                                    let view = {
+                                        title: this.state.track.title,
+                                        subtitle: this.state.track.artist,
+                                        thumbnail: this.state.track.artwork,
+                                        videoId: this.state.track.id
+                                    };
+
+                                    global.showModal(view);
+                                }}
+                                android_ripple={rippleConfig}
+                                style={stylesTop.topThird}
+                            >
+                                <MaterialIcons name="more-vert" color={"black"} size={30}/>
+                            </Pressable>
                         </View>
                     </View>
                 </View>
@@ -276,28 +289,16 @@ const stylesRest = StyleSheet.create({
 });
 
 const stylesBottom = StyleSheet.create({
-    bottomBit: {
-        height: Dimensions.get("screen").height * 0.39,
-        alignItems: "center",
-        justifyContent: "center",
-        alignSelf: "stretch",
-        paddingTop: 30
-    },
-
     subtitleText: {
         paddingTop: 5,
         alignSelf: "center",
-        overflow: "hidden",
-        width: "80%",
-        textAlign: "center",
+        textAlign: "center"
     },
 
     titleText: {
         fontSize: 25,
         fontWeight: "bold",
-        overflow: "hidden",
-        width: "80%",
-        textAlign: "center",
+        textAlign: "center"
     },
 
     buttonContainer: {
@@ -310,16 +311,12 @@ const stylesBottom = StyleSheet.create({
 
 const imageStyles = StyleSheet.create({
     view: {
-        alignItems: "center",
-        alignSelf: "stretch",
-        height: Dimensions.get("screen").height * 0.39
+        height: "50%",
+        alignSelf: "stretch"
     },
 
     image: {
-        //width: Dimensions.get("screen").height * 0.39,
-        height: "100%",
-        aspectRatio: 1,
-        backgroundColor: appColor.background.backgroundColor
+        flex: 1
     }
 });
 
@@ -327,7 +324,6 @@ const controlStyles = StyleSheet.create({
     container: {
         flexDirection: "row",
         justifyContent: "space-between",
-        alignItems: "center"
     },
 });
 
@@ -349,11 +345,13 @@ const stylesTop = StyleSheet.create({
     },
 
     vertContainer: {
-        height: "100%",
         width: "100%",
+        height: "100%",
+        padding: "10%",
+        paddingBottom: 100,
         flexWrap: "wrap",
+        alignSelf: "stretch",
         alignContent: "stretch",
-        justifyContent: "center",
-        paddingBottom: 30
+        justifyContent: "space-around"
     }
 });

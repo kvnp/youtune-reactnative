@@ -36,7 +36,7 @@ export default class SwipePlaylist extends PureComponent {
                 <View style={styles.panel}>
                     <Pressable style={styles.panelHeader} onPress={() => this._panel.show()}>
                         <View style={stylesRest.smallBar}/>
-                        <Text style={{color: "white"}}>WIEDERGABELISTE</Text>
+                        <Text style={{color: "white"}}>PLAYLIST</Text>
                     </Pressable>
 
                     <FlatList
