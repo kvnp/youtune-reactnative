@@ -115,16 +115,23 @@ export function digestSearchResults(json) {
                 entry.thumbnail = thumbnaillist[0].url;
                 
                 if (responsiveMusicItem.hasOwnProperty("navigationEndpoint")) {
-                    let type = responsiveMusicItem.navigationEndpoint.browseEndpoint.browseEndpointContextSupportedConfigs.browseEndpointContextMusicConfig.pageType;
-                    if (type == "MUSIC_PAGE_TYPE_ARTIST")
-                        entry.type = "Artist";
-                    else if (type == "MUSIC_PAGE_TYPE_ALBUM")
-                        entry.type = "Album";
-                    else if (type == "MUSIC_PAGE_TYPE_PLAYLIST")
-                        entry.type = "Playlist";
-                    
-                    entry.playlistId = responsiveMusicItem.doubleTapCommand.watchPlaylistEndpoint.playlistId;
-                    entry.browseId = responsiveMusicItem.navigationEndpoint.browseEndpoint.browseId;
+                    if (responsiveMusicItem.navigationEndpoint.hasOwnProperty("watchEndpoint")) {
+                        entry.type = "Title";
+                        entry.playlistId = responsiveMusicItem.navigationEndpoint.watchEndpoint.playlistId;
+                        entry.videoId = responsiveMusicItem.navigationEndpoint.watchEndpoint.videoId;
+
+                    } else {
+                        let type = responsiveMusicItem.navigationEndpoint.browseEndpoint.browseEndpointContextSupportedConfigs.browseEndpointContextMusicConfig.pageType;
+                        if (type == "MUSIC_PAGE_TYPE_ARTIST")
+                            entry.type = "Artist";
+                        else if (type == "MUSIC_PAGE_TYPE_ALBUM")
+                            entry.type = "Album";
+                        else if (type == "MUSIC_PAGE_TYPE_PLAYLIST")
+                            entry.type = "Playlist";
+
+                        entry.playlistId = responsiveMusicItem.doubleTapCommand.watchPlaylistEndpoint.playlistId;
+                        entry.browseId = responsiveMusicItem.navigationEndpoint.browseEndpoint.browseId;
+                    }
                 } else {
                     entry.type = "Title";
                     entry.videoId = responsiveMusicItem.doubleTapCommand.watchEndpoint.videoId;
@@ -586,7 +593,6 @@ export async function digestStreams(text) {
     } catch {
         return null;
     }
-    console.log(parse);
 
     let videoId = parse.videoDetails.videoId;
 
@@ -612,7 +618,6 @@ export async function digestStreams(text) {
                         stream += "&" + sigArray[j];
                 }
                 stream += "&sig=" + s;
-                console.log(stream);
                 return stream;
             } else
                 return parse.streamingData.adaptiveFormats[i].url;
@@ -625,10 +630,6 @@ export function digestNextResults(json) {
     
     let playlistRenderer = json.contents.singleColumnMusicWatchNextResultsRenderer.playlist.playlistPanelRenderer;
     playlist.index = json.currentVideoEndpoint.watchEndpoint.index;
-    
-    /*playlist.index = playlistRenderer.currentIndex;
-    console.log(playlistRenderer.currentIndex);
-    console.log(json.currentVideoEndpoint.watchEndpoint.index+"\n\n\n");*/
 
     for (let i = 0; i < playlistRenderer.contents.length; i++) {
         if (playlistRenderer.contents[i].hasOwnProperty("automixPreviewVideoRenderer")) {

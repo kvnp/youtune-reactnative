@@ -11,11 +11,12 @@ import {
 import { getHttpResponse, getUrl } from "./HTTP";
 import { settings } from "../../modules/storage/SettingsStorage";
 
-const headers_api = {"User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:79.0) Gecko/20100101 Firefox/79.0"};
+const useragent = "Mozilla/5.0 (X11; Linux x86_64; rv:79.0) Gecko/20100101 Firefox/79.0";
+const headers_api = {"User-Agent": useragent};
 const headers_ytm = {
     "Referer":      "https://music.youtube.com/",
     "Content-Type": "application/json",
-    "User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:79.0) Gecko/20100101 Firefox/79.0"
+    "User-Agent": useragent
 };
 
 export const headers_yt = {

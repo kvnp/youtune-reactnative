@@ -6,7 +6,8 @@ import {
     Image,
     Pressable,
     ActivityIndicator,
-    Platform
+    Platform,
+    ScrollView
 } from "react-native";
 
 import TrackPlayer from 'react-native-web-track-player';
@@ -20,7 +21,6 @@ import { appColor } from "../../styles/App";
 import { startPlayback, skip, setPlay, setRepeat, startPlaylist } from "../../service";
 import { isRepeating } from "../../service";
 import { getSongLike, likeSong } from "../../modules/storage/MediaStorage";
-import { ScrollView } from "react-native-gesture-handler";
 
 export default class PlayView extends PureComponent {
     constructor(props) {
@@ -129,8 +129,8 @@ export default class PlayView extends PureComponent {
                 var artist = subtitle;
                 var artwork = thumbnail;
 
-                startPlayback(this.props.route.params)
-                    .catch(params => this.props.navigation.navigate("Captcha", params));
+                startPlayback(this.props.route.params);
+                    //.catch(params => this.props.navigation.navigate("Captcha", params));
             }
 
             this.props.route.params = undefined;
@@ -171,25 +171,23 @@ export default class PlayView extends PureComponent {
                                 />
                             </Pressable>
 
-                            <View style={{alignItems: "center", flex: 1}}>
-                                {Platform.OS != "web"
-                                    ? <>
-                                        <ScrollView horizontal={true} style={{marginHorizontal: 10}}>
-                                            <Text numberOfLines={1} style={stylesBottom.titleText}>{title}</Text>
-                                        </ScrollView>
+                            
+                            {Platform.OS != "web"
+                                ? <View style={{alignItems: "center", flex: 1}}>
+                                    <ScrollView horizontal={true} style={{marginHorizontal: 10}}>
+                                        <Text numberOfLines={1} style={stylesBottom.titleText}>{title}</Text>
+                                    </ScrollView>
 
-                                        <ScrollView horizontal={true} style={{marginHorizontal: 10}}>
-                                            <Text numberOfLines={1} style={stylesBottom.subtitleText}>{artist}</Text>
-                                        </ScrollView>
-                                    </>
+                                    <ScrollView horizontal={true} style={{marginHorizontal: 10}}>
+                                        <Text numberOfLines={1} style={stylesBottom.subtitleText}>{artist}</Text>
+                                    </ScrollView>
+                                  </View>
 
-                                    : <>
-                                        <Text numberOfLines={1} style={[stylesBottom.titleText, {marginHorizontal: 10, overflow: "hidden", width: "80%"}]}>{title}</Text>
-                                        <Text numberOfLines={1} style={[stylesBottom.subtitleText, {marginHorizontal: 10, overflow: "hidden", width: "80%"}]}>{artist}</Text>
-                                    </>
-                                }
-                                
-                            </View>
+                                : <View style={{alignItems: "center"}}>
+                                    <Text adjustsFontSizeToFit={true} ellipsizeMode="tail" numberOfLines={1} style={[stylesBottom.titleText, {marginHorizontal: 10, width: 150}]}>{title}</Text>
+                                    <Text adjustsFontSizeToFit={true} ellipsizeMode="tail" numberOfLines={1} style={[stylesBottom.subtitleText, {marginHorizontal: 10, width: 150}]}>{artist}</Text>
+                                  </View>
+                            }
 
                             <Pressable onPress={() => {likeSong(id, true); this.refreshUI();}} android_ripple={rippleConfig}>
                                 <MaterialIcons
