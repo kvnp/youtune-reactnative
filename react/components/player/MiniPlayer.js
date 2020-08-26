@@ -19,24 +19,19 @@ export default class MiniPlayer extends PureComponent{
 
     componentDidMount() {
         this.refreshUI();
+        this._unsub = [];
+        this._unsub.push(
+            TrackPlayer.addEventListener("playback-state", params => this.refreshUI())
+        );
 
-        if (Platform.OS != "web") {
-            this._unsub = [];
-            this._unsub.push(
-                TrackPlayer.addEventListener("playback-state", params => this.refreshUI())
-            );
-
-            this._unsub.push(
-                TrackPlayer.addEventListener("playback-track-changed", params => this.refreshUI())
-            );
-        }
+        this._unsub.push(
+            TrackPlayer.addEventListener("playback-track-changed", params => this.refreshUI())
+        );
     }
 
     componentWillUnmount() {
-        if (Platform.OS != "web") {
-            for (let i = 0; i < this._unsub.length; i++)
-                this._unsub[i].remove();
-        }
+        for (let i = 0; i < this._unsub.length; i++)
+            this._unsub[i].remove();
     }
 
     refreshUI = async() => {
@@ -92,35 +87,33 @@ export default class MiniPlayer extends PureComponent{
         if (this.state.track != null)
             var {title, artist, artwork} = this.state.track;
 
-        return (
-            <View style={[this.props.style, {height: this.state.isStopped ?0 :50}, styles.container]}>
-                <Image source={{uri: artwork}} style={styles.image}/>
-                <View style={styles.textContainer}>
-                    <Pressable android_ripple={rippleConfig} onPress={this.onOpen}>
-                        <Text numberOfLines={1} style={[styles.text, styles.titleText]}>{title}</Text>
-                        <Text numberOfLines={1} style={[styles.text, styles.subtitleText]}>{artist}</Text>
-                    </Pressable>
-                </View>
+        return  <View style={[this.props.style, {height: this.state.isStopped ?0 :50}, styles.container]}>
+                    <Image source={{uri: artwork}} style={styles.image}/>
+                    <View style={styles.textContainer}>
+                        <Pressable android_ripple={rippleConfig} onPress={this.onOpen}>
+                            <Text numberOfLines={1} style={[styles.text, styles.titleText]}>{title}</Text>
+                            <Text numberOfLines={1} style={[styles.text, styles.subtitleText]}>{artist}</Text>
+                        </Pressable>
+                    </View>
 
-                <View style={styles.button}>
-                    <Pressable android_ripple={rippleConfig} onPress={this.onStop}>
-                        <MaterialIcons name="clear" color="white" size={29}/>
-                    </Pressable>
-                </View>
+                    <View style={styles.button}>
+                        <Pressable android_ripple={rippleConfig} onPress={this.onStop}>
+                            <MaterialIcons name="clear" color="white" size={29}/>
+                        </Pressable>
+                    </View>
 
-                <View style={styles.button}>
-                    <Pressable android_ripple={rippleConfig} onPress={this.onPlay}>
-                        <MaterialIcons name={this.state.isPlaying ?"pause" :"play-arrow"} color="white" size={29}/>
-                    </Pressable>
-                </View>
+                    <View style={styles.button}>
+                        <Pressable android_ripple={rippleConfig} onPress={this.onPlay}>
+                            <MaterialIcons name={this.state.isPlaying ?"pause" :"play-arrow"} color="white" size={29}/>
+                        </Pressable>
+                    </View>
 
-                <View style={styles.button}>
-                    <Pressable android_ripple={rippleConfig} onPress={this.onNext}>
-                        <MaterialIcons name="skip-next" color="white" size={29}/>
-                    </Pressable>
+                    <View style={styles.button}>
+                        <Pressable android_ripple={rippleConfig} onPress={this.onNext}>
+                            <MaterialIcons name="skip-next" color="white" size={29}/>
+                        </Pressable>
+                    </View>
                 </View>
-            </View>
-        );
     }
 }
 
@@ -131,12 +124,12 @@ const styles = StyleSheet.create({
         paddingRight: 15,
         paddingLeft: 15,
         alignItems: "center",
-        alignSelf: "center",
+        alignSelf: "stretch",
     },
 
     image: {
-        height: "100%",
-        aspectRatio: 1,
+        width: 50,
+        alignSelf: "stretch",
         backgroundColor: "gray",
     },
 
