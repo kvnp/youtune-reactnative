@@ -1,5 +1,6 @@
 const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const WebpackPwaManifest = require('webpack-pwa-manifest');
 
 module.exports = (defaults) => ({
     ...defaults,
@@ -143,7 +144,31 @@ module.exports = (defaults) => ({
         new HtmlWebpackPlugin({
             template: './index.html'
         }),
+
         new webpack.HotModuleReplacementPlugin(),
+
+        new WebpackPwaManifest({
+            name: 'YouTune',
+            short_name: 'YouTune',
+            description: 'YouTube Music Frontend',
+            background_color: '#2f4f4f',
+            crossorigin: 'use-credentials', //can be null, use-credentials or anonymous
+            icons: [
+                {
+                    src: './icon.png',
+                    sizes: [96, 128, 192, 256, 384, 512] // multiple sizes
+                },
+                {
+                    src: './icon.png',
+                    size: '1024x1024' // you can also use the specifications pattern
+                },
+                {
+                    src: './icon.png',
+                    size: '1024x1024',
+                    purpose: 'maskable'
+                }
+            ]
+        })
     ],
     
     resolve: {
