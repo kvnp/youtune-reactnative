@@ -1,8 +1,9 @@
 import { AppRegistry } from 'react-native'
+import * as OfflinePluginRuntime from 'offline-plugin/runtime';
+import iconFont from 'react-native-vector-icons/Fonts/MaterialIcons.ttf';
+
 import { name } from '../react/app.json'
 import App from '../react/App'
-
-import iconFont from 'react-native-vector-icons/Fonts/MaterialIcons.ttf';
 import { register } from '../react/service';
 
 const iconFontStyles = `@font-face {
@@ -46,3 +47,5 @@ AppRegistry.runApplication(name, {
     initialProps: {},
     rootTag: document.getElementById('app'),
 });
+
+OfflinePluginRuntime.install();

@@ -52,6 +52,7 @@
     "eslint": "6.8.0",
     "jest": "25.5.4",
     "metro-react-native-babel-preset": "0.59.0",
+    "offline-plugin": "^5.0.7",
     "react-test-renderer": "16.13.1",
     "webpack-dev-server": "^3.11.0",
     "webpack-pwa-manifest": "^4.2.0"
