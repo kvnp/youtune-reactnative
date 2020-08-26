@@ -627,8 +627,18 @@ export async function digestStreams(text) {
 
 export function digestNextResults(json) {
     let playlist = new Playlist();
-    
-    let playlistRenderer = json.contents.singleColumnMusicWatchNextResultsRenderer.playlist.playlistPanelRenderer;
+    console.log(json)
+
+    let playlistRenderer;
+    if (json.contents.singleColumnMusicWatchNextResultsRenderer.hasOwnProperty("playlist"))
+        playlistRenderer = json.contents.singleColumnMusicWatchNextResultsRenderer
+                                .playlist.playlistPanelRenderer;
+    else
+        playlistRenderer = json.contents.singleColumnMusicWatchNextResultsRenderer
+                                .tabbedRenderer.watchNextTabbedResultsRenderer.tabs[0]
+                                .tabRenderer.content.musicQueueRenderer.content
+                                .playlistPanelRenderer;
+
     playlist.index = json.currentVideoEndpoint.watchEndpoint.index;
 
     for (let i = 0; i < playlistRenderer.contents.length; i++) {

@@ -11,6 +11,10 @@ module.exports = (defaults) => ({
                 secure: true,
                 changeOrigin: true,
                 pathRewrite: {'^/start' : ''},
+
+                headers: {
+                    "User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:79.0) Gecko/20100101 Firefox/79.0"
+                }
             },
 
             '/youtubei': {
@@ -20,7 +24,8 @@ module.exports = (defaults) => ({
 
                 headers: {
                     "Referer": "https://music.youtube.com",
-                    "Origin": "https://music.youtube.com"
+                    "Origin": "https://music.youtube.com",
+                    "User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:79.0) Gecko/20100101 Firefox/79.0"
                 },
             },
 
@@ -31,7 +36,8 @@ module.exports = (defaults) => ({
 
                 headers: {
                     "Referer": "https://www.youtube.com",
-                    "Origin": "https://www.youtube.com"
+                    "Origin": "https://www.youtube.com",
+                    "User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:79.0) Gecko/20100101 Firefox/79.0"
                 },
             },
 
@@ -54,7 +60,8 @@ module.exports = (defaults) => ({
 
                 headers: {
                     "Referer": "https://www.youtube.com",
-                    "Origin": "https://www.youtube.com"
+                    "Origin": "https://www.youtube.com",
+                    "User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:79.0) Gecko/20100101 Firefox/79.0"
                 },
             }
         },
@@ -65,7 +72,7 @@ module.exports = (defaults) => ({
 
         historyApiFallback: true,
 
-        public: "https://youtune.kvnp.eu:443",
+        //public: "https://youtune.kvnp.eu:443",
         disableHostCheck: true,
         compress: true
     },

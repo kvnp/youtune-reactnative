@@ -40,24 +40,52 @@ export default class PlayView extends PureComponent {
 
     componentDidMount() {
         this.refreshUI();
-        if (Platform.OS != "web") {
-            this._unsub = [];
+        this._unsub = [];
 
-            this._unsub.push(
-                TrackPlayer.addEventListener("playback-state", params => this.refreshUI())
-            );
+        this._unsub.push(
+            TrackPlayer.addEventListener("playback-state", params => {
+                console.log("PLAYBACK_STATE");
+                console.log(params);
 
-            this._unsub.push(
-                TrackPlayer.addEventListener("playback-track-changed", params => this.refreshUI())
-            );
-        }
+                let state;
+                if (params.hasOwnProperty("state"))
+                    state = params.state;
+                else
+                    state = 0;
+
+                switch (state) {
+                    case TrackPlayer.STATE_NONE:
+                        console.log("NONE: " + params.state);
+                        break;
+                    case TrackPlayer.STATE_PLAYING:
+                        console.log("PLAYING: " + params.state);
+                        break;
+                    case TrackPlayer.STATE_PAUSED:
+                        console.log("PAUSED: " + params.state);
+                        break;
+                    case TrackPlayer.STATE_STOPPED:
+                        console.log("STOPPED: " + params.state);
+                        break;
+                    case TrackPlayer.STATE_BUFFERING:
+                        console.log("BUFFERING: " + params.state);
+                        break;
+                }
+                this.refreshUI();
+            }
+        ));
+
+        this._unsub.push(
+            TrackPlayer.addEventListener("playback-track-changed", params => {
+                console.log("TRACK_CHANGED");
+                console.log(params);
+                this.refreshUI();
+            })
+        );
     }
 
     componentWillUnmount() {
-        if (Platform.OS != "web") {
-            for (let i = 0; i < this._unsub.length; i++)
-                this._unsub[i].remove();
-        }
+        for (let i = 0; i < this._unsub.length; i++)
+            this._unsub[i].remove();
     }
 
     refreshUI = async() => {

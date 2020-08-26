@@ -61,50 +61,45 @@ export const skipAuto = async() => {
         skip(true);
 }
 
-export const skipTo = (id) => {
-    return new Promise(
-        async(resolve, reject) => {
-            let array = await TrackPlayer.getQueue();
-            let index;
-            let track;
+export const skipTo = async(id) => {
+    let array = await TrackPlayer.getQueue();
+    let index;
+    let track;
 
-            for (let i = 0; i < array.length; i++) {
-                if (array[i].id == id) {
-                    index = i;
-                    track = array[i];
-                    break;
-                }
-            }
-
-            focusedId = id;
-            if (track.url == undefined)
-                track.url = await fetchAudioStream(id);
-            else {
-                TrackPlayer.skip(id);
-
-                resolve(true);
-                return;
-            }
-
-            let next;
-            if (index == array.length - 1)
-                next = null;
-            else
-                next = array[index + 1].id;
-
-            await TrackPlayer.remove(id);
-            await TrackPlayer.add(track, next);
-            await TrackPlayer.skip(id);
-            TrackPlayer.seekTo(0);
-
-            resolve(true);
+    for (let i = 0; i < array.length; i++) {
+        if (array[i].id == id) {
+            index = i;
+            track = array[i];
+            break;
         }
-    );
+    }
+
+    focusedId = id;
+    if (track.url == undefined)
+        track.url = await fetchAudioStream(id);
+    else {
+        TrackPlayer.skip(id);
+        return;
+    }
+
+    let next;
+    if (index == array.length - 1)
+        next = null;
+    else
+        next = array[index + 1].id;
+
+    await TrackPlayer.remove(id);
+    await TrackPlayer.add(track, next);
+    await TrackPlayer.skip(id);
+    TrackPlayer.seekTo(0);
 }
 
 export const skip = async(forward) => {
     let id = await TrackPlayer.getCurrentTrack();
+    console.log("CURRENT: " + id);
     let array = await TrackPlayer.getQueue();
+    console.log("ARRAY: ");
+    console.log(array);
 
     let position = await TrackPlayer.getPosition();
     let index;
