@@ -43,43 +43,11 @@ export default class PlayView extends PureComponent {
         this._unsub = [];
 
         this._unsub.push(
-            TrackPlayer.addEventListener("playback-state", params => {
-                console.log("PLAYBACK_STATE");
-                console.log(params);
-
-                let state;
-                if (params.hasOwnProperty("state"))
-                    state = params.state;
-                else
-                    state = 0;
-
-                switch (state) {
-                    case TrackPlayer.STATE_NONE:
-                        console.log("NONE: " + params.state);
-                        break;
-                    case TrackPlayer.STATE_PLAYING:
-                        console.log("PLAYING: " + params.state);
-                        break;
-                    case TrackPlayer.STATE_PAUSED:
-                        console.log("PAUSED: " + params.state);
-                        break;
-                    case TrackPlayer.STATE_STOPPED:
-                        console.log("STOPPED: " + params.state);
-                        break;
-                    case TrackPlayer.STATE_BUFFERING:
-                        console.log("BUFFERING: " + params.state);
-                        break;
-                }
-                this.refreshUI();
-            }
-        ));
+            TrackPlayer.addEventListener("playback-state", this.refreshUI)
+        );
 
         this._unsub.push(
-            TrackPlayer.addEventListener("playback-track-changed", params => {
-                console.log("TRACK_CHANGED");
-                console.log(params);
-                this.refreshUI();
-            })
+            TrackPlayer.addEventListener("playback-track-changed", this.refreshUI)
         );
     }
 
@@ -234,10 +202,7 @@ export default class PlayView extends PureComponent {
                             </Pressable>
                         </View>
 
-                        {Platform.OS != "web"
-                            ?<SeekBar navigation={this.props.navigation}/>
-                            :null
-                        }
+                        <SeekBar navigation={this.props.navigation}/>
                         
                         <View style={stylesBottom.buttonContainer}>
                             <Pressable onPress={() => {}} android_ripple={rippleConfig}>

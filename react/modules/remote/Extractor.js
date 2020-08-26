@@ -627,7 +627,6 @@ export async function digestStreams(text) {
 
 export function digestNextResults(json) {
     let playlist = new Playlist();
-    console.log(json)
 
     let playlistRenderer;
     if (json.contents.singleColumnMusicWatchNextResultsRenderer.hasOwnProperty("playlist"))

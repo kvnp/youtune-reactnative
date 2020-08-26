@@ -75,9 +75,10 @@ export const skipTo = async(id) => {
     }
 
     focusedId = id;
-    if (track.url == undefined)
+    if (track.url == undefined) {
+        TrackPlayer.pause();
         track.url = await fetchAudioStream(id);
-    else {
+    } else {
         TrackPlayer.skip(id);
         return;
     }
@@ -96,10 +97,7 @@ export const skipTo = async(id) => {
 
 export const skip = async(forward) => {
     let id = await TrackPlayer.getCurrentTrack();
-    console.log("CURRENT: " + id);
     let array = await TrackPlayer.getQueue();
-    console.log("ARRAY: ");
-    console.log(array);
 
     let position = await TrackPlayer.getPosition();
     let index;
@@ -111,7 +109,7 @@ export const skip = async(forward) => {
         }
     }
 
-    if (forward && index == array.length - 1 || !forward && position > 10)
+    if (forward && index == array.length - 1 || !forward && position > 10 || !forward && index == 0)
         return TrackPlayer.seekTo(0);
 
     let next;
@@ -120,7 +118,7 @@ export const skip = async(forward) => {
     else
         next = array[index - 1].id;
 
-    return skipTo(next);
+    skipTo(next);
 }
 
 export async function startPlayback({ playlistId, videoId }) {

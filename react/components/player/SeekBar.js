@@ -63,16 +63,16 @@ const styles = StyleSheet.create({
         marginTop: -12
     },
 
-    container: Platform.OS == "ios"
-    ? {
-        paddingTop: 16
-    }
+    container: Platform.OS == "android"
+        ? {
+            paddingTop: 16,
+            marginLeft: -15,
+            marginRight: -15
+        }
 
-    : {
-        paddingTop: 16,
-        marginLeft: -15,
-        marginRight: -15
-    },
+        : {
+            paddingTop: 16
+        },
 
     track: {
         height: 2,
@@ -83,7 +83,7 @@ const styles = StyleSheet.create({
         color: appColor.background.backgroundColor
     },
 
-    text: Platform.OS == "ios" 
+    text: Platform.OS == "ios"
     ? {
         color: 'black',
         fontSize: 12,

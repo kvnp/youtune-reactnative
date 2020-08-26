@@ -12,7 +12,6 @@ import { skip, isRepeating, focusedId } from './service';
 
 module.exports = async function() {
     TrackPlayer.addEventListener("playback-track-changed", params => {
-        console.log("TRACK_CHANGED");
         if (isRepeating && params["nextTrack"] != focusedId)
             TrackPlayer.skipToPrevious();
     });
