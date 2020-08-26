@@ -152,7 +152,9 @@ module.exports = (defaults) => ({
             short_name: 'YouTune',
             description: 'YouTube Music Frontend',
             background_color: '#2f4f4f',
+            theme_color: '#2f4f4f',
             crossorigin: 'use-credentials', //can be null, use-credentials or anonymous
+            display: "fullscreen",
             icons: [
                 {
                     src: './icon.png',
@@ -167,7 +169,12 @@ module.exports = (defaults) => ({
                     size: '1024x1024',
                     purpose: 'maskable'
                 }
-            ]
+            ],
+            ios: {
+                'apple-mobile-web-app-title': "YouTune",
+                'apple-mobile-web-app-capable': "yes",
+                'apple-mobile-web-app-status-bar-style': "black-translucent"
+            }
         })
     ],
     
