@@ -27,10 +27,6 @@ export default class SearchTab extends PureComponent {
         super(props);
         this.state = {
             shelves: [],
-
-            query: "",
-            oldQuery: null,
-            buttonDisabled: true,
             loading: false,
 
             message: "",
@@ -49,35 +45,31 @@ export default class SearchTab extends PureComponent {
         this._unsubscribe();
     }
 
-    setQuery = (event) => {
-        if (event.nativeEvent.text.length > 0)
-            this.setState({query: event.nativeEvent.text,
-                           buttonDisabled: false});
-        else
-            this.setState({query: event.nativeEvent.text,
-                           buttonDisabled: true});
-    }
-
-    search = () => {
+    search = (query) => {
         Keyboard.dismiss();
-        if (this.state.query.length > 0) {
-            this.setState({buttonDisabled: true, loading: true, oldQuery: this.state.query});
-            fetchResults(this.state.query)
-                .then(data => this.setState(
-                    {
-                        shelves: data.shelves,
-                        suggestion: data.suggestion,
-                        instead: data.insteadOption,
-                        suggestion: data.suggestionOption,
-                        loading: false
-                    }
-            ));
+        if (query.length > 0) {
+            this.setState({loading: true});
+
+            fetchResults(query).then(data => {
+                if (data.suggestionOption == this.state.suggestion)
+                    data.suggestionOption = null;
+
+                if (data.insteadOption == this.state.instead)
+                    data.insteadOption = null;
+
+                this.setState({
+                    shelves: data.shelves,
+                    instead: data.insteadOption,
+                    suggestion: data.suggestionOption,
+                    loading: false
+                });
+            });
         }
     }
 
-    searchInstead = async(query) => {
-        this.setState({query: query, message: null, instead: null, suggestion: null});
-        this.search();
+    searchInstead = query => {
+        this._input.value = query;
+        this.search(query);
     }
 
     render() {
@@ -104,16 +96,7 @@ export default class SearchTab extends PureComponent {
                 sections={this.state.shelves}
 
                 refreshing={this.state.loading}
-                onRefresh={
-                    this.state.oldQuery == null
-                        ? undefined
-                        : () => {
-                            if (this.state.query != this.state.oldQuery)
-                                this.setState({query: this.state.oldQuery});
-                            
-                            this.search();
-                        }
-                }
+                onRefresh={() => this.search(this._input.value)}
 
                 keyExtractor={(item, index) => index + item.title}
                 renderItem={({ item }) =>  <Entry entry={item} navigation={this.props.navigation}/>}
@@ -161,16 +144,15 @@ export default class SearchTab extends PureComponent {
                 
                 {this.getSpecificButtons()}
                 <View style={searchBarStyle.container}>
-                    <TextInput  style={searchBarStyle.input}
+                    <TextInput  ref={(c) => (this._input = c)}
+                                style={searchBarStyle.input}
                                 placeholder="Search"
                                 value={this.state.query}
                                 placeholderTextColor={textStyle.placeholder.color}
-                                onChange={this.setQuery}
-                                onSubmitEditing={this.search}/>
-                    <Pressable  onPress={this.search}
+                                onSubmitEditing={() => this.search(this._input.value)}/>
+                    <Pressable  onPress={() => this.search(this._input.value)}
                                 android_ripple={rippleConfig}
-                                style={searchBarStyle.button}
-                                disabled={this.state.buttonDisabled}>
+                                style={searchBarStyle.button}>
                         { this.state.loading
                             ? <ActivityIndicator color="white" size="small"/>
                             : <MaterialIcons name="search" color="white" size={24}/>
