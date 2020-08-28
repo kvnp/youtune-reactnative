@@ -127,16 +127,15 @@ export default class SearchTab extends PureComponent {
 
             <KeyboardAvoidingView enabled={Platform.OS == "ios" ? true : false} behavior="padding" keyboardVerticalOffset={170}>
                 {this.state.suggestion != null
-                    ? <View style={searchBarStyle.suggestion}>
-                        <Pressable style={[searchBarStyle.suggestionContainer, {width: "25%"}]} onPress={() => this.searchInstead(this.state.suggestion.endpoints.query)}>
-                            <Text style={{color: "white"}}>{this.state.suggestion.endpoints.text}</Text>
-                            <Text style={{color: "white"}}>
-                                {this.state.suggestion.correctedList
-                                    .map(entry => <Text style={entry.italics ? {fontWeight: "bold"} :null}>{entry.text}</Text>)}
-                            </Text>
-                        </Pressable>
-
-                    </View>
+                    ?   <View style={searchBarStyle.suggestion}>
+                            <Pressable style={[searchBarStyle.suggestionContainer, {width: "25%"}]} onPress={() => this.searchInstead(this.state.suggestion.endpoints.query)}>
+                                <Text style={{color: "white"}}>{this.state.suggestion.endpoints.text}</Text>
+                                <Text style={{color: "white"}}>
+                                    {this.state.suggestion.correctedList
+                                        .map(entry => <Text style={entry.italics ? {fontWeight: "bold"} :null}>{entry.text}</Text>)}
+                                </Text>
+                            </Pressable>
+                        </View>
 
                     : null
                 }

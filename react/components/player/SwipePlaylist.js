@@ -26,7 +26,7 @@ export default class SwipePlaylist extends PureComponent {
     render() {
         return (
             <SlidingUpPanel
-                ref={(c) => (this._panel = c)}
+                ref={c => (this._panel = c)}
                 draggableRange={this.props.draggableRange}
                 animatedValue={this._draggedValue}
                 snappingPoints={[51]}
