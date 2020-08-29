@@ -6,28 +6,7 @@ import { name } from '../react/app.json'
 import App from '../react/App'
 import { register } from '../react/service';
 
-const iconFontStyles = `@font-face {
-                            src: url(${iconFont});
-                            font-family: MaterialIcons;
-                        }
-
-                        body {
-                            position: fixed;
-                            top: 0;
-                            width: 100%;
-                            height: 100%;
-                        }
-
-                        #app {
-                            height: 100%;
-                            width: 100%;
-                        }
-                        
-                        #app > div {
-                            height: 100%
-                        }
-
-                        `;
+const iconFontStyles = `@font-face{src: url(${iconFont});font-family: MaterialIcons;}`;
 
 const style = document.createElement('style');
 style.rel = "stylesheet";
@@ -43,9 +22,9 @@ document.head.appendChild(style);
 AppRegistry.registerComponent(name, () => App);
 register();
 
+OfflinePluginRuntime.install();
+
 AppRegistry.runApplication(name, {
     initialProps: {},
     rootTag: document.getElementById('app'),
 });
-
-OfflinePluginRuntime.install();
