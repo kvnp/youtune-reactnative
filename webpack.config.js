@@ -112,23 +112,14 @@ module.exports = (defaults) => ({
                 }
             },
 
-            {
+            /*{
                 test: /\.css$/,
-                use: {
-                    loader: 'style-loader!css-loader'
-                }
-            },
+                loader: 'style-loader!css-loader'
+            },*/
 
             {
-                test: /\.(png|jpe?g|gif)$/i,
-                use: {
-                    loader: 'file-loader',
-                }
-            },
-
-            {
-                test: /\.ttf$/,
-                loader: "file-loader"
+                test: /\.(png|jpe?g|gif|ico|ttf|css)$/i,
+                loader: 'file-loader',
             },
         ]
     },    
@@ -143,7 +134,9 @@ module.exports = (defaults) => ({
         }),
 
         new HtmlWebpackPlugin({
-            template: './web/index.html'
+            template: './web/index.html',
+            favicon: './web/favicon.ico',
+            css: './web/main.web.css'
         }),
 
         new webpack.HotModuleReplacementPlugin(),

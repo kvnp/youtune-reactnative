@@ -5,9 +5,18 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <meta http-equiv="X-UA-Compatible" content="ie=edge" />
         <title>YouTune</title>
-        <link rel="shortcut icon" href="/web/favicon.ico" type="image/x-icon">
-        <link rel="icon" href="/web/favicon.ico" type="image/x-icon">
-        <link href="/web/main.web.css" rel="stylesheet"/>
+        <link rel="shortcut icon"
+              href="<%= require('./favicon.ico').default %>"
+              type="image/x-icon"
+        />
+
+        <link rel="icon"
+              href="<%= require('./favicon.ico').default %>"
+              type="image/x-icon"
+        />
+        <link rel="stylesheet"
+              href="<%= require('./main.web.css').default %>"
+        />
     </head>
     <body>
         <div id="app"></div>
