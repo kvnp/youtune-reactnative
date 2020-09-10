@@ -22,9 +22,9 @@ document.head.appendChild(style);
 AppRegistry.registerComponent(name, () => App);
 register();
 
-OfflinePluginRuntime.install();
-
 AppRegistry.runApplication(name, {
     initialProps: {},
     rootTag: document.getElementById('app'),
 });
+
+OfflinePluginRuntime.install();

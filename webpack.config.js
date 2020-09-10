@@ -134,9 +134,7 @@ module.exports = (defaults) => ({
         }),
 
         new HtmlWebpackPlugin({
-            template: './web/index.html',
-            favicon: './web/favicon.ico',
-            css: './web/main.web.css'
+            template: './web/index.html'
         }),
 
         new webpack.HotModuleReplacementPlugin(),
