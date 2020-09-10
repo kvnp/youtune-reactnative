@@ -2,9 +2,25 @@ const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const WebpackPwaManifest = require('webpack-pwa-manifest');
 const OfflinePlugin = require('offline-plugin');
+const TerserPlugin = require('terser-webpack-plugin');
 
 module.exports = (defaults) => ({
     ...defaults,
+    mode: 'production',
+
+    optimization: {
+        nodeEnv: 'production',
+        minimizer: [
+            new TerserPlugin({
+                cache: true,
+                parallel: true,
+                sourceMap: true, // Must be set to true if using source-maps in production
+                terserOptions: {
+                    // https://github.com/webpack-contrib/terser-webpack-plugin#terseroptions
+                }
+            }),
+        ],
+    },
 
     devServer: {
         proxy: {
