@@ -29,19 +29,19 @@ const handle = (navigation, list, index) => {
 
 export default ({entries, navigation, isPlaylist}) => {
     return <FlatList
+                style={{}}
+                contentContainerStyle={{marginHorizontal: "auto", position: "absolute", width: "100%"}}
                 data={entries}
                 renderItem={
-                    ({item, index}) => <Entry
-                                            entry={item}
-                                            index={index + 1}
-                                            playPlaylist={
+                    ({item, index}) => <Entry entry={item} index={index + 1}
+                                              playPlaylist={
                                                 isPlaylist != undefined
                                                     ? () => {
                                                         handle(navigation, entries, index);
                                                     }
 
                                                     : undefined
-                                            }
+                                             }
 
                                             navigation={navigation}
                                         />

@@ -88,7 +88,7 @@ export const resultStyle = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         backgroundColor: "rgba(0,0,0,0.1)",
-        borderWidth: .5,
+        borderWidth: .5
     },
 
     resultCover: {
@@ -132,7 +132,9 @@ export const specificStyle = StyleSheet.create({
         paddingBottom: 5,
         flexDirection: 'row',
         width: '80%',
-        backgroundColor: 'transparent'
+        backgroundColor: appColor.background.backgroundColor,
+        marginHorizontal: "auto",
+        alignSelf: "center"
     },
 
     button: {

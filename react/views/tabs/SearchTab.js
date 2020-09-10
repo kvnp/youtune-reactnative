@@ -13,7 +13,7 @@ import {
 
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 
-import { searchBarStyle, specificStyle } from '../../styles/Search';
+import { searchBarStyle } from '../../styles/Search';
 import { resultHomeStyle, preResultHomeStyle } from '../../styles/Home';
 import Entry from '../../components/shared/Entry';
 import { shelvesStyle } from '../../styles/Shelves';
@@ -27,6 +27,7 @@ export default class SearchTab extends PureComponent {
         super(props);
         this.state = {
             shelves: [],
+            query: "",
             loading: false,
 
             message: "",
@@ -43,6 +44,10 @@ export default class SearchTab extends PureComponent {
     
     componentWillUnmount() {
         this._unsubscribe();
+    }
+
+    changeValue = (query) => {
+        this.setState({query: query})
     }
 
     search = (query) => {
@@ -68,7 +73,7 @@ export default class SearchTab extends PureComponent {
     }
 
     searchInstead = query => {
-        this._input.value = query;
+        this.state.query = query;
         this.search(query);
     }
 
@@ -96,7 +101,7 @@ export default class SearchTab extends PureComponent {
                 sections={this.state.shelves}
 
                 refreshing={this.state.loading}
-                onRefresh={() => this.search(this._input.value)}
+                onRefresh={() => this.search(this.state.query)}
 
                 keyExtractor={(item, index) => index + item.title}
                 renderItem={({ item }) =>  <Entry entry={item} navigation={this.props.navigation}/>}
@@ -107,7 +112,7 @@ export default class SearchTab extends PureComponent {
                     <Pressable style={searchBarStyle.suggestionContainer} onPress={() => this.searchInstead(this.state.instead.endpoints.corrected.query)}>
                         <Text style={{color: "white"}}>{this.state.instead.endpoints.corrected.text}</Text>
                         <Text style={{color: "white"}}>
-                        {this.state.instead.correctedList
+                            {this.state.instead.correctedList
                                 .map(entry => <Text style={entry.italics ? {fontWeight: "bold"} :null}>{entry.text}</Text>)}
                         </Text>
                     </Pressable>
@@ -141,15 +146,52 @@ export default class SearchTab extends PureComponent {
                 }
 
                 
-                {this.getSpecificButtons()}
+                {
+                    /*this.state.shelves.length > 0
+                    ? <View style={specificStyle.container}>
+                        <Pressable style={specificStyle.button}>
+                            <Text style={specificStyle.text}>
+                                Videos
+                            </Text>
+                        </Pressable>
+
+                        <Pressable style={specificStyle.button}>
+                            <Text style={specificStyle.text}>
+                                Playlists
+                            </Text>
+                        </Pressable>
+
+                        <Pressable style={specificStyle.button}>
+                            <Text style={specificStyle.text}>
+                                Songs
+                            </Text>
+                        </Pressable>
+
+                        <Pressable style={specificStyle.button}>
+                            <Text style={specificStyle.text}>
+                                Künstler
+                            </Text>
+                        </Pressable>
+
+                        <Pressable style={specificStyle.button}>
+                            <Text style={specificStyle.text}>
+                                Alben
+                            </Text>
+                        </Pressable>
+                    </View>
+
+                    : null*/
+                    null
+                }
+
                 <View style={searchBarStyle.container}>
-                    <TextInput  ref={(c) => (this._input = c)}
-                                style={searchBarStyle.input}
+                    <TextInput  style={searchBarStyle.input}
                                 placeholder="Search"
                                 value={this.state.query}
+                                onChangeText={query => this.changeValue(query)}
                                 placeholderTextColor={textStyle.placeholder.color}
-                                onSubmitEditing={() => this.search(this._input.value)}/>
-                    <Pressable  onPress={() => this.search(this._input.value)}
+                                onSubmitEditing={() => this.search(this.state.query)}/>
+                    <Pressable  onPress={() => this.search(this.state.query)}
                                 android_ripple={rippleConfig}
                                 style={searchBarStyle.button}>
                         { this.state.loading
@@ -163,42 +205,5 @@ export default class SearchTab extends PureComponent {
             </KeyboardAvoidingView>
             </>
         )
-    }
-
-    getSpecificButtons = () => {
-        this.state.shelves.length > 0 
-            ? <View style={specificStyle.container}>
-                <Pressable style={specificStyle.button}>
-                    <Text style={specificStyle.text}>
-                        Videos
-                    </Text>
-                </Pressable>
-
-                <Pressable style={specificStyle.button}>
-                    <Text style={specificStyle.text}>
-                        Playlists
-                    </Text>
-                </Pressable>
-
-                <Pressable style={specificStyle.button}>
-                    <Text style={specificStyle.text}>
-                        Songs
-                    </Text>
-                </Pressable>
-
-                <Pressable style={specificStyle.button}>
-                    <Text style={specificStyle.text}>
-                        Künstler
-                    </Text>
-                </Pressable>
-
-                <Pressable style={specificStyle.button}>
-                    <Text style={specificStyle.text}>
-                        Alben
-                    </Text>
-                </Pressable>
-            </View>
-
-            : null;
     }
 };

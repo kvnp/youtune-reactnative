@@ -65,7 +65,7 @@ export const textStyle = StyleSheet.create({
 export const navOptions = Platform.OS == "android" 
     ? {
         optimizationsEnabled: true,
-        lazy: true,
+        lazy: false,
 
         style: {
             backgroundColor: appColor.background.backgroundColor

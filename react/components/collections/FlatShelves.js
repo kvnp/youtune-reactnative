@@ -7,6 +7,7 @@ import Shelf from '../shared/Shelf';
 export default ({shelves, navigation}) => {
     return <FlatList
                 style={shelvesStyle.scrollView}
+                contentContainerStyle={{marginHorizontal: "auto", position: "absolute", width: "100%"}}
                 refreshing={false}
                 onRefresh={() => {}}
                 data={shelves}

@@ -25,34 +25,38 @@ export default ({route, navigation}) => {
 
             <ImageBackground style={bottomBarStyle.container} source={{uri: thumbnail}}>
                 <LinearGradient style={bottomBarStyle.artistGradientStyle} colors={artistGradient}>
-                    <View style={bottomBarStyle.centerContainer}>
-                        <View style={bottomBarStyle.topRow}>
-                            <View style={bottomBarStyle.topLeftPadding}/>
-                            <View style={bottomBarStyle.artistColumn}>
-                                <Text style={bottomBarStyle.artistName}>{title}</Text>
+                    <View style={bottomBarStyle.topRow}>
+                        <View style={bottomBarStyle.artistColumn}>
+                            <Text style={bottomBarStyle.artistName}>{title}</Text>
 
-                                <Pressable style={bottomBarStyle.subscribeArtist}>
-                                    <Text style={{fontWeight: "bold"}}>SUBSCRIBE {subscriptions}</Text>
-                                </Pressable>
+                            <Pressable style={bottomBarStyle.subscribeArtist}>
+                                <Text style={{fontWeight: "bold"}}>SUBSCRIBE {subscriptions}</Text>
+                            </Pressable>
+                        </View>
+                        <Pressable android_ripple={rippleConfig} onPress={() => navigation.pop()}>
+                            <View style={bottomBarStyle.closeButton}>
+                                <MaterialIcons name="arrow-back" color="black" size={20}/>
                             </View>
-                            <Pressable android_ripple={rippleConfig} onPress={() => {navigation.pop()}}>
-                                <View style={bottomBarStyle.closeButton}>
-                                    <MaterialIcons name="arrow-back" color="black" size={20}/>
-                                </View>
-                            </Pressable>
-                        </View>
+                        </Pressable>
+                    </View>
 
-                        <View style={bottomBarStyle.buttonView}>
-                            <Pressable android_ripple={rippleConfig}>
-                                <Text style={[bottomBarStyle.buttonText, bottomBarStyle.button]}>PLAY</Text>
-                            </Pressable>
-                            <Pressable android_ripple={rippleConfig}>
-                                <Text style={[bottomBarStyle.buttonText, bottomBarStyle.button]}>ADD TO LIBRARY</Text>
-                            </Pressable>
-                            <Pressable android_ripple={rippleConfig}>
-                                <Text style={[bottomBarStyle.buttonText, bottomBarStyle.button]}>SHARE</Text>
-                            </Pressable>
-                        </View>
+                    <View style={{
+                        flexDirection: "row",
+                        alignSelf: "stretch",
+                        alignItems: "center",
+                        alignContent: "center",
+                        justifyContent: "space-evenly",
+                        paddingVertical: 10
+                    }}>
+                        <Pressable android_ripple={rippleConfig}>
+                            <Text style={[bottomBarStyle.buttonText, bottomBarStyle.button]}>PLAY</Text>
+                        </Pressable>
+                        <Pressable android_ripple={rippleConfig}>
+                            <Text style={[bottomBarStyle.buttonText, bottomBarStyle.button]}>ADD TO LIBRARY</Text>
+                        </Pressable>
+                        <Pressable android_ripple={rippleConfig}>
+                            <Text style={[bottomBarStyle.buttonText, bottomBarStyle.button]}>SHARE</Text>
+                        </Pressable>
                     </View>
                 </LinearGradient>
             </ImageBackground>

@@ -3,7 +3,8 @@ import {
     View,
     Text,
     Image,
-    Pressable
+    Pressable,
+    Platform
 } from "react-native";
 
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
@@ -25,10 +26,16 @@ export default PlaylistView = ({ route, navigation }) => {
         <>
             <FlatEntries entries={entries} isPlaylist={true} navigation={navigation}/>
 
-            <View style={[bottomBarStyle.centerContainer, {alignSelf: "stretch", backgroundColor: appColor.background.backgroundColor}]}>
+            <View style={{
+                alignSelf: "stretch",
+                alignItems: "stretch",
+                justifyContent: "space-evenly",
+                backgroundColor: appColor.background.backgroundColor,
+                width: "100%"
+            }}>
                 <View style={bottomBarStyle.topRow}>
                     <Image style={bottomBarAlbumStyle.albumCover} source={{uri: thumbnail}}/>
-                    <View style={bottomBarAlbumStyle.topColumn}>
+                    <View>
                         <Text numberOfLines={1} style={[bottomBarAlbumStyle.albumTitle, bottomBarAlbumStyle.albumText]}>
                             {title}
                         </Text>
@@ -40,7 +47,6 @@ export default PlaylistView = ({ route, navigation }) => {
                         <Text numberOfLines={1} style={[bottomBarAlbumStyle.albumInfo, bottomBarAlbumStyle.albumText]}>
                             {secondSubtitle}
                         </Text>
-
                     </View>
                     <Pressable android_ripple={rippleConfig} style={bottomBarStyle.closeButton}
                                onPress={() => {navigation.pop()}}>
@@ -48,7 +54,14 @@ export default PlaylistView = ({ route, navigation }) => {
                     </Pressable>
                 </View>
 
-                <View style={[bottomBarStyle.buttonView, {alignSelf: "center", paddingBottom: 10}]}>
+                <View style={{
+                        flexDirection: "row",
+                        alignSelf: "stretch",
+                        alignItems: "center",
+                        alignContent: "center",
+                        justifyContent: "space-evenly",
+                        paddingVertical: 10
+                }}>
                     <Pressable android_ripple={rippleConfig} style={bottomBarStyle.button}>
                         <Text style={bottomBarStyle.buttonText}>PLAY</Text>
                     </Pressable>
