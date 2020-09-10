@@ -1,11 +1,9 @@
 html {
+    height: 100%;
     overscroll-behavior: none;
 }
 
 body {
-    position: fixed;
-    top: 0;
-    width: 100%;
     height: 100%;
 }
 
@@ -16,4 +14,15 @@ body {
 
 #app > div {
     height: 100%
+}
+
+/*div.r-display-6koalj:nth-child(2) > div:nth-child(2) > div:nth-child(2) > div:nth-child(1) > div:nth-child(1) {
+    flex-shrink: 1;
+}*/
+
+.r-backgroundSize-ehq7j7 {
+    font-family: MaterialIcons;
+    font-style: normal;
+    font-weight: normal;
+    font-size: 20px;
 }
