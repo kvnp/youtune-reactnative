@@ -36,6 +36,8 @@ export default class HomeTab extends PureComponent {
         this._unsubscribe = this.props.navigation.addListener('focus', () => {
             global.setHeader({title: "Home"});
         });
+
+        this.startRefresh();
     }
     
     componentWillUnmount() {
