@@ -3,8 +3,7 @@ import {
     View,
     Text,
     Image,
-    Pressable,
-    Platform
+    Pressable
 } from "react-native";
 
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
@@ -23,7 +22,7 @@ export default PlaylistView = ({ route, navigation }) => {
     navigation.setOptions({ title: title });
     
     return (
-        <>
+        <View style={{overflow: "hidden", height: "100%"}}>
             <FlatEntries entries={entries} isPlaylist={true} navigation={navigation}/>
 
             <View style={{
@@ -73,6 +72,6 @@ export default PlaylistView = ({ route, navigation }) => {
                     </Pressable>
                 </View>
             </View>
-        </>
+        </View>
     )
 }
