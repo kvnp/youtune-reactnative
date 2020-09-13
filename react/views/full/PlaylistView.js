@@ -25,13 +25,7 @@ export default PlaylistView = ({ route, navigation }) => {
         <View style={{overflow: "hidden", height: "100%"}}>
             <FlatEntries entries={entries} isPlaylist={true} navigation={navigation}/>
 
-            <View style={{
-                alignSelf: "stretch",
-                alignItems: "stretch",
-                justifyContent: "space-evenly",
-                backgroundColor: appColor.background.backgroundColor,
-                width: "100%"
-            }}>
+            <>
                 <View style={bottomBarStyle.topRow}>
                     <Image style={bottomBarAlbumStyle.albumCover} source={{uri: thumbnail}}/>
                     <View>
@@ -71,7 +65,7 @@ export default PlaylistView = ({ route, navigation }) => {
                         <Text style={bottomBarStyle.buttonText}>SHARE</Text>
                     </Pressable>
                 </View>
-            </View>
+            </>
         </View>
     )
 }
