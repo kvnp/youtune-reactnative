@@ -143,13 +143,7 @@ export default class PlayView extends PureComponent {
         }
 
         return (
-            <View style={{
-                alignSelf: "stretch",
-                alignItems: "stretch",
-                justifyContent: "space-evenly",
-                backgroundColor: appColor.background.backgroundColor,
-                width: "100%"
-            }}>
+            <View style={{overflow: "hidden", height: "100%"}}>
                 <View style={stylesTop.vertContainer}>
                     <View style={imageStyles.view}>
                         <Image resizeMode="contain" style={imageStyles.image} source={{uri: artwork}}/>
