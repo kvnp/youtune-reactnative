@@ -10,7 +10,7 @@ import {
     ScrollView
 } from "react-native";
 
-import TrackPlayer from 'react-native-web-track-player';
+import TrackPlayer from 'react-native-track-player';
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 
 import SeekBar from "../../components/player/SeekBar";

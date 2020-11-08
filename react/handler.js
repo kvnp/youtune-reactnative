@@ -7,7 +7,7 @@
  * such as processing media buttons or analytics
  */
 
-import TrackPlayer from 'react-native-web-track-player';
+import TrackPlayer from 'react-native-track-player';
 import { skip, isRepeating, focusedId } from './service';
 
 module.exports = async function() {

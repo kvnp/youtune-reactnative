@@ -1,0 +1,336 @@
+From 2986ac2a4a9cf79249b632dadba26b2853c812f6 Mon Sep 17 00:00:00 2001
+From: kvnp <kevin.pfeifer8@gmail.com>
+Date: Sun, 8 Nov 2020 12:33:27 +0100
+Subject: [PATCH] add web support
+
+---
+ lib/index.js       |  13 +-
+ web/TrackPlayer.js | 289 +++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 298 insertions(+), 4 deletions(-)
+ create mode 100644 web/TrackPlayer.js
+
+diff --git a/lib/index.js b/lib/index.js
+index 416ffd5..3a74379 100644
+--- a/lib/index.js
++++ b/lib/index.js
+@@ -1,12 +1,17 @@
+-import { Platform, AppRegistry, DeviceEventEmitter, NativeEventEmitter, NativeModules } from 'react-native';
+-import resolveAssetSource from 'react-native/Libraries/Image/resolveAssetSource';
++import { Platform, AppRegistry, DeviceEventEmitter, NativeEventEmitter, NativeModules, Image } from 'react-native';
++import RNTrackPlayer from "../web/TrackPlayer";
++
++if (Platform.OS != "web") {
++    var { TrackPlayerModule: TrackPlayer } = NativeModules;
++} else {
++    TrackPlayer = new RNTrackPlayer();
++}
+ 
+-const { TrackPlayerModule: TrackPlayer } = NativeModules;
+ const emitter = Platform.OS !== 'android' ? new NativeEventEmitter(TrackPlayer) : DeviceEventEmitter;
+ 
+ function resolveAsset(uri) {
+     if(!uri) return undefined;
+-    return resolveAssetSource(uri);
++    return Image.resolveAssetSource(uri);
+ }
+ 
+ function resolveUrl(url) {
+diff --git a/web/TrackPlayer.js b/web/TrackPlayer.js
+new file mode 100644
+index 0000000..ac9295f
+--- /dev/null
++++ b/web/TrackPlayer.js
+@@ -0,0 +1,289 @@
++import { DeviceEventEmitter } from "react-native";
++
++export default class RNTrackPlayer {
++    STATE_NONE = 0;
++    STATE_STOPPED = 1;
++    STATE_PAUSED = 2;
++    STATE_PLAYING = 3;
++    STATE_BUFFERING = 4;
++
++    constructor() {
++        this.emitter = DeviceEventEmitter;
++        this.audio;
++        this.index;
++        this.track;
++        this.playlist = [];
++
++        if ("mediaSession" in navigator) {
++            const handlers = [
++                ['play', this.play],
++                ['pause', this.pause],
++                ['nexttrack', this.skipToNext],
++                ['previoustrack', this.skipToPrevious]
++            ];
++
++            for (const [action, handler] of handlers) {
++                try { navigator.mediaSession.setActionHandler(action, handler); }
++                catch{ console.log(action + " is not supported yet"); }
++            }
++        }
++    }
++
++    play = () => {
++        if (this.audio != null) {
++            if ("mediaSession" in navigator)
++                navigator.mediaSession.playbackState = "playing";
++
++            this.emitter.emit("playback-state", {"state": this.STATE_PLAYING});
++            this.audio.play();
++        }
++    }
++
++    pause = () => {
++        if (this.audio != null) {
++            if ("mediaSession" in navigator)
++                navigator.mediaSession.playbackState = "paused";
++
++            this.emitter.emit("playback-state", {"state": this.STATE_PAUSED});
++            this.audio.pause();
++        }
++    }
++
++    remove = id => {
++        let newList = []
++        for (let i = 0; i < this.playlist.length; i++) {
++            if (this.playlist[i].id != id)
++                newList.push(this.playlist[i]);
++        }
++
++        this.playlist = newList;
++    }
++
++    add = (track_list, afterId) => {
++        if (afterId == undefined)
++            afterId = null;
++
++        if (afterId == null) {
++            for (let i = 0; i < track_list.length; i++) {
++                this.playlist.push(track_list[i]);
++            }
++        } else {
++            let newList = [];
++            for (let i = 0; i < this.playlist.length; i++) {
++                if (this.playlist[i].id == afterId) {
++                    for (let j = 0; j < track_list.length; j++) {
++                        newList.push(track_list[j]);
++                    }
++
++                    newList.push(this.playlist[i]);
++
++                } else {
++                    newList.push(this.playlist[i]);
++
++                }
++            }
++
++            this.playlist = newList;
++        }
++    }
++
++    stop = () => {
++        return new Promise((resolve, reject) => {
++            if (this.audio != null)
++                this.audio.stop();
++            resolve();
++        });
++    }
++
++    reset = () => {
++        return new Promise((resolve, reject) => {
++            if (this.audio != null)
++                this.audio.pause();
++
++            this.audio = null;
++            this.track = null;
++            this.playlist = [];
++            this.emitter.emit("playback-state", {"state": this.STATE_NONE});
++            resolve();
++        });
++        
++    }
++
++    destroy = () => {
++        return new Promise((resolve, reject) => {
++            this.audio = null;
++            this.track = null;
++            this.playlist = [];
++            resolve();
++        });
++    }
++
++    skip = id => {
++        return new Promise((resolve, reject) => {
++            this.emitter.emit("playback-state", {"state": this.STATE_BUFFERING});
++            for (let i = 0; i < this.playlist.length; i++) {
++                if (this.playlist[i].id == id) {
++                    let previous = null;
++                    let position = 0;
++
++                    if (this.audio != null) {
++                        previous = this.track.id;
++                        position = this.audio.currentTime;
++                        this.audio.pause();
++                    }
++
++                    this.emitter.emit("playback-track-changed", {
++                        nextTrack: this.playlist[i].id,
++                        position: position,
++                        track: previous
++                    });
++
++
++                    if (this.playlist[i].url != null) {
++                        this.index = i;
++                        this.track = this.playlist[i];
++                        this.audio = new Audio(this.track.url);
++
++                        this.audio.addEventListener("ended", e => {
++                            this.emitter.emit("playback-state", { state: this.STATE_PAUSED });
++                            this.skipToNext();
++                        });
++        
++                        if ("mediaSession" in navigator) {
++                            navigator.mediaSession.metadata = new MediaMetadata({
++                                title: this.track.title,
++                                artist: this.track.artist,
++                                artwork: [
++                                    { src: this.track.artwork, type: 'image/png' },
++                                ]
++                            });
++        
++                            navigator.mediaSession.playbackState = "playing";
++                        }
++        
++                        this.emitter.emit("playback-state", { state: this.STATE_PLAYING });
++                        this.audio.play();
++
++                    } else
++                        this.emitter.emit("playback-error", { reason: "url is missing" });
++
++                    resolve();
++                    break;
++                }
++            }
++        });
++    }
++
++    skipToNext = () => {
++        if (this.playlist != null) {
++            if (this.playlist.length != this.index) {
++                this.audio.pause();
++                this.skip(this.playlist[this.index + 1].id);
++            }
++        }
++    }
++
++    skipToPrevious = () => {
++        if (this.playlist != null) {
++            if (this.index != 0) {
++                this.audio.pause();
++                this.skip(this.playlist[this.index - 1].id);
++            }
++        }
++    }
++
++    removeUpcomingTracks = () => {
++        console.log("REMOVE_UPCOMING_TRACKS");
++    }
++
++    setVolume = () => {}
++
++    setRate = () => {}
++
++    seekTo = seconds => {
++        return new Promise((resolve, reject) => {
++            if (this.audio != null) {
++                if (this.audio.fastSeek != undefined)
++                    this.audio.fastSeek(seconds);
++                else
++                    this.audio.currentTime = seconds;
++            }
++            resolve(seconds);
++        });
++    }
++
++    getTrack = id => {
++        return new Promise((resolve, reject) => {
++            for (let i = 0; i < this.playlist.length; i++) {
++                if (this.playlist[i].id == id)
++                    resolve(this.playlist[i]);
++            }
++            
++        });
++    }
++
++    getCurrentTrack = () => {
++        return new Promise((resolve, reject) => {
++            if (this.track != null)
++                resolve(this.track.id);
++            else
++                resolve(null);
++            
++        });
++    }
++
++    getPosition = () => {
++        return new Promise((resolve, reject) => {
++            if (this.audio != null)
++                resolve(this.audio.currentTime);
++            else
++                resolve(0); 
++        });
++    }
++
++    getVolume = () => {}
++
++    getDuration = () => {
++        return new Promise((resolve, reject) => {
++            if (this.audio != null)
++                resolve(this.track.duration);
++            else
++                resolve(0);
++        });
++    }
++
++
++    getBufferedPosition = () => {
++
++    }
++
++    getState = () => {
++        return new Promise((resolve, reject) => {
++            if (this.audio == null)
++                resolve(this.STATE_NONE);
++            else {
++                if (this.audio.paused)
++                    resolve(this.STATE_PAUSED);
++                else
++                    resolve(this.STATE_PLAYING);
++            }
++        });
++    }
++
++    getRate = () => {
++        return new Promise((resolve, reject) => {
++            if (this.audio != null)
++                resolve(this.audio.defaultPlaybackRate);
++            else
++                resolve(null);
++        });
++    }
++
++    getQueue = () => {
++        return new Promise((resolve, reject) => {
++            resolve(this.playlist);
++        });
++    }
++
++    updateOptions = () => {}
++}
+\ No newline at end of file
+-- 
+2.29.2.windows.2
+
