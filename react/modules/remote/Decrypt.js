@@ -1,4 +1,5 @@
-import { getHttpResponse, headers_yt } from "./HTTP";
+import { getHttpResponse } from "./HTTP";
+import { headers_yt } from "./API";
 
 const REGEXES = [
     "(?:\\b|[^a-zA-Z0-9$])([a-zA-Z0-9$]{2})\\s*=\\s*function\\(\\s*a\\s*\\)\\s*\\{\\s*a\\s*=\\s*a\\.split\\(\\s*\"\"\\s*\\)",
@@ -8,13 +9,31 @@ const REGEXES = [
     "\\bc\\s*&&\\s*d\\.set\\([^,]+\\s*,\\s*(:encodeURIComponent\\s*\\()([a-zA-Z0-9$]+)\\("
 ];
 
+const domain = "https://www.youtube.com";
+
 const function_name = "decryptionFunction";
 var functionString = null;
 
-function getPlayer(response) {
-    let jsIndex = response.indexOf('"js":');
+export function getFunctionState() {
+    if (functionString == null)
+        return false;
+    else
+        return true;
+}
 
-    let side = response.substring(jsIndex + '"js":'.length);
+function getPlayer(response) {
+    let searchTerm;
+    if (response.indexOf('"js":') != -1) {
+        searchTerm = '"js":';
+    } else if (response.indexOf('"jsUrl":') != -1) {
+        searchTerm = '"jsUrl":';
+    } else {
+        return null;
+    }
+
+    let jsIndex = response.indexOf(searchTerm);
+
+    let side = response.substring(jsIndex + searchTerm.length);
     let ind1x = side.indexOf(",");
     let ind2x = side.indexOf("}");
 
@@ -24,7 +43,9 @@ function getPlayer(response) {
     else
         result = side.substring(0, ind2x);
 
-    return {result: result.replace(/\\/g, '').replace(/\"/g, '')};
+    console.log(result.replace(/\\/g, '').replace(/\"/g, ''));
+
+    return result.replace(/\\/g, '').replace(/\"/g, '');
 }
 
 function getFunction(code) {
@@ -33,9 +54,11 @@ function getFunction(code) {
         let pattern = new RegExp(REGEXES[i]);
         let result = pattern.exec(code);
 
-        if (result[1] != undefined) {
-            decryptionFunctionName = result[1];
-            break;
+        if (result != undefined) {
+            if (result[1] != undefined) {
+                decryptionFunctionName = result[1];
+                break;
+            }
         }
     }
 
@@ -49,30 +72,41 @@ function getFunction(code) {
     return helperObject + decryptionFunction + callerFunction;
 }
 
-async function fetchFunction(videoId) {
-    let domain = "https://www.youtube.com"
+async function fetchFunctionByVideoId(videoId) {
     let watch = domain + "/watch?v=" + videoId;
     let watchResponse = await getHttpResponse(watch, {
         method: "GET",
         headers: headers_yt
     }, "text");
 
-    let playerLocation = getPlayer(watchResponse);
-    let playerUrl = domain + playerLocation.result;
+    await fetchFunctionByResponse(watchResponse);
+}
+
+export async function fetchFunctionByResponse(response) {
+    console.log(response);
+    let playerLocation = getPlayer(response);
+    if (playerLocation == null)
+        return null;
+
+    let playerUrl = domain + playerLocation;
+    console.log(playerUrl);
     let playerCode = await getHttpResponse(playerUrl, {
         method: "GET",
         headers: headers_yt
     }, "text");
 
-    return getFunction(playerCode);
+    setFunction(getFunction(playerCode));
+}
+
+function setFunction(functionString) {
+    console.log(functionString);
+    gEval = function(){ (1, eval)(functionString.replace(";,", ";")); };
+    gEval();
 }
 
 export async function getSignature(videoId, signature) {
-    if (functionString == null) {
-        functionString = await fetchFunction(videoId);
-        gEval = function(){ (1, eval)(functionString.replace(";,", ";")); };
-        gEval();
-    }
+    if (functionString == null)
+        await fetchFunctionByVideoId(videoId);
 
     return decryptionFunction(signature);
 }
