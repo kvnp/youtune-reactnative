@@ -1,27 +1,27 @@
-From 2986ac2a4a9cf79249b632dadba26b2853c812f6 Mon Sep 17 00:00:00 2001
+From 512d284f82f62f9fc45025b0b0b03837964cdd69 Mon Sep 17 00:00:00 2001
 From: kvnp <kevin.pfeifer8@gmail.com>
-Date: Sun, 8 Nov 2020 12:33:27 +0100
-Subject: [PATCH] add web support
+Date: Thu, 12 Nov 2020 16:11:13 +0100
+Subject: [PATCH] fix web support
 
 ---
- lib/index.js       |  13 +-
- web/TrackPlayer.js | 289 +++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 298 insertions(+), 4 deletions(-)
+ lib/index.js       |  60 +++++-----
+ web/TrackPlayer.js | 291 +++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 319 insertions(+), 32 deletions(-)
  create mode 100644 web/TrackPlayer.js
 
 diff --git a/lib/index.js b/lib/index.js
-index 416ffd5..3a74379 100644
+index 416ffd5..b5dbb0c 100644
 --- a/lib/index.js
 +++ b/lib/index.js
-@@ -1,12 +1,17 @@
+@@ -1,17 +1,22 @@
 -import { Platform, AppRegistry, DeviceEventEmitter, NativeEventEmitter, NativeModules } from 'react-native';
 -import resolveAssetSource from 'react-native/Libraries/Image/resolveAssetSource';
 +import { Platform, AppRegistry, DeviceEventEmitter, NativeEventEmitter, NativeModules, Image } from 'react-native';
-+import RNTrackPlayer from "../web/TrackPlayer";
 +
 +if (Platform.OS != "web") {
 +    var { TrackPlayerModule: TrackPlayer } = NativeModules;
 +} else {
++    const RNTrackPlayer = require("../web/TrackPlayer");
 +    TrackPlayer = new RNTrackPlayer();
 +}
  
@@ -35,12 +35,101 @@ index 416ffd5..3a74379 100644
  }
  
  function resolveUrl(url) {
+     if(!url) return undefined;
+-    return resolveAssetSource(url) || url;
++    return Image.resolveAssetSource(url) || url;
+ }
+ 
+ function setupPlayer(options) {
+@@ -23,24 +28,23 @@ function updateOptions(data) {
+     data = Object.assign({}, data);
+ 
+     // Resolve the asset for each icon
+-    data.icon = resolveAsset(data.icon);
+-    data.playIcon = resolveAsset(data.playIcon);
+-    data.pauseIcon = resolveAsset(data.pauseIcon);
+-    data.stopIcon = resolveAsset(data.stopIcon);
+-    data.previousIcon = resolveAsset(data.previousIcon);
+-    data.nextIcon = resolveAsset(data.nextIcon);
+-    data.rewindIcon = resolveAsset(data.rewindIcon);
+-    data.forwardIcon = resolveAsset(data.forwardIcon);
++    if (Platform.OS != "web") {
++        data.icon = resolveAsset(data.icon);
++        data.playIcon = resolveAsset(data.playIcon);
++        data.pauseIcon = resolveAsset(data.pauseIcon);
++        data.stopIcon = resolveAsset(data.stopIcon);
++        data.previousIcon = resolveAsset(data.previousIcon);
++        data.nextIcon = resolveAsset(data.nextIcon);
++        data.rewindIcon = resolveAsset(data.rewindIcon);
++        data.forwardIcon = resolveAsset(data.forwardIcon);
++    }
+ 
+     return TrackPlayer.updateOptions(data);
+ }
+ 
+ function add(tracks, insertBeforeId) {
+-    // Clone the array before modifying it, so we don't run into problems with immutable objects
+-    if(Array.isArray(tracks)) {
+-      tracks = [...tracks];
+-    } else {
+-      tracks = [tracks];
++    if(!Array.isArray(tracks)) {
++        tracks = [tracks];
+     }
+ 
+     if(tracks.length < 1) return;
+@@ -50,8 +54,10 @@ function add(tracks, insertBeforeId) {
+         tracks[i] = Object.assign({}, tracks[i]);
+ 
+         // Resolve the URLs
+-        tracks[i].url = resolveUrl(tracks[i].url);
+-        tracks[i].artwork = resolveUrl(tracks[i].artwork);
++        if (Platform.OS != "web") {
++            tracks[i].url = resolveUrl(tracks[i].url);
++            tracks[i].artwork = resolveUrl(tracks[i].artwork);
++        }
+ 
+         // Cast ID's into strings
+         tracks[i].id = `${tracks[i].id}`
+@@ -68,16 +74,6 @@ function remove(tracks) {
+     return TrackPlayer.remove(tracks);
+ }
+ 
+-function updateMetadataForTrack(id, metadata) {
+-    // Clone the object before modifying it
+-    metadata = Object.assign({}, metadata);
+-
+-    // Resolve the artowork URL
+-    metadata.artwork = resolveUrl(metadata.artwork);
+-
+-    return TrackPlayer.updateMetadataForTrack(id, metadata);
+-}
+-
+ function registerPlaybackService(serviceFactory) {
+     if (Platform.OS === 'android') {
+         // Registers the headless task
+@@ -190,7 +186,7 @@ module.exports.skip = TrackPlayer.skip;
+ module.exports.getQueue = TrackPlayer.getQueue;
+ module.exports.skipToNext = TrackPlayer.skipToNext;
+ module.exports.skipToPrevious = TrackPlayer.skipToPrevious;
+-module.exports.updateMetadataForTrack = updateMetadataForTrack;
++module.exports.updateMetadataForTrack = TrackPlayer.updateMetadataForTrack;
+ module.exports.removeUpcomingTracks = TrackPlayer.removeUpcomingTracks;
+ 
+ // Player Playback Commands
+@@ -220,4 +216,4 @@ module.exports.ProgressComponent = require('./ProgressComponent');
+ 
+ // React Hooks (Requires React v16.8+ and React Native v0.59+)
+ const hooks = require('./hooks');
+-module.exports = { ...module.exports, ...hooks }
++module.exports = { ...module.exports, ...hooks }
+\ No newline at end of file
 diff --git a/web/TrackPlayer.js b/web/TrackPlayer.js
 new file mode 100644
-index 0000000..ac9295f
+index 0000000..590392d
 --- /dev/null
 +++ b/web/TrackPlayer.js
-@@ -0,0 +1,289 @@
+@@ -0,0 +1,291 @@
 +import { DeviceEventEmitter } from "react-native";
 +
 +export default class RNTrackPlayer {
@@ -330,6 +419,8 @@ index 0000000..ac9295f
 +
 +    updateOptions = () => {}
 +}
++
++module.exports = RNTrackPlayer;
 \ No newline at end of file
 -- 
 2.29.2.windows.2
