@@ -9,7 +9,8 @@
     "test": "jest",
     "lint": "eslint .",
     "web": "webpack-dev-server",
-    "postinstall": "git apply --directory node_modules/react-native-track-player/ ./patches/react-native-track-player/0001-add-web-support.patch && git apply --directory node_modules/rn-sliding-up-panel/ ./patches/rn-sliding-up-panel/0001-fix-web-support.patch"
+    "postinstall": "git apply --directory node_modules/react-native-track-player/ ./patches/react-native-track-player/0001-fix-web-support.patch || git apply --directory node_modules/rn-sliding-up-panel/ ./patches/rn-sliding-up-panel/0001-fix-web-support.patch",
+    "patch": "git apply --directory node_modules/react-native-track-player/ ./patches/react-native-track-player/0001-add-fix-support.patch || git apply --directory node_modules/rn-sliding-up-panel/ ./patches/rn-sliding-up-panel/0001-fix-web-support.patch"
   },
   "dependencies": {
     "@react-native-community/async-storage": "^1.12.0",
