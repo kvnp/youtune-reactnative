@@ -78,15 +78,14 @@ module.exports = () => ({
     entry: {
         app: './index.web.js',
         index: [
-            'react-native-webpack/clients/polyfills.js',
-            //'./index.web.js',
+            'react-native-webpack/clients/polyfills.js'
         ]
     },
 
     output: {
         path: __dirname + '/dist',
         filename: 'app-[chunkhash].bundle.js',
-        publicPath: '/'
+        publicPath: './'
     },
 
     devtool: 'source-map',
