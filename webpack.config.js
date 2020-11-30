@@ -1,111 +1,92 @@
 const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const WebpackPwaManifest = require('webpack-pwa-manifest');
-const OfflinePlugin = require('offline-plugin');
-const TerserPlugin = require('terser-webpack-plugin');
+//const {InjectManifest} = require('workbox-webpack-plugin');
 
-module.exports = (defaults) => ({
-    ...defaults,
-    mode: 'production',
+const userAgent = "Mozilla/5.0 (X11; Linux x86_64; rv:79.0) Gecko/20100101 Firefox/79.0";
+const musicYoutube = "https://music.youtube.com";
+const wwwYoutube = "https://www.youtube.com";
+const wwwYoutubeSlash = wwwYoutube + "/";
 
-    optimization: {
-        nodeEnv: 'production',
-        minimizer: [
-            new TerserPlugin({
-                cache: true,
-                parallel: true,
-                sourceMap: true, // Must be set to true if using source-maps in production
-                terserOptions: {
-                    // https://github.com/webpack-contrib/terser-webpack-plugin#terseroptions
-                }
-            }),
-        ],
-    },
-
+module.exports = () => ({
     devServer: {
         proxy: {
             '/start': {
-                target: "https://music.youtube.com",
+                target: musicYoutube,
                 secure: true,
                 changeOrigin: true,
                 pathRewrite: {'^/start' : ''},
 
                 headers: {
-                    "User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:79.0) Gecko/20100101 Firefox/79.0"
+                    "User-Agent": userAgent
                 }
             },
 
             '/youtubei': {
-                target: "https://music.youtube.com",
+                target: musicYoutube,
                 secure: true,
                 changeOrigin: true,
 
                 headers: {
-                    "Referer": "https://music.youtube.com",
-                    "Origin": "https://music.youtube.com",
-                    "User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:79.0) Gecko/20100101 Firefox/79.0"
+                    "Referer": musicYoutube,
+                    "Origin": musicYoutube,
+                    "User-Agent": userAgent
                 },
             },
 
             '/get_video_info': {
-                target: "https://www.youtube.com/",
+                target: wwwYoutubeSlash,
                 secure: true,
                 changeOrigin: true,
 
                 headers: {
-                    "Referer": "https://www.youtube.com",
-                    "Origin": "https://www.youtube.com",
-                    "User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:79.0) Gecko/20100101 Firefox/79.0"
+                    "Referer": wwwYoutube,
+                    "Origin": wwwYoutube,
+                    "User-Agent": userAgent
                 },
             },
 
             '/watch': {
-                target: "https://www.youtube.com/",
+                target: wwwYoutubeSlash,
                 secure: true,
                 changeOrigin: true,
 
                 headers: {
-                    "Referer": "https://www.youtube.com",
-                    "Origin": "https://www.youtube.com",
-                    "User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:79.0) Gecko/20100101 Firefox/79.0"
+                    "Referer": wwwYoutube,
+                    "Origin": wwwYoutube,
+                    "User-Agent": userAgent
                 },
             },
 
             '/s': {
-                target: "https://www.youtube.com/",
+                target: wwwYoutubeSlash,
                 secure: true,
                 changeOrigin: true,
 
                 headers: {
-                    "Referer": "https://www.youtube.com",
-                    "Origin": "https://www.youtube.com",
-                    "User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:79.0) Gecko/20100101 Firefox/79.0"
+                    "Referer": wwwYoutube,
+                    "Origin": wwwYoutube,
+                    "User-Agent": userAgent
                 },
             }
         },
 
-        allowedHosts: [
-            '127.0.0.1',
-        ],
-
         historyApiFallback: true,
-
-        //public: "https://youtune.kvnp.eu:443",
-        disableHostCheck: true,
         compress: true
     },
 
     entry: {
         app: './index.web.js',
-        /*index: [
-            //'react-native-webpack/clients/polyfills.js',
-            './index.web.js',
-        ]*/
+        index: [
+            'react-native-webpack/clients/polyfills.js',
+            //'./index.web.js',
+        ]
     },
 
     output: {
         path: __dirname + '/dist',
-        filename: 'app-[hash].bundle.js',
+        filename: 'app-[chunkhash].bundle.js',
+        publicPath: '/'
     },
 
     devtool: 'source-map',
@@ -128,11 +109,6 @@ module.exports = (defaults) => ({
                 }
             },
 
-            /*{
-                test: /\.css$/,
-                loader: 'style-loader!css-loader'
-            },*/
-
             {
                 test: /\.(png|jpe?g|gif|ico|ttf|css)$/i,
                 loader: 'file-loader',
@@ -150,7 +126,8 @@ module.exports = (defaults) => ({
         }),
 
         new HtmlWebpackPlugin({
-            template: './web/index.html'
+            template: './web/index.html',
+            filename: 'index.html'
         }),
 
         new webpack.HotModuleReplacementPlugin(),
@@ -184,8 +161,6 @@ module.exports = (defaults) => ({
                 'apple-mobile-web-app-status-bar-style': "black-translucent"
             }
         }),
-
-        new OfflinePlugin()
     ],
     
     resolve: {

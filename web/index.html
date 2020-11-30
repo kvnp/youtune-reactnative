@@ -17,6 +17,9 @@
         <link rel="stylesheet"
               href="<%= require('./main.web.css').default %>"
         />
+        <script>
+            window.setImmediate = window.setTimeout;
+       </script>
     </head>
     <body>
         <div id="app"></div>

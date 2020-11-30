@@ -1,6 +1,6 @@
-From 512d284f82f62f9fc45025b0b0b03837964cdd69 Mon Sep 17 00:00:00 2001
+From 6695a436c59b3e039f2308c80d32200c47f251aa Mon Sep 17 00:00:00 2001
 From: kvnp <kevin.pfeifer8@gmail.com>
-Date: Thu, 12 Nov 2020 16:11:13 +0100
+Date: Thu, 12 Nov 2020 16:42:27 +0100
 Subject: [PATCH] fix web support
 
 ---

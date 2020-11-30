@@ -1,5 +1,4 @@
 import { AppRegistry } from 'react-native'
-import * as OfflinePluginRuntime from 'offline-plugin/runtime';
 import iconFont from 'react-native-vector-icons/Fonts/MaterialIcons.ttf';
 
 import { name } from './react/app.json'
@@ -10,7 +9,6 @@ const iconFontStyles = `@font-face{src: url(${iconFont});font-family: MaterialIc
 
 const style = document.createElement('style');
 style.rel = "stylesheet";
-style.type = 'text/css';
 
 if (style.styleSheet)
     style.styleSheet.cssText = iconFontStyles;
@@ -26,5 +24,3 @@ AppRegistry.runApplication(name, {
     initialProps: {},
     rootTag: document.getElementById('app'),
 });
-
-OfflinePluginRuntime.install();
