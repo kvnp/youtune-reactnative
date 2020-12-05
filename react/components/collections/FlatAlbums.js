@@ -4,7 +4,7 @@ import { FlatList } from "react-native";
 import Playlist from '../shared/Playlist';
 import { albumStyle } from '../../styles/Home';
 
-export default ({albums, navigation}) => {
+export default FlatAlbums = ({albums, navigation}) => {
     return <FlatList style={albumStyle.albumCollection}
                      horizontal={true}
                      showsHorizontalScrollIndicator={false}

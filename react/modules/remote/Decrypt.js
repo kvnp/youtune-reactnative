@@ -43,8 +43,6 @@ function getPlayer(response) {
     else
         result = side.substring(0, ind2x);
 
-    console.log(result.replace(/\\/g, '').replace(/\"/g, ''));
-
     return result.replace(/\\/g, '').replace(/\"/g, '');
 }
 
@@ -83,13 +81,11 @@ async function fetchFunctionByVideoId(videoId) {
 }
 
 export async function fetchFunctionByResponse(response) {
-    console.log(response);
     let playerLocation = getPlayer(response);
     if (playerLocation == null)
         return null;
 
     let playerUrl = domain + playerLocation;
-    console.log(playerUrl);
     let playerCode = await getHttpResponse(playerUrl, {
         method: "GET",
         headers: headers_yt
@@ -99,7 +95,6 @@ export async function fetchFunctionByResponse(response) {
 }
 
 function setFunction(functionString) {
-    console.log(functionString);
     gEval = function(){ (1, eval)(functionString.replace(";,", ";")); };
     gEval();
 }

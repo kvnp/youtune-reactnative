@@ -1,5 +1,4 @@
 import { StyleSheet, Platform } from 'react-native';
-import { appColor } from './App';
 
 export const refreshStyle = StyleSheet.create({
     button: {
@@ -10,8 +9,7 @@ export const refreshStyle = StyleSheet.create({
         paddingTop: 5,
         borderRadius: 20,
         alignSelf: 'center',
-        justifyContent: 'center',
-        backgroundColor: appColor.background.backgroundColor,
+        justifyContent: 'center'
     },
 
     buttonText: {

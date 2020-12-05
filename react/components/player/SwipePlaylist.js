@@ -34,19 +34,19 @@ export default class SwipePlaylist extends PureComponent {
                 friction={0.5}
             >
                 <View style={styles.panel}>
-                    <Pressable style={styles.panelHeader} onPress={() => this._panel.show()}>
-                        <View style={stylesRest.smallBar}/>
-                        <Text style={{color: "white"}}>PLAYLIST</Text>
+                    <Pressable style={[styles.panelHeader, {backgroundColor: this.props.backgroundColor}]} onPress={() => this._panel.show()}>
+                        <View style={[stylesRest.smallBar, {backgroundColor: this.props.textColor}]}/>
+                        <Text style={{color: this.props.textColor}}>PLAYLIST</Text>
                     </Pressable>
 
                     <FlatList
-                        style={{backgroundColor: appColor.background.backgroundColor, height: height - 150}}
-                        contentContainerStyle={stylesRest.playlistContainer}
+                        style={{height: height - 150}}
+                        contentContainerStyle={[stylesRest.playlistContainer, {backgroundColor: this.props.backgroundColor}]}
 
                         data={this.props.playlist}
 
                         keyExtractor={item => item.id}
-                        renderItem={({item, index}) => 
+                        renderItem={({item, index}) =>
                             <Pressable style={{
                                             height: 50,
                                             flexDirection: "row",
@@ -57,16 +57,22 @@ export default class SwipePlaylist extends PureComponent {
                                         onPress={() => skipTo(item.id)}
                             >
                                 {
-                                    this.props.track.id == item.id
-                                        ? <MaterialIcons style={{width: 30, textAlign: "center", textAlignVertical: "center"}} name="play-arrow" color="white" size={20}/>
-                                        : <Text style={{width: 30, textAlign: "center", fontSize: 15, color: "white"}}>{index + 1}</Text>
+                                    this.props.track != null
+                                        ? this.props.track.id == item.id
+                                            ? <MaterialIcons style={{width: 30, textAlign: "center", textAlignVertical: "center"}} name="play-arrow" color={this.props.textColor} size={20}/>
+                                            : <Text style={{width: 30, textAlign: "center", fontSize: 15, color: this.props.textColor}}>{index + 1}</Text>
+
+                                        : <Text style={{width: 30, textAlign: "center", fontSize: 15, color: this.props.textColor}}>{index + 1}</Text>
+
+                                        
+                                        
                                 }
 
                                 <Image style={{height: 50, width: 50, marginRight: 10}} source={{uri: item.artwork}}/>
 
                                 <View style={{width: 0, flexGrow: 1, flex: 1}}>
-                                    <Text style={{color: "white"}} numberOfLines={2}>{item.title}</Text>
-                                    <Text style={{color: "white"}} numberOfLines={1}>{item.artist}</Text>
+                                    <Text style={{color: this.props.textColor}} numberOfLines={2}>{item.title}</Text>
+                                    <Text style={{color: this.props.textColor}} numberOfLines={1}>{item.artist}</Text>
                                 </View>
                             </Pressable>
                         }
@@ -82,9 +88,7 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         alignItems: "stretch",
-        justifyContent: "center",
-        backgroundColor: appColor.background.backgroundColor,
-        
+        justifyContent: "center"
     },
 
     panel: {
@@ -97,7 +101,6 @@ const styles = StyleSheet.create({
         alignItems: "center",
         justifyContent: "center",
         height: 50,
-        backgroundColor: appColor.background.backgroundColor,
         borderTopLeftRadius: 25,
         borderTopRightRadius: 25,
         paddingBottom: 10
@@ -112,7 +115,6 @@ const styles = StyleSheet.create({
 const stylesRest = StyleSheet.create({
     playlistContainer: {
         width: "100%",
-        backgroundColor: appColor.background.backgroundColor,
         paddingHorizontal: 10,
         paddingBottom: 50
     },
@@ -126,7 +128,6 @@ const stylesRest = StyleSheet.create({
         height: 4,
         width: 30,
         borderRadius: 2,
-        backgroundColor: "white",
         alignSelf: "center",
         marginTop: 10,
         marginBottom: 10

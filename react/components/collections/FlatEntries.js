@@ -27,7 +27,7 @@ const handle = (navigation, list, index) => {
     handleMedia(null, navigation, index, playlist);
 }
 
-export default ({entries, navigation, isPlaylist}) => {
+export default FlatEntries = ({entries, navigation, isPlaylist}) => {
     return <FlatList
                 style={{}}
                 contentContainerStyle={{marginHorizontal: "auto", position: "absolute", width: "100%"}}

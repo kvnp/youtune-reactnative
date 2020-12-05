@@ -4,9 +4,7 @@ import { appColor } from './App';
 export const searchBarStyle = StyleSheet.create({
     container: {
         flexDirection: "row",
-        backgroundColor: appColor.background.backgroundColor,
         paddingHorizontal: 20,
-        paddingVertical: 3,
         height: 50
     },
 
@@ -16,6 +14,7 @@ export const searchBarStyle = StyleSheet.create({
         backgroundColor: "rgba(25, 25, 25, 0.5)",
         justifyContent: "center",
         alignItems: "center",
+        alignSelf: "center",
         borderWidth: 1,
         borderTopRightRadius: 25,
         borderBottomRightRadius: 25,
@@ -25,7 +24,6 @@ export const searchBarStyle = StyleSheet.create({
     input: {
         height: 45,
         flex: 1,
-        color: "white",
         alignSelf: "center",
         backgroundColor: "rgba(25, 25, 25, 0.3)",
         textAlign: "center",
@@ -37,7 +35,6 @@ export const searchBarStyle = StyleSheet.create({
     suggestion: {
         height: 50,
         width: "100%",
-        backgroundColor: appColor.background.backgroundColor,
         justifyContent: "center",
         flexDirection: "row"
     },
@@ -132,7 +129,6 @@ export const specificStyle = StyleSheet.create({
         paddingBottom: 5,
         flexDirection: 'row',
         width: '80%',
-        backgroundColor: appColor.background.backgroundColor,
         marginHorizontal: "auto",
         alignSelf: "center"
     },

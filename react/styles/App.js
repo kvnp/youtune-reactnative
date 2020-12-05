@@ -12,8 +12,6 @@ export const appColor = {
     }
 };
 
-export const gradientColors = ['rgba(255, 255, 255, 0.2)', 'rgba(255, 255, 255, 0.5)'];
-
 export const headerStyle = StyleSheet.create({
     headerPicture: {
         width: '100%',
@@ -62,14 +60,10 @@ export const textStyle = StyleSheet.create({
     }
 });
 
-export const navOptions = Platform.OS == "android" 
+export const navOptionsOld = Platform.OS == "android" 
     ? {
         optimizationsEnabled: true,
         lazy: false,
-
-        style: {
-            backgroundColor: appColor.background.backgroundColor
-        },
 
         indicatorStyle: {
             color: colorStyle.white.color,
@@ -95,10 +89,6 @@ export const navOptions = Platform.OS == "android"
         optimizationsEnabled: true,
         lazy: true,
 
-        style: {
-            backgroundColor: appColor.background.backgroundColor
-        },
-
         indicatorStyle: {
             color: colorStyle.white.color,
             backgroundColor: colorStyle.white.color,
@@ -109,6 +99,27 @@ export const navOptions = Platform.OS == "android"
 
         activeTintColor: colorStyle.white.color,
         inactiveTintColor: colorStyle.darkgray.color,
+
+        keyboardHidesTabBar: true,
+
+        showIcon: true,
+        showLabel: false
+    };
+
+export const navOptions = Platform.OS == "android" 
+    ? {
+        optimizationsEnabled: true,
+        lazy: false,
+
+        keyboardHidesTabBar: true,
+
+        showIcon: true,
+        showLabel: false
+    }
+
+    : {
+        optimizationsEnabled: true,
+        lazy: true,
 
         keyboardHidesTabBar: true,
 

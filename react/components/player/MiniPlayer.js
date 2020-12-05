@@ -1,40 +1,39 @@
-import React, { PureComponent } from "react";
-import { StyleSheet, View, Pressable, Image, Text, Platform } from "react-native";
+import React, { useEffect, useState } from "react";
+import { StyleSheet, View, Pressable, Image, Text } from "react-native";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import TrackPlayer from 'react-native-track-player';
 import { skip, setPlay } from "../../service";
 import { rippleConfig } from "../../styles/Ripple";
-import { appColor } from "../../styles/App";
+import { useTheme } from "@react-navigation/native";
 
-export default class MiniPlayer extends PureComponent{
-    constructor(props) {
-        super(props);
-        this.state = {
-            isPlaying: false,
-            isStopped: true,
-            isLoading: false,
-            track: null
-        };
-    }
+export default MiniPlayer = ({navigation, style}) => {
+    const [playerState, setPlayer] = useState({
+        isPlaying: false,
+        isStopped: true,
+        isLoading: false,
+        track: null
+    });
 
-    componentDidMount() {
-        this.refreshUI();
-        this._unsub = [];
-        this._unsub.push(
-            TrackPlayer.addEventListener("playback-state", params => this.refreshUI())
+    const {dark, colors} = useTheme();
+
+    useEffect(() => {
+        refreshUI();
+        _unsub = [];
+        _unsub.push(
+            TrackPlayer.addEventListener("playback-state", params => refreshUI())
         );
 
-        this._unsub.push(
-            TrackPlayer.addEventListener("playback-track-changed", params => this.refreshUI())
+        _unsub.push(
+            TrackPlayer.addEventListener("playback-track-changed", params => refreshUI())
         );
-    }
 
-    componentWillUnmount() {
-        for (let i = 0; i < this._unsub.length; i++)
-            this._unsub[i].remove();
-    }
+        return () => {
+            for (let i = 0; i < _unsub.length; i++)
+                _unsub[i].remove();
+        }
+    }, []);
 
-    refreshUI = async() => {
+    const refreshUI = async() => {
         let id = await TrackPlayer.getCurrentTrack();
         if (id != null) {
             let track = await TrackPlayer.getTrack(id);
@@ -66,55 +65,60 @@ export default class MiniPlayer extends PureComponent{
                     break;
             }
 
-            this.setState(newstate);
+            setPlayer(newstate);
         } else
-            this.setState({isPlaying: false, isLoading: false, isStopped: true});
+            setPlayer({
+                isPlaying: false,
+                isLoading: false,
+                isStopped: true
+            });
     }
 
-    onOpen = () => this.props.navigation.navigate("Music");
+    const onOpen = () => navigation.navigate("Music");
 
-    onNext = () => skip(true);
+    const onNext = () => skip(true);
 
-    onPlay = () => setPlay(this.state.isPlaying);
+    const onPlay = () => setPlay(playerState.isPlaying);
 
-    onStop = () => TrackPlayer.reset().then(this.refreshUI);
+    const onStop = () => TrackPlayer.reset().then(refreshUI);
 
-    render() {
-        var title = null;
-        var artist = null;
-        var artwork = null;
+    var title = null;
+    var artist = null;
+    var artwork = null;
 
-        if (this.state.track != null)
-            var {title, artist, artwork} = this.state.track;
+    if (playerState.track != null) {
+        title = playerState.track.title;
+        artist = playerState.track.artist;
+        artwork = playerState.track.artwork;
+    }
 
-        return  <View style={[this.props.style, {height: this.state.isStopped ?0 :50}, styles.container]}>
-                    <Image source={{uri: artwork}} style={styles.image}/>
-                    <View style={styles.textContainer}>
-                        <Pressable android_ripple={rippleConfig} onPress={this.onOpen}>
-                            <Text numberOfLines={1} style={[styles.text, styles.titleText]}>{title}</Text>
-                            <Text numberOfLines={1} style={[styles.text, styles.subtitleText]}>{artist}</Text>
-                        </Pressable>
-                    </View>
-
-                    <View style={styles.button}>
-                        <Pressable android_ripple={rippleConfig} onPress={this.onStop}>
-                            <MaterialIcons name="clear" color="white" size={29}/>
-                        </Pressable>
-                    </View>
-
-                    <View style={styles.button}>
-                        <Pressable android_ripple={rippleConfig} onPress={this.onPlay}>
-                            <MaterialIcons name={this.state.isPlaying ?"pause" :"play-arrow"} color="white" size={29}/>
-                        </Pressable>
-                    </View>
-
-                    <View style={styles.button}>
-                        <Pressable android_ripple={rippleConfig} onPress={this.onNext}>
-                            <MaterialIcons name="skip-next" color="white" size={29}/>
-                        </Pressable>
-                    </View>
+    return  <View style={[{height: playerState.isStopped ?0 :50, backgroundColor: colors.card}, styles.container]}>
+                <Image source={{uri: artwork}} style={styles.image}/>
+                <View style={styles.textContainer}>
+                    <Pressable android_ripple={rippleConfig} onPress={onOpen}>
+                        <Text numberOfLines={1} style={[styles.titleText, {color: colors.text}]}>{title}</Text>
+                        <Text numberOfLines={1} style={[styles.subtitleText, {color: colors.text}]}>{artist}</Text>
+                    </Pressable>
                 </View>
-    }
+
+                <View style={[styles.button, {color: colors.card}]}>
+                    <Pressable android_ripple={rippleConfig} onPress={onStop}>
+                        <MaterialIcons name="clear" color={colors.text} size={29}/>
+                    </Pressable>
+                </View>
+
+                <View style={[styles.button, {color: colors.card}]}>
+                    <Pressable android_ripple={rippleConfig} onPress={onPlay}>
+                        <MaterialIcons name={playerState.isPlaying ?"pause" :"play-arrow"} color={colors.text} size={29}/>
+                    </Pressable>
+                </View>
+
+                <View style={[styles.button, {color: colors.card}]}>
+                    <Pressable android_ripple={rippleConfig} onPress={onNext}>
+                        <MaterialIcons name="skip-next" color={colors.text} size={29}/>
+                    </Pressable>
+                </View>
+            </View>
 }
 
 const styles = StyleSheet.create({
@@ -140,10 +144,6 @@ const styles = StyleSheet.create({
         paddingRight: 10,
     },
 
-    text: {
-        color: "white",
-    },
-
     titleText: {
         fontWeight: "bold"
     },
@@ -155,7 +155,6 @@ const styles = StyleSheet.create({
     button: {
         justifyContent: "center",
         alignItems: "center",
-        backgroundColor: appColor.background.backgroundColor,
         width: 40,
         height: 40,
         paddingLeft: 2,

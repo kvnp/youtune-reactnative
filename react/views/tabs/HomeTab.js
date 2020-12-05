@@ -1,4 +1,4 @@
-import React, { PureComponent } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import {
     Text,
@@ -14,92 +14,77 @@ import { fetchHome } from "../../modules/remote/API";
 import Shelf from '../../components/shared/Shelf';
 import MiniPlayer from '../../components/player/MiniPlayer';
 
-import { appColor } from '../../styles/App';
 import { shelvesStyle } from '../../styles/Shelves';
 import { refreshStyle, preResultHomeStyle } from '../../styles/Home';
+import { useTheme } from '@react-navigation/native';
 
-export default class HomeTab extends PureComponent {
-    constructor(props) {
-        super(props);
-        this.state = {
-            modalVisible: false,
-            shelves: [],
-            loading: false,
-        }
-    }
+export default HomeTab = ({navigation}) => {
+    const [shelves, setShelves] = useState([]);
+    const [loading, setLoading] = useState(false);
+    const {dark, colors} = useTheme();
 
-    setModalVisible = (boolean) => {
-        this.setState({modalVisible: boolean});
-    }
-
-    componentDidMount() {
-        this._unsubscribe = this.props.navigation.addListener('focus', () => {
+    useEffect(() => {
+        const _unsubscribe = navigation.addListener('focus', () => {
             global.setHeader({title: "Home"});
         });
 
-        this.startRefresh();
-    }
-    
-    componentWillUnmount() {
-        this._unsubscribe();
-    }
+        startRefresh();
 
-    startRefresh = async() => {
-        this.setState({loading: true});
+        return () => {
+            _unsubscribe();
+        };
+    }, []);
+
+    const startRefresh = async() => {
+        setLoading(true);
         let result = await fetchHome();
 
         if (result.background != undefined)
             global.setHeader({image: result.background});
 
-        this.setState({
-            shelves: result.shelves,
-            loading: false
-        });
+        setShelves(result.shelves);
+        setLoading(false);
     }
 
-    render() {
-        return (
-            <>
-            <FlatList
-                style={shelvesStyle.scrollView}
-                contentContainerStyle={shelvesStyle.scrollContainer}
+    return <>
+        <FlatList
+            style={shelvesStyle.scrollView}
+            contentContainerStyle={shelvesStyle.scrollContainer}
 
-                ListEmptyComponent={
-                    this.state.loading
-                    ?   <View style={[shelvesStyle.scrollView, shelvesStyle.scrollContainer]}>
-                            <ActivityIndicator size="large"/>
-                        </View>
+            ListEmptyComponent={
+                loading
+                ?   <View style={[shelvesStyle.scrollView, shelvesStyle.scrollContainer]}>
+                        <ActivityIndicator color={colors.text} size="large"/>
+                    </View>
 
-                    :   <Pressable onPress={Platform.OS == "web" ?this.startRefresh :null}>
-                            <Text style={[preResultHomeStyle.preHomeBottomText, preResultHomeStyle.preHomeTopText]}>🏠</Text>
-                            <Text style={preResultHomeStyle.preHomeBottomText}>{Platform.OS =="web" ?"Press the home icon to load" :"Pull down to load"}</Text>
-                        </Pressable>
-                }
-
-                ListFooterComponent={
-                    <Pressable onPress={() => this.startRefresh()} style={refreshStyle.button}>
-                        <Text style={refreshStyle.buttonText}>Aktualisieren</Text>
+                :   <Pressable onPress={Platform.OS == "web" ?startRefresh :null}>
+                        <Text style={[preResultHomeStyle.preHomeBottomText, preResultHomeStyle.preHomeTopText]}>🏠</Text>
+                        <Text style={preResultHomeStyle.preHomeBottomText}>{Platform.OS =="web" ?"Press the home icon to load" :"Pull down to load"}</Text>
                     </Pressable>
-                }
+            }
 
-                progressViewOffset={0}
+            ListFooterComponent={
+                <Pressable onPress={startRefresh} style={[refreshStyle.button, {backgroundColor: colors.card}]}>
+                    <Text style={[refreshStyle.buttonText, {color: colors.text}]}>Aktualisieren</Text>
+                </Pressable>
+            }
 
-                renderItem={({item}) => <Shelf shelf={item} navigation={this.props.navigation}/>}
+            progressViewOffset={0}
 
-                refreshing={this.state.loading}
-                onRefresh={this.startRefresh}
+            renderItem={({item}) => <Shelf shelf={item} navigation={navigation}/>}
 
-                ListFooterComponentStyle={
-                    this.state.shelves.length == 0 
-                    ? {display: "none"}
-                    : {paddingBottom: 20}
-                }
+            refreshing={loading}
+            onRefresh={startRefresh}
 
-                data={this.state.shelves}
-                keyExtractor={item => item.title}
-            />
-            <MiniPlayer navigation={this.props.navigation} style={appColor.background}/>
-            </>
-        );
-    }
+            ListFooterComponentStyle={
+                shelves.length == 0 
+                ? {display: "none"}
+                : {paddingBottom: 20}
+            }
+
+            data={shelves}
+            keyExtractor={item => item.title}
+        />
+        <MiniPlayer navigation={navigation}/>
+    </>
 };

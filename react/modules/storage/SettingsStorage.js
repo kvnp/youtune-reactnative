@@ -1,15 +1,23 @@
 import AsyncStorage from '@react-native-community/async-storage';
+import { darkCallback } from '../../App';
 
 export var settings = {
     transmitLanguage: false,
     proxyYTM: false,
-    safetyMode: false
+    safetyMode: false,
+    darkMode: false,
 }
 
-getSettings().then(storage => {
-    if (storage != null)
-        settings = storage;
-});
+export const initSettings = () => {
+    getSettings().then(storage => {
+        if (storage != null) {
+            settings = storage;
+
+            if (settings.darkMode)
+                darkCallback(settings.darkMode);
+        }
+    });
+}
 
 export async function getSettings() {
     try {
@@ -49,4 +57,10 @@ export const setProxyYTM = boolean => {
 export const setSafetyMode = boolean => {
     settings.safetyMode = boolean;
     storeSettings();
+}
+
+export const setDarkMode = boolean => {
+    settings.darkMode = boolean;
+    storeSettings();
+    darkCallback(boolean);
 }

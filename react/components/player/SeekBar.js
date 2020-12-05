@@ -10,6 +10,7 @@ import {
 import TrackPlayer, { useTrackPlayerProgress } from 'react-native-track-player';
 import Slider from "@react-native-community/slider";
 import { appColor } from '../../styles/App';
+import { useTheme } from '@react-navigation/native';
 
 function pad(n, width, z = 0) {
     n = n + '';
@@ -30,6 +31,7 @@ export default ({ style }) => {
 
     const elapsed = minutesAndSeconds(position);
     const remaining = minutesAndSeconds(duration - position);
+    const { colors } = useTheme();
 
     return (
         <View style={[styles.container, style]}>
@@ -38,19 +40,19 @@ export default ({ style }) => {
                 onSlidingComplete={async(value) => await doSeek(value)}
                 value={position}
                 bufferedPosition={bufferedPosition}
-                minimumTrackTintColor="black"
-                maximumTrackTintColor="darkgray"
-                thumbTintColor={appColor.background.backgroundColor}
-                thumbStyle={styles.thumb}
+                minimumTrackTintColor={colors.text}
+                maximumTrackTintColor={colors.card}
+                thumbTintColor={colors.primary}
+                thumbStyle={{color: colors.primary}}
                 trackStyle={styles.track}
             />
 
             <View style={{ flexDirection: 'row', paddingRight: 15, paddingLeft: 15 }}>
-                <Text style={styles.text}>
+                <Text style={[styles.text, {color: colors.text}]}>
                     {elapsed[0] + ":" + elapsed[1]}
                 </Text>
                 <View style={{ flex: 1 }} />
-                <Text style={[styles.text, {textAlign: "right"}]}>
+                <Text style={[styles.text, {textAlign: "right", color: colors.text}]}>
                     {"-" + remaining[0] + ":" + remaining[1]}
                 </Text>
             </View>
@@ -79,13 +81,8 @@ const styles = StyleSheet.create({
         borderRadius: 1
     },
 
-    thumb: {
-        color: appColor.background.backgroundColor
-    },
-
     text: Platform.OS == "ios"
     ? {
-        color: 'black',
         fontSize: 12,
         textAlign: 'center',
         marginLeft: -14,
@@ -93,7 +90,6 @@ const styles = StyleSheet.create({
     }
 
     : {
-        color: 'black',
         fontSize: 13,
         textAlign: 'center'
     }

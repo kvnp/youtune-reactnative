@@ -24,13 +24,13 @@ function getTabOptions(title) {
 const Nav = createMaterialTopTabNavigator();
 
 export default Navigator = ({navigation}) => {
-    return (
-        <>
+    return <>
         <Header style={headerStyle.headerPicture}/>
         <Nav.Navigator
                 initialRouteName="Home"
                 tabBarPosition="bottom"
                 tabBarOptions={navOptions}
+                
                 style={
                     Platform.OS == "web"
                         ? {
@@ -48,6 +48,5 @@ export default Navigator = ({navigation}) => {
             <Nav.Screen name="Settings" component={SettingsTab} options={getTabOptions("settings")}/>
         </Nav.Navigator>
         <MoreModal navigation={navigation}/>
-        </>
-    )
+    </>
 }

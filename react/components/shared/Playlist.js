@@ -9,8 +9,9 @@ import {
 import { playlistStyle } from '../../styles/Playlist';
 import { handleMedia } from '../../modules/event/mediaNavigator';
 import { rippleConfig } from '../../styles/Ripple';
+import { useTheme } from '@react-navigation/native';
 
-export default ({ playlist, navigation, style }) => {
+export default Playlist = ({ playlist, navigation, style }) => {
     let { title, subtitle, thumbnail } = playlist;
     let { videoId, browseId, playlistId } = playlist;
 
@@ -24,6 +25,8 @@ export default ({ playlist, navigation, style }) => {
         ...navigation
     };
 
+    const { colors } = useTheme();
+
     return (
         <Pressable
             android_ripple={rippleConfig}
@@ -33,11 +36,11 @@ export default ({ playlist, navigation, style }) => {
         >
             <Image style={playlistStyle.cover} source={{uri: thumbnail}}/>
 
-            <Text style={playlistStyle.title} numberOfLines={2}>
+            <Text style={[playlistStyle.title, {color: colors.text}]} numberOfLines={2}>
                 {title}
             </Text>
 
-            <Text style={playlistStyle.description} numberOfLines={2}>
+            <Text style={[playlistStyle.description, {color: colors.text}]} numberOfLines={2}>
                 {subtitle}
             </Text>
         </Pressable>

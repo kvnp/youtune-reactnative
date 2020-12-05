@@ -12,10 +12,11 @@ import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import { resultStyle } from '../../styles/Search';
 import { handleMedia } from '../../modules/event/mediaNavigator';
 import { rippleConfig } from '../../styles/Ripple';
+import { useTheme } from '@react-navigation/native';
 
 const handle = (obj, navigation, index) => handleMedia(obj, navigation, index);
 
-export default ({ entry, navigation, index, playPlaylist }) => {
+export default Entry = ({ entry, navigation, index, playPlaylist }) => {
     let { title, subtitle, secondTitle, secondSubtitle, thumbnail } = entry;
     let { videoId, browseId, playlistId } = entry;
 
@@ -27,6 +28,8 @@ export default ({ entry, navigation, index, playPlaylist }) => {
         browseId: browseId,
         playlistId: playlistId,
     };
+
+    const { colors } = useTheme();
 
     return (
         <Pressable
@@ -44,7 +47,7 @@ export default ({ entry, navigation, index, playPlaylist }) => {
         >
             {
                 index != undefined
-                    ? <Text style={{width: 30, textAlign: "left"}}>
+                    ? <Text style={[{width: 30, textAlign: "left"}, {color: colors.text}]}>
                         {index}
                     </Text>
 
@@ -65,13 +68,13 @@ export default ({ entry, navigation, index, playPlaylist }) => {
             </Pressable>
 
             <View style={resultStyle.resultColumnOne}>
-                <Text numberOfLines={1} style={resultStyle.resultText}>{title}</Text>
-                <Text numberOfLines={1} style={resultStyle.resultText}>{subtitle}</Text>
+                <Text numberOfLines={1} style={[resultStyle.resultText, {color: colors.text}]}>{title}</Text>
+                <Text numberOfLines={1} style={[resultStyle.resultText, {color: colors.text}]}>{subtitle}</Text>
             </View>
 
             <View style={resultStyle.resultColumnTwo}>
-                <Text numberOfLines={1} style={resultStyle.resultText}>{secondTitle}</Text>
-                <Text numberOfLines={1} style={resultStyle.resultText}>{secondSubtitle}</Text>
+                <Text numberOfLines={1} style={[resultStyle.resultText, {color: colors.text}]}>{secondTitle}</Text>
+                <Text numberOfLines={1} style={[resultStyle.resultText, {color: colors.text}]}>{secondSubtitle}</Text>
             </View>
 
             <Pressable onPress={() => global.showModal(view)}>

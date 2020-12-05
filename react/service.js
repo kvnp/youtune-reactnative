@@ -1,6 +1,7 @@
 import TrackPlayer from 'react-native-track-player';
 import { fetchNext, fetchAudioStream } from "./modules/remote/API";
 import { StatusBar } from 'react-native';
+import { initSettings } from './modules/storage/SettingsStorage';
 
 export const register = () => {
     StatusBar.setBarStyle("dark-content", true);
@@ -41,6 +42,8 @@ export const register = () => {
             TrackPlayer.CAPABILITY_SKIP_TO_NEXT
         ],
     });
+
+    initSettings();
 }
 
 export const YOUTUBE_WATCH = "https://www.youtube.com/watch?v=";
@@ -121,26 +124,31 @@ export const skip = async(forward) => {
     skipTo(next);
 }
 
-export async function startPlayback({ playlistId, videoId }) {
-    let playlist = await fetchNext(videoId, playlistId);
-    startPlaylist(playlist);
+export function startPlayback({ playlistId, videoId }) {
+    fetchNext(videoId, playlistId).then(playlist => {
+        startPlaylist(playlist);
+    });
 }
 
-export async function startPlaylist(playlist) {
-    await TrackPlayer.reset();
-    for (let i = 0; i < playlist.list.length; i++) {
-        let track = playlist.list[i];
-        if (i == playlist.index || i == 0)
-            track.url = await fetchAudioStream(track.id);
+export function startPlaylist(playlist) {
+    return new Promise(async(resolve, reject) => {
+        await TrackPlayer.reset();
+        for (let i = 0; i < playlist.list.length; i++) {
+            let track = playlist.list[i];
+            if (i == playlist.index || i == 0)
+                track.url = await fetchAudioStream(track.id);
 
-        await TrackPlayer.add(track);
+            await TrackPlayer.add(track);
 
-        if (i == playlist.index) {
-            focusedId = track.id;
-            await TrackPlayer.skip(track.id);
-            TrackPlayer.play();
+            if (i == playlist.index) {
+                focusedId = track.id;
+                await TrackPlayer.skip(track.id);
+                TrackPlayer.play();
+                resolve();
+            }
         }
-    }
+        reject();
+    });
 }
 
 export function setPlay(isPlaying) {

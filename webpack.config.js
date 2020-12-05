@@ -85,7 +85,7 @@ module.exports = () => ({
     output: {
         path: __dirname + '/dist',
         filename: 'app-[chunkhash].bundle.js',
-        publicPath: './'
+        publicPath: '/'
     },
 
     devtool: 'source-map',

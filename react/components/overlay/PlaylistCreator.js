@@ -8,37 +8,39 @@ import {
     TextInput
 } from "react-native";
 import { rippleConfig } from "../../styles/Ripple";
-import { appColor } from "../../styles/App";
+import { useTheme } from "@react-navigation/native";
 
-export default ({ callback, style }) => {
+export default PlaylistCreator = ({ callback, style }) => {
+    const {dark, colors} = useTheme();
+
     let title = "";
     let description = "";
     return (
-        <View style={[style, styles.headerContainer]}>
+        <View style={[style, styles.headerContainer, {backgroundColor: colors.card}]}>
             <View style={styles.headerCenterContainer}>
                 <View style={styles.headerTopRow}>
-                    <TextInput style={styles.inputText}
+                    <TextInput style={[styles.inputText, {color: colors.text}]}
                                onChangeText={ text => title = text }
                                placeholder="Title"/>
 
-                    <TextInput style={styles.inputText}
+                    <TextInput style={[styles.inputText, {color: colors.text}]}
                                onChangeText={ text => description = text}
                                placeholder="Description"/>
                     
                 </View>
 
                 <View style={styles.headerButtonView}>
-                    <Pressable android_ripple={rippleConfig} style={styles.headerButton}
+                    <Pressable android_ripple={rippleConfig} style={[styles.headerButton, {backgroundColor: colors.primary}]}
                                       onPress={() => callback() }>
-                        <Text style={styles.headerButtonText}>CANCEL</Text>
+                        <Text style={[styles.headerButtonText, {color: colors.text}]}>CANCEL</Text>
                     </Pressable>
-                    <Pressable android_ripple={rippleConfig} style={styles.headerButton}
+                    <Pressable android_ripple={rippleConfig} style={[styles.headerButton, {backgroundColor: colors.primary}]}
                                       onPress={() =>  {
                                             if (title.length > 0) {
                                                 callback({title: title, description: description});
                                             }
                                       }}>
-                        <Text style={styles.headerButtonText}>CREATE</Text>
+                        <Text style={[styles.headerButtonText, {color: colors.text}]}>CREATE</Text>
                     </Pressable>
                 </View>
             </View>
@@ -114,14 +116,11 @@ const styles = StyleSheet.create({
         paddingRight: 13,
         paddingTop: 2,
         paddingBottom: 2,
-        backgroundColor: 'white',
         borderRadius: 5
     },
 
     headerButtonText: {
         fontWeight: 'bold',
-        color: "white",
-        backgroundColor: appColor.background.backgroundColor,
         paddingHorizontal: 10,
         paddingVertical: 2,
         borderRadius: 20

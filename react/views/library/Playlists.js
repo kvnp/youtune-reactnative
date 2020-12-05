@@ -105,7 +105,6 @@ const styles = StyleSheet.create({
     },
 
     modalChild: {
-        backgroundColor: "white",
         borderRadius: 10
     },
 

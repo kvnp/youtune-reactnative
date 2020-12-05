@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 
 //import ViewPagerAdapter from 'react-native-tab-view-viewpager-adapter';
@@ -10,18 +10,17 @@ import Songs from '../library/Songs';
 import Artists from '../library/Artists';
 import { tabOptions } from '../../styles/Library';
 import MiniPlayer from '../../components/player/MiniPlayer';
-import { appColor } from '../../styles/App';
 
 const Tab = createMaterialTopTabNavigator();
 
-export default ({navigation}) => {
-    React.useEffect(() => {
+export default LibraryTab = ({navigation}) => {
+    useEffect(() => {
         const unsubscribe = navigation.addListener('focus', () => {
             global.setHeader({title: "Library"});
         });
 
         return () => unsubscribe();
-    }, [navigation]);
+    }, []);
 
     return (
         <>
@@ -31,7 +30,7 @@ export default ({navigation}) => {
             <Tab.Screen name="Songs" component={Songs} options={global.navigationOptions}/>
             <Tab.Screen name="Artists" component={Artists} options={global.navigationOptions}/>
         </Tab.Navigator>
-        <MiniPlayer navigation={navigation} style={appColor.background}/>
+        <MiniPlayer navigation={navigation}/>
         </>
     );
 };

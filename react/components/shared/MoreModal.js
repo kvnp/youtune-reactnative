@@ -98,9 +98,7 @@ export default class MoreModal extends PureComponent {
 
     render() {
         const { browseId, playlistId, videoId} = this.state.modalContent;
-        console.log({
-            browseId, playlistId, videoId
-        });
+
         var likeFunction = null;
         var type;
 

@@ -12,7 +12,7 @@ import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import { appColor } from '../../styles/App';
 import { ScrollView } from 'react-native-gesture-handler';
 import MiniPlayer from '../../components/player/MiniPlayer';
-import { setTransmitLanguage, setProxyYTM, setSafetyMode, settings} from '../../modules/storage/SettingsStorage';
+import { setTransmitLanguage, setProxyYTM, setSafetyMode, setDarkMode, settings} from '../../modules/storage/SettingsStorage';
 
 export default class SettingsTab extends PureComponent {
     constructor(props) {
@@ -21,6 +21,7 @@ export default class SettingsTab extends PureComponent {
             language: false,
             proxy: false,
             safety: false,
+            dark: false,
         }
     }
 
@@ -31,7 +32,8 @@ export default class SettingsTab extends PureComponent {
             this.setState({
                 language: settings.transmitLanguage,
                 proxy: settings.proxyYTM,
-                safety: settings.safetyMode
+                safety: settings.safetyMode,
+                dark: settings.darkMode,
             });
         });
     }
@@ -55,10 +57,15 @@ export default class SettingsTab extends PureComponent {
         this.setState({safety: boolean});
     }
 
+    toggleDarkMode = boolean => {
+        setDarkMode(boolean);
+        this.setState({dark: boolean});
+    }
+
     render() {
         return <>
-            <ScrollView bounces={true} contentContainerStyle={{flexGrow: 1, justifyContent: "flex-end"}}>
-                <Pressable onPress={() => this.toggleLanguage(!this.state.language)} style={{flexDirection: "row", width: "100%", alignItems: "center", justifyContent: "space-evenly", backgroundColor: "darkgray", borderWidth: 1, height: 65, marginTop: 7, marginBottom: 7}}>
+            <ScrollView bounces={true} contentContainerStyle={styles.content}>
+                <Pressable onPress={() => this.toggleLanguage(!this.state.language)} style={styles.entry}>
                     <MaterialIcons name="language" color="black" size={30}/>
                     <Text style={{flexWrap: "wrap", width: "50%"}}>Transmit device language to YouTube</Text>
                     <Switch
@@ -70,7 +77,7 @@ export default class SettingsTab extends PureComponent {
                     />
                 </Pressable>
 
-                <Pressable onPress={Platform.OS == "web" ?null :() => this.toggleProxy(!this.state.proxy)} style={{flexDirection: "row", width: "100%", alignItems: "center", justifyContent: "space-evenly", backgroundColor: "darkgray", borderWidth: 1, height: 65, marginTop: 7, marginBottom: 7}}>
+                <Pressable onPress={Platform.OS == "web" ?null :() => this.toggleProxy(!this.state.proxy)} style={styles.entry}>
                     <MaterialIcons name="public" color="black" size={30}/>
                     <Text style={{flexWrap: "wrap", width: "50%"}}>Proxy YouTube Music (Search/Browse) requests</Text>
                     <Switch
@@ -83,7 +90,7 @@ export default class SettingsTab extends PureComponent {
                     />
                 </Pressable>
 
-                <Pressable onPress={() => this.toggleSafetyMode(!this.state.safety)} style={{flexDirection: "row", width: "100%", alignItems: "center", justifyContent: "space-evenly", backgroundColor: "darkgray", borderWidth: 1, height: 65, marginTop: 7, marginBottom: 7}}>
+                <Pressable onPress={() => this.toggleSafetyMode(!this.state.safety)} style={styles.entry}>
                     <MaterialIcons name="child-friendly" color="black" size={30}/>
                     <Text style={{flexWrap: "wrap", width: "50%"}}>Enable safety mode</Text>
                     <Switch
@@ -94,6 +101,17 @@ export default class SettingsTab extends PureComponent {
                         value={this.state.safety}
                     />
                 </Pressable>
+                <Pressable onPress={() => this.toggleDarkMode(!this.state.safety)} style={styles.entry}>
+                    <MaterialIcons name="brightness-low" color="black" size={30}/>
+                    <Text style={{flexWrap: "wrap", width: "50%"}}>Enable dark mode</Text>
+                    <Switch
+                        trackColor={{ false: "#767577", true: "#81b0ff" }}
+                        thumbColor={this.state.dark ? appColor.background.backgroundColor : "darkgray"}
+                        ios_backgroundColor="#3e3e3e"
+                        onValueChange={this.toggleDarkMode}
+                        value={this.state.dark}
+                    />
+                </Pressable>
             </ScrollView>
             <MiniPlayer navigation={this.props.navigation} style={appColor.background}/>
         </>
@@ -101,19 +119,20 @@ export default class SettingsTab extends PureComponent {
 };
 
 const styles = StyleSheet.create({
-    headerPicture: {
-        width: '100%',
-        height: '20%'
-    },
-
-    middleView: {
+    content: {
         flexGrow: 1,
-        alignItems: 'center',
-        justifyContent: 'center',
-        width: '100%'
+        justifyContent: "flex-end"
     },
 
-    placeholder: {
-        fontSize: 70
-    },
+    entry: {
+        flexDirection: "row",
+        width: "100%",
+        alignItems: "center",
+        justifyContent: "space-evenly",
+        backgroundColor: "darkgray",
+        borderWidth: 1,
+        height: 65,
+        marginTop: 7,
+        marginBottom: 7
+    }
 });
