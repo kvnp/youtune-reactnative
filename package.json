@@ -3,12 +3,12 @@
   "version": "0.0.1",
   "private": true,
   "scripts": {
-    "android": "react-native run-android",
-    "ios": "react-native run-ios",
-    "start": "react-native start",
+    "android": ".\\node_modules\\.bin\\react-native run-android",
+    "ios": ".\\node_modules\\.bin\\react-native run-ios",
+    "start": ".\\node_modules\\.bin\\react-native start",
     "test": "jest",
     "lint": "eslint .",
-    "web": "webpack serve",
+    "web": ".\\node_modules\\.bin\\webpack serve",
     "postinstall": "git apply --directory node_modules/react-native-track-player/ ./patches/react-native-track-player/0001-fix-web-support.patch || git apply --directory node_modules/rn-sliding-up-panel/ ./patches/rn-sliding-up-panel/0001-fix-web-support.patch",
     "patch": "git apply --reject --directory node_modules/react-native-track-player/ ./patches/react-native-track-player/0001-fix-web-support.patch || git apply --reject --directory node_modules/rn-sliding-up-panel/ ./patches/rn-sliding-up-panel/0001-fix-web-support.patch"
   },
