@@ -82,15 +82,15 @@ export const resultStyle = StyleSheet.create({
         paddingLeft: 15,
         paddingRight: 15,
         marginTop: 10,
+        borderRadius: 5,
+        height: 70,
         flexDirection: 'row',
-        alignItems: 'center',
-        backgroundColor: "rgba(0,0,0,0.1)",
-        borderWidth: .5
+        alignItems: 'center'
     },
 
     resultCover: {
-        width: 45,
-        height: 45,
+        width: 70,
+        height: 70,
         //aspectRatio: 1
     },
 
@@ -98,17 +98,18 @@ export const resultStyle = StyleSheet.create({
         paddingLeft: 10,
         flex: 1,
         flexDirection: 'column',
-        alignItems: 'center'
+        alignItems: 'flex-start'
     },
 
     resultColumnTwo: {
         paddingLeft: 10,
-        flex: 1,
+        width: 120,
         flexDirection: 'column',
         alignItems: 'center'
     },
 
     resultText: {
+        fontSize: 15
     }
 });
 

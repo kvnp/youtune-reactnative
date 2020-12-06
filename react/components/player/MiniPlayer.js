@@ -18,7 +18,7 @@ export default MiniPlayer = ({navigation, style}) => {
 
     useEffect(() => {
         refreshUI();
-        _unsub = [];
+        let _unsub = [];
         _unsub.push(
             TrackPlayer.addEventListener("playback-state", params => refreshUI())
         );

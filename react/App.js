@@ -30,10 +30,20 @@ export default App = () => {
     return  <NavigationContainer theme={dark ? DarkTheme : DefaultTheme}>
                 <Stack.Navigator>
                     <Stack.Screen name="App" component={Navigator} options={global.navigationOptions}/>
-                    <Stack.Screen name="Playlist" component={PlaylistView} options={Platform.OS == "web" ? {HeaderBackButton: getIcon("arrow-back", "black")} : null }/>
                     <Stack.Screen name="Music" component={PlayView} options={global.navigationOptions}/>
-                    <Stack.Screen name="Artist" component={ArtistView} options={Platform.OS == "web" ? {HeaderBackButton: getIcon("arrow-back", "black")} : null }/>
                     <Stack.Screen name="Captcha" component={CaptchaView}/>
+                    
+                    <Stack.Screen name="Playlist" component={PlaylistView} options={
+                        Platform.OS == "web"
+                            ? {headerBackImage: () => getIcon({title: "arrow-back"})}
+                            : null 
+                    }/>
+                    
+                    <Stack.Screen name="Artist" component={ArtistView} options={
+                        Platform.OS == "web"
+                            ? {headerBackImage: () => getIcon({title: "arrow-back"})}
+                            : null
+                    }/>
                 </Stack.Navigator>
             </NavigationContainer>
 }

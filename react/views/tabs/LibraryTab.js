@@ -22,8 +22,7 @@ export default LibraryTab = ({navigation}) => {
         return () => unsubscribe();
     }, []);
 
-    return (
-        <>
+    return <>
         <Tab.Navigator tabBarOptions={tabOptions} initialRouteName="Playlists" tabBarPosition="bottom">
             <Tab.Screen name="Playlists" component={Playlists} options={global.navigationOptions}/>
             <Tab.Screen name="Albums" component={Albums} options={global.navigationOptions}/>
@@ -31,6 +30,5 @@ export default LibraryTab = ({navigation}) => {
             <Tab.Screen name="Artists" component={Artists} options={global.navigationOptions}/>
         </Tab.Navigator>
         <MiniPlayer navigation={navigation}/>
-        </>
-    );
+    </>
 };

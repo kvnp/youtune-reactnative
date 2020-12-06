@@ -32,7 +32,7 @@ export default SearchTab = ({navigation}) => {
     const { dark, colors } = useTheme();
 
     useEffect(() => {
-        _unsubscribe = navigation.addListener('focus', () => {
+        const _unsubscribe = navigation.addListener('focus', () => {
             global.setHeader({title: "Search"});
         });
 
@@ -67,8 +67,7 @@ export default SearchTab = ({navigation}) => {
         search(query);
     }
 
-    return (
-        <>
+    return <>
         <SectionList
             style={shelvesStyle.scrollView}
             contentContainerStyle={shelvesStyle.scrollContainer}
@@ -152,6 +151,5 @@ export default SearchTab = ({navigation}) => {
 
             <MiniPlayer navigation={navigation}/>
         </KeyboardAvoidingView>
-        </>
-    );
+    </>
 }

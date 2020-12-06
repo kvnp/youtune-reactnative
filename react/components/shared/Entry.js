@@ -43,7 +43,7 @@ export default Entry = ({ entry, navigation, index, playPlaylist }) => {
             }
 
             onLongPress={() => global.showModal(view)}
-            style={resultStyle.resultView}
+            style={[resultStyle.resultView, {backgroundColor: colors.card}]}
         >
             {
                 index != undefined
@@ -67,18 +67,19 @@ export default Entry = ({ entry, navigation, index, playPlaylist }) => {
                 <Image style={resultStyle.resultCover} source={{uri: thumbnail}}/>
             </Pressable>
 
+            <View style={resultStyle.resultColumnTwo}>
+                <Text numberOfLines={1} style={[resultStyle.resultText, {color: colors.text}]}>{secondTitle}</Text>
+                <Text numberOfLines={1} style={[resultStyle.resultText, {color: colors.text}]}>{secondSubtitle}</Text>
+            </View>
+            
             <View style={resultStyle.resultColumnOne}>
                 <Text numberOfLines={1} style={[resultStyle.resultText, {color: colors.text}]}>{title}</Text>
                 <Text numberOfLines={1} style={[resultStyle.resultText, {color: colors.text}]}>{subtitle}</Text>
             </View>
 
-            <View style={resultStyle.resultColumnTwo}>
-                <Text numberOfLines={1} style={[resultStyle.resultText, {color: colors.text}]}>{secondTitle}</Text>
-                <Text numberOfLines={1} style={[resultStyle.resultText, {color: colors.text}]}>{secondSubtitle}</Text>
-            </View>
 
             <Pressable onPress={() => global.showModal(view)}>
-                <MaterialIcons name="more-vert" color="black" size={24}/>
+                <MaterialIcons name="more-vert" color={colors.text} size={24}/>
             </Pressable>
         </Pressable>
     );

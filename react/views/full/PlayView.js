@@ -38,7 +38,7 @@ export default PlayView = ({route, navigation}) => {
 
     useEffect(() => {
         refreshUI();
-        _unsub = [];
+        let _unsub = [];
 
         _unsub.push(
             TrackPlayer.addEventListener("playback-state", refreshUI)

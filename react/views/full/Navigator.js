@@ -12,13 +12,19 @@ import Header from "../../components/overlay/Header";
 import { headerStyle, navOptions } from "../../styles/App";
 import MoreModal from "../../components/shared/MoreModal";
 import { Platform } from "react-native";
+import { useTheme } from "@react-navigation/native";
 
-export function getIcon(title, color) {
+export const getIcon = ({title, color}) => {
+    if (color == undefined) {
+        const { colors } = useTheme();
+        color = colors.text;
+    }
+
     return <MaterialIcons name={title} color={color} size={25}/>;
 }
 
-function getTabOptions(title) {
-    return { tabBarIcon: ({ color }) => getIcon(title, color) };
+const getTabOptions = (title) => {
+    return { tabBarIcon: ({ color }) => getIcon({title, color}) };
 }
 
 const Nav = createMaterialTopTabNavigator();
