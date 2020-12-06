@@ -41,7 +41,7 @@ export default FlatEntries = ({entries, navigation, isPlaylist}) => {
                                                     }
 
                                                     : undefined
-                                             }
+                                              }
 
                                             navigation={navigation}
                                         />

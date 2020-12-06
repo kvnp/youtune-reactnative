@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Platform, StatusBar } from "react-native";
+import { StatusBar, View } from "react-native";
 
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
@@ -13,7 +13,6 @@ import Navigator, { getIcon } from "./views/full/Navigator";
 import CaptchaView from "./views/full/CaptchaView";
 
 export var darkCallback = null;
-
 const Stack = createStackNavigator();
 
 export default App = () => {
@@ -27,23 +26,21 @@ export default App = () => {
             StatusBar.setBarStyle("dark-content", true);
     };
 
-    return  <NavigationContainer theme={dark ? DarkTheme : DefaultTheme}>
-                <Stack.Navigator>
-                    <Stack.Screen name="App" component={Navigator} options={global.navigationOptions}/>
-                    <Stack.Screen name="Music" component={PlayView} options={global.navigationOptions}/>
-                    <Stack.Screen name="Captcha" component={CaptchaView}/>
-                    
-                    <Stack.Screen name="Playlist" component={PlaylistView} options={
-                        Platform.OS == "web"
-                            ? {headerBackImage: () => getIcon({title: "arrow-back"})}
-                            : null 
-                    }/>
-                    
-                    <Stack.Screen name="Artist" component={ArtistView} options={
-                        Platform.OS == "web"
-                            ? {headerBackImage: () => getIcon({title: "arrow-back"})}
-                            : null
-                    }/>
-                </Stack.Navigator>
-            </NavigationContainer>
+    return  <View style={{position: 'fixed', width: '100%', height: '100%'}}>
+        <NavigationContainer theme={dark ? DarkTheme : DefaultTheme}>
+            <Stack.Navigator>
+                <Stack.Screen name="App" component={Navigator} options={global.navigationOptions}/>
+                <Stack.Screen name="Music" component={PlayView} options={global.navigationOptions}/>
+                <Stack.Screen name="Captcha" component={CaptchaView}/>
+                
+                <Stack.Screen name="Playlist" component={PlaylistView}
+                              options={{headerBackImage: () => getIcon({title: "arrow-back"})}}
+                />
+                
+                <Stack.Screen name="Artist" component={ArtistView}
+                              options={{headerBackImage: () => getIcon({title: "arrow-back"})}}
+                />
+            </Stack.Navigator>
+        </NavigationContainer>
+    </View>
 }

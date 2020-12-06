@@ -27,8 +27,6 @@ export const bottomBarStyle = StyleSheet.create({
     },
 
     closeButton: {
-        backgroundColor: "white",
-        color: "black",
         width: 40,
         height: 40,
         
@@ -47,7 +45,6 @@ export const bottomBarStyle = StyleSheet.create({
         paddingRight: 13,
         paddingTop: 2,
         paddingBottom: 2,
-        backgroundColor: "white",
         borderRadius: 5,
         zIndex: 10
     },
@@ -68,7 +65,6 @@ export const bottomBarStyle = StyleSheet.create({
     },
 
     artistName: {
-        color: 'white',
         fontWeight: 'bold',
         fontSize: 25
     },
@@ -104,7 +100,6 @@ export const bottomBarAlbumStyle = StyleSheet.create({
     },
 
     albumText: {
-        color: "white",
         fontWeight: "bold"
     }
 });

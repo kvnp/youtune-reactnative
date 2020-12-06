@@ -4,7 +4,8 @@ import {
     StyleSheet,
     Switch,
     Text,
-    Pressable
+    Pressable,
+    Platform
 } from 'react-native';
 
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
@@ -53,14 +54,18 @@ export default SettingsTab = ({navigation}) => {
 
     const drawEntry = entry => {
         const func = entry.function;
-        const state = entry.state;
         const icon = entry.icon;
         const desc = entry.description;
-        const disabled = entry.hasOwnProperty("override")
+
+        const disabled = entry.hasOwnProperty("override") && Platform.OS == "web"
             ? entry.override.web.disabled
             : false;
+        
+        const state = entry.hasOwnProperty("override") && Platform.OS == "web"
+            ? entry.override.web.state
+            : entry.state;
 
-        return <Pressable onPress={() => disabled ? null : func(!state)} style={[styles.entry, {backgroundColor: colors.card}]}>
+        return <Pressable key={icon} onPress={() => disabled ? null : func(!state)} style={[styles.entry, {backgroundColor: colors.card}]}>
             <MaterialIcons name={icon} color={colors.text} size={30}/>
             <Text style={{flexWrap: "wrap", width: "50%", color: colors.text}}>{desc}</Text>
             <Switch
@@ -68,6 +73,7 @@ export default SettingsTab = ({navigation}) => {
                 thumbColor="darkgray"
                 onValueChange={disabled ? null : func}
                 value={state}
+                disabled={disabled}
             />
         </Pressable>
     }

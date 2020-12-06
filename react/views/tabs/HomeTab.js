@@ -21,7 +21,7 @@ import { useTheme } from '@react-navigation/native';
 export default HomeTab = ({navigation}) => {
     const [shelves, setShelves] = useState([]);
     const [loading, setLoading] = useState(false);
-    const {dark, colors} = useTheme();
+    const { colors } = useTheme();
 
     useEffect(() => {
         const _unsubscribe = navigation.addListener('focus', () => {
@@ -53,20 +53,37 @@ export default HomeTab = ({navigation}) => {
 
             ListEmptyComponent={
                 loading
-                ?   <View style={[shelvesStyle.scrollView, shelvesStyle.scrollContainer]}>
-                        <ActivityIndicator color={colors.text} size="large"/>
-                    </View>
+                ? <View style={[shelvesStyle.scrollView, shelvesStyle.scrollContainer]}>
+                    <ActivityIndicator color={colors.text} size="large"/>
+                </View>
 
-                :   <Pressable onPress={Platform.OS == "web" ?startRefresh :null}>
-                        <Text style={[preResultHomeStyle.preHomeBottomText, preResultHomeStyle.preHomeTopText]}>🏠</Text>
-                        <Text style={preResultHomeStyle.preHomeBottomText}>{Platform.OS =="web" ?"Press the home icon to load" :"Pull down to load"}</Text>
-                    </Pressable>
+                : <Pressable onPress={Platform.OS == "web" ?startRefresh :null}>
+                    <Text style={[preResultHomeStyle.preHomeBottomText, preResultHomeStyle.preHomeTopText]}>🏠</Text>
+                    <Text style={preResultHomeStyle.preHomeBottomText}>
+                        {
+                            Platform.OS == "web"
+                                ? "Press the home icon to load"
+                                : "Pull down to load"
+                        }
+                    </Text>
+                </Pressable>
             }
 
             ListFooterComponent={
-                <Pressable onPress={startRefresh} style={[refreshStyle.button, {backgroundColor: colors.card}]}>
-                    <Text style={[refreshStyle.buttonText, {color: colors.text}]}>Aktualisieren</Text>
-                </Pressable>
+                Platform.OS == "web"
+                    ? loading
+                        ? <View style={[shelvesStyle.scrollView, shelvesStyle.scrollContainer]}>
+                            <ActivityIndicator color={colors.text} size="large"/>
+                        </View>
+
+                        : <Pressable onPress={startRefresh} style={[refreshStyle.button, {backgroundColor: colors.card}]}>
+                            <Text style={[refreshStyle.buttonText, {color: colors.text}]}>Aktualisieren</Text>
+                        </Pressable>
+
+                    : <Pressable onPress={startRefresh} style={[refreshStyle.button, {backgroundColor: colors.card}]}>
+                        <Text style={[refreshStyle.buttonText, {color: colors.text}]}>Aktualisieren</Text>
+                    </Pressable>
+                
             }
 
             progressViewOffset={0}
