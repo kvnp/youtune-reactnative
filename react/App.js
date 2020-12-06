@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { StatusBar, View } from "react-native";
+import { Platform, StatusBar, View } from "react-native";
 
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
@@ -26,7 +26,7 @@ export default App = () => {
             StatusBar.setBarStyle("dark-content", true);
     };
 
-    return  <View style={{position: 'fixed', width: '100%', height: '100%'}}>
+    return  <View style={{position: Platform.OS == "web" ? "fixed" : "absolute", width: '100%', height: '100%'}}>
         <NavigationContainer theme={dark ? DarkTheme : DefaultTheme}>
             <Stack.Navigator>
                 <Stack.Screen name="App" component={Navigator} options={global.navigationOptions}/>
