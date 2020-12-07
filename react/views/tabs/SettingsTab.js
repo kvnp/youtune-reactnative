@@ -13,6 +13,7 @@ import { ScrollView } from 'react-native-gesture-handler';
 import MiniPlayer from '../../components/player/MiniPlayer';
 import { setTransmitLanguage, setProxyYTM, setSafetyMode, setDarkMode, settings} from '../../modules/storage/SettingsStorage';
 import { useTheme } from '@react-navigation/native';
+import { setHeader } from '../../components/overlay/Header';
 
 export default SettingsTab = ({navigation}) => {
     const [language, setLanguage] = useState(settings.transmitLanguage);
@@ -24,7 +25,7 @@ export default SettingsTab = ({navigation}) => {
 
     useEffect(() => {
         const _unsubscribe = navigation.addListener('focus', () => {
-            global.setHeader({title: "Settings"});
+            setHeader({title: "Settings"});
         });
 
         return () => {

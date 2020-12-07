@@ -21,6 +21,7 @@ import { fetchResults } from '../../modules/remote/API';
 import MiniPlayer from '../../components/player/MiniPlayer';
 import { rippleConfig } from '../../styles/Ripple';
 import { useTheme } from '@react-navigation/native';
+import { setHeader } from '../../components/overlay/Header';
 
 export default SearchTab = ({navigation}) => {
     const [shelves, setShelves] = useState([]);
@@ -33,7 +34,7 @@ export default SearchTab = ({navigation}) => {
 
     useEffect(() => {
         const _unsubscribe = navigation.addListener('focus', () => {
-            global.setHeader({title: "Search"});
+            setHeader({title: "Search"});
         });
 
         return () => {

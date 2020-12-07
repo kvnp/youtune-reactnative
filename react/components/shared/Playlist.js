@@ -10,6 +10,7 @@ import { playlistStyle } from '../../styles/Playlist';
 import { handleMedia } from '../../modules/event/mediaNavigator';
 import { rippleConfig } from '../../styles/Ripple';
 import { useTheme } from '@react-navigation/native';
+import { showModal } from './MoreModal';
 
 export default Playlist = ({ playlist, navigation, style }) => {
     let { title, subtitle, thumbnail } = playlist;
@@ -30,7 +31,7 @@ export default Playlist = ({ playlist, navigation, style }) => {
     return (
         <Pressable
             android_ripple={rippleConfig}
-            onLongPress={() => global.showModal(view)}
+            onLongPress={() => showModal(view)}
             onPress={() => handleMedia(view, navigation)}
             style={[style, playlistStyle.container]}
         >

@@ -17,6 +17,7 @@ import MiniPlayer from '../../components/player/MiniPlayer';
 import { shelvesStyle } from '../../styles/Shelves';
 import { refreshStyle, preResultHomeStyle } from '../../styles/Home';
 import { useTheme } from '@react-navigation/native';
+import { setHeader } from '../../components/overlay/Header';
 
 export default HomeTab = ({navigation}) => {
     const [shelves, setShelves] = useState([]);
@@ -25,7 +26,7 @@ export default HomeTab = ({navigation}) => {
 
     useEffect(() => {
         const _unsubscribe = navigation.addListener('focus', () => {
-            global.setHeader({title: "Home"});
+            setHeader({title: "Home"});
         });
 
         startRefresh();
@@ -40,7 +41,7 @@ export default HomeTab = ({navigation}) => {
         let result = await fetchHome();
 
         if (result.background != undefined)
-            global.setHeader({image: result.background});
+            setHeader({image: result.background});
 
         setShelves(result.shelves);
         setLoading(false);

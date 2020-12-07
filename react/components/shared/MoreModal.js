@@ -23,6 +23,9 @@ import {
     getPlaylistLike,
     getArtistLike
 } from "../../modules/storage/MediaStorage";
+import { downloadSong, localIDs } from "../../modules/storage/SongStorage";
+
+export var showModal = null;
 
 export default class MoreModal extends PureComponent {
     constructor(props) {
@@ -41,7 +44,7 @@ export default class MoreModal extends PureComponent {
             }
         }
 
-        global.showModal = content => {
+        showModal = content => {
             this.setModalVisible(true, content);
         }
     }
@@ -93,6 +96,12 @@ export default class MoreModal extends PureComponent {
                 break;
             case "Artist":
                 getArtistLike(id).then(boolean => { this.setState({ isLiked: boolean }) });
+        }
+    }
+
+    downloadMedia() {
+        if (this.state.modalContent.videoId != undefined) {
+            downloadSong(this.state.modalContent.videoId)
         }
     }
 
@@ -213,7 +222,7 @@ export default class MoreModal extends PureComponent {
                                     android_ripple={{color: "gray"}}
                                 >
                                     {
-                                        type != "Song"
+                                        type == "Song"
                                             ? <>
                                                 <MaterialIcons name="play-arrow" color="black" size={25}/>
                                                 <Text style={{paddingLeft: 20}}>Play</Text>
@@ -228,16 +237,24 @@ export default class MoreModal extends PureComponent {
                             </View>
                         
                         <View style={modalStyles.entryView}>
-                        <Pressable onPress={() => {}} style={modalStyles.entry} android_ripple={{color: "gray"}}>
+                        <Pressable onPress={() => this.downloadMedia()} disabled={localIDs == null ? true : false} style={modalStyles.entry} android_ripple={{color: "gray"}}>
                             <MaterialIcons name="get-app" color="black" size={25}/>
-                            <Text style={{paddingLeft: 20}}>Download</Text>
+                            <Text style={{paddingLeft: 20}}>
+                                {
+                                    localIDs != null
+                                        ? localIDs.includes(this.state.modalContent.videoId)
+                                            ? "Remove"
+                                            : "Download"
+                                        : "Download"
+                                }
+                            </Text>
                         </Pressable>
                         </View>
 
                         <View style={modalStyles.entryView}>
                         <Pressable onPress={() => {}} style={modalStyles.entry} android_ripple={{color: "gray"}}>
                             {
-                                type != "Song"
+                                type == "Song"
                                     ? <>
                                         <MaterialIcons name="playlist-add" color="black" size={25}/>
                                         <Text style={{paddingLeft: 20}}>Add to playlist</Text>

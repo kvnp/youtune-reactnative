@@ -10,8 +10,10 @@ import { useTheme } from '@react-navigation/native';
 import LinearGradient from 'react-native-linear-gradient';
 import { headerStyle } from '../../styles/App';
 
+export var setHeader = null;
+
 export default Header = ({style, onPress}) => {
-    global.setHeader = ({title, image}) => {
+    setHeader = ({title, image}) => {
         let state = {};
         if (image != undefined)         state.source = {uri: image};
         else if (header.source != null) state.source = header.source;
@@ -20,10 +22,10 @@ export default Header = ({style, onPress}) => {
         else if (header.title == null)  state.title = 'Home';
         else                            state.title = header.title;
 
-        setHeader(state);
+        setState(state);
     }
 
-    const [header, setHeader] = useState({
+    const [header, setState] = useState({
         title: "Home",
         source: null
     });

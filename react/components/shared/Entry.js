@@ -13,6 +13,7 @@ import { resultStyle } from '../../styles/Search';
 import { handleMedia } from '../../modules/event/mediaNavigator';
 import { rippleConfig } from '../../styles/Ripple';
 import { useTheme } from '@react-navigation/native';
+import { showModal } from './MoreModal';
 
 const handle = (obj, navigation, index) => handleMedia(obj, navigation, index);
 
@@ -42,7 +43,7 @@ export default Entry = ({ entry, navigation, index, playPlaylist }) => {
                 }
             }
 
-            onLongPress={() => global.showModal(view)}
+            onLongPress={() => showModal(view)}
             style={[resultStyle.resultView, {backgroundColor: colors.card}]}
         >
             {
@@ -78,7 +79,7 @@ export default Entry = ({ entry, navigation, index, playPlaylist }) => {
             </View>
 
 
-            <Pressable onPress={() => global.showModal(view)}>
+            <Pressable onPress={() => showModal(view)}>
                 <MaterialIcons name="more-vert" color={colors.text} size={24}/>
             </Pressable>
         </Pressable>

@@ -21,6 +21,7 @@ import { startPlayback, skip, setPlay, setRepeat, startPlaylist } from "../../se
 import { isRepeating } from "../../service";
 import { getSongLike, likeSong } from "../../modules/storage/MediaStorage";
 import { useTheme } from "@react-navigation/native";
+import { showModal } from "../../components/shared/MoreModal";
 
 export default PlayView = ({route, navigation}) => {
     const [playbackState, setPlayback] = useState({
@@ -241,7 +242,7 @@ export default PlayView = ({route, navigation}) => {
                                     videoId: track.id
                                 };
 
-                                global.showModal(view);
+                                showModal(view);
                             }}
                             android_ripple={rippleConfig}
                             style={stylesTop.topThird}

@@ -8,7 +8,7 @@ import {
     digestStreams
 } from "./Extractor";
 
-import { getHttpResponse, getUrl } from "./HTTP";
+import { getHttpResponse, getPublicHttpResponse, getUrl } from "./HTTP";
 import { settings } from "../../modules/storage/SettingsStorage";
 
 const useragent = "Mozilla/5.0 (X11; Linux x86_64; rv:79.0) Gecko/20100101 Firefox/79.0";
@@ -21,18 +21,20 @@ const headers_ytm = {
 
 export const headers_yt = {
     "Referer": "",
-    "Content-Type": "*/*"
+    "Content-Type": "*/*",
 }
 
+var apiKey = null;
+
 async function getApiKey() {
-    if (global.apiKey == null) {
+    if (apiKey == null) {
         let text = await getHttpResponse("https://music.youtube.com/", {method: "GET", headers: headers_api}, "text");
 
         text = text.slice(text.indexOf("INNERTUBE_API_KEY\":\"")+20);
-        global.apiKey = text.slice(0, text.indexOf("\""));
+        apiKey = text.slice(0, text.indexOf("\""));
     }
 
-    return global.apiKey;
+    return apiKey;
 }
 
 function getRequestBody() {
@@ -180,4 +182,15 @@ export async function fetchNext(videoId, playlistId) {
     }, "json");
 
     return digestNextResults(response);
+}
+
+export async function downloadMedia(url, target) {
+    let responseBlob = await getPublicHttpResponse(url, {
+        method: "GET",
+        headers: target != null
+            ? {...headers_ytm, Target: target}
+            : headers_ytm
+    }, "blob");
+
+    return responseBlob;
 }

@@ -1,4 +1,4 @@
-import React, { PureComponent } from "react";
+import React, { useEffect, useState } from "react";
 import {
     ScrollView,
     StyleSheet,
@@ -12,85 +12,93 @@ import { storePlaylists, getPlaylists } from "../../modules/storage/PlaylistStor
 import Playlist from '../../components/shared/Playlist';
 import PlaylistCreator from "../../components/overlay/PlaylistCreator";
 import { rippleConfig } from "../../styles/Ripple";
+import { useTheme } from "@react-navigation/native";
 
-export default class Playlists extends PureComponent {
-    constructor(props) {
-        super(props);
-        this.state = {
-            modalVisible: false,
-            playlists: []
-        }
-    }
+export default Playlists = ({navigation}) => {
+    const [modalVisible, setModalVisible] = useState(false);
+    const [playlists, setPlaylists] = useState([]);
+    const { colors } = useTheme();
 
-    setModalVisible = (boolean) => {
-        this.setState({modalVisible: boolean});
-    }
-
-    componentDidMount() {
-        this._unsubscribe = this.props.navigation.addListener('focus', () => {
-            this.setModalVisible(false);
+    useEffect(() => {
+        const _unsubscribe = navigation.addListener('focus', () => {
+            setModalVisible(false);
         });
 
-        getPlaylists()
-            .then(playlists => this.setState({playlists: playlists}));
-    }
-    
-    componentWillUnmount() {
-        this._unsubscribe();
-    }
-
-    createPlaylist = ({title, description}) => {
-        let temp = this.state.playlists;
-        temp.push({title: title, subtitle: description});
-        storePlaylists(temp);
-
-        this.setState({playlists: temp});
-        this.forceUpdate();
-    }
-      
-
-    render() {
-        return (
-            <>
-                <ScrollView contentContainerStyle={styles.playlistCollectionContainer}>
-                    <Pressable style={styles.playlist} android_ripple={rippleConfig} onPress={() => this.setModalVisible(true)}>
-                        <Text style={styles.newPlaylist}>+</Text>
-                        <Text style={styles.playlistTitle}>Add Playlist</Text>
-                    </Pressable>
-
-                    {this.state.playlists.map((playlist) => {
-                        return <Playlist playlist={playlist} navigation={this.props.navigation} style={styles.playlist}/>
-                    })}
-                </ScrollView>
-
-                <Modal
-                    animationType="slide"
-                    transparent={true}
-                    style={ Platform.OS == "web" ? {display: "none"} : null }
-                    visible={this.state.modalVisible}
-                    hardwareAccelerated={true}
-
-                    onRequestClose={() => this.setModalVisible(false)}
-                    onDismiss={() => this.setModalVisible(false)}
-                >
-                    <Pressable 
-                        onPress={() => this.setModalVisible(false)}
-                        style={{height: "100%", width: "100%", justifyContent: "flex-end", backgroundColor: "rgba(0, 0, 0, 0.3)"}}
-                    >
-                        <Pressable style={{marginBottom: 100}}>
-                            <PlaylistCreator
-                                style={styles.modalChild}
-                                callback={ obj => {
-                                    if (obj != undefined) this.createPlaylist(obj);
-                                    this.setModalVisible(false);
-                                }}
-                            />
-                        </Pressable>
-                    </Pressable>
-                </Modal>
-            </>
+        getPlaylists().then(
+            playlists => setPlaylists(playlists)
         );
+
+        return () => {
+            _unsubscribe();
+        };
+    }, []);
+
+    const createPlaylist = ({title, description}) => {
+        let sum = title + description;
+
+        for (let i = 0; i < playlists.length; i++) {
+            if (playlists[i].title + playlists[i].subtitle == sum) {
+                showWarning("playlist already exists");
+                return;
+            }
+        }
+
+        storePlaylists([...playlists, {title: title, subtitle: description}]);
+        setPlaylists([...playlists, {title: title, subtitle: description}]);
     }
+
+    const showWarning = message => {
+        console.log(message);
+    }
+
+    return <>
+        <ScrollView contentContainerStyle={styles.playlistCollectionContainer}>
+            <Pressable style={styles.playlist} android_ripple={rippleConfig} onPress={() => setModalVisible(true)}>
+                <Text style={[styles.newPlaylist, {color: colors.text}]}>+</Text>
+                <Text style={[styles.playlistTitle, {color: colors.text}]}>Add Playlist</Text>
+            </Pressable>
+
+            {
+                playlists.map(
+                    playlist => {
+                        return <Playlist key={playlist.title + playlist.subtitle}
+                                         playlist={playlist}
+                                         navigation={navigation}
+                                         style={styles.playlist}
+                                         local={true}/>
+                    }
+                )
+            }
+
+        </ScrollView>
+
+        <Modal
+            animationType="slide"
+            transparent={true}
+            visible={modalVisible}
+            hardwareAccelerated={true}
+
+            onRequestClose={() => setModalVisible(false)}
+            onDismiss={() => setModalVisible(false)}
+        >
+            <Pressable 
+                onPress={() => setModalVisible(false)}
+                style={{height: "100%", width: "100%", justifyContent: "flex-end", backgroundColor: "rgba(0, 0, 0, 0.3)"}}
+            >
+                <Pressable style={{marginBottom: 100}}>
+                    <PlaylistCreator
+                        style={styles.modalChild}
+                        callback={
+                            obj => {
+                                if (obj != undefined) createPlaylist(obj);
+                                setModalVisible(false);
+                            }
+                        }
+                    />
+                </Pressable>
+            </Pressable>
+        </Modal>
+    </>
 }
 
 const styles = StyleSheet.create({
@@ -165,13 +173,16 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         flexDirection: 'row',
         alignItems: "flex-end",
-        flexWrap: "wrap-reverse"
+        flexWrap: Platform.OS == "web"
+            ? "wrap"
+            : "wrap-reverse"
+        // wtf
     },
 
     playlist: {
         margin: 10,
         width: 150,
-        height: 200
+        height: 220
     },
 
     playlistTitle: {

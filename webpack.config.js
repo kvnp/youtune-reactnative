@@ -6,6 +6,8 @@ const WebpackPwaManifest = require('webpack-pwa-manifest');
 const userAgent = "Mozilla/5.0 (X11; Linux x86_64; rv:79.0) Gecko/20100101 Firefox/79.0";
 const musicYoutube = "https://music.youtube.com";
 const wwwYoutube = "https://www.youtube.com";
+const imgYoutube = "https://i.ytimg.com";
+const videoYoutube = "https://redirector.googlevideo.com";
 const wwwYoutubeSlash = wwwYoutube + "/";
 
 module.exports = () => ({
@@ -68,7 +70,33 @@ module.exports = () => ({
                     "Origin": wwwYoutube,
                     "User-Agent": userAgent
                 },
-            }
+            },
+
+            '/video': {
+                target: videoYoutube,
+                changeOrigin: true,
+                secure: false,
+                followRedirects: true,
+                pathRewrite: {'^/video' : ''},
+
+                headers: {
+                    "Referer": wwwYoutube,
+                    "Origin": wwwYoutube,
+                    "User-Agent": userAgent
+                }
+            },
+
+            '/vi': {
+                target: imgYoutube,
+                secure: true,
+                changeOrigin: true,
+
+                headers: {
+                    "Referer": wwwYoutube,
+                    "Origin": wwwYoutube,
+                    "User-Agent": userAgent
+                }
+            },
         },
 
         historyApiFallback: true,

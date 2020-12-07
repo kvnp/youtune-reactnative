@@ -10,13 +10,16 @@ import Songs from '../library/Songs';
 import Artists from '../library/Artists';
 import { tabOptions } from '../../styles/Library';
 import MiniPlayer from '../../components/player/MiniPlayer';
+import { setHeader } from '../../components/overlay/Header';
+import { navigationOptions } from '../../App';
+import Downloads from '../library/Downloads';
 
 const Tab = createMaterialTopTabNavigator();
 
 export default LibraryTab = ({navigation}) => {
     useEffect(() => {
         const unsubscribe = navigation.addListener('focus', () => {
-            global.setHeader({title: "Library"});
+            setHeader({title: "Library"});
         });
 
         return () => unsubscribe();
@@ -24,10 +27,11 @@ export default LibraryTab = ({navigation}) => {
 
     return <>
         <Tab.Navigator tabBarOptions={tabOptions} initialRouteName="Playlists" tabBarPosition="bottom">
-            <Tab.Screen name="Playlists" component={Playlists} options={global.navigationOptions}/>
-            <Tab.Screen name="Albums" component={Albums} options={global.navigationOptions}/>
-            <Tab.Screen name="Songs" component={Songs} options={global.navigationOptions}/>
-            <Tab.Screen name="Artists" component={Artists} options={global.navigationOptions}/>
+            <Tab.Screen name="Playlists" component={Playlists} options={navigationOptions}/>
+            <Tab.Screen name="Albums" component={Albums} options={navigationOptions}/>
+            <Tab.Screen name="Songs" component={Songs} options={navigationOptions}/>
+            <Tab.Screen name="Artists" component={Artists} options={navigationOptions}/>
+            <Tab.Screen name="Downloads" component={Downloads} options={navigationOptions}/>
         </Tab.Navigator>
         <MiniPlayer navigation={navigation}/>
     </>

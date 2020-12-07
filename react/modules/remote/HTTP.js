@@ -23,7 +23,20 @@ export const getHttpResponse = async (url, input, type) => {
     const response = await fetch(url, input);
 
     if (type == "json")
-        return response.json();
+        return await response.json();
+    else if (type == "blob")
+        return await response.blob();
     else
-        return response.text();
+        return await response.text();
+}
+
+export const getPublicHttpResponse = async (url, input, type) => {
+    const response = await fetch(url, input);
+
+    if (type == "json")
+        return await response.json();
+    else if (type == "blob")
+        return await response.blob();
+    else
+        return await response.text();
 }

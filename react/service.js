@@ -8,11 +8,6 @@ export const register = () => {
     StatusBar.setTranslucent(true);
     StatusBar.setBackgroundColor("transparent", true);
 
-    global.navigationOptions = {
-        headerTitle: null,
-        headerShown: false
-    };
-
     TrackPlayer.registerPlaybackService(() => require("./handler"));
 
     TrackPlayer.updateOptions({

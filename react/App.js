@@ -13,6 +13,11 @@ import Navigator, { getIcon } from "./views/full/Navigator";
 import CaptchaView from "./views/full/CaptchaView";
 
 export var darkCallback = null;
+export const navigationOptions = {
+    headerTitle: null,
+    headerShown: false
+};
+
 const Stack = createStackNavigator();
 
 export default App = () => {
@@ -29,8 +34,8 @@ export default App = () => {
     return  <View style={{position: Platform.OS == "web" ? "fixed" : "absolute", width: '100%', height: '100%'}}>
         <NavigationContainer theme={dark ? DarkTheme : DefaultTheme}>
             <Stack.Navigator>
-                <Stack.Screen name="App" component={Navigator} options={global.navigationOptions}/>
-                <Stack.Screen name="Music" component={PlayView} options={global.navigationOptions}/>
+                <Stack.Screen name="App" component={Navigator} options={navigationOptions}/>
+                <Stack.Screen name="Music" component={PlayView} options={navigationOptions}/>
                 <Stack.Screen name="Captcha" component={CaptchaView}/>
                 
                 <Stack.Screen name="Playlist" component={PlaylistView}
