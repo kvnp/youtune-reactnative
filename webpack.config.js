@@ -13,6 +13,7 @@ const wwwYoutubeSlash = wwwYoutube + "/";
 module.exports = () => ({
     devServer: {
         host: "0.0.0.0",
+        port: process.env.PORT ? process.env.PORT : 8080,
         proxy: {
             '/start': {
                 target: musicYoutube,
