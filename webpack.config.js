@@ -13,8 +13,8 @@ const wwwYoutubeSlash = wwwYoutube + "/";
 module.exports = () => ({
     devServer: {
         host: "0.0.0.0",
-        port: process.env.PORT ? process.env.PORT : 8080,
-        disableHostCheck: true,
+        port: process.env.PORT || 8080,
+        public: "youtune-react.herokuapp.com",
         proxy: {
             '/start': {
                 target: musicYoutube,
