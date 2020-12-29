@@ -12,23 +12,18 @@ import { getHttpResponse, getPublicHttpResponse, getUrl } from "./HTTP";
 import { settings } from "../../modules/storage/SettingsStorage";
 
 const useragent = "Mozilla/5.0 (X11; Linux x86_64; rv:79.0) Gecko/20100101 Firefox/79.0";
-const headers_api = {"User-Agent": useragent};
+export const headers_simple = {"User-Agent": useragent};
 const headers_ytm = {
     "Referer":      "https://music.youtube.com/",
     "Content-Type": "application/json",
     "User-Agent": useragent
 };
 
-export const headers_yt = {
-    "Referer": "",
-    "Content-Type": "*/*",
-}
-
 var apiKey = null;
 
 async function getApiKey() {
     if (apiKey == null) {
-        let text = await getHttpResponse("https://music.youtube.com/", {method: "GET", headers: headers_api}, "text");
+        let text = await getHttpResponse("https://music.youtube.com/", {method: "GET", headers: headers_simple}, "text");
 
         text = text.slice(text.indexOf("INNERTUBE_API_KEY\":\"")+20);
         apiKey = text.slice(0, text.indexOf("\""));
@@ -143,7 +138,7 @@ export async function fetchVideoInfo(videoId) {
 
     let response = await getHttpResponse(url, {
         method: "GET",
-        headers: headers_yt
+        headers: headers_simple
     }, "text");
 
     return digestVideoInfoResults(response);
@@ -156,7 +151,7 @@ export async function fetchAudioStream(videoId) {
 
         let response = await getHttpResponse(url, {
             method: "GET",
-            headers: headers_yt
+            headers: headers_simple
         }, "text");
 
         let stream = await digestStreams(response);

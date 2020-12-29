@@ -1,5 +1,5 @@
 import { getHttpResponse } from "./HTTP";
-import { headers_yt } from "./API";
+import { headers_simple } from "./API";
 
 const REGEXES = [
     "(?:\\b|[^a-zA-Z0-9$])([a-zA-Z0-9$]{2})\\s*=\\s*function\\(\\s*a\\s*\\)\\s*\\{\\s*a\\s*=\\s*a\\.split\\(\\s*\"\"\\s*\\)",
@@ -74,7 +74,7 @@ async function fetchFunctionByVideoId(videoId) {
     let watch = domain + "/watch?v=" + videoId;
     let watchResponse = await getHttpResponse(watch, {
         method: "GET",
-        headers: headers_yt
+        headers: headers_simple
     }, "text");
 
     await fetchFunctionByResponse(watchResponse);
@@ -88,7 +88,7 @@ export async function fetchFunctionByResponse(response) {
     let playerUrl = domain + playerLocation;
     let playerCode = await getHttpResponse(playerUrl, {
         method: "GET",
-        headers: headers_yt
+        headers: headers_simple
     }, "text");
 
     setFunction(getFunction(playerCode));
