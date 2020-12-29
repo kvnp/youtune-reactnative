@@ -124,18 +124,22 @@ export function digestSearchResults(json) {
                         let type = responsiveMusicItem.navigationEndpoint.browseEndpoint.browseEndpointContextSupportedConfigs.browseEndpointContextMusicConfig.pageType;
                         if (type == "MUSIC_PAGE_TYPE_ARTIST")
                             entry.type = "Artist";
-                        else if (type == "MUSIC_PAGE_TYPE_ALBUM")
-                            entry.type = "Album";
-                        else if (type == "MUSIC_PAGE_TYPE_PLAYLIST")
-                            entry.type = "Playlist";
+                        else {
+                            if (type == "MUSIC_PAGE_TYPE_ALBUM")
+                                entry.type = "Album";
+                            else if (type == "MUSIC_PAGE_TYPE_PLAYLIST")
+                                entry.type = "Playlist";
 
-                        entry.playlistId = responsiveMusicItem.doubleTapCommand.watchPlaylistEndpoint.playlistId;
+                            entry.playlistId = responsiveMusicItem.overlay.musicItemThumbnailOverlayRenderer.content.musicPlayButtonRenderer.playNavigationEndpoint.watchPlaylistEndpoint.playlistId;
+                        }
+
                         entry.browseId = responsiveMusicItem.navigationEndpoint.browseEndpoint.browseId;
                     }
                 } else {
                     entry.type = "Title";
-                    entry.videoId = responsiveMusicItem.doubleTapCommand.watchEndpoint.videoId;
-                    entry.playlistId = responsiveMusicItem.doubleTapCommand.watchEndpoint.playlistId;
+                    
+                    entry.videoId = responsiveMusicItem.playlistItemData.videoId;
+                    entry.playlistId = responsiveMusicItem.flexColumns[0].musicResponsiveListItemFlexColumnRenderer.text.runs[0].navigationEndpoint.watchEndpoint.playlistId;
                 }
 
                 final.results += 1;
