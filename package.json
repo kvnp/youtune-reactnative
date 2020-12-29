@@ -10,8 +10,8 @@
         "test": "jest",
         "lint": "eslint .",
         "web": "./node_modules/.bin/webpack serve",
-        "postinstall": "git apply --directory node_modules/react-native-track-player/ ./patches/react-native-track-player/0001-fix-web-support.patch || git apply --directory node_modules/rn-sliding-up-panel/ ./patches/rn-sliding-up-panel/0001-fix-web-support.patch",
-        "patch": "git apply --reject --directory node_modules/react-native-track-player/ ./patches/react-native-track-player/0001-fix-web-support.patch || git apply --reject --directory node_modules/rn-sliding-up-panel/ ./patches/rn-sliding-up-panel/0001-fix-web-support.patch"
+        "postinstall": "git apply --directory node_modules/react-native-track-player/ ./patches/react-native-track-player/0001-fix-web-support.patch --reject --ignore-space-change --ignore-whitespace || git apply --directory node_modules/rn-sliding-up-panel/ ./patches/rn-sliding-up-panel/0001-fix-web-support.patch --reject --ignore-space-change --ignore-whitespace || git apply --directory node_modules/react-native-webpack/ ./patches/react-native-webpack/0001-fix-require.patch --reject --ignore-space-change --ignore-whitespace",
+        "patch": "git apply --directory node_modules/react-native-track-player/ ./patches/react-native-track-player/0001-fix-web-support.patch --reject --ignore-space-change --ignore-whitespace || git apply --directory node_modules/rn-sliding-up-panel/ ./patches/rn-sliding-up-panel/0001-fix-web-support.patch --reject --ignore-space-change --ignore-whitespace || git apply --directory node_modules/react-native-webpack/ ./patches/react-native-webpack/0001-fix-require.patch --reject --ignore-space-change --ignore-whitespace"
     },
     "dependencies": {
         "@react-native-community/async-storage": "^1.12.1",
@@ -43,7 +43,7 @@
         "react-native-web": "^0.14.10",
         "react-native-web-linear-gradient": "^1.1.1",
         "react-native-webpack": "^0.1.1",
-        "rn-sliding-up-panel": "^2.4.4",
+        "rn-sliding-up-panel": "^2.4.5",
         "workbox-webpack-plugin": "^5.1.4"
     },
     "devDependencies": {
@@ -51,12 +51,12 @@
         "@babel/runtime": "^7.12.5",
         "@react-native-community/eslint-config": "^2.0.0",
         "babel-jest": "^26.6.3",
-        "eslint": "^7.15.0",
+        "eslint": "^7.16.0",
         "jest": "^26.6.3",
         "metro-react-native-babel-preset": "^0.64.0",
         "react-test-renderer": "^16.14.0",
-        "webpack": "^5.11.0",
-        "webpack-cli": "^4.2.0",
+        "webpack": "^5.11.1",
+        "webpack-cli": "^4.3.0",
         "webpack-dev-server": "github:webpack/webpack-dev-server#master",
         "webpack-pwa-manifest": "^4.3.0"
     },
