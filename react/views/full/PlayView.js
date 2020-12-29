@@ -6,8 +6,7 @@ import {
     Image,
     Pressable,
     ActivityIndicator,
-    Platform,
-    ScrollView
+    Platform
 } from "react-native";
 
 import TrackPlayer from 'react-native-track-player';
@@ -163,22 +162,14 @@ export default PlayView = ({route, navigation}) => {
                         </Pressable>
 
                         
-                        {Platform.OS != "web"
-                            ? <View style={{alignItems: "center", flex: 1}}>
-                                <ScrollView horizontal={true} style={{marginHorizontal: 10}}>
-                                    <Text numberOfLines={1} style={[stylesBottom.titleText, {color: colors.text}]}>{title}</Text>
-                                </ScrollView>
-
-                                <ScrollView horizontal={true} style={{marginHorizontal: 10}}>
-                                    <Text numberOfLines={1} style={[stylesBottom.subtitleText, {color: colors.text}]}>{artist}</Text>
-                                </ScrollView>
-                            </View>
-
-                            : <View style={{alignItems: "center"}}>
-                                <Text adjustsFontSizeToFit={true} ellipsizeMode="tail" numberOfLines={1} style={[stylesBottom.titleText, {marginHorizontal: 10, width: 150, color: colors.text}]}>{title}</Text>
-                                <Text adjustsFontSizeToFit={true} ellipsizeMode="tail" numberOfLines={1} style={[stylesBottom.subtitleText, {marginHorizontal: 10, width: 150, color: colors.text}]}>{artist}</Text>
-                            </View>
-                        }
+                        <View style={
+                            Platform.OS == "web"
+                                ? {display: "grid", width: "calc(100% - 100px)"}
+                                : {alignItems: "center"}
+                            }>
+                            <Text adjustsFontSizeToFit={true} ellipsizeMode="tail" numberOfLines={1} style={[stylesBottom.titleText, {marginHorizontal: 10, color: colors.text}]}>{title}</Text>
+                            <Text adjustsFontSizeToFit={true} ellipsizeMode="tail" numberOfLines={1} style={[stylesBottom.subtitleText, {marginHorizontal: 10, color: colors.text}]}>{artist}</Text>
+                        </View>
 
                         <Pressable onPress={() => {likeSong(id, true); refreshUI();}} android_ripple={rippleConfig}>
                             <MaterialIcons
@@ -217,7 +208,6 @@ export default PlayView = ({route, navigation}) => {
                                     </Pressable>
                             }
                         </View>
-                        
 
                         <Pressable onPress={() => skip(true)} android_ripple={rippleConfig}>
                             <MaterialIcons name="skip-next" color={colors.text} size={40}/>
