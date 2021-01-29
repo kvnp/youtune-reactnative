@@ -5,15 +5,25 @@ import {
     Switch,
     Text,
     Pressable,
-    Platform
+    Platform,
+    Linking
 } from 'react-native';
 
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
-import { ScrollView } from 'react-native-gesture-handler';
+import { FlatList } from 'react-native-gesture-handler';
 import MiniPlayer from '../../components/player/MiniPlayer';
-import { setTransmitLanguage, setProxyYTM, setSafetyMode, setDarkMode, settings} from '../../modules/storage/SettingsStorage';
+
+import {
+    setTransmitLanguage,
+    setProxyYTM,
+    setSafetyMode,
+    setDarkMode,
+    settings
+} from '../../modules/storage/SettingsStorage';
+
 import { useTheme } from '@react-navigation/native';
 import { setHeader } from '../../components/overlay/Header';
+import { rippleConfig } from '../../styles/Ripple';
 
 export default SettingsTab = ({navigation}) => {
     const [language, setLanguage] = useState(settings.transmitLanguage);
@@ -32,6 +42,16 @@ export default SettingsTab = ({navigation}) => {
             _unsubscribe();
         }
     }, []);
+
+    const openRepo = () => {
+        const url = "https://github.com/kvnp/youtune-reactnative";
+        if (Platform.OS == "web")
+            window.open(url, "_blank");
+        else
+            Linking.openURL(url).catch(
+                err => console.error("Couldn't load page", err)
+            );
+    };
 
     const toggleLanguage = boolean => {
         setTransmitLanguage(boolean);
@@ -53,38 +73,54 @@ export default SettingsTab = ({navigation}) => {
         setDark(boolean);
     };
 
-    const drawEntry = entry => {
-        const func = entry.function;
-        const icon = entry.icon;
-        const desc = entry.description;
+    const drawItem = ({item}) => {
+        const func = item.function;
+        const icon = item.icon;
+        const desc = item.description;
+        const useSwitch = item.switch;
 
-        const disabled = entry.hasOwnProperty("override") && Platform.OS == "web"
-            ? entry.override.web.disabled
+        const disabled = item.hasOwnProperty("override") && Platform.OS == "web"
+            ? item.override.web.disabled
             : false;
         
-        const state = entry.hasOwnProperty("override") && Platform.OS == "web"
-            ? entry.override.web.state
-            : entry.state;
+        const state = item.hasOwnProperty("override") && Platform.OS == "web"
+            ? item.override.web.state
+            : item.state;
 
-        return <Pressable key={icon} onPress={() => disabled ? null : func(!state)} style={[styles.entry, {backgroundColor: colors.card}]}>
+        return <Pressable key={icon} android_ripple={rippleConfig} onPress={() => disabled ? null : func(!state)} style={[styles.item, {backgroundColor: colors.card}]}>
             <MaterialIcons name={icon} color={colors.text} size={30}/>
             <Text style={{flexWrap: "wrap", width: "50%", color: colors.text}}>{desc}</Text>
-            <Switch
-                trackColor={{ false: "gray", true: colors.primary }}
-                thumbColor="darkgray"
-                onValueChange={disabled ? null : func}
-                value={state}
-                disabled={disabled}
-            />
+            {
+                useSwitch
+                ? <Switch
+                    trackColor={{ false: "gray", true: colors.primary }}
+                    thumbColor="darkgray"
+                    onValueChange={disabled ? null : func}
+                    value={state}
+                    disabled={disabled}
+                />
+
+                : <MaterialIcons name="launch" color={colors.text} size={30}/>
+            }
         </Pressable>
     }
 
-    const entries = [
+    const items = [
+        {
+            icon: "code",
+            description: "View git repository",
+            state: true,
+            function: openRepo,
+            switch: false
+        },
+
+
         {
             icon: "language",
             description: "Transmit device language",
             state: language,
-            function: toggleLanguage
+            function: toggleLanguage,
+            switch: true
         },
 
         {
@@ -92,6 +128,7 @@ export default SettingsTab = ({navigation}) => {
             description: "Proxy search and browse requests over youtune.kvnp.eu",
             state: proxy,
             function: toggleProxy,
+            switch: true,
             override: {
                 web: {
                     disabled: true,
@@ -104,21 +141,29 @@ export default SettingsTab = ({navigation}) => {
             icon: "child-friendly",
             description: "Enable safety mode",
             state: safety,
-            function: toggleSafetyMode
+            function: toggleSafetyMode,
+            switch: true
         },
 
         {
             icon: "brightness-low",
             description: "Enable dark mode",
             state: dark,
-            function: toggleDarkMode
+            function: toggleDarkMode,
+            switch: true
         },
     ];
-
+    
     return <>
-        <ScrollView bounces={true} contentContainerStyle={styles.content}>
-            {entries.map(drawEntry)}
-        </ScrollView>
+        <FlatList
+            bounces={true}
+            contentContainerStyle={styles.content}
+
+
+            data={items}
+            renderItem={drawItem}
+        />
+
         <MiniPlayer navigation={navigation}/>
     </>
 }
@@ -126,12 +171,15 @@ export default SettingsTab = ({navigation}) => {
 const styles = StyleSheet.create({
     content: {
         flexGrow: 1,
-        justifyContent: "flex-end"
+        justifyContent: "flex-end",
+        
+        maxWidth: "800px",
+        width: "100%",
+        alignSelf: "center"
     },
 
-    entry: {
+    item: {
         flexDirection: "row",
-        width: "100%",
         alignItems: "center",
         justifyContent: "space-evenly",
         height: 65,
