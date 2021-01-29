@@ -53,7 +53,7 @@ export default Playlists = ({navigation}) => {
 
     return <>
         <ScrollView contentContainerStyle={styles.playlistCollectionContainer}>
-            <Pressable style={styles.playlist} android_ripple={rippleConfig} onPress={() => setModalVisible(true)}>
+            <Pressable android_ripple={rippleConfig} style={styles.playlist} onPress={() => setModalVisible(true)}>
                 <Text style={[styles.newPlaylist, {color: colors.text}]}>+</Text>
                 <Text style={[styles.playlistTitle, {color: colors.text}]}>Add Playlist</Text>
             </Pressable>
@@ -85,7 +85,7 @@ export default Playlists = ({navigation}) => {
                 onPress={() => setModalVisible(false)}
                 style={{height: "100%", width: "100%", justifyContent: "flex-end", backgroundColor: "rgba(0, 0, 0, 0.3)"}}
             >
-                <Pressable style={{marginBottom: 100}}>
+                <Pressable android_ripple={rippleConfig} style={{marginBottom: 100}}>
                     <PlaylistCreator
                         style={styles.modalChild}
                         callback={

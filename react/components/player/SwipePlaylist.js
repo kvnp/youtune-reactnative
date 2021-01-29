@@ -13,7 +13,7 @@ import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import SlidingUpPanel from 'rn-sliding-up-panel';
 
 import { skipTo } from "../../service";
-import { appColor } from "../../styles/App";
+import { rippleConfig } from "../../styles/Ripple";
 
 const { height } = Dimensions.get("window");
 export default class SwipePlaylist extends PureComponent {
@@ -34,7 +34,7 @@ export default class SwipePlaylist extends PureComponent {
                 friction={0.5}
             >
                 <View style={styles.panel}>
-                    <Pressable style={[styles.panelHeader, {backgroundColor: this.props.backgroundColor}]} onPress={() => this._panel.show()}>
+                    <Pressable android_ripple={rippleConfig} style={[styles.panelHeader, {backgroundColor: this.props.backgroundColor}]} onPress={() => this._panel.show()}>
                         <View style={[stylesRest.smallBar, {backgroundColor: this.props.textColor}]}/>
                         <Text style={{color: this.props.textColor}}>PLAYLIST</Text>
                     </Pressable>
@@ -47,7 +47,8 @@ export default class SwipePlaylist extends PureComponent {
 
                         keyExtractor={item => item.id}
                         renderItem={({item, index}) =>
-                            <Pressable style={{
+                            <Pressable android_ripple={rippleConfig}
+                                        style={{
                                             height: 50,
                                             flexDirection: "row",
                                             alignItems: "center",

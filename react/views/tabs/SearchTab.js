@@ -70,7 +70,6 @@ export default SearchTab = ({navigation}) => {
 
     return <>
         <SectionList
-            style={shelvesStyle.scrollView}
             contentContainerStyle={shelvesStyle.scrollContainer}
 
             ListEmptyComponent={
@@ -98,7 +97,7 @@ export default SearchTab = ({navigation}) => {
 
         {instead != null
             ? <View style={searchBarStyle.suggestion}>
-                <Pressable style={searchBarStyle.suggestionContainer} onPress={() => searchInstead(instead.endpoints.corrected.query)}>
+                <Pressable android_ripple={rippleConfig} style={searchBarStyle.suggestionContainer} onPress={() => searchInstead(instead.endpoints.corrected.query)}>
                     <Text style={{color: colors.text}}>{instead.endpoints.corrected.text}</Text>
                     <Text style={{color: colors.text}}>
                         {instead.correctedList
@@ -106,7 +105,7 @@ export default SearchTab = ({navigation}) => {
                     </Text>
                 </Pressable>
 
-                <Pressable style={searchBarStyle.suggestionContainer} onPress={() => searchInstead(instead.endpoints.original.query)}>
+                <Pressable android_ripple={rippleConfig} style={searchBarStyle.suggestionContainer} onPress={() => searchInstead(instead.endpoints.original.query)}>
                     <Text style={{color: colors.text}}>{instead.endpoints.original.text}</Text>
                     <Text style={{color: colors.text}}>
                         {instead.originalList
@@ -121,7 +120,7 @@ export default SearchTab = ({navigation}) => {
         <KeyboardAvoidingView enabled={Platform.OS == "ios" ? true : false} behavior="padding" keyboardVerticalOffset={170}>
             {suggestion != null
                 ?   <View style={searchBarStyle.suggestion}>
-                        <Pressable style={[searchBarStyle.suggestionContainer, {width: "25%"}]} onPress={() => searchInstead(suggestion.endpoints.query)}>
+                        <Pressable android_ripple={rippleConfig} style={[searchBarStyle.suggestionContainer, {width: "25%"}]} onPress={() => searchInstead(suggestion.endpoints.query)}>
                             <Text style={{color: colors.text}}>{suggestion.endpoints.text}</Text>
                             <Text style={{color: colors.text}}>
                                 {suggestion.correctedList
@@ -134,20 +133,22 @@ export default SearchTab = ({navigation}) => {
             }
 
             <View style={[searchBarStyle.container, {backgroundColor: colors.card}]}>
-                <TextInput style={[searchBarStyle.input, {color: colors.text}]}
-                           placeholder="Search"
-                           value={query}
-                           onChangeText={setQuery}
-                           placeholderTextColor={colors.text}
-                           onSubmitEditing={() => search(query)}/>
-                <Pressable onPress={() => search(query)}
-                           android_ripple={rippleConfig}
-                           style={searchBarStyle.button}>
-                    { loading
-                        ? <ActivityIndicator color={colors.text} size="small"/>
-                        : <MaterialIcons name="search" color={colors.text} size={24}/>
-                    }
-                </Pressable>
+                <View style={searchBarStyle.inputBox}>
+                    <TextInput style={[searchBarStyle.input, {color: colors.text}]}
+                            placeholder="Search"
+                            value={query}
+                            onChangeText={setQuery}
+                            placeholderTextColor={colors.text}
+                            onSubmitEditing={() => search(query)}/>
+                    <Pressable onPress={() => search(query)}
+                            android_ripple={rippleConfig}
+                            style={searchBarStyle.button}>
+                        { loading
+                            ? <ActivityIndicator color={colors.text} size="small"/>
+                            : <MaterialIcons name="search" color={colors.text} size={24}/>
+                        }
+                    </Pressable>
+                </View>
             </View>
 
             <MiniPlayer navigation={navigation}/>

@@ -1,11 +1,29 @@
 import { StyleSheet } from 'react-native';
-import { appColor } from './App';
 
 export const searchBarStyle = StyleSheet.create({
     container: {
-        flexDirection: "row",
         paddingHorizontal: 20,
-        height: 50
+        height: 50,
+        alignItems: "center",
+        justifyContent: "center"
+    },
+
+    inputBox: {
+        flexDirection: "row",
+        justifyContent: "center",
+        maxWidth: "800px",
+        width: "100%"
+    },
+
+    input: {
+        height: 45,
+        flex: 1,
+        alignSelf: "center",
+        backgroundColor: "rgba(25, 25, 25, 0.3)",
+        textAlign: "center",
+        borderTopLeftRadius: 25,
+        borderBottomLeftRadius: 25,
+        elevation: 1
     },
 
     button: {
@@ -18,17 +36,6 @@ export const searchBarStyle = StyleSheet.create({
         borderWidth: 1,
         borderTopRightRadius: 25,
         borderBottomRightRadius: 25,
-        elevation: 1
-    },
-
-    input: {
-        height: 45,
-        flex: 1,
-        alignSelf: "center",
-        backgroundColor: "rgba(25, 25, 25, 0.3)",
-        textAlign: "center",
-        borderTopLeftRadius: 25,
-        borderBottomLeftRadius: 25,
         elevation: 1
     },
 

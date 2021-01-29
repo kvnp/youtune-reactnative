@@ -6,8 +6,7 @@ import {
     Text,
     Image,
     StyleSheet,
-    Share,
-    Platform
+    Share
 } from "react-native";
 
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
@@ -24,6 +23,7 @@ import {
     getArtistLike
 } from "../../modules/storage/MediaStorage";
 import { downloadSong, localIDs } from "../../modules/storage/SongStorage";
+import { rippleConfig } from "../../styles/Ripple";
 
 export var showModal = null;
 
@@ -73,14 +73,14 @@ export default class MoreModal extends PureComponent {
             this.setModalVisible(false);
             
             if (result.action === Share.sharedAction) {
-                if (result.activityType) {
-                // shared with activity type of result.activityType
-                } else {
-                // shared
-                }
-            } else if (result.action === Share.dismissedAction) {
-                // dismissed
-            }
+                if (result.activityType)
+                    console.log("shared with activity type of result.activityType");
+                else
+                    console.log("shared");
+                
+            } else if (result.action === Share.dismissedAction)
+                console.log("dismissed")
+
         } catch (error) {
             alert(error.message);
         }
@@ -159,7 +159,17 @@ export default class MoreModal extends PureComponent {
                 hardwareAccelerated={true}
             >
                 <Pressable onPress={() => this.setModalVisible(false)} style={{height: "100%", width: "100%", justifyContent: "flex-end", backgroundColor: "rgba(0, 0, 0, 0.3)"}}>
-                    <Pressable style={{paddingHorizontal: 10}}>
+                    <Pressable
+                        android_ripple={rippleConfig}
+                        style={
+                            {
+                                paddingHorizontal: 10,
+                                maxWidth: "800px",
+                                alignSelf: "center",
+                                width: "100%"
+                            }
+                        }
+                    >
                         <View style={modalStyles.header}>
                             <Image source={{uri: this.state.modalContent.thumbnail}} style={modalStyles.thumbnail}/>
                             <View style={modalStyles.headerText}>
@@ -270,25 +280,22 @@ export default class MoreModal extends PureComponent {
 
                         <View style={modalStyles.entryView}>
                         <Pressable
-                            onPress={
-                                () => {
-                                    let file;
-                                    let message;
-                                    if (type == "Song") {
-                                        message = this.state.modalContent.title + " - " + this.state.modalContent.subtitle;
-                                        file = "watch?v=" + videoId;
-                                    } else if (type == "Playlist") {
-                                        message = this.state.modalContent.title + " - " + this.state.modalContent.subtitle;
-                                        file = "playlist?list=" + playlistId;
-                                    } else {
-                                        message = this.state.modalContent.title + " - " + type;
-                                        file = "channel/" + browseId;
-                                    }
-                                    
-
-                                    this.onShare(type, "https://music.youtube.com/" + file, message);
+                            onPress={() => {
+                                let file;
+                                let message;
+                                if (type == "Song") {
+                                    message = this.state.modalContent.title + " - " + this.state.modalContent.subtitle;
+                                    file = "watch?v=" + videoId;
+                                } else if (type == "Playlist") {
+                                    message = this.state.modalContent.title + " - " + this.state.modalContent.subtitle;
+                                    file = "playlist?list=" + playlistId;
+                                } else {
+                                    message = this.state.modalContent.title + " - " + type;
+                                    file = "channel/" + browseId;
                                 }
-                            }
+
+                                this.onShare(type, "https://music.youtube.com/" + file, message);
+                            }}
 
                             style={modalStyles.entry} android_ripple={{color: "gray"}}
                         >

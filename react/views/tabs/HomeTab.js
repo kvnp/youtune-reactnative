@@ -78,11 +78,11 @@ export default HomeTab = ({navigation}) => {
                         </View>
 
                         : <Pressable onPress={startRefresh} style={[refreshStyle.button, {backgroundColor: colors.card}]}>
-                            <Text style={[refreshStyle.buttonText, {color: colors.text}]}>Aktualisieren</Text>
+                            <Text style={[refreshStyle.buttonText, {color: colors.text}]}>Refresh</Text>
                         </Pressable>
 
                     : <Pressable onPress={startRefresh} style={[refreshStyle.button, {backgroundColor: colors.card}]}>
-                        <Text style={[refreshStyle.buttonText, {color: colors.text}]}>Aktualisieren</Text>
+                        <Text style={[refreshStyle.buttonText, {color: colors.text}]}>Refresh</Text>
                     </Pressable>
                 
             }

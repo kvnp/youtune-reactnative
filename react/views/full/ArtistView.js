@@ -34,7 +34,7 @@ export default ({route, navigation}) => {
                         <View style={bottomBarStyle.artistColumn}>
                             <Text style={[bottomBarStyle.artistName, {color: colors.text}]}>{title}</Text>
 
-                            <Pressable style={bottomBarStyle.subscribeArtist}>
+                            <Pressable android_ripple={rippleConfig} style={bottomBarStyle.subscribeArtist}>
                                 <Text style={{fontWeight: "bold", color: "white"}}>SUBSCRIBE {subscriptions}</Text>
                             </Pressable>
                         </View>
