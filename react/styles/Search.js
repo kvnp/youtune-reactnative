@@ -86,8 +86,8 @@ export const resultStyle = StyleSheet.create({
 
     resultView: {
         flexGrow: 1,
-        paddingLeft: 15,
-        paddingRight: 15,
+        paddingHorizontal: 15,
+        marginHorizontal: 5,
         marginTop: 10,
         borderRadius: 5,
         height: 70,
@@ -97,8 +97,7 @@ export const resultStyle = StyleSheet.create({
 
     resultCover: {
         width: 70,
-        height: 70,
-        //aspectRatio: 1
+        height: 70
     },
 
     resultColumnOne: {
