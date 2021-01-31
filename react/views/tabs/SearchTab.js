@@ -11,17 +11,16 @@ import {
     Platform
 } from 'react-native';
 
+import { useTheme } from '@react-navigation/native';
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 
+import Entry from '../../components/shared/Entry';
+import { setHeader } from '../../components/overlay/Header';
+import { fetchResults } from '../../modules/remote/API';
+import { shelvesStyle } from '../../styles/Shelves';
+import { rippleConfig } from '../../styles/Ripple';
 import { searchBarStyle } from '../../styles/Search';
 import { resultHomeStyle, preResultHomeStyle } from '../../styles/Home';
-import Entry from '../../components/shared/Entry';
-import { shelvesStyle } from '../../styles/Shelves';
-import { fetchResults } from '../../modules/remote/API';
-import MiniPlayer from '../../components/player/MiniPlayer';
-import { rippleConfig } from '../../styles/Ripple';
-import { useTheme } from '@react-navigation/native';
-import { setHeader } from '../../components/overlay/Header';
 
 export default SearchTab = ({navigation}) => {
     const [shelves, setShelves] = useState([]);
@@ -150,8 +149,6 @@ export default SearchTab = ({navigation}) => {
                     </Pressable>
                 </View>
             </View>
-
-            <MiniPlayer navigation={navigation}/>
         </KeyboardAvoidingView>
     </>
 }

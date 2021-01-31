@@ -11,7 +11,6 @@ import {
 
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import { FlatList } from 'react-native-gesture-handler';
-import MiniPlayer from '../../components/player/MiniPlayer';
 
 import {
     setTransmitLanguage,
@@ -154,18 +153,14 @@ export default SettingsTab = ({navigation}) => {
         },
     ];
     
-    return <>
-        <FlatList
-            bounces={true}
-            contentContainerStyle={styles.content}
+    return <FlatList
+        bounces={true}
+        contentContainerStyle={styles.content}
 
 
-            data={items}
-            renderItem={drawItem}
-        />
-
-        <MiniPlayer navigation={navigation}/>
-    </>
+        data={items}
+        renderItem={drawItem}
+    />
 }
 
 const styles = StyleSheet.create({
@@ -182,9 +177,9 @@ const styles = StyleSheet.create({
         flexDirection: "row",
         alignItems: "center",
         justifyContent: "space-evenly",
-        height: 65,
-        marginTop: 7,
-        marginBottom: 7,
+        height: 70,
+        marginHorizontal: 5,
+        marginBottom: 10,
         borderRadius: 5
-    }
+    },
 });

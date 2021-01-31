@@ -47,62 +47,59 @@ export default HomeTab = ({navigation}) => {
         setLoading(false);
     }
 
-    return <>
-        <FlatList
-            style={shelvesStyle.scrollView}
-            contentContainerStyle={shelvesStyle.scrollContainer}
+    return <FlatList
+        style={shelvesStyle.scrollView}
+        contentContainerStyle={shelvesStyle.scrollContainer}
 
-            ListEmptyComponent={
-                loading
-                ? <View style={[shelvesStyle.scrollView, shelvesStyle.scrollContainer]}>
-                    <ActivityIndicator color={colors.text} size="large"/>
-                </View>
+        ListEmptyComponent={
+            loading
+            ? <View style={[shelvesStyle.scrollView, shelvesStyle.scrollContainer]}>
+                <ActivityIndicator color={colors.text} size="large"/>
+            </View>
 
-                : <Pressable onPress={Platform.OS == "web" ?startRefresh :null}>
-                    <Text style={[preResultHomeStyle.preHomeBottomText, preResultHomeStyle.preHomeTopText]}>🏠</Text>
-                    <Text style={preResultHomeStyle.preHomeBottomText}>
-                        {
-                            Platform.OS == "web"
-                                ? "Press the home icon to load"
-                                : "Pull down to load"
-                        }
-                    </Text>
-                </Pressable>
-            }
+            : <Pressable onPress={Platform.OS == "web" ?startRefresh :null}>
+                <Text style={[preResultHomeStyle.preHomeBottomText, preResultHomeStyle.preHomeTopText]}>🏠</Text>
+                <Text style={preResultHomeStyle.preHomeBottomText}>
+                    {
+                        Platform.OS == "web"
+                            ? "Press the home icon to load"
+                            : "Pull down to load"
+                    }
+                </Text>
+            </Pressable>
+        }
 
-            ListFooterComponent={
-                Platform.OS == "web"
-                    ? loading
-                        ? <View style={[shelvesStyle.scrollView, shelvesStyle.scrollContainer]}>
-                            <ActivityIndicator color={colors.text} size="large"/>
-                        </View>
-
-                        : <Pressable onPress={startRefresh} style={[refreshStyle.button, {backgroundColor: colors.card}]}>
-                            <Text style={[refreshStyle.buttonText, {color: colors.text}]}>Refresh</Text>
-                        </Pressable>
+        ListFooterComponent={
+            Platform.OS == "web"
+                ? loading
+                    ? <View style={[shelvesStyle.scrollView, shelvesStyle.scrollContainer]}>
+                        <ActivityIndicator color={colors.text} size="large"/>
+                    </View>
 
                     : <Pressable onPress={startRefresh} style={[refreshStyle.button, {backgroundColor: colors.card}]}>
                         <Text style={[refreshStyle.buttonText, {color: colors.text}]}>Refresh</Text>
                     </Pressable>
-                
-            }
 
-            progressViewOffset={0}
+                : <Pressable onPress={startRefresh} style={[refreshStyle.button, {backgroundColor: colors.card}]}>
+                    <Text style={[refreshStyle.buttonText, {color: colors.text}]}>Refresh</Text>
+                </Pressable>
+            
+        }
 
-            renderItem={({item}) => <Shelf shelf={item} navigation={navigation}/>}
+        progressViewOffset={0}
 
-            refreshing={loading}
-            onRefresh={startRefresh}
+        renderItem={({item}) => <Shelf shelf={item} navigation={navigation}/>}
 
-            ListFooterComponentStyle={
-                shelves.length == 0 
-                ? {display: "none"}
-                : {paddingBottom: 20}
-            }
+        refreshing={loading}
+        onRefresh={startRefresh}
 
-            data={shelves}
-            keyExtractor={item => item.title}
-        />
-        <MiniPlayer navigation={navigation}/>
-    </>
+        ListFooterComponentStyle={
+            shelves.length == 0 
+            ? {display: "none"}
+            : {paddingBottom: 20}
+        }
+
+        data={shelves}
+        keyExtractor={item => item.title}
+    />
 };
