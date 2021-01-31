@@ -22,6 +22,10 @@ const Stack = createStackNavigator();
 
 export default App = () => {
     const [dark, setDark] = useState(settings.darkMode);
+    if (settings.darkMode)
+        StatusBar.setBarStyle("light-content", true);
+    else
+        StatusBar.setBarStyle("dark-content", true);
 
     darkCallback = boolean => {
         setDark(boolean);
@@ -32,7 +36,7 @@ export default App = () => {
     };
 
     return <NavigationContainer theme={dark ? DarkTheme : DefaultTheme}>
-        <Stack.Navigator style={{position: "fixed", height: "100%", width: "100%"}}>
+        <Stack.Navigator>
             <Stack.Screen name="App" component={Navigator} options={navigationOptions}/>
             <Stack.Screen name="Music" component={PlayView} options={navigationOptions}/>
             <Stack.Screen name="Captcha" component={CaptchaView}/>
