@@ -327,6 +327,7 @@ const modalStyles = StyleSheet.create({
     thumbnail: {
         backgroundColor: appColor.background.backgroundColor,
         height: 50,
+        width: 50,
         aspectRatio: 1
     },
 
