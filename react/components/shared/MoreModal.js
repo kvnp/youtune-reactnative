@@ -1,4 +1,4 @@
-import React, { PureComponent } from "react";
+import React, { useState } from "react";
 import {
     Modal,
     Pressable,
@@ -22,44 +22,28 @@ import {
     getPlaylistLike,
     getArtistLike
 } from "../../modules/storage/MediaStorage";
+
 import { downloadSong, localIDs } from "../../modules/storage/SongStorage";
 import { rippleConfig } from "../../styles/Ripple";
 
 export var showModal = null;
 
-export default class MoreModal extends PureComponent {
-    constructor(props) {
-        super(props);
-        this.state = {
-            modalVisible: false,
-            isLiked: null,
-            modalContent: {
-                title: null,
-                subtitle: null,
-                thumbnail: null,
-                videoId: null,
-                browseId: null,
-                playlistId: null,
-                
-            }
-        }
+export default MoreModal = ({navigation}) => {
+    const [content, setContent] = useState({
+        title: null,
+        subtitle: null,
+        thumbnail: null,
+        videoId: null,
+        browseId: null,
+        playlistId: null,
+        type: null,
+        likeFunction: () => {}
+    });
 
-        showModal = content => {
-            this.setModalVisible(true, content);
-        }
-    }
+    const [visible, setVisible] = useState(false);
+    const [liked, setLiked] = useState(null);
 
-    setModalVisible = (
-        boolean,
-        content = {title: null, subtitle: null, thumbnail: null, videoId: null, browseId: null, playlistId: null}
-    ) => {
-        this.setState({
-            modalVisible: boolean,
-            modalContent: content
-        });
-    }
-
-    onShare = async (type, url, message) => {
+    const onShare = async(type, url, message) => {
         try {
             const title = "YouTune - " + type;
             const result = await Share.share({
@@ -70,7 +54,7 @@ export default class MoreModal extends PureComponent {
                 dialogTitle: title
             });
 
-            this.setModalVisible(false);
+            setVisible(false);
             
             if (result.action === Share.sharedAction) {
                 if (result.activityType)
@@ -86,230 +70,240 @@ export default class MoreModal extends PureComponent {
         }
     };
 
-    refresh(type, id) {
+    const downloadMedia = () => {
+        if (content.videoId != undefined)
+            downloadSong(content.videoId)
+    };
+
+    const refresh = (type, id) => {
         switch(type) {
             case "Song":
-                getSongLike(id).then(boolean => { this.setState({ isLiked: boolean }) });
+                getSongLike(id)
+                    .then(boolean => {
+                        setLiked({ isLiked: boolean });
+                    });
                 break;
             case "Playlist":
-                getPlaylistLike(id).then(boolean => { this.setState({ isLiked: boolean }) });
+                getPlaylistLike(id)
+                    .then(boolean => {
+                        setLiked({ isLiked: boolean });
+                    });
                 break;
             case "Artist":
-                getArtistLike(id).then(boolean => { this.setState({ isLiked: boolean }) });
+                getArtistLike(id)
+                    .then(boolean => {
+                        setLiked({ isLiked: boolean });
+                    });
         }
-    }
+    };
 
-    downloadMedia() {
-        if (this.state.modalContent.videoId != undefined) {
-            downloadSong(this.state.modalContent.videoId)
-        }
-    }
-
-    render() {
-        const { browseId, playlistId, videoId} = this.state.modalContent;
-
-        var likeFunction = null;
-        var type;
+    showModal = info => {
+        let type;
+        let likeFunction;
 
         if (videoId != null) {
             type = "Song";
-            this.refresh(type, videoId);
-            likeFunction = (boolean) => {
+            refresh(type, videoId);
+    
+            likeFunction = boolean => {
                 likeSong(videoId, boolean);
-                this.refresh(type, videoId);
+                refresh(type, videoId);
             }
         } else if (playlistId != null || browseId != null) {
             if (browseId != null) {
                 if (browseId.slice(0, 2) == "UC") {
                     type = "Artist";
-                    this.refresh(type, browseId);
+                    refresh(type, browseId);
                     likeFunction = (boolean) => {
                         likeArtist(browseId, boolean);
-                        this.refresh(type, browseId);
+                        refresh(type, browseId);
                     }
-
+    
                 } else {
                     type = "Playlist";
-                    this.refresh(type, playlistId);
-                    likeFunction = (boolean) => {
+                    refresh(type, playlistId);
+                    likeFunction = boolean => {
                         likePlaylist(playlistId, boolean);
-                        this.refresh(type, playlistId);
+                        refresh(type, playlistId);
                     }
-
+    
                 }
             } else {
                 type = "Playlist";
-                this.refresh(type, playlistId);
-                likeFunction = (boolean) => {
+                refresh(type, playlistId);
+                likeFunction = boolean => {
                     likePlaylist(playlistId, boolean);
-                    this.refresh(type, playlistId);
+                    refresh(type, playlistId);
                 }
-
+    
             }
         }
 
-        return (
-            <Modal
-                animationType="slide"
-                transparent={true}
-                visible={this.state.modalVisible}
-                onRequestClose={() => this.setModalVisible(false)}
-                onDismiss={() => this.setModalVisible(false)}
+        setContent({
+            ...info,
+            type: type,
+            likeFunction: likeFunction
+        });
+        setVisible(true);
+    };
 
-                hardwareAccelerated={true}
-            >
-                <Pressable onPress={() => this.setModalVisible(false)} style={{height: "100%", width: "100%", justifyContent: "flex-end", backgroundColor: "rgba(0, 0, 0, 0.3)"}}>
-                    <Pressable
-                        android_ripple={rippleConfig}
-                        style={
-                            {
-                                paddingHorizontal: 10,
-                                maxWidth: "800px",
-                                alignSelf: "center",
-                                width: "100%"
-                            }
-                        }
-                    >
-                        <View style={modalStyles.header}>
-                            <Image source={{uri: this.state.modalContent.thumbnail}} style={modalStyles.thumbnail}/>
-                            <View style={modalStyles.headerText}>
-                                <Text numberOfLines={1} style={{}}>{this.state.modalContent.title}</Text>
-                                <Text numberOfLines={1} style={{}}>{this.state.modalContent.subtitle}</Text>
-                            </View>
-                            <View style={{width: 120, height: 50, alignItems: "center", justifyContent: "center", flexDirection: "row"}}>
-                                <View style={{width: 50, height: 50, alignItems: "center", justifyContent: "center"}}>
-                                    <Pressable
-                                        onPress={() => likeFunction(false)}
-                                        android_ripple={{color: "darkgray", borderless: true}}
-                                    >
-                                        <MaterialIcons
-                                            name="thumb-down"
+    const {
+        browseId,
+        playlistId,
+        videoId,
+        type,
+        likeFunction
+    } = content;
 
-                                            color={
-                                                this.state.isLiked == null
-                                                    ? "darkgray"
-                                                    : !this.state.isLiked
-                                                        ? "black"
-                                                        : "darkgray"
-                                            }
+    return <Modal
+        animationType="slide"
+        transparent={true}
+        visible={visible}
+        onRequestClose={() => setVisible(false)}
+        onDismiss={() => setVisible(false)}
+        hardwareAccelerated={true}>
+        <Pressable onPress={() => setVisible(false)} style={{height: "100%", width: "100%", justifyContent: "flex-end", backgroundColor: "rgba(0, 0, 0, 0.3)"}}>
+            <Pressable android_ripple={rippleConfig}
+                       style={{
+                            paddingHorizontal: 10,
+                            maxWidth: "800px",
+                            alignSelf: "center",
+                            width: "100%"
+                       }}>
+                <View style={modalStyles.header}>
+                    <Image source={{uri: content.thumbnail}} style={modalStyles.thumbnail}/>
+                    <View style={modalStyles.headerText}>
+                        <Text numberOfLines={1}>{content.title}</Text>
+                        <Text numberOfLines={1}>{content.subtitle}</Text>
+                    </View>
+                    <View style={{width: 120, height: 50, alignItems: "center", justifyContent: "center", flexDirection: "row"}}>
+                        <View style={{width: 50, height: 50, alignItems: "center", justifyContent: "center"}}>
+                            <Pressable
+                                onPress={() => likeFunction(false)}
+                                android_ripple={{color: "darkgray", borderless: true}}
+                            >
+                                <MaterialIcons
+                                    name="thumb-down"
 
-                                            size={25}
-                                        />
-                                    </Pressable>
-                                </View>
-                                <View style={{width: 50, height: 50, alignItems: "center", justifyContent: "center"}}>
-                                    <Pressable
-                                        onPress={() => likeFunction(true)}
-                                        android_ripple={{color: "darkgray", borderless: true}}
-                                    >
-                                        <MaterialIcons
-                                            name="thumb-up"
-
-                                            color={
-                                                this.state.isLiked == null
-                                                    ? "darkgray"
-                                                    : this.state.isLiked
-                                                        ? "black"
-                                                        : "darkgray"
-                                            }
-
-                                            size={25}
-                                        />
-                                    </Pressable>
-                                </View>
-                            </View>
-                        </View>
-
-                        <View style={modalStyles.entryView}>
-                                <Pressable 
-                                    onPress={
-                                        () => {
-                                            handleMedia(this.state.modalContent, this.props.navigation);
-                                            this.setModalVisible(false);
-                                        }
+                                    color={
+                                        liked == null
+                                            ? "darkgray"
+                                            : !liked
+                                                ? "black"
+                                                : "darkgray"
                                     }
-                                    style={modalStyles.entry}
-                                    android_ripple={{color: "gray"}}
-                                >
-                                    {
-                                        type == "Song"
-                                            ? <>
-                                                <MaterialIcons name="play-arrow" color="black" size={25}/>
-                                                <Text style={{paddingLeft: 20}}>Play</Text>
-                                            </>
-                                            
-                                            : <>
-                                                <MaterialIcons name="launch" color="black" size={25}/>
-                                                <Text style={{paddingLeft: 20}}>Open</Text>
-                                            </>
+
+                                    size={25}
+                                />
+                            </Pressable>
+                        </View>
+                        <View style={{width: 50, height: 50, alignItems: "center", justifyContent: "center"}}>
+                            <Pressable
+                                onPress={() => likeFunction(true)}
+                                android_ripple={{color: "darkgray", borderless: true}}
+                            >
+                                <MaterialIcons
+                                    name="thumb-up"
+
+                                    color={
+                                        liked == null
+                                            ? "darkgray"
+                                            : liked
+                                                ? "black"
+                                                : "darkgray"
                                     }
-                                </Pressable>
-                            </View>
-                        
-                        <View style={modalStyles.entryView}>
-                        <Pressable onPress={() => this.downloadMedia()} disabled={localIDs == null ? true : false} style={modalStyles.entry} android_ripple={{color: "gray"}}>
-                            <MaterialIcons name="get-app" color="black" size={25}/>
-                            <Text style={{paddingLeft: 20}}>
-                                {
-                                    localIDs != null
-                                        ? localIDs.includes(this.state.modalContent.videoId)
-                                            ? "Remove"
-                                            : "Download"
-                                        : "Download"
-                                }
-                            </Text>
-                        </Pressable>
+
+                                    size={25}
+                                />
+                            </Pressable>
                         </View>
+                    </View>
+                </View>
 
-                        <View style={modalStyles.entryView}>
-                        <Pressable onPress={() => {}} style={modalStyles.entry} android_ripple={{color: "gray"}}>
-                            {
-                                type == "Song"
-                                    ? <>
-                                        <MaterialIcons name="playlist-add" color="black" size={25}/>
-                                        <Text style={{paddingLeft: 20}}>Add to playlist</Text>
-                                    </>
-
-                                    : <>
-                                        <MaterialIcons name="library-add" color="black" size={25}/>
-                                        <Text style={{paddingLeft: 20}}>Add to library</Text>
-                                    </>
-                            }
-                        </Pressable>
-                        </View>
-
-                        <View style={modalStyles.entryView}>
+                <View style={modalStyles.entryView}>
                         <Pressable
                             onPress={() => {
-                                let file;
-                                let message;
-                                if (type == "Song") {
-                                    message = this.state.modalContent.title + " - " + this.state.modalContent.subtitle;
-                                    file = "watch?v=" + videoId;
-                                } else if (type == "Playlist") {
-                                    message = this.state.modalContent.title + " - " + this.state.modalContent.subtitle;
-                                    file = "playlist?list=" + playlistId;
-                                } else {
-                                    message = this.state.modalContent.title + " - " + type;
-                                    file = "channel/" + browseId;
-                                }
-
-                                this.onShare(type, "https://music.youtube.com/" + file, message);
+                                handleMedia(content, navigation);
+                                setVisible(false);
                             }}
-
-                            style={modalStyles.entry} android_ripple={{color: "gray"}}
+                            style={modalStyles.entry}
+                            android_ripple={{color: "gray"}}
                         >
-                            <MaterialIcons name="share" color="black" size={25}/>
-                            <Text style={{paddingLeft: 20}}>Share</Text>
+                            {type == "Song"
+                                ? <>
+                                    <MaterialIcons name="play-arrow" color="black" size={25}/>
+                                    <Text style={{paddingLeft: 20}}>Play</Text>
+                                </>
+                                
+                                : <>
+                                    <MaterialIcons name="launch" color="black" size={25}/>
+                                    <Text style={{paddingLeft: 20}}>Open</Text>
+                                </>
+                            }
                         </Pressable>
-                        </View>
-                    </Pressable>
+                    </View>
+                
+                <View style={modalStyles.entryView}>
+                <Pressable onPress={() => downloadMedia()} disabled={localIDs == null ? true : false} style={modalStyles.entry} android_ripple={{color: "gray"}}>
+                    <MaterialIcons name="get-app" color="black" size={25}/>
+                    <Text style={{paddingLeft: 20}}>
+                        {
+                            localIDs != null
+                                ? localIDs.includes(content.videoId)
+                                    ? "Remove"
+                                    : "Download"
+                                : "Download"
+                        }
+                    </Text>
                 </Pressable>
-            </Modal>
-        );
-        
-    }
-}
+                </View>
+
+                <View style={modalStyles.entryView}>
+                <Pressable onPress={() => {}} style={modalStyles.entry} android_ripple={{color: "gray"}}>
+                    {
+                        type == "Song"
+                            ? <>
+                                <MaterialIcons name="playlist-add" color="black" size={25}/>
+                                <Text style={{paddingLeft: 20}}>Add to playlist</Text>
+                            </>
+
+                            : <>
+                                <MaterialIcons name="library-add" color="black" size={25}/>
+                                <Text style={{paddingLeft: 20}}>Add to library</Text>
+                            </>
+                    }
+                </Pressable>
+                </View>
+
+                <View style={modalStyles.entryView}>
+                <Pressable
+                    onPress={() => {
+                        let file;
+                        let message;
+                        if (type == "Song") {
+                            message = content.title + " - " + content.subtitle;
+                            file = "watch?v=" + videoId;
+                        } else if (type == "Playlist") {
+                            message = content.title + " - " + content.subtitle;
+                            file = "playlist?list=" + playlistId;
+                        } else {
+                            message = content.title + " - " + type;
+                            file = "channel/" + browseId;
+                        }
+
+                        onShare(type, "https://music.youtube.com/" + file, message);
+                    }}
+
+                    style={modalStyles.entry} android_ripple={{color: "gray"}}
+                >
+                    <MaterialIcons name="share" color="black" size={25}/>
+                    <Text style={{paddingLeft: 20}}>Share</Text>
+                </Pressable>
+                </View>
+            </Pressable>
+        </Pressable>
+    </Modal>
+};
 
 const modalStyles = StyleSheet.create({
     header: {
