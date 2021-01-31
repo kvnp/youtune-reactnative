@@ -1,4 +1,4 @@
-import React, { PureComponent } from "react";
+import React from "react";
 import {
     Image,
     View,
@@ -15,75 +15,67 @@ import SlidingUpPanel from 'rn-sliding-up-panel';
 import { skipTo } from "../../service";
 import { rippleConfig } from "../../styles/Ripple";
 
-const { height } = Dimensions.get("window");
-export default class SwipePlaylist extends PureComponent {
-    static defaultProps = {
-        draggableRange: { top: height - 50, bottom: 50}
-    };
-  
-    _draggedValue = new Animated.Value(50);
-  
-    render() {
-        return (
-            <SlidingUpPanel
-                ref={c => (this._panel = c)}
-                draggableRange={this.props.draggableRange}
-                animatedValue={this._draggedValue}
-                snappingPoints={[51]}
-                height={height}
-                friction={0.5}
-            >
-                <View style={styles.panel}>
-                    <Pressable android_ripple={rippleConfig} style={[styles.panelHeader, {backgroundColor: this.props.backgroundColor}]} onPress={() => this._panel.show()}>
-                        <View style={[stylesRest.smallBar, {backgroundColor: this.props.textColor}]}/>
-                        <Text style={{color: this.props.textColor}}>PLAYLIST</Text>
-                    </Pressable>
+export default SwipePlaylist = ({playlist, track, backgroundColor, textColor}) => {
+    const { height } = Dimensions.get("window");
+    const draggableRange = { top: height - 50, bottom: 50 }
 
-                    <FlatList
-                        style={{height: height - 150}}
-                        contentContainerStyle={[stylesRest.playlistContainer, {backgroundColor: this.props.backgroundColor}]}
+    const draggedValue = new Animated.Value(50);
 
-                        data={this.props.playlist}
+    return (
+        <SlidingUpPanel
+            ref={c => (_panel = c)}
+            draggableRange={draggableRange}
+            animatedValue={draggedValue}
+            snappingPoints={[51]}
+            height={height}
+            friction={0.5}
+        >
+            <View style={styles.panel}>
+                <Pressable android_ripple={rippleConfig} style={[styles.panelHeader, {backgroundColor: backgroundColor}]} onPress={() => _panel.show()}>
+                    <View style={[stylesRest.smallBar, {backgroundColor: textColor}]}/>
+                    <Text style={{color: textColor}}>PLAYLIST</Text>
+                </Pressable>
 
-                        keyExtractor={item => item.id}
-                        renderItem={({item, index}) =>
-                            <Pressable android_ripple={rippleConfig}
-                                        style={{
-                                            height: 50,
-                                            flexDirection: "row",
-                                            alignItems: "center",
-                                            marginVertical: 5
-                                        }}
+                <FlatList
+                    style={{height: height - 150}}
+                    contentContainerStyle={[stylesRest.playlistContainer, {backgroundColor: backgroundColor}]}
 
-                                        onPress={() => skipTo(item.id)}
-                            >
-                                {
-                                    this.props.track != null
-                                        ? this.props.track.id == item.id
-                                            ? <MaterialIcons style={{width: 30, textAlign: "center", textAlignVertical: "center"}} name="play-arrow" color={this.props.textColor} size={20}/>
-                                            : <Text style={{width: 30, textAlign: "center", fontSize: 15, color: this.props.textColor}}>{index + 1}</Text>
+                    data={playlist}
 
-                                        : <Text style={{width: 30, textAlign: "center", fontSize: 15, color: this.props.textColor}}>{index + 1}</Text>
+                    keyExtractor={item => item.id}
+                    renderItem={({item, index}) =>
+                        <Pressable android_ripple={rippleConfig}
+                                    style={{
+                                        height: 50,
+                                        flexDirection: "row",
+                                        alignItems: "center",
+                                        marginVertical: 5
+                                    }}
 
-                                        
-                                        
-                                }
+                                    onPress={() => skipTo(item.id)}
+                        >
+                            {
+                                track != null
+                                    ? track.id == item.id
+                                        ? <MaterialIcons style={{width: 30, textAlign: "center", textAlignVertical: "center"}} name="play-arrow" color={textColor} size={20}/>
+                                        : <Text style={{width: 30, textAlign: "center", fontSize: 15, color: textColor}}>{index + 1}</Text>
 
-                                <Image style={{height: 50, width: 50, marginRight: 10}} source={{uri: item.artwork}}/>
+                                    : <Text style={{width: 30, textAlign: "center", fontSize: 15, color: textColor}}>{index + 1}</Text>
+                            }
 
-                                <View style={{width: 0, flexGrow: 1, flex: 1}}>
-                                    <Text style={{color: this.props.textColor}} numberOfLines={2}>{item.title}</Text>
-                                    <Text style={{color: this.props.textColor}} numberOfLines={1}>{item.artist}</Text>
-                                </View>
-                            </Pressable>
-                        }
-                    />
-                </View>
-            </SlidingUpPanel>
-        );
-    }
-}
+                            <Image style={{height: 50, width: 50, marginRight: 10}} source={{uri: item.artwork}}/>
 
+                            <View style={{width: 0, flexGrow: 1, flex: 1}}>
+                                <Text style={{color: textColor}} numberOfLines={2}>{item.title}</Text>
+                                <Text style={{color: textColor}} numberOfLines={1}>{item.artist}</Text>
+                            </View>
+                        </Pressable>
+                    }
+                />
+            </View>
+        </SlidingUpPanel>
+    );
+};
 
 const styles = StyleSheet.create({
     container: {
@@ -95,7 +87,10 @@ const styles = StyleSheet.create({
     panel: {
         flex: 1,
         backgroundColor: "transparent",
-        position: "relative"
+        position: "relative",
+        alignSelf: "center",
+        width: "100%",
+        maxWidth: "800px"
     },
 
     panelHeader: {
