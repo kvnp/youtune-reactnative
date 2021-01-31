@@ -33,7 +33,7 @@ export default SwipePlaylist = ({playlist, track, backgroundColor, textColor}) =
             <View style={styles.panel}>
                 <Pressable android_ripple={rippleConfig} style={[styles.panelHeader, {backgroundColor: backgroundColor}]} onPress={() => _panel.show()}>
                     <View style={[stylesRest.smallBar, {backgroundColor: textColor}]}/>
-                    <Text style={{color: textColor}}>PLAYLIST</Text>
+                    <Text style={{color: textColor}} selectable={false}>PLAYLIST</Text>
                 </Pressable>
 
                 <FlatList
