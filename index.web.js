@@ -11,6 +11,7 @@ const styles = `@font-face{
 #app > div {
     position: fixed;
     height: 100%;
+    width: 100%;
 }`;
 
 const style = document.createElement('style');
