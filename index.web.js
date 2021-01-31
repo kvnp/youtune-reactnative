@@ -5,15 +5,21 @@ import { name } from './react/app.json'
 import App from './react/App'
 import { register } from './react/service';
 
-const iconFontStyles = `@font-face{src: url(${iconFont});font-family: MaterialIcons;}`;
+const styles = `@font-face{
+    src: url(${iconFont});font-family: MaterialIcons;
+}
+#app > div {
+    position: fixed;
+    height: 100%;
+}`;
 
 const style = document.createElement('style');
 style.rel = "stylesheet";
 
 if (style.styleSheet)
-    style.styleSheet.cssText = iconFontStyles;
+    style.styleSheet.cssText = styles;
 else
-    style.appendChild(document.createTextNode(iconFontStyles));
+    style.appendChild(document.createTextNode(styles));
 
 document.head.appendChild(style);
 

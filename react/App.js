@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Platform, StatusBar, View } from "react-native";
+import { StatusBar } from "react-native";
 
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
@@ -31,21 +31,19 @@ export default App = () => {
             StatusBar.setBarStyle("dark-content", true);
     };
 
-    return  <View style={{position: Platform.OS == "web" ? "fixed" : "absolute", width: '100%', height: '100%'}}>
-        <NavigationContainer theme={dark ? DarkTheme : DefaultTheme}>
-            <Stack.Navigator>
-                <Stack.Screen name="App" component={Navigator} options={navigationOptions}/>
-                <Stack.Screen name="Music" component={PlayView} options={navigationOptions}/>
-                <Stack.Screen name="Captcha" component={CaptchaView}/>
-                
-                <Stack.Screen name="Playlist" component={PlaylistView}
-                              options={{headerBackImage: () => getIcon({title: "arrow-back"})}}
-                />
-                
-                <Stack.Screen name="Artist" component={ArtistView}
-                              options={{headerBackImage: () => getIcon({title: "arrow-back"})}}
-                />
-            </Stack.Navigator>
-        </NavigationContainer>
-    </View>
+    return <NavigationContainer theme={dark ? DarkTheme : DefaultTheme}>
+        <Stack.Navigator style={{position: "fixed", height: "100%", width: "100%"}}>
+            <Stack.Screen name="App" component={Navigator} options={navigationOptions}/>
+            <Stack.Screen name="Music" component={PlayView} options={navigationOptions}/>
+            <Stack.Screen name="Captcha" component={CaptchaView}/>
+            
+            <Stack.Screen name="Playlist" component={PlaylistView}
+                            options={{headerBackImage: () => getIcon({title: "arrow-back"})}}
+            />
+            
+            <Stack.Screen name="Artist" component={ArtistView}
+                            options={{headerBackImage: () => getIcon({title: "arrow-back"})}}
+            />
+        </Stack.Navigator>
+    </NavigationContainer>
 }
