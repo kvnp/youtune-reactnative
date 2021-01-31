@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { StyleSheet, View, Pressable, Image, Text } from "react-native";
+import { useTheme } from "@react-navigation/native";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import TrackPlayer, { useTrackPlayerProgress } from 'react-native-track-player';
+
 import { skip, setPlay } from "../../service";
 import { rippleConfig } from "../../styles/Ripple";
-import { useTheme } from "@react-navigation/native";
 
 export default MiniPlayer = ({navigation, style}) => {
     const [playerState, setPlayer] = useState({
@@ -96,47 +97,48 @@ export default MiniPlayer = ({navigation, style}) => {
         artwork = playerState.track.artwork;
     }
 
-    return  <View style={[styles.main, {height: playerState.isStopped ?0 :50, backgroundColor: colors.card}]}>
-                <View style={styles.playback}>
-                    <View style={{width: positionLength + "%", backgroundColor: colors.text}}></View>
-                    <View style={{width: remainingLength + "%", backgroundColor: colors.card}}></View>
+    return  <View style={[style, styles.main, {height: playerState.isStopped ?0 :50, backgroundColor: colors.card}]}>
+        <View style={[styles.main, {justifyContent: "space-evenly", width: "100%", maxWidth: "800px", alignSelf: "center"}]}>
+            <View style={styles.playback}>
+                <View style={{width: positionLength + "%", backgroundColor: colors.text}}></View>
+                <View style={{width: remainingLength + "%", backgroundColor: colors.card}}></View>
+            </View>
+            <View style={styles.container}>
+                <Image source={{uri: artwork}} style={styles.image}/>
+                <View style={styles.textContainer}>
+                    <Pressable android_ripple={rippleConfig} onPress={onOpen}>
+                        <Text numberOfLines={1} style={[styles.titleText, {color: colors.text}]}>{title}</Text>
+                        <Text numberOfLines={1} style={[styles.subtitleText, {color: colors.text}]}>{artist}</Text>
+                    </Pressable>
                 </View>
-                <View style={styles.container}>
-                    <Image source={{uri: artwork}} style={styles.image}/>
-                    <View style={styles.textContainer}>
-                        <Pressable android_ripple={rippleConfig} onPress={onOpen}>
-                            <Text numberOfLines={1} style={[styles.titleText, {color: colors.text}]}>{title}</Text>
-                            <Text numberOfLines={1} style={[styles.subtitleText, {color: colors.text}]}>{artist}</Text>
-                        </Pressable>
-                    </View>
 
-                    <View style={[styles.button, {color: colors.card}]}>
-                        <Pressable android_ripple={rippleConfig} onPress={onStop}>
-                            <MaterialIcons name="clear" color={colors.text} size={29}/>
-                        </Pressable>
-                    </View>
+                <View style={[styles.button, {color: colors.card}]}>
+                    <Pressable android_ripple={rippleConfig} onPress={onStop}>
+                        <MaterialIcons name="clear" color={colors.text} size={29}/>
+                    </Pressable>
+                </View>
 
-                    <View style={[styles.button, {color: colors.card}]}>
-                        <Pressable android_ripple={rippleConfig} onPress={onPlay}>
-                            <MaterialIcons name={playerState.isPlaying ?"pause" :"play-arrow"} color={colors.text} size={29}/>
-                        </Pressable>
-                    </View>
+                <View style={[styles.button, {color: colors.card}]}>
+                    <Pressable android_ripple={rippleConfig} onPress={onPlay}>
+                        <MaterialIcons name={playerState.isPlaying ?"pause" :"play-arrow"} color={colors.text} size={29}/>
+                    </Pressable>
+                </View>
 
-                    <View style={[styles.button, {color: colors.card}]}>
-                        <Pressable android_ripple={rippleConfig} onPress={onNext}>
-                            <MaterialIcons name="skip-next" color={colors.text} size={29}/>
-                        </Pressable>
-                    </View>
+                <View style={[styles.button, {color: colors.card}]}>
+                    <Pressable android_ripple={rippleConfig} onPress={onNext}>
+                        <MaterialIcons name="skip-next" color={colors.text} size={29}/>
+                    </Pressable>
                 </View>
             </View>
+        </View>
+    </View>
 }
 
 const styles = StyleSheet.create({
     main: {
         flexDirection: "column",
-        padding: "0",
-        margin: "0",
-        justifyContent: "space-evenly",
+        padding: 0,
+        margin: 0,
         overflow: "hidden"
     },
 
