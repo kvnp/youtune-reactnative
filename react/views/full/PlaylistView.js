@@ -25,7 +25,7 @@ export default PlaylistView = ({ route, navigation }) => {
     navigation.setOptions({ title: "Loading" });
 
     useEffect(() => {
-        fetchBrowse("VL" + route.params.list)
+        fetchBrowse(route.params.list)
             .then(playlist => {
                 setPlaylist(playlist);
                 navigation.setOptions({ title: playlist.title });
