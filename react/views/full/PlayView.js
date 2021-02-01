@@ -5,22 +5,28 @@ import {
     StyleSheet,
     Image,
     Pressable,
-    ActivityIndicator,
-    Platform
+    ActivityIndicator
 } from "react-native";
 
 import TrackPlayer from 'react-native-track-player';
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
+import { useTheme } from "@react-navigation/native";
 
 import SeekBar from "../../components/player/SeekBar";
 import SwipePlaylist from "../../components/player/SwipePlaylist";
 
 import { rippleConfig } from "../../styles/Ripple";
-import { startPlayback, skip, setPlay, setRepeat, startPlaylist } from "../../service";
-import { isRepeating } from "../../service";
+import {
+    skip,
+    setPlay,
+    setRepeat,
+    startPlaylist,
+    isRepeating
+} from "../../service";
 import { getSongLike, likeSong } from "../../modules/storage/MediaStorage";
-import { useTheme } from "@react-navigation/native";
+
 import { showModal } from "../../components/shared/MoreModal";
+import { fetchNext } from "../../modules/remote/API";
 
 export default PlayView = ({route, navigation}) => {
     const [playbackState, setPlayback] = useState({
@@ -37,24 +43,33 @@ export default PlayView = ({route, navigation}) => {
     const { dark, colors } = useTheme();
 
     useEffect(() => {
+        navigation.setOptions({title: "Loading"});
+        if (route.params)
+            if (route.params.v) {
+                setPlayback({
+                    isPlaying: false,
+                    isLoading: true,
+                    isStopped: false
+                });
+        
+                fetchNext(route.params.v, route.params.list).then(playlist => {
+                    setPlaylist(playlist.list);
+                    startPlaylist(playlist);
+                });
+            }
+
         refreshUI();
+
         let _unsub = [];
-
-        _unsub.push(
-            TrackPlayer.addEventListener("playback-state", refreshUI)
-        );
-
-        _unsub.push(
-            TrackPlayer.addEventListener("playback-track-changed", refreshUI)
-        );
-
+        _unsub.push(TrackPlayer.addEventListener("playback-state", refreshUI));
+        _unsub.push(TrackPlayer.addEventListener("playback-track-changed", refreshUI));
         return () => {
             for (let i = 0; i < _unsub.length; i++)
                 _unsub[i].remove();
         };
     }, []);
 
-    refreshUI = async() => {
+    const refreshUI = async() => {
         let id = await TrackPlayer.getCurrentTrack();
         if (id != null) {
             switch ( await TrackPlayer.getState() ) {
@@ -90,9 +105,12 @@ export default PlayView = ({route, navigation}) => {
                     });
                     break;
             }
+
+            let track = await TrackPlayer.getTrack(id);
+            navigation.setOptions({title: track.title});
+            navigation.setParams({v: id, list: track.playlistId});
             
-            setPlaylist(await TrackPlayer.getQueue());
-            setTrack(await TrackPlayer.getTrack(id));
+            setTrack(track);
             setLiked(await getSongLike(id));
         }
     }
@@ -102,155 +120,124 @@ export default PlayView = ({route, navigation}) => {
         setRepeat(!willRepeat);
     }
 
-    if (route.params != undefined) {
-        setPlayback({
-            isPlaying: false,
-            isLoading: true,
-            isStopped: false
-        });
-
-        if (route.params.list != undefined) {
-            var index = route.params.index;
-            var list = route.params.list;
-            var { title, artist, artwork, id } = list[index];
-
-            startPlaylist(route.params);
-        } else {
-            var { title, subtitle, thumbnail, id } = route.params;
-            var artist = subtitle;
-            var artwork = thumbnail;
-
-            startPlayback(route.params);
-            //.catch(params => navigation.navigate("Captcha", params));
-        }
-
-        route.params = undefined;
-    } else {
-        if (track != null)
-            var {title, artist, artwork, id } = track;
-        else {
-            var id = null;
-            var title = null;
-            var artist = null;
-            var artwork = null;
-        }
+    if (track != null)
+        var {title, artist, artwork, id } = track;
+    else {
+        var id = null;
+        var title = null;
+        var artist = null;
+        var artwork = null;
     }
 
-    return (
-        <View style={{overflow: "hidden", height: "100%"}}>
-            <View style={stylesTop.vertContainer}>
-                <View style={imageStyles.view}>
-                    <Image resizeMode="contain" style={imageStyles.image} source={{uri: artwork}}/>
-                </View>
-
-                <View style={{alignSelf: "stretch", justifyContent: "space-around", alignItems: "stretch", paddingRight: "2%", paddingLeft: "2%", justifyContent: "center"}}>
-                    <View style={controlStyles.container}>
-                        <Pressable onPress={() => {likeSong(id, false); refreshUI();}} android_ripple={rippleConfig}>
-                            <MaterialIcons
-                                name="thumb-down"
-
-                                color={
-                                    isLiked == null
-                                        ? colors.text
-                                        : !isLiked
-                                            ? colors.primary
-                                            : colors.text
-                                }
-
-                                size={30}
-                            />
-                        </Pressable>
-
-                        
-                        <View style={
-                            Platform.OS == "web"
-                                ? {display: "grid", width: "calc(100% - 100px)"}
-                                : {alignItems: "center"}
-                            }>
-                            <Text adjustsFontSizeToFit={true} ellipsizeMode="tail" numberOfLines={1} style={[stylesBottom.titleText, {marginHorizontal: 10, color: colors.text}]}>{title}</Text>
-                            <Text adjustsFontSizeToFit={true} ellipsizeMode="tail" numberOfLines={1} style={[stylesBottom.subtitleText, {marginHorizontal: 10, color: colors.text}]}>{artist}</Text>
-                        </View>
-
-                        <Pressable onPress={() => {likeSong(id, true); refreshUI();}} android_ripple={rippleConfig}>
-                            <MaterialIcons
-                                name="thumb-up"
-
-                                color={
-                                    isLiked == null
-                                        ? colors.text
-                                        : isLiked
-                                            ? colors.primary
-                                            : colors.text
-                                }
-
-                                size={30}
-                            />
-                        </Pressable>
-                    </View>
-
-                    <SeekBar navigation={navigation}/>
-                    
-                    <View style={stylesBottom.buttonContainer}>
-                        <Pressable onPress={() => {}} android_ripple={rippleConfig}>
-                            <MaterialIcons name="shuffle" color={colors.text} size={30}/>
-                        </Pressable>
-
-                        <Pressable onPress={() => skip(false)} android_ripple={rippleConfig}>
-                            <MaterialIcons name="skip-previous" color={colors.text} size={40}/>
-                        </Pressable>
-
-                        <View style={{alignSelf: "center", alignItems: "center", justifyContent: "center", backgroundColor: dark ? colors.card : colors.primary, width: 60, height: 60, borderRadius: 30}}>
-                            {playbackState.isLoading
-                                ?   <ActivityIndicator style={{alignSelf: "center"}} color={colors.text} size="large"/>
-
-                                :   <Pressable onPress={() => setPlay(playbackState.isPlaying)} android_ripple={rippleConfig}>
-                                        <MaterialIcons name={playbackState.isPlaying ? "pause" : "play-arrow"} color={colors.text} size={40}/>
-                                    </Pressable>
-                            }
-                        </View>
-
-                        <Pressable onPress={() => skip(true)} android_ripple={rippleConfig}>
-                            <MaterialIcons name="skip-next" color={colors.text} size={40}/>
-                        </Pressable>
-
-                        <Pressable onPress={setRepeatLocal} android_ripple={rippleConfig}>
-                            <MaterialIcons name={willRepeat ?"repeat-one" :"repeat"} color={colors.text} size={30}/>
-                        </Pressable>
-                    </View>
-
-                    <View style={{justifyContent: "space-between", flexDirection: "row", paddingTop: 30}}>
-                        <Pressable onPress={navigation.goBack} android_ripple={rippleConfig} style={stylesTop.topFirst}>
-                            <MaterialIcons name="keyboard-arrow-down" color={colors.text} size={30}/>
-                        </Pressable>
-
-                        <Pressable
-                            onPress={() => {
-                                let view = {
-                                    title: track.title,
-                                    subtitle: track.artist,
-                                    thumbnail: track.artwork,
-                                    videoId: track.id
-                                };
-
-                                showModal(view);
-                            }}
-                            android_ripple={rippleConfig}
-                            style={stylesTop.topThird}
-                        >
-                            <MaterialIcons name="more-vert" color={colors.text} size={30}/>
-                        </Pressable>
-                    </View>
-                </View>
+    return <View style={{overflow: "hidden", height: "100%"}}>
+        <View style={stylesTop.vertContainer}>
+            <View style={imageStyles.view}>
+                <Image resizeMode="contain" style={imageStyles.image} source={{uri: artwork}}/>
             </View>
 
-            <SwipePlaylist minimumHeight={50}
-                           backgroundColor={dark ? colors.card : colors.primary}
-                           textColor={colors.text}
-                           playlist={playlist}
-                           track={track}
-                           style={stylesRest.container}/>
+            <View style={{width: "100%", maxWidth: "800px", alignSelf: "center", justifyContent: "space-around", alignItems: "stretch", justifyContent: "center"}}>
+                <View style={controlStyles.container}>
+                    <Pressable onPress={() => { likeSong(id, false); refreshUI();}} android_ripple={rippleConfig}>
+                        <MaterialIcons selectable={false}
+                            name="thumb-down"
+
+                            color={
+                                isLiked == null
+                                    ? colors.text
+                                    : !isLiked
+                                        ? colors.primary
+                                        : colors.text
+                            }
+
+                            size={30}
+                        />
+                    </Pressable>
+
+                    
+                    <View style={{flexGrow: "1", width: "1px", alignItems: "center"}}>
+                        <Text adjustsFontSizeToFit={true} ellipsizeMode="tail" numberOfLines={1} style={[stylesBottom.titleText, {marginHorizontal: 10, color: colors.text}]}>{title}</Text>
+                        <Text adjustsFontSizeToFit={true} ellipsizeMode="tail" numberOfLines={1} style={[stylesBottom.subtitleText, {marginHorizontal: 10, color: colors.text}]}>{artist}</Text>
+                    </View>
+
+                    <Pressable onPress={() => { likeSong(id, true); refreshUI(); }} android_ripple={rippleConfig}>
+                        <MaterialIcons selectable={false}
+                            name="thumb-up"
+
+                            color={
+                                isLiked == null
+                                    ? colors.text
+                                    : isLiked
+                                        ? colors.primary
+                                        : colors.text
+                            }
+
+                            size={30}
+                        />
+                    </Pressable>
+                </View>
+
+                <SeekBar navigation={navigation}/>
+                
+                <View style={stylesBottom.buttonContainer}>
+                    <Pressable onPress={() => {}} android_ripple={rippleConfig}>
+                        <MaterialIcons selectable={false} name="shuffle" color={colors.text} size={30}/>
+                    </Pressable>
+
+                    <Pressable onPress={() => skip(false)} android_ripple={rippleConfig}>
+                        <MaterialIcons selectable={false} name="skip-previous" color={colors.text} size={40}/>
+                    </Pressable>
+
+                    <View style={{alignSelf: "center", alignItems: "center", justifyContent: "center", backgroundColor: dark ? colors.card : colors.primary, width: 60, height: 60, borderRadius: 30}}>
+                        {playbackState.isLoading
+                            ?   <ActivityIndicator style={{alignSelf: "center"}} color={colors.text} size="large"/>
+
+                            :   <Pressable onPress={() => setPlay(playbackState.isPlaying)} android_ripple={rippleConfig}>
+                                    <MaterialIcons selectable={false} name={playbackState.isPlaying ? "pause" : "play-arrow"} color={colors.text} size={40}/>
+                                </Pressable>
+                        }
+                    </View>
+
+                    <Pressable onPress={() => skip(true)} android_ripple={rippleConfig}>
+                        <MaterialIcons selectable={false} name="skip-next" color={colors.text} size={40}/>
+                    </Pressable>
+
+                    <Pressable onPress={setRepeatLocal} android_ripple={rippleConfig}>
+                        <MaterialIcons selectable={false} name={willRepeat ?"repeat-one" :"repeat"} color={colors.text} size={30}/>
+                    </Pressable>
+                </View>
+
+                <View style={{justifyContent: "space-between", flexDirection: "row", paddingTop: 30}}>
+                    <Pressable onPress={navigation.goBack} android_ripple={rippleConfig} style={stylesTop.topFirst}>
+                        <MaterialIcons selectable={false} name="keyboard-arrow-down" color={colors.text} size={30}/>
+                    </Pressable>
+
+                    <Pressable
+                        onPress={() => {
+                            let view = {
+                                title: track.title,
+                                subtitle: track.artist,
+                                thumbnail: track.artwork,
+                                videoId: track.id
+                            };
+
+                            showModal(view);
+                        }}
+                        android_ripple={rippleConfig}
+                        style={stylesTop.topThird}
+                    >
+                        <MaterialIcons selectable={false} name="more-vert" color={colors.text} size={30}/>
+                    </Pressable>
+                </View>
+            </View>
         </View>
-    )
+
+        <SwipePlaylist minimumHeight={50}
+                        backgroundColor={dark ? colors.card : colors.primary}
+                        textColor={colors.text}
+                        playlist={playlist}
+                        track={track}
+                        style={stylesRest.container}/>
+    </View>
 }
 
 const stylesRest = StyleSheet.create({
@@ -259,8 +246,7 @@ const stylesRest = StyleSheet.create({
         borderTopRightRadius: 15,
         borderTopLeftRadius: 15,
         position: "absolute",
-        bottom: 0,
-        width: "100%",
+        bottom: 0
     },
 });
 

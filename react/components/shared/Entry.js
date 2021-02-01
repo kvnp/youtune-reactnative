@@ -15,9 +15,7 @@ import { rippleConfig } from '../../styles/Ripple';
 import { useTheme } from '@react-navigation/native';
 import { showModal } from './MoreModal';
 
-const handle = (obj, navigation, index) => handleMedia(obj, navigation, index);
-
-export default Entry = ({ entry, navigation, index, playPlaylist }) => {
+export default Entry = ({ entry, navigation, index }) => {
     let { title, subtitle, secondTitle, secondSubtitle, thumbnail } = entry;
     let { videoId, browseId, playlistId } = entry;
 
@@ -34,15 +32,7 @@ export default Entry = ({ entry, navigation, index, playPlaylist }) => {
 
     return (
         <Pressable
-            onPress={
-                () => {
-                    if (playPlaylist != undefined)
-                        playPlaylist();
-                    else
-                        handle(view, navigation, 0);
-                }
-            }
-
+            onPress={() => handleMedia(view, navigation)}
             onLongPress={() => showModal(view)}
             style={[resultStyle.resultView, {backgroundColor: colors.card}]}
         >
@@ -57,14 +47,8 @@ export default Entry = ({ entry, navigation, index, playPlaylist }) => {
 
             <Pressable
                 android_ripple={rippleConfig}
-                onPress={
-                    () => {
-                        if (playPlaylist != undefined)
-                            playPlaylist(view);
-                        else
-                            handle(view, navigation, index);
-                    }
-            }>
+                onPress={() => handleMedia(view, navigation)}
+            >
                 <Image style={resultStyle.resultCover} source={{uri: thumbnail}}/>
             </Pressable>
 

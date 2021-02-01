@@ -27,7 +27,6 @@ export default ArtistView = ({ route, navigation }) => {
     useEffect(() => {
         fetchBrowse(route.params.channelId)
             .then(artist => {
-                console.log(artist);
                 setArtist(artist);
                 navigation.setOptions({ title: artist.header.title });
             });

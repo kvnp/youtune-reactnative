@@ -1,5 +1,5 @@
 import TrackPlayer from 'react-native-track-player';
-import { fetchNext, fetchAudioStream } from "./modules/remote/API";
+import { fetchAudioStream } from "./modules/remote/API";
 import { StatusBar } from 'react-native';
 import { initSettings } from './modules/storage/SettingsStorage';
 
@@ -117,12 +117,6 @@ export const skip = async(forward) => {
         next = array[index - 1].id;
 
     skipTo(next);
-}
-
-export function startPlayback({ playlistId, videoId }) {
-    fetchNext(videoId, playlistId).then(playlist => {
-        startPlaylist(playlist);
-    });
 }
 
 export function startPlaylist(playlist) {

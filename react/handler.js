@@ -36,16 +36,16 @@ module.exports = async function() {
         TrackPlayer.seekTo( ~~(params["position"]) );
     });
 
-    TrackPlayer.addEventListener('remote-jump-forward', async () => {
+    TrackPlayer.addEventListener('remote-jump-forward', async() => {
         let position = await TrackPlayer.getPosition();
         let duration = await TrackPlayer.getDuration();
         position += 10;
         if (newPosition > duration) position = duration;
-        
+
         TrackPlayer.seekTo(position);
       });
       
-      TrackPlayer.addEventListener('remote-jump-backward', async () => {
+      TrackPlayer.addEventListener('remote-jump-backward', async() => {
         let position = await TrackPlayer.getPosition();
         position -= 10;
         if (newPosition < 0) position = 0;
