@@ -39,7 +39,7 @@ export default Navigator = ({navigation}) => {
     useEffect(() => {
         resizeContainer();
         let _unsub = TrackPlayer.addEventListener("playback-state", params => resizeContainer());
-        return () => { _unsub[i].remove(); };
+        return () => _unsub.remove();
     }, []);
 
     const resizeContainer = async() => {
