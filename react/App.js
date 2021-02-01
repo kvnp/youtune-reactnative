@@ -20,6 +20,39 @@ export const navigationOptions = {
 
 const Stack = createStackNavigator();
 
+const config = {
+    screens: {
+        App: {
+            path: "",
+            screens: {
+                Home: "",
+                Search: "search",
+                Settings: "settings",
+                
+                Library: {
+                    path: "library",
+                    screens: {
+                        Playlists: "playlists",
+                        Albums: "albums",
+                        Songs: "songs",
+                        Artists: "artists",
+                        Downloads: "downloads"
+                    }
+                }
+            }
+        },
+
+        Music: "watch",
+        Artist: "channel/:channelId",
+        Playlist: "playlist"
+    }
+};
+
+const linking = {
+    prefixes: ["https://youtune.kvnp.eu", "http://127.0.0.1"],
+    config
+};
+
 export default App = () => {
     const [dark, setDark] = useState(settings.darkMode);
     if (settings.darkMode)
@@ -35,18 +68,18 @@ export default App = () => {
             StatusBar.setBarStyle("dark-content", true);
     };
 
-    return <NavigationContainer theme={dark ? DarkTheme : DefaultTheme}>
+    return <NavigationContainer linking={linking} theme={dark ? DarkTheme : DefaultTheme}>
         <Stack.Navigator>
             <Stack.Screen name="App" component={Navigator} options={navigationOptions}/>
             <Stack.Screen name="Music" component={PlayView} options={navigationOptions}/>
             <Stack.Screen name="Captcha" component={CaptchaView}/>
             
             <Stack.Screen name="Playlist" component={PlaylistView}
-                            options={{headerBackImage: () => getIcon({title: "arrow-back"})}}
+                          options={{headerBackImage: () => getIcon({title: "arrow-back"})}}
             />
             
             <Stack.Screen name="Artist" component={ArtistView}
-                            options={{headerBackImage: () => getIcon({title: "arrow-back"})}}
+                          options={{headerBackImage: () => getIcon({title: "arrow-back"})}}
             />
         </Stack.Navigator>
     </NavigationContainer>

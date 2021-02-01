@@ -22,16 +22,22 @@ import { rippleConfig } from '../../styles/Ripple';
 import { searchBarStyle } from '../../styles/Search';
 import { resultHomeStyle, preResultHomeStyle } from '../../styles/Home';
 
-export default SearchTab = ({navigation}) => {
+export default SearchTab = ({route, navigation}) => {
     const [shelves, setShelves] = useState([]);
     const [loading, setLoading] = useState(false);
     const [message, setMessage] = useState("");
     const [suggestion, setSuggestion] = useState(null);
     const [instead, setInstead] = useState(null);
     const [query, setQuery] = useState("");
-    const { dark, colors } = useTheme();
+    const {dark, colors} = useTheme();
 
     useEffect(() => {
+        if (route.params)
+            if (route.params.q) {
+                setQuery(route.params.q);
+                search(route.params.q)
+            }
+
         const _unsubscribe = navigation.addListener('focus', () => {
             setHeader({title: "Search"});
         });
@@ -43,6 +49,7 @@ export default SearchTab = ({navigation}) => {
     }, []);
 
     const search = query => {
+        navigation.setParams({q: query});
         Keyboard.dismiss();
         if (query.length > 0) {
             setLoading(true);
@@ -71,12 +78,10 @@ export default SearchTab = ({navigation}) => {
         <SectionList
             contentContainerStyle={shelvesStyle.scrollContainer}
 
-            ListEmptyComponent={
-                <>
+            ListEmptyComponent={<>
                 <Text style={[preResultHomeStyle.preHomeBottomText, preResultHomeStyle.preHomeTopText, {color: colors.text}]}>🔍</Text>
                 <Text style={[preResultHomeStyle.preHomeBottomText, {color: colors.text}]}>Look for music using the search bar</Text>
-                </>
-            }
+            </>}
 
             renderSectionHeader={({ section: { title } }) => (
                 <View style={resultHomeStyle.textView}>
@@ -136,7 +141,7 @@ export default SearchTab = ({navigation}) => {
                     <TextInput style={[searchBarStyle.input, {color: colors.text}]}
                             placeholder="Search"
                             value={query}
-                            onChangeText={setQuery}
+                            onChangeText={newQuery => setQuery(newQuery)}
                             placeholderTextColor={colors.text}
                             onSubmitEditing={() => search(query)}/>
                     <Pressable onPress={() => search(query)}

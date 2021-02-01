@@ -8,7 +8,6 @@ const musicYoutube = "https://music.youtube.com";
 const wwwYoutube = "https://www.youtube.com";
 const imgYoutube = "https://i.ytimg.com";
 const videoYoutube = "https://redirector.googlevideo.com";
-const wwwYoutubeSlash = wwwYoutube + "/";
 
 module.exports = () => ({
     devServer: {
@@ -16,21 +15,22 @@ module.exports = () => ({
         port: process.env.PORT || 8080,
         public: "youtune-react.herokuapp.com",
         proxy: {
-            '/start': {
+            '/proxy/start': {
                 target: musicYoutube,
                 secure: true,
                 changeOrigin: true,
-                pathRewrite: {'^/start' : ''},
+                pathRewrite: {'^/proxy/start' : ''},
 
                 headers: {
                     "User-Agent": userAgent
                 }
             },
 
-            '/youtubei': {
+            '/proxy/youtubei': {
                 target: musicYoutube,
                 secure: true,
                 changeOrigin: true,
+                pathRewrite: {'^/proxy' : ''},
 
                 headers: {
                     "Referer": musicYoutube,
@@ -39,10 +39,11 @@ module.exports = () => ({
                 },
             },
 
-            '/get_video_info': {
-                target: wwwYoutubeSlash,
+            '/proxy/get_video_info': {
+                target: wwwYoutube,
                 secure: true,
                 changeOrigin: true,
+                pathRewrite: {'^/proxy' : ''},
 
                 headers: {
                     "Referer": wwwYoutube,
@@ -51,10 +52,11 @@ module.exports = () => ({
                 },
             },
 
-            '/watch': {
-                target: wwwYoutubeSlash,
+            '/proxy/watch': {
+                target: wwwYoutube,
                 secure: true,
                 changeOrigin: true,
+                pathRewrite: {'^/proxy' : ''},
 
                 headers: {
                     "Referer": wwwYoutube,
@@ -63,10 +65,11 @@ module.exports = () => ({
                 },
             },
 
-            '/s': {
-                target: wwwYoutubeSlash,
+            '/proxy/s': {
+                target: wwwYoutube,
                 secure: true,
                 changeOrigin: true,
+                pathRewrite: {'^/proxy' : ''},
 
                 headers: {
                     "Referer": wwwYoutube,
@@ -75,12 +78,12 @@ module.exports = () => ({
                 },
             },
 
-            '/video': {
+            '/proxy/video': {
                 target: videoYoutube,
                 changeOrigin: true,
                 secure: false,
                 followRedirects: true,
-                pathRewrite: {'^/video' : ''},
+                pathRewrite: {'^/proxy' : ''},
 
                 headers: {
                     "Referer": wwwYoutube,
@@ -89,10 +92,11 @@ module.exports = () => ({
                 }
             },
 
-            '/vi': {
+            '/proxy/vi': {
                 target: imgYoutube,
                 secure: true,
                 changeOrigin: true,
+                pathRewrite: {'^/proxy' : ''},
 
                 headers: {
                     "Referer": wwwYoutube,

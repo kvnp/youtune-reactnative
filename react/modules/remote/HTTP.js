@@ -1,4 +1,5 @@
 import { Platform } from "react-native";
+import { settings } from "../storage/SettingsStorage";
 
 const url = "https://music.youtube.com/"
 const partialEndpoint = "youtubei/v1/"
@@ -9,14 +10,17 @@ export function getUrl(endpoint, apiKey) {
 }
 
 export const getHttpResponse = async (url, input, type) => {
-    if (Platform.OS == "web") {
+    if (Platform.OS == "web" || settings.proxyYTM) {
+        const location = window.location.protocol + "//" +
+                         window.location.host + "/proxy/";
+
         if (url[23] == "/")
-            url = window.location + url.slice(24);
+            url = location + url.slice(24);
         else {
             if (url.length == 26)
-                url = window.location + "start";
+                url = location + "start";
             else if (url.length > 26)
-                url = window.location + url.slice(26);
+                url = location + url.slice(26);
         }
     }
 

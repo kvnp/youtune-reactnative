@@ -1,15 +1,10 @@
-import { fetchBrowse } from "../remote/API";
-
-function showPlaylist(id, navigation) {
-    fetchBrowse(id).then((playlist) => 
-        navigation.push("Playlist", playlist)
-    );
+function showPlaylist(browseId, navigation) {
+    const playlistId = browseId.slice(2);
+    navigation.push("Playlist", {list: playlistId});
 }
 
 function showArtist(browseId, navigation) {
-    fetchBrowse(browseId).then((artist) => 
-        navigation.push("Artist", artist)
-    );
+    navigation.push("Artist", {channelId: browseId})
 }
 
 export function handleMedia(media, navigation, index, playlist) {
