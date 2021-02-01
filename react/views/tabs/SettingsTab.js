@@ -24,6 +24,10 @@ import { useTheme } from '@react-navigation/native';
 import { setHeader } from '../../components/overlay/Header';
 import { rippleConfig } from '../../styles/Ripple';
 
+const host = Platform.OS == "web"
+    ? window.location.hostname
+    : "youtune.kvnp.eu";
+
 export default SettingsTab = ({navigation}) => {
     const [language, setLanguage] = useState(settings.transmitLanguage);
     const [proxy, setProxy] = useState(settings.proxyYTM);
@@ -124,7 +128,7 @@ export default SettingsTab = ({navigation}) => {
 
         {
             icon: "public",
-            description: "Proxy search and browse requests over youtune.kvnp.eu",
+            description: "Proxy search and browse requests over " + host,
             state: proxy,
             function: toggleProxy,
             switch: true,
