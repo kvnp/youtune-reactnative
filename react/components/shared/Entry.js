@@ -16,7 +16,7 @@ import { useTheme } from '@react-navigation/native';
 import { showModal } from './MoreModal';
 
 export default Entry = ({ entry, navigation, index }) => {
-    let { title, subtitle, secondTitle, secondSubtitle, thumbnail } = entry;
+    let { title, subtitle, thumbnail } = entry;
     let { videoId, browseId, playlistId } = entry;
 
     let view = {
@@ -52,16 +52,10 @@ export default Entry = ({ entry, navigation, index }) => {
                 <Image style={resultStyle.resultCover} source={{uri: thumbnail}}/>
             </Pressable>
 
-            <View style={resultStyle.resultColumnTwo}>
-                <Text numberOfLines={1} style={[resultStyle.resultText, {color: colors.text}]}>{secondTitle}</Text>
-                <Text numberOfLines={1} style={[resultStyle.resultText, {color: colors.text}]}>{secondSubtitle}</Text>
-            </View>
-            
             <View style={resultStyle.resultColumnOne}>
                 <Text numberOfLines={1} style={[resultStyle.resultText, {color: colors.text}]}>{title}</Text>
                 <Text numberOfLines={1} style={[resultStyle.resultText, {color: colors.text}]}>{subtitle}</Text>
             </View>
-
 
             <Pressable onPress={() => showModal(view)}>
                 <MaterialIcons name="more-vert" color={colors.text} size={24}/>

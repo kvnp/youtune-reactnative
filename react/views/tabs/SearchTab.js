@@ -76,7 +76,7 @@ export default SearchTab = ({route, navigation}) => {
 
     return <>
         <SectionList
-            contentContainerStyle={shelvesStyle.scrollContainer}
+            contentContainerStyle={shelvesStyle.searchContainer}
 
             ListEmptyComponent={<>
                 <Text style={[preResultHomeStyle.preHomeBottomText, preResultHomeStyle.preHomeTopText, {color: colors.text}]}>🔍</Text>
