@@ -59,7 +59,12 @@ export default ArtistView = ({ route, navigation }) => {
                             </Text>
                         </Pressable>
                     </View>
-                    <Pressable android_ripple={rippleConfig} onPress={() => navigation.pop()}>
+                    <Pressable android_ripple={rippleConfig}
+                               onPress={() => {
+                                    navigation.pop()
+                                    if (navigation.isFocused())
+                                        navigation.navigate("App");
+                               }}>
                         <View style={[bottomBarStyle.closeButton, {backgroundColor: colors.card}]}>
                             <MaterialIcons name="arrow-back" color={colors.text} size={20}/>
                         </View>

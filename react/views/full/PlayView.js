@@ -96,6 +96,8 @@ export default PlayView = ({route, navigation}) => {
                         isStopped: true
                     });
                     navigation.goBack();
+                    if (navigation.isFocused())
+                        navigation.navigate("App");
                     return;
                 case TrackPlayer.STATE_BUFFERING:
                     setPlayback({
@@ -207,7 +209,12 @@ export default PlayView = ({route, navigation}) => {
                 </View>
 
                 <View style={{justifyContent: "space-between", flexDirection: "row", paddingTop: 30}}>
-                    <Pressable onPress={navigation.goBack} android_ripple={rippleConfig} style={stylesTop.topFirst}>
+                    <Pressable android_ripple={rippleConfig} style={stylesTop.topFirst}
+                               onPress={() => {
+                                    navigation.goBack();
+                                    if (navigation.isFocused())
+                                        navigation.navigate("App");
+                               }}>
                         <MaterialIcons selectable={false} name="keyboard-arrow-down" color={colors.text} size={30}/>
                     </Pressable>
 
