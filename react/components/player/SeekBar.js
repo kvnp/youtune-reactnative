@@ -10,6 +10,7 @@ import {
 import TrackPlayer, { useTrackPlayerProgress } from 'react-native-track-player';
 import Slider from "@react-native-community/slider";
 import { useTheme } from '@react-navigation/native';
+import { useState } from 'react';
 
 function pad(n, width, z = 0) {
     n = n + '';
@@ -21,12 +22,11 @@ const minutesAndSeconds = (position) => ([
     pad( ~~(position % 60), 2),
 ]);
 
-const doSeek = async(value) => {
-    await TrackPlayer.seekTo(value);
-}
-
 export default ({ style }) => {
-    const { position, bufferedPosition, duration } = useTrackPlayerProgress();
+    const [isSliding, setSliding] = useState(false);
+    const [positionCache, setPositionCache] = useState(0);
+
+    const { position, bufferedPosition, duration } = useTrackPlayerProgress(0.25);
 
     const elapsed = minutesAndSeconds(position);
     const remaining = minutesAndSeconds(duration - position);
@@ -35,9 +35,16 @@ export default ({ style }) => {
     return (
         <View style={[styles.container, style]}>
             <Slider
-                maximumValue={Math.max(duration, 1, position + 1)}
-                onSlidingComplete={async(value) => await doSeek(value)}
-                value={position}
+                maximumValue={Math.max(duration, 1, position)}
+                onSlidingComplete={async(value) => {
+                    await TrackPlayer.seekTo(value);
+                    setSliding(false);
+                }}
+                onSlidingStart={position => {
+                    setSliding(true);
+                    setPositionCache(position);
+                }}
+                value={isSliding != true ? position : positionCache}
                 bufferedPosition={bufferedPosition}
                 minimumTrackTintColor={colors.text}
                 maximumTrackTintColor={colors.card}
