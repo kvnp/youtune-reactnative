@@ -117,7 +117,6 @@ export default SettingsTab = ({navigation}) => {
             switch: false
         },
 
-
         {
             icon: "language",
             description: "Transmit device language",
@@ -161,7 +160,6 @@ export default SettingsTab = ({navigation}) => {
         bounces={true}
         contentContainerStyle={styles.content}
 
-
         data={items}
         renderItem={drawItem}
     />
@@ -172,7 +170,7 @@ const styles = StyleSheet.create({
         flexGrow: 1,
         justifyContent: "flex-end",
         
-        maxWidth: "800px",
+        maxWidth: 800,
         width: "100%",
         alignSelf: "center"
     },

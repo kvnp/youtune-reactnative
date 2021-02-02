@@ -47,7 +47,7 @@ export default ArtistView = ({ route, navigation }) => {
                     <View style={bottomBarStyle.artistColumn}>
                         {
                             artist == null
-                            ? <View style={{width: "200px", height: "20px", marginBottom: "2px", backgroundColor: colors.text}}/>
+                            ? <View style={{width: 200, height: 20, marginBottom: 2, backgroundColor: colors.text}}/>
                             : <Text style={[bottomBarStyle.artistName, {color: colors.text}]}>
                                 {artist.header.title}
                             </Text>

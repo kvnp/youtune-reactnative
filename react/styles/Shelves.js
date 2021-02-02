@@ -13,7 +13,7 @@ export const shelvesStyle = StyleSheet.create({
         flexGrow: 1,
         justifyContent: "center",
         paddingBottom: 20,
-        maxWidth: "800px",
+        maxWidth: 800,
         width: "100%",
         alignSelf: "center"
     }

@@ -90,7 +90,7 @@ const styles = StyleSheet.create({
         position: "relative",
         alignSelf: "center",
         width: "100%",
-        maxWidth: "800px"
+        maxWidth: 800
     },
 
     panelHeader: {

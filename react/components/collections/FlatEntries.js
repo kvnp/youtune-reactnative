@@ -6,9 +6,9 @@ import Entry from '../shared/Entry';
 export default FlatEntries = ({entries, navigation}) => {
     return <FlatList
                 contentContainerStyle={{
-                    marginHorizontal: "10px",
+                    marginHorizontal: 10,
                     alignSelf: "center",
-                    maxWidth: "800px",
+                    maxWidth: 800,
                     width: "100%"
                 }}
 

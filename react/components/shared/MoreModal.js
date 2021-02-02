@@ -166,7 +166,7 @@ export default MoreModal = ({navigation}) => {
             <Pressable android_ripple={rippleConfig}
                        style={{
                             paddingHorizontal: 10,
-                            maxWidth: "800px",
+                            maxWidth: 800,
                             alignSelf: "center",
                             width: "100%"
                        }}>

@@ -98,7 +98,7 @@ export default MiniPlayer = ({navigation, style}) => {
     }
 
     return  <View style={[style, styles.main, {height: playerState.isStopped ?0 :50, backgroundColor: colors.card}]}>
-        <View style={[styles.main, {justifyContent: "space-evenly", width: "100%", maxWidth: "800px", alignSelf: "center"}]}>
+        <View style={[styles.main, {justifyContent: "space-evenly", width: "100%", maxWidth: 800, alignSelf: "center"}]}>
             <View style={styles.playback}>
                 <View style={{width: positionLength + "%", backgroundColor: colors.text}}></View>
                 <View style={{width: remainingLength + "%", backgroundColor: colors.card}}></View>
@@ -143,7 +143,7 @@ const styles = StyleSheet.create({
     },
 
     playback: {
-        height: "1px",
+        height: 1,
         flexDirection: "row"
     },
 

@@ -137,7 +137,7 @@ export default PlayView = ({route, navigation}) => {
                 <Image resizeMode="contain" style={imageStyles.image} source={{uri: artwork}}/>
             </View>
 
-            <View style={{width: "100%", maxWidth: "800px", alignSelf: "center", justifyContent: "space-around", alignItems: "stretch", justifyContent: "center"}}>
+            <View style={{width: "100%", maxWidth: 800, alignSelf: "center", justifyContent: "space-around", alignItems: "stretch", justifyContent: "center"}}>
                 <View style={controlStyles.container}>
                     <Pressable onPress={() => { likeSong(id, false); refreshUI();}} android_ripple={rippleConfig}>
                         <MaterialIcons selectable={false}
@@ -154,9 +154,8 @@ export default PlayView = ({route, navigation}) => {
                             size={30}
                         />
                     </Pressable>
-
                     
-                    <View style={{flexGrow: "1", width: "1px", alignItems: "center"}}>
+                    <View style={{flexGrow: 1, width: 1, alignItems: "center"}}>
                         <Text adjustsFontSizeToFit={true} ellipsizeMode="tail" numberOfLines={1} style={[stylesBottom.titleText, {marginHorizontal: 10, color: colors.text}]}>{title}</Text>
                         <Text adjustsFontSizeToFit={true} ellipsizeMode="tail" numberOfLines={1} style={[stylesBottom.subtitleText, {marginHorizontal: 10, color: colors.text}]}>{artist}</Text>
                     </View>

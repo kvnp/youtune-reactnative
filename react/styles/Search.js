@@ -11,7 +11,7 @@ export const searchBarStyle = StyleSheet.create({
     inputBox: {
         flexDirection: "row",
         justifyContent: "center",
-        maxWidth: "800px",
+        maxWidth: 800,
         width: "100%"
     },
 
