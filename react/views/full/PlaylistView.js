@@ -57,28 +57,23 @@ export default PlaylistView = ({ route, navigation }) => {
                 <View>
                     {
                         playlist == null
-                        ? <View style={{width: 250, height: 20, marginBottom: 2, backgroundColor: colors.text}}/>
-                        : <Text numberOfLines={1} style={[bottomBarAlbumStyle.albumTitle, bottomBarAlbumStyle.albumText, {color: colors.text}]}>
-                            {playlist.title}
-                        </Text>
+                        ? <>
+                            <View style={{width: 250, height: 20, marginBottom: 2, backgroundColor: colors.text}}/>
+                            <View style={{width: 200, height: 20, marginBottom: 2, backgroundColor: colors.text}}/>
+                            <View style={{width: 230, height: 20, marginBottom: 2, backgroundColor: colors.text}}/>
+                        </>
+                        : <>
+                            <Text numberOfLines={1} style={[bottomBarAlbumStyle.albumTitle, bottomBarAlbumStyle.albumText, {color: colors.text}]}>
+                                {playlist.title}
+                            </Text>
+                            <Text numberOfLines={1} style={[bottomBarAlbumStyle.albumSubtitle, bottomBarAlbumStyle.albumText, {color: colors.text}]}>
+                                {playlist.subtitle}
+                            </Text>
+                            <Text numberOfLines={1} style={[bottomBarAlbumStyle.albumInfo, bottomBarAlbumStyle.albumText, {color: colors.text}]}>
+                                {playlist.secondSubtitle}
+                            </Text>
+                        </>
                     }
-
-                    {
-                        playlist == null
-                        ? <View style={{width: 200, height: 20, marginBottom: 2, backgroundColor: colors.text}}/>
-                        : <Text numberOfLines={1} style={[bottomBarAlbumStyle.albumSubtitle, bottomBarAlbumStyle.albumText, {color: colors.text}]}>
-                            {playlist.subtitle}
-                        </Text>
-                    }
-
-                    {
-                        playlist == null
-                        ? <View style={{width: 230, height: 20, marginBottom: 2, backgroundColor: colors.text}}/>
-                        : <Text numberOfLines={1} style={[bottomBarAlbumStyle.albumInfo, bottomBarAlbumStyle.albumText, {color: colors.text}]}>
-                            {playlist.secondSubtitle}
-                        </Text>
-                    }
-                    
                 </View>
                 <Pressable android_ripple={rippleConfig} style={[bottomBarStyle.closeButton, {backgroundColor: colors.border}]}
                             onPress={() => {
