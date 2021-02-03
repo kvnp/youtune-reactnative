@@ -5,7 +5,7 @@ export var settings = {
     transmitLanguage: false,
     proxyYTM: false,
     safetyMode: false,
-    darkMode: false,
+    darkMode: true,
 }
 
 export const initSettings = () => {
