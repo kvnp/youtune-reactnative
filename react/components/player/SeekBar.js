@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 import {
     View,
@@ -7,11 +7,10 @@ import {
     Platform
 } from 'react-native';
 
-import TrackPlayer, { useTrackPlayerProgress } from 'react-native-track-player';
-import Slider from "@react-native-community/slider";
 import { useTheme } from '@react-navigation/native';
-import { useState } from 'react';
-import { useEffect } from 'react';
+import Slider from "@react-native-community/slider";
+
+import TrackPlayer, { useTrackPlayerProgress } from 'react-native-track-player';
 
 function pad(n, width, z = 0) {
     n = n + '';
@@ -27,7 +26,7 @@ export default SeekBar = ({ style }) => {
     const [isSliding, setSliding] = useState(false);
     const [positionCache, setPositionCache] = useState(0);
 
-    const { position, bufferedPosition, duration } = useTrackPlayerProgress();
+    const { position, bufferedPosition, duration } = useTrackPlayerProgress(250);
 
     const elapsed = minutesAndSeconds(position);
     const remaining = minutesAndSeconds(duration - position);
