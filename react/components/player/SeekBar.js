@@ -11,6 +11,7 @@ import TrackPlayer, { useTrackPlayerProgress } from 'react-native-track-player';
 import Slider from "@react-native-community/slider";
 import { useTheme } from '@react-navigation/native';
 import { useState } from 'react';
+import { useEffect } from 'react';
 
 function pad(n, width, z = 0) {
     n = n + '';
@@ -22,11 +23,11 @@ const minutesAndSeconds = (position) => ([
     pad( ~~(position % 60), 2),
 ]);
 
-export default ({ style }) => {
+export default SeekBar = ({ style }) => {
     const [isSliding, setSliding] = useState(false);
     const [positionCache, setPositionCache] = useState(0);
 
-    const { position, bufferedPosition, duration } = useTrackPlayerProgress(0.25);
+    const { position, bufferedPosition, duration } = useTrackPlayerProgress();
 
     const elapsed = minutesAndSeconds(position);
     const remaining = minutesAndSeconds(duration - position);
