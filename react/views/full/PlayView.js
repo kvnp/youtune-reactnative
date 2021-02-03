@@ -5,7 +5,9 @@ import {
     StyleSheet,
     Image,
     Pressable,
-    ActivityIndicator
+    ActivityIndicator,
+    Dimensions,
+    Platform
 } from "react-native";
 
 import TrackPlayer from 'react-native-track-player';
@@ -39,6 +41,22 @@ export default PlayView = ({route, navigation}) => {
     const [track, setTrack] = useState(null);
     const [playlist, setPlaylist] = useState(null);
     const [isLiked, setLiked] = useState(null);
+    const [dimensions, setDimensions] = useState(
+        Platform.OS == "web"
+            ? {
+                width: window.innerHeight> window.innerWidth
+                    ? window.innerWidth - 50
+                    : window.innerHeight - 50,
+                height: window.innerHeight > window.innerWidth
+                    ? window.innerHeight / 2.6
+                    : window.innerWidth / 2.6
+            }
+
+            : {
+                width: Dimensions.get("window").width - 50,
+                height: Dimensions.get("window").height / 2.6
+            }
+    );
 
     const { dark, colors } = useTheme();
 
@@ -64,7 +82,25 @@ export default PlayView = ({route, navigation}) => {
         let _unsub = [];
         _unsub.push(TrackPlayer.addEventListener("playback-state", refreshUI));
         _unsub.push(TrackPlayer.addEventListener("playback-track-changed", refreshUI));
+        
+        let resizeListener = Platform.OS == "web"
+            ? window.addEventListener(
+                "resize", () => setDimensions({
+                    width: window.innerHeight > window.innerWidth
+                        ? window.innerWidth - 50
+                        : window.innerHeight - 50,
+                    height: window.innerHeight > window.innerWidth
+                        ? window.innerHeight / 2.6
+                        : window.innerWidth / 2.6
+                })
+            )
+        
+            : undefined;
+
         return () => {
+            if (resizeListener)
+                resizeListener.removeEventListener("resize");
+
             for (let i = 0; i < _unsub.length; i++)
                 _unsub[i].remove();
         };
@@ -130,19 +166,20 @@ export default PlayView = ({route, navigation}) => {
         var artist = null;
         var artwork = null;
     }
+    
+    
 
-    return <View style={{overflow: "hidden", height: "100%"}}>
+    return <>
         <View style={stylesTop.vertContainer}>
-            <View style={imageStyles.view}>
+            <View style={[imageStyles.view, {height: dimensions.height, width: dimensions.width}]}>
                 <Image resizeMode="contain" style={imageStyles.image} source={{uri: artwork}}/>
             </View>
 
-            <View style={{width: "100%", maxWidth: 800, alignSelf: "center", justifyContent: "space-around", alignItems: "stretch", justifyContent: "center"}}>
+            <View style={[stylesBottom.container, {width: dimensions.width, height: dimensions.height}]}>
                 <View style={controlStyles.container}>
-                    <Pressable onPress={() => { likeSong(id, false); refreshUI();}} android_ripple={rippleConfig}>
+                    <Pressable onPress={() => { likeSong(id, false); refreshUI(); }} style={{paddingTop: 5}} android_ripple={rippleConfig}>
                         <MaterialIcons selectable={false}
                             name="thumb-down"
-
                             color={
                                 isLiked == null
                                     ? colors.text
@@ -155,15 +192,14 @@ export default PlayView = ({route, navigation}) => {
                         />
                     </Pressable>
                     
-                    <View style={{flexGrow: 1, width: 1, alignItems: "center"}}>
-                        <Text adjustsFontSizeToFit={true} ellipsizeMode="tail" numberOfLines={1} style={[stylesBottom.titleText, {marginHorizontal: 10, color: colors.text}]}>{title}</Text>
-                        <Text adjustsFontSizeToFit={true} ellipsizeMode="tail" numberOfLines={1} style={[stylesBottom.subtitleText, {marginHorizontal: 10, color: colors.text}]}>{artist}</Text>
+                    <View style={{flexGrow: 1, width: 1, paddingHorizontal: 5, alignItems: "center"}}>
+                        <Text adjustsFontSizeToFit={true} ellipsizeMode="tail" numberOfLines={1} style={[stylesBottom.titleText, {color: colors.text}]}>{title}</Text>
+                        <Text adjustsFontSizeToFit={true} ellipsizeMode="tail" numberOfLines={1} style={[stylesBottom.subtitleText, {color: colors.text}]}>{artist}</Text>
                     </View>
 
-                    <Pressable onPress={() => { likeSong(id, true); refreshUI(); }} android_ripple={rippleConfig}>
+                    <Pressable onPress={() => { likeSong(id, true); refreshUI(); }} style={{paddingTop: 5}} android_ripple={rippleConfig}>
                         <MaterialIcons selectable={false}
                             name="thumb-up"
-
                             color={
                                 isLiked == null
                                     ? colors.text
@@ -239,7 +275,7 @@ export default PlayView = ({route, navigation}) => {
                         playlist={playlist}
                         track={track}
                         style={stylesRest.container}/>
-    </View>
+    </>
 }
 
 const stylesRest = StyleSheet.create({
@@ -253,6 +289,15 @@ const stylesRest = StyleSheet.create({
 });
 
 const stylesBottom = StyleSheet.create({
+    container: {
+        alignSelf: "center",
+        justifyContent: "space-around",
+        alignItems: "stretch",
+        justifyContent: "center",
+        maxWidth: 400,
+        paddingHorizontal: "5%"
+    },
+
     subtitleText: {
         paddingTop: 5,
         alignSelf: "center",
@@ -275,8 +320,8 @@ const stylesBottom = StyleSheet.create({
 
 const imageStyles = StyleSheet.create({
     view: {
-        height: "50%",
-        alignSelf: "stretch"
+        alignSelf: "stretch",
+        maxWidth: 400
     },
 
     image: {
@@ -311,11 +356,11 @@ const stylesTop = StyleSheet.create({
     vertContainer: {
         width: "100%",
         height: "100%",
-        padding: "10%",
-        paddingBottom: 100,
+        paddingHorizontal: "10%",
+        paddingBottom: 50,
         flexWrap: "wrap",
-        alignSelf: "stretch",
-        alignContent: "stretch",
+        alignSelf: "center",
+        alignContent: "space-around",
         justifyContent: "space-around"
     }
 });
