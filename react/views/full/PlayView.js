@@ -46,6 +46,7 @@ export default PlayView = ({route, navigation}) => {
         navigation.setOptions({title: "Loading"});
         if (route.params)
             if (route.params.v) {
+                TrackPlayer.reset();
                 setPlayback({
                     isPlaying: false,
                     isLoading: true,
@@ -96,8 +97,6 @@ export default PlayView = ({route, navigation}) => {
                         isStopped: true
                     });
                     navigation.goBack();
-                    if (navigation.isFocused())
-                        navigation.navigate("App");
                     return;
                 case TrackPlayer.STATE_BUFFERING:
                     setPlayback({
@@ -113,6 +112,7 @@ export default PlayView = ({route, navigation}) => {
             navigation.setParams({v: id, list: track.playlistId});
             
             setTrack(track);
+            setPlaylist(await TrackPlayer.getQueue())
             setLiked(await getSongLike(id));
         }
     }
@@ -202,18 +202,14 @@ export default PlayView = ({route, navigation}) => {
                         <MaterialIcons selectable={false} name="skip-next" color={colors.text} size={40}/>
                     </Pressable>
 
-                    <Pressable onPress={setRepeatLocal} android_ripple={rippleConfig}>
+                    <Pressable onPress={() => setRepeatLocal()} android_ripple={rippleConfig}>
                         <MaterialIcons selectable={false} name={willRepeat ?"repeat-one" :"repeat"} color={colors.text} size={30}/>
                     </Pressable>
                 </View>
 
                 <View style={{justifyContent: "space-between", flexDirection: "row", paddingTop: 30}}>
                     <Pressable android_ripple={rippleConfig} style={stylesTop.topFirst}
-                               onPress={() => {
-                                    navigation.goBack();
-                                    if (navigation.isFocused())
-                                        navigation.navigate("App");
-                               }}>
+                               onPress={() => navigation.goBack()}>
                         <MaterialIcons selectable={false} name="keyboard-arrow-down" color={colors.text} size={30}/>
                     </Pressable>
 

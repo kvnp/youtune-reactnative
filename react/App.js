@@ -21,8 +21,10 @@ export const navigationOptions = {
 const Stack = createStackNavigator();
 
 const config = {
+    initialRouteName: "App",
     screens: {
         App: {
+            initialRouteName: "Home",
             path: "",
             screens: {
                 Home: "",
@@ -44,7 +46,7 @@ const config = {
 
         Music: "watch",
         Artist: "channel/:channelId",
-        Playlist: "playlist"
+        Playlist: "playlist",
     }
 };
 
@@ -69,7 +71,7 @@ export default App = () => {
     };
 
     return <NavigationContainer linking={linking} theme={dark ? DarkTheme : DefaultTheme}>
-        <Stack.Navigator>
+        <Stack.Navigator detachInactiveScreens={false} options={{animationEnabled: true, detachPreviousScreen: false}}>
             <Stack.Screen name="App" component={Navigator} options={navigationOptions}/>
             <Stack.Screen name="Music" component={PlayView} options={navigationOptions}/>
             <Stack.Screen name="Captcha" component={CaptchaView}/>

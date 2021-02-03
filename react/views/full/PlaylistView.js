@@ -27,8 +27,10 @@ export default PlaylistView = ({ route, navigation }) => {
     useEffect(() => {
         fetchBrowse(route.params.list)
             .then(playlist => {
-                setPlaylist(playlist);
-                navigation.setOptions({ title: playlist.title });
+                if (navigation.isFocused()) {
+                    setPlaylist(playlist);
+                    navigation.setOptions({ title: playlist.title });
+                }
             });
     }, []);
 
@@ -76,11 +78,7 @@ export default PlaylistView = ({ route, navigation }) => {
                     }
                 </View>
                 <Pressable android_ripple={rippleConfig} style={[bottomBarStyle.closeButton, {backgroundColor: colors.border}]}
-                            onPress={() => {
-                                navigation.pop()
-                                if (navigation.isFocused())
-                                    navigation.navigate("App");
-                            }}>
+                            onPress={() => navigation.pop()}>
                     <MaterialIcons name="arrow-back" color={colors.text} size={20}/>
                 </Pressable>
             </View>

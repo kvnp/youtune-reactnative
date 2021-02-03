@@ -27,8 +27,10 @@ export default ArtistView = ({ route, navigation }) => {
     useEffect(() => {
         fetchBrowse(route.params.channelId)
             .then(artist => {
-                setArtist(artist);
-                navigation.setOptions({ title: artist.header.title });
+                if (navigation.isFocused()) {
+                    setArtist(artist);
+                    navigation.setOptions({ title: artist.header.title });
+                }
             });
     }, []);
 
@@ -60,11 +62,7 @@ export default ArtistView = ({ route, navigation }) => {
                         </Pressable>
                     </View>
                     <Pressable android_ripple={rippleConfig}
-                               onPress={() => {
-                                    navigation.pop()
-                                    if (navigation.isFocused())
-                                        navigation.navigate("App");
-                               }}>
+                               onPress={() => navigation.pop()}>
                         <View style={[bottomBarStyle.closeButton, {backgroundColor: colors.card}]}>
                             <MaterialIcons name="arrow-back" color={colors.text} size={20}/>
                         </View>
