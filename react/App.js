@@ -4,6 +4,7 @@ import { StatusBar } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import { DefaultTheme, DarkTheme } from '@react-navigation/native';
+import { enableScreens } from 'react-native-screens';
 
 import { settings } from "./modules/storage/SettingsStorage";
 import PlayView from "./views/full/PlayView";
@@ -11,6 +12,8 @@ import PlaylistView from "./views/full/PlaylistView";
 import ArtistView from "./views/full/ArtistView";
 import Navigator, { getIcon } from "./views/full/Navigator";
 import CaptchaView from "./views/full/CaptchaView";
+
+enableScreens();
 
 export var darkCallback = null;
 export const navigationOptions = {
