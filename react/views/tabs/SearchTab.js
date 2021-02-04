@@ -48,13 +48,13 @@ export default SearchTab = ({route, navigation}) => {
 
     }, []);
 
-    const search = query => {
+    const search = (query, params) => {
         navigation.setParams({q: query});
         Keyboard.dismiss();
         if (query.length > 0) {
             setLoading(true);
 
-            fetchResults(query).then(data => {
+            fetchResults(query, params).then(data => {
                 if (data.suggestionOption == suggestion)
                     data.suggestionOption = null;
 
@@ -71,7 +71,7 @@ export default SearchTab = ({route, navigation}) => {
 
     const searchInstead = query => {
         setQuery(query);
-        search(query);
+        search(query, null);
     }
 
     return <>
@@ -89,11 +89,24 @@ export default SearchTab = ({route, navigation}) => {
                 </View>
             )}
 
+            renderSectionFooter={({ section: { bottomEndpoint } }) => (
+                bottomEndpoint != null
+                    ? <Pressable
+                        android_ripple={rippleConfig}
+                        onPress={() => search(bottomEndpoint.query, bottomEndpoint.params)}
+                        style={{padding: 10, margin: 20, width: 100, borderRadius: 10, alignItems: "center", backgroundColor: colors.card}}
+                    >
+                        <Text style={{color: colors.text, fontSize: 15, fontWeight: 700}}>{bottomEndpoint.text}</Text>
+                    </Pressable>
+
+                    : null
+            )}
+
             progressViewOffset={20}
             sections={shelves}
 
             refreshing={loading}
-            onRefresh={() => search(query)}
+            onRefresh={() => search(query, null)}
 
             keyExtractor={(item, index) => index + item.title}
             renderItem={({ item }) =>  <Entry entry={item} navigation={navigation}/>}
@@ -143,8 +156,8 @@ export default SearchTab = ({route, navigation}) => {
                             value={query}
                             onChangeText={newQuery => setQuery(newQuery)}
                             placeholderTextColor={colors.text}
-                            onSubmitEditing={() => search(query)}/>
-                    <Pressable onPress={() => search(query)}
+                            onSubmitEditing={() => search(query, null)}/>
+                    <Pressable onPress={() => search(query, null)}
                             android_ripple={rippleConfig}
                             style={searchBarStyle.button}>
                         { loading

@@ -52,12 +52,15 @@ function getRequestBody() {
     return body;
 }
 
-export async function fetchResults(query) {
+export async function fetchResults(query, params) {
     const apikey = await getApiKey();
     const url = getUrl("search", apikey);
 
     let body = getRequestBody();
     body["query"] = query;
+    
+    if (params)
+        body["params"] = params;
 
     let response = await getHttpResponse(url, {
         method: "POST",
@@ -84,12 +87,18 @@ export async function fetchSpecificResults(kind) {
     return digestSearchResults(response);
 }
 
-export async function fetchHome() {
+export async function fetchHome(continuation) {
     const apikey = await getApiKey();
-    const url = getUrl("browse", apikey);
+    let url = getUrl("browse", apikey);
 
     let body = getRequestBody();
-    body["browseId"] = "FEmusic_home";
+
+    if (continuation)
+        url = url + "&ctoken=" + continuation.continuation + 
+                    "&continuation=" + continuation.continuation +
+                    "&itct=" + continuation.itct
+    else
+        body["browseId"] = "FEmusic_home";
 
     let response = await getHttpResponse(url, {
         method: "POST",

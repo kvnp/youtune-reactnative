@@ -70,7 +70,26 @@ export function digestSearchResults(json) {
             for (let ttl = 0; ttl < titlelist.length; ttl++)
                 title += titlelist[ttl].text;
 
-            let shelf = {title: title, data: []};
+            let bottomEndpoint = null;
+            if (musicShelf.hasOwnProperty("bottomEndpoint")) {
+                let bottomText = "";
+                let textArray = musicShelf.bottomText.runs;
+                for (let botText = 0; botText < textArray.length; botText++) {
+                    bottomText += textArray[botText].text;
+                }
+
+                bottomEndpoint = {
+                    query: musicShelf.bottomEndpoint.searchEndpoint.query,
+                    params: musicShelf.bottomEndpoint.searchEndpoint.params,
+                    text: bottomText
+                };
+            }
+
+            let shelf = {
+                title: title,
+                bottomEndpoint: bottomEndpoint,
+                data: []
+            };
 
             let responsiveMusicList = musicShelf.contents;
             for (let rml = 0; rml < responsiveMusicList.length; rml++) {
@@ -151,9 +170,28 @@ export function digestSearchResults(json) {
 }
 
 export function digestHomeResults(json) {
-    let contentList = json.contents.singleColumnBrowseResultsRenderer.tabs[0].tabRenderer.content.sectionListRenderer.contents;
+    let tabRenderer = json.contents.singleColumnBrowseResultsRenderer.tabs[0].tabRenderer;
+    
+    let sectionList = null;
+    if (tabRenderer.hasOwnProperty("content"))
+        sectionList = tabRenderer.content.sectionListRenderer;
+    else {
+        console.log(json);
+        sectionList = json.continuationContents.sectionListContinuation;
+    }
 
-    let final = {background: null, shelves: []};
+    //{ctoken, continuation} = continuation
+    //itct = clickTrackingParams
+    let final = {background: null, shelves: [], continuation: null};
+    if (sectionList.hasOwnProperty("continuations")) {
+        let continuations = sectionList.continuations[0].nextContinuationData;
+        final.continuation = {
+            continuation: continuations.continuation,
+            itct: continuations.clickTrackingParams
+        }
+    }
+
+    let contentList = sectionList.contents;
     for (let y = 0; y < contentList.length; y++) {
         let shelf = {title: "", albums: []};
         let shelfRenderer;

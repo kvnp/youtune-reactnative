@@ -12,7 +12,6 @@ import {
 import { fetchHome } from "../../modules/remote/API";
 
 import Shelf from '../../components/shared/Shelf';
-import MiniPlayer from '../../components/player/MiniPlayer';
 
 import { shelvesStyle } from '../../styles/Shelves';
 import { refreshStyle, preResultHomeStyle } from '../../styles/Home';
@@ -21,8 +20,12 @@ import { setHeader } from '../../components/overlay/Header';
 
 export default HomeTab = ({navigation}) => {
     const [shelves, setShelves] = useState([]);
-    const [loading, setLoading] = useState(false);
+    const [continuation, setContinuation] = useState(null);
+    const [loading, setLoading] = useState(true);
     const { colors } = useTheme();
+    const homeText = Platform.OS == "web"
+        ? "Press the home icon to load"
+        : "Pull down to load";
 
     useEffect(() => {
         const _unsubscribe = navigation.addListener('focus', () => {
@@ -37,14 +40,21 @@ export default HomeTab = ({navigation}) => {
     }, []);
 
     const startRefresh = async() => {
-        setLoading(true);
-        let result = await fetchHome();
+        let temp = continuation;
+        setContinuation(null);
 
-        if (result.background != undefined)
+        let result = await fetchHome(temp);
+
+        if (result.background)
             setHeader({image: result.background});
 
-        setShelves(result.shelves);
-        setLoading(false);
+        setShelves(shelves.concat(result.shelves));
+
+        if (result.continuation)
+            setContinuation(result.continuation);
+
+        if (loading)
+            setLoading(false);
     }
 
     return <FlatList
@@ -57,17 +67,18 @@ export default HomeTab = ({navigation}) => {
                 <ActivityIndicator color={colors.text} size="large"/>
             </View>
 
-            : <Pressable onPress={Platform.OS == "web" ?startRefresh :null}>
+            : <Pressable onPress={Platform.OS == "web" ? () => startRefresh() :null}>
                 <Text style={[preResultHomeStyle.preHomeBottomText, preResultHomeStyle.preHomeTopText]}>🏠</Text>
                 <Text style={preResultHomeStyle.preHomeBottomText}>
-                    {
-                        Platform.OS == "web"
-                            ? "Press the home icon to load"
-                            : "Pull down to load"
-                    }
+                    {homeText}
                 </Text>
             </Pressable>
         }
+
+        onEndReached={() => {
+            if (continuation)
+                startRefresh();
+        }}
 
         ListFooterComponent={
             Platform.OS == "web"
