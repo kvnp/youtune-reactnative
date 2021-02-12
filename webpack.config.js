@@ -109,7 +109,8 @@ module.exports = () => ({
         historyApiFallback: true,
         compress: true
     },
-
+    
+    mode: 'development',
     entry: {
         app: './index.web.js',
         index: [
