@@ -5,7 +5,8 @@ import {
     digestBrowseResults,
     digestNextResults,
     digestVideoInfoResults,
-    digestStreams
+    digestStreams,
+    extractConfiguration
 } from "./Extractor";
 
 import { getHttpResponse, getPublicHttpResponse, getUrl } from "./HTTP";
@@ -19,17 +20,25 @@ const headers_ytm = {
     "User-Agent": useragent
 };
 
+export var configuration = null;
+
 var apiKey = null;
 
-async function getApiKey() {
-    if (apiKey == null) {
-        let text = await getHttpResponse("https://music.youtube.com/", {method: "GET", headers: headers_simple}, "text");
+async function getConfig() {
+    let response = await getHttpResponse(
+        "https://music.youtube.com/", {
+            method: "GET",
+            headers: headers_simple
+        },
+        "text"
+    );
 
-        text = text.slice(text.indexOf("INNERTUBE_API_KEY\":\"")+20);
-        apiKey = text.slice(0, text.indexOf("\""));
-    }
-
-    return apiKey;
+    configuration = extractConfiguration(response);
+    
+    apiKey = configuration
+        .WEB_PLAYER_CONTEXT_CONFIGS
+        .WEB_PLAYER_CONTEXT_CONFIG_ID_MUSIC_WATCH
+        .innertubeApiKey;
 }
 
 function getRequestBody() {
@@ -47,16 +56,17 @@ function getRequestBody() {
         body.context.client["hl"] = getHL();
     }
 
-    body.context["user"] = { enableSafetyMode: settings.safetyMode }
-
     return body;
 }
 
 export async function fetchResults(query, params) {
-    const apikey = await getApiKey();
-    const url = getUrl("search", apikey);
+    if (!apiKey)
+        await getConfig();
+
+    const url = getUrl("search", apiKey);
 
     let body = getRequestBody();
+    body.context["user"] = { enableSafetyMode: settings.safetyMode }
     body["query"] = query;
     
     if (params)
@@ -67,15 +77,19 @@ export async function fetchResults(query, params) {
         headers: headers_ytm,
         body: JSON.stringify(body)
     }, "json");
+
     
     return digestSearchResults(response);
 }
 
 export async function fetchSpecificResults(kind) {
-    const apikey = await getApiKey();
-    const url = getUrl("browse", apikey);
+    if (!apiKey)
+        await getConfig();
+
+    const url = getUrl("browse", apiKey);
 
     let body = getRequestBody();
+    body.context["user"] = { enableSafetyMode: settings.safetyMode }
     body["input"] = input;
 
     let response = await getHttpResponse(url, {
@@ -88,32 +102,45 @@ export async function fetchSpecificResults(kind) {
 }
 
 export async function fetchHome(continuation) {
-    const apikey = await getApiKey();
-    let url = getUrl("browse", apikey);
+    if (!apiKey)
+        await getConfig();
 
-    let body = getRequestBody();
+    if (!continuation) {
+        for (let element of configuration.YTMUSIC_INITIAL_DATA)
+            if (element.path == "/browse")
+                return digestHomeResults(element.data);
 
-    if (continuation)
-        url = url + "&ctoken=" + continuation.continuation + 
-                    "&continuation=" + continuation.continuation +
-                    "&itct=" + continuation.itct
-    else
-        body["browseId"] = "FEmusic_home";
+    } else {
+        let url = getUrl("browse", apiKey);
 
-    let response = await getHttpResponse(url, {
-        method: "POST",
-        headers: headers_ytm,
-        body: JSON.stringify(body)
-    }, "json");
+        let body = getRequestBody();
+        body.context["user"] = { enableSafetyMode: settings.safetyMode }
 
-    return digestHomeResults(response);
+        if (continuation)
+            url = url + "&ctoken=" + continuation.continuation + 
+                        "&continuation=" + continuation.continuation +
+                        "&itct=" + continuation.itct
+        else
+            body["browseId"] = "FEmusic_home";
+
+        let response = await getHttpResponse(url, {
+            method: "POST",
+            headers: headers_ytm,
+            body: JSON.stringify(body)
+        }, "json");
+
+        return digestHomeResults(response);
+    }
 }
 
 export async function fetchSuggestions(input) {
-    const apikey = await getApiKey();
-    const url = getUrl("get_search_suggestions", apikey);
+    if (!apiKey)
+        await getConfig();
+
+    const url = getUrl("get_search_suggestions", apiKey);
 
     let body = getRequestBody();
+    body.context["user"] = { enableSafetyMode: settings.safetyMode }
     body["input"] = input;
 
     let response = await getHttpResponse(url, {
@@ -126,10 +153,13 @@ export async function fetchSuggestions(input) {
 }
 
 export async function fetchBrowse(browseId) {
-    const apikey = await getApiKey();
-    const url = getUrl("browse", apikey);
+    if (!apiKey)
+        await getConfig();
+
+    const url = getUrl("browse", apiKey);
 
     let body = getRequestBody();
+    body.context["user"] = { enableSafetyMode: settings.safetyMode }
     body["browseId"] = browseId;
 
     let response = await getHttpResponse(url, {
@@ -153,11 +183,10 @@ export async function fetchVideoInfo(videoId) {
     return digestVideoInfoResults(response);
 }
 
-export async function fetchAudioStream(videoId) {
+export async function fetchAudioStream(videoId, playlistId) {
     while (true) {
         let url = "https://www.youtube.com/get_video_info?video_id=" + videoId +
-                "&el=detailpage&c=WEB_REMIX&cver=0.1&cplayer=UNIPLAYER";
-
+                  "&el=detailpage&c=WEB_REMIX&cver=0.1&cplayer=UNIPLAYER";
         let response = await getHttpResponse(url, {
             method: "GET",
             headers: headers_simple
@@ -168,11 +197,32 @@ export async function fetchAudioStream(videoId) {
         if (stream != null)
             return stream;
     }
+
+    /*let url = "https://music.youtube.com/youtubei/v1/player?key=" + apiKey;
+
+    let body = getRequestBody();
+    body.context["user"] = { lockedSafetyMode: settings.safetyMode }
+    body["videoId"] = videoId;
+
+    if (playlistId)
+        body["playlistId"] = playlistId;
+
+    let response = await getHttpResponse(url, {
+        method: "POST",
+        headers: headers_ytm,
+        body: JSON.stringify(body)
+    }, "json");
+
+    let stream = await digestStreams(response);
+
+    if (stream != null)
+        return stream;*/
 }
 
 export async function fetchNext(videoId, playlistId) {
-    const apikey = await getApiKey();
-    const url = getUrl("next", apikey);
+    if (!apiKey)
+        await getConfig();
+    const url = getUrl("next", apiKey);
 
     let body = getRequestBody();
     body["enablePersistentPlaylistPanel"] = true;

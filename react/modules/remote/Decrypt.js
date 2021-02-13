@@ -1,5 +1,5 @@
 import { getHttpResponse } from "./HTTP";
-import { headers_simple } from "./API";
+import { configuration, headers_simple } from "./API";
 
 const REGEXES = [
     "(?:\\b|[^a-zA-Z0-9$])([a-zA-Z0-9$]{2})\\s*=\\s*function\\(\\s*a\\s*\\)\\s*\\{\\s*a\\s*=\\s*a\\.split\\(\\s*\"\"\\s*\\)",
@@ -19,31 +19,6 @@ export function getFunctionState() {
         return false;
     else
         return true;
-}
-
-function getPlayer(response) {
-    let searchTerm;
-    if (response.indexOf('"js":') != -1) {
-        searchTerm = '"js":';
-    } else if (response.indexOf('"jsUrl":') != -1) {
-        searchTerm = '"jsUrl":';
-    } else {
-        return null;
-    }
-
-    let jsIndex = response.indexOf(searchTerm);
-
-    let side = response.substring(jsIndex + searchTerm.length);
-    let ind1x = side.indexOf(",");
-    let ind2x = side.indexOf("}");
-
-    let result;
-    if (ind1x < ind2x)
-        result = side.substring(0, ind1x);
-    else
-        result = side.substring(0, ind2x);
-
-    return result.replace(/\\/g, '').replace(/\"/g, '');
 }
 
 function getFunction(code) {
@@ -70,22 +45,53 @@ function getFunction(code) {
     return helperObject + decryptionFunction + callerFunction;
 }
 
-async function fetchFunctionByVideoId(videoId) {
-    let watch = domain + "/watch?v=" + videoId;
-    let watchResponse = await getHttpResponse(watch, {
-        method: "GET",
-        headers: headers_simple
-    }, "text");
+async function fetchBaseJsLocation(videoId) {
+    let location;
+    if (!configuration) {
+        let watch = domain + "/watch?v=" + videoId;
+        let watchResponse = await getHttpResponse(watch, {
+            method: "GET",
+            headers: headers_simple
+        }, "text");
 
-    await fetchFunctionByResponse(watchResponse);
+        location = extractLocation(watchResponse);
+    } else {
+        location = configuration
+            .WEB_PLAYER_CONTEXT_CONFIGS
+            .WEB_PLAYER_CONTEXT_CONFIG_ID_MUSIC_WATCH
+            .jsUrl;
+    }
+
+    await fetchBaseJs(location);
 }
 
-export async function fetchFunctionByResponse(response) {
-    let playerLocation = getPlayer(response);
-    if (playerLocation == null)
+function extractLocation(response) {
+    let searchTerm;
+    if (response.indexOf('"js":') != -1) {
+        searchTerm = '"js":';
+    } else if (response.indexOf('"jsUrl":') != -1) {
+        searchTerm = '"jsUrl":';
+    } else {
         return null;
+    }
 
-    let playerUrl = domain + playerLocation;
+    let jsIndex = response.indexOf(searchTerm);
+
+    let side = response.substring(jsIndex + searchTerm.length);
+    let ind1x = side.indexOf(",");
+    let ind2x = side.indexOf("}");
+
+    let result;
+    if (ind1x < ind2x)
+        result = side.substring(0, ind1x);
+    else
+        result = side.substring(0, ind2x);
+
+    return result.replace(/\\/g, '').replace(/\"/g, '');
+}
+
+async function fetchBaseJs(location) {
+    let playerUrl = domain + location;
     let playerCode = await getHttpResponse(playerUrl, {
         method: "GET",
         headers: headers_simple
@@ -101,7 +107,7 @@ function setFunction(functionString) {
 
 export async function getSignature(videoId, signature) {
     if (functionString == null)
-        await fetchFunctionByVideoId(videoId);
+        await fetchBaseJsLocation(videoId);
 
     return decryptionFunction(signature);
 }

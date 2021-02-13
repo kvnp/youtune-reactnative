@@ -4,6 +4,72 @@ import Playlist from "../models/music/playlist";
 import { decodeNestedURI } from "../utils/Decoder";
 import { getSignature } from "./Decrypt";
 
+export function extractConfiguration(html) {
+    let ytData = {};
+
+    let ytcfg = {set: object => {
+        for (key of Object.keys(object)) {
+            ytData[key] = object[key];
+            
+            if (key == "YTMUSIC_INITIAL_DATA") {
+                ytData[key].map((element, index) =>
+                    ytData[key][index].data = JSON.parse(element.data)
+                );
+            }
+        }
+    }};
+
+    let setMessage = msgs => ytData.MESSAGES = msgs;
+
+    let initialData = [];
+
+    while (html.includes("<script")) {
+        html = html.slice(html.indexOf("<script"));
+
+        let part = html.slice(html.indexOf(">"), html.indexOf("</"));
+
+        while (part.includes("initialData.push(")) {
+            let dataOne = part.indexOf("initialData.push(");
+            let dataTwo = part.indexOf(");") + 2;
+            eval(part.slice(dataOne, dataTwo))
+            part = part.slice(dataTwo);
+        }
+
+        if (part.includes("ytcfg.set(")) {
+            let yOne = part.indexOf("ytcfg.set(") + 10;
+            part = part.slice(yOne);
+            let yTwo = part.indexOf("</");
+        
+            let slice = part.slice(0, yTwo).replace(",}", "}").replace(/\'/g, '"');
+            
+            if (slice.includes(");"))
+                slice = slice.slice(0, slice.indexOf(");"));
+
+            try {
+                if (slice[slice.length - 1] == ")")
+                    slice = slice.slice(0, slice.length - 1);
+
+                if (slice.includes("initialData"))
+                    slice = slice.replace("initialData", JSON.stringify(initialData));
+                
+                ytcfg.set(JSON.parse(slice));
+            } catch (e) {
+                console.error(e);
+            }
+        }
+        
+        if (part.includes("setMessage(")) {
+            part = part.slice(part.indexOf("setMessage(") + 11);
+            part = part.slice(0, part.indexOf(");"));
+            setMessage(JSON.parse(part));
+        }
+
+        html = html.slice(html.indexOf("</"));
+    }
+
+    return ytData;
+}
+
 export function digestSearchResults(json) {
     let final = {
         results: 0,
@@ -170,18 +236,15 @@ export function digestSearchResults(json) {
 }
 
 export function digestHomeResults(json) {
+    console.log(json);
     let tabRenderer = json.contents.singleColumnBrowseResultsRenderer.tabs[0].tabRenderer;
     
     let sectionList = null;
     if (tabRenderer.hasOwnProperty("content"))
         sectionList = tabRenderer.content.sectionListRenderer;
-    else {
-        console.log(json);
+    else
         sectionList = json.continuationContents.sectionListContinuation;
-    }
 
-    //{ctoken, continuation} = continuation
-    //itct = clickTrackingParams
     let final = {background: null, shelves: [], continuation: null};
     if (sectionList.hasOwnProperty("continuations")) {
         let continuations = sectionList.continuations[0].nextContinuationData;
@@ -258,6 +321,8 @@ export function digestHomeResults(json) {
         
         final.shelves.push(shelf);
     }
+
+    console.log(final);
 
     return final;
 }
@@ -634,6 +699,7 @@ export async function digestStreams(text) {
     let parse = null;
     try {
         parse = JSON.parse(decode.substring(indexone, indextwo));
+        console.log(parse);
     } catch {
         return null;
     }
@@ -642,25 +708,17 @@ export async function digestStreams(text) {
 
     for (let i = 0; i < parse.streamingData.adaptiveFormats.length; i++) {
         if (parse.streamingData.adaptiveFormats[i].mimeType.split("/")[0] == "audio") {
-            if (parse.streamingData.adaptiveFormats[i].signatureCipher != undefined) {
-                let signatureCipher = decodeNestedURI(parse.streamingData.adaptiveFormats[i].signatureCipher);
+            if (parse.streamingData.adaptiveFormats[i].signatureCipher) {
+                let signatureCipher = parse.streamingData.adaptiveFormats[i].signatureCipher;
 
-                let stream = "";
-                let sigArray = signatureCipher.split("&");
+                let sigArray = decodeNestedURI(signatureCipher).split("&");
+                let stream = sigArray[2].slice(4);
+                let s = await getSignature(videoId, sigArray[0].substring(2));
 
-                let s;
-                for (let j = 0; j < sigArray.length; j++) {
-                    if (j == 0)
-                        s = await getSignature(videoId, sigArray[0].substring(2));
-
-                    else if (j == 1) {}
-
-                    else if (j == 2)
-                        stream = sigArray[2].substring(4);
-
-                    else 
+                for (let j = 0; j < sigArray.length; j++)
+                    if (j != 0 & j != 2)
                         stream += "&" + sigArray[j];
-                }
+
                 stream += "&sig=" + s;
                 return stream;
             } else
