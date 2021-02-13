@@ -1,6 +1,7 @@
 const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const WebpackPwaManifest = require('webpack-pwa-manifest');
+const { GenerateSW, InjectManifest } = require('workbox-webpack-plugin');
 //const {InjectManifest} = require('workbox-webpack-plugin');
 
 const userAgent = "Mozilla/5.0 (X11; Linux x86_64; rv:79.0) Gecko/20100101 Firefox/79.0";
@@ -196,6 +197,47 @@ module.exports = () => ({
                 'apple-mobile-web-app-status-bar-style': "black-translucent"
             }
         }),
+
+        new GenerateSW(
+            {
+                navigateFallback: "/index.html",
+                maximumFileSizeToCacheInBytes: 3e+6,
+                cleanupOutdatedCaches: true,
+                clientsClaim: true,
+                runtimeCaching: [
+                    {
+                        urlPattern: /\.(?:ico|html|js|css|json)$/,
+                        handler: "CacheFirst",
+
+                        options: {
+                            cacheName: "main"
+                        }
+                    },
+
+                    {
+                        urlPattern: /\.(?:png|jpg|jpeg)$/,
+                        handler: "CacheFirst",
+
+                        options: {
+                            cacheName: "images",
+
+                            expiration: {
+                                maxEntries: 50,
+                            }
+                        }
+                    },
+
+                    {
+                        urlPattern: "/proxy/*",
+                        handler: "NetworkFirst",
+
+                        options: {
+                            cacheName: "proxy"
+                        }
+                    }
+                ],
+            }
+        )
     ],
     
     resolve: {
