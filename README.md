@@ -6,13 +6,13 @@ What works:
 - Opening Playlists and Artists
 - Playing music from artist and playlist pages
 - Playing music from search results
-- Include provided music mix into playlist when playing a song
+- Include song recommendations
 - Retain playlist after selecting a song from artist or playlist pages
 - Links to music streams are deobfuscated (thanks to [NewPipeExtractor](https://github.com/TeamNewPipe/NewPipeExtractor))
 - Youtube Music API requests are proxied over webpack-dev-server or Nginx using provided config
 - Control playback through notifications (Android, iOS, Web(only Chrome so far))
 - Dark mode
-- Basic PWA support
+- PWA support with asset caching
 - Deep linking based on Youtube's URL structure
 
 Features that need to be fixed:
