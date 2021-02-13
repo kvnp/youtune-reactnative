@@ -10,7 +10,10 @@ const wwwYoutube = "https://www.youtube.com";
 const imgYoutube = "https://i.ytimg.com";
 const videoYoutube = "https://redirector.googlevideo.com";
 
-const mode = process.argv.pop();
+if (!process.env.NODE_ENV)
+    process.env.NODE_ENV = "development";
+
+console.log(process.env.NODE_ENV);
 
 module.exports = () => ({
     devServer: {
@@ -113,7 +116,7 @@ module.exports = () => ({
         compress: true
     },
     
-    mode: mode,
+    mode: process.env.NODE_ENV,
     entry: {
         app: './index.web.js',
         index: [
@@ -122,8 +125,8 @@ module.exports = () => ({
     },
 
     optimization: {
-        nodeEnv: mode,
-        minimize: mode == "production",
+        nodeEnv: process.env.NODE_ENV,
+        minimize: process.env.NODE_ENV == "production",
         /*minimizer: [
             new TerserPlugin({
                 cache: true,
@@ -220,7 +223,7 @@ module.exports = () => ({
 
         new GenerateSW(
             {
-                mode: mode,
+                mode: process.env.NODE_ENV,
                 navigateFallback: "/index.html",
                 maximumFileSizeToCacheInBytes: 3e+6,
                 cleanupOutdatedCaches: true,
