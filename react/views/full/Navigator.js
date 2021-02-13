@@ -1,9 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Dimensions } from "react-native";
 
-import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
-import { useTheme } from "@react-navigation/native";
 
 import TrackPlayer from 'react-native-track-player';
 
@@ -16,16 +14,7 @@ import Header from "../../components/overlay/Header";
 import { headerStyle, navOptions } from "../../styles/App";
 import MoreModal from "../../components/shared/MoreModal";
 import MiniPlayer from "../../components/player/MiniPlayer";
-
-
-export const getIcon = ({title, color}) => {
-    if (color == undefined) {
-        const { colors } = useTheme();
-        color = colors.text;
-    }
-
-    return <MaterialIcons name={title} color={color} size={25}/>;
-}
+import { getIcon } from "../../modules/utils/Icon";
 
 const getTabOptions = (title) => {
     return { tabBarIcon: ({ color }) => getIcon({title, color}) };
@@ -38,7 +27,7 @@ export default Navigator = ({navigation}) => {
 
     useEffect(() => {
         resizeContainer();
-        let _unsub = TrackPlayer.addEventListener("playback-state", params => resizeContainer());
+        let _unsub = TrackPlayer.addEventListener("playback-state", resizeContainer);
         return () => _unsub.remove();
     }, []);
 

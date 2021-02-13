@@ -10,8 +10,10 @@ import { settings } from "./modules/storage/SettingsStorage";
 import PlayView from "./views/full/PlayView";
 import PlaylistView from "./views/full/PlaylistView";
 import ArtistView from "./views/full/ArtistView";
-import Navigator, { getIcon } from "./views/full/Navigator";
+import Navigator from "./views/full/Navigator";
 import CaptchaView from "./views/full/CaptchaView";
+
+import { getIcon } from "./modules/utils/Icon";
 
 enableScreens();
 
