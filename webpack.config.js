@@ -1,7 +1,7 @@
 const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const WebpackPwaManifest = require('webpack-pwa-manifest');
-const { GenerateSW, InjectManifest } = require('workbox-webpack-plugin');
+const { GenerateSW } = require('workbox-webpack-plugin');
 //const {InjectManifest} = require('workbox-webpack-plugin');
 
 const userAgent = "Mozilla/5.0 (X11; Linux x86_64; rv:79.0) Gecko/20100101 Firefox/79.0";
@@ -10,11 +10,13 @@ const wwwYoutube = "https://www.youtube.com";
 const imgYoutube = "https://i.ytimg.com";
 const videoYoutube = "https://redirector.googlevideo.com";
 
+const mode = process.argv.pop();
+
 module.exports = () => ({
     devServer: {
         host: "0.0.0.0",
         port: process.env.PORT || 8080,
-        public: "youtune-react.herokuapp.com",
+        public: "utune.herokuapp.com",
         proxy: {
             '/proxy/start': {
                 target: musicYoutube,
@@ -111,12 +113,30 @@ module.exports = () => ({
         compress: true
     },
     
-    mode: 'development',
+    mode: mode,
     entry: {
         app: './index.web.js',
         index: [
             'react-native-webpack/clients/polyfills.js'
         ]
+    },
+
+    optimization: {
+        nodeEnv: mode,
+        minimize: mode == "production",
+        /*minimizer: [
+            new TerserPlugin({
+                cache: true,
+                parallel: true,
+                sourceMap: true, // Must be set to true if using source-maps in production
+                terserOptions: {
+                    // https://github.com/webpack-contrib/terser-webpack-plugin#terseroptions
+                },
+            }),
+        ],*/
+
+        runtimeChunk: 'multiple',
+        moduleIds: 'deterministic',
     },
 
     output: {
@@ -200,6 +220,7 @@ module.exports = () => ({
 
         new GenerateSW(
             {
+                mode: mode,
                 navigateFallback: "/index.html",
                 maximumFileSizeToCacheInBytes: 3e+6,
                 cleanupOutdatedCaches: true,
