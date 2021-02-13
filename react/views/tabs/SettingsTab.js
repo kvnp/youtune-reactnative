@@ -25,7 +25,7 @@ import { setHeader } from '../../components/overlay/Header';
 import { rippleConfig } from '../../styles/Ripple';
 
 const host = Platform.OS == "web"
-    ? window.location.hostname
+    ? window.location.hostname.replace("-", "‑") // Unicode NON-BREAKING HYPHEN (U+2011)
     : "youtune.kvnp.eu";
 
 export default SettingsTab = ({navigation}) => {
