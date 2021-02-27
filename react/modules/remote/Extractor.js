@@ -667,28 +667,29 @@ export function digestBrowseResults(json, browseId) {
 }
 
 export function digestVideoInfoResults(text) {
-    let list = text.split("&");
+    let decode = decodeURIComponent(text);
+    let indexone = decode.indexOf("player_response=") + 16;
+    let indextwo = decode.indexOf("}&") + 1;
 
-    for (let i = 0; i < list.length; i++) {
-        if (list[i].includes("player_response=")) {
-            let decode = decodeNestedURI(list[i]);
-            let indexone = decode.indexOf("player_response=") + 16;
-            let indextwo = decode.length;
-            let parse = JSON.parse(decode.slice(indexone, indextwo));
-
-            let titleInfo = {
-                playable: parse.playabilityStatus.status,
-                videoId: parse.videoDetails.videoId,
-                channelId: parse.videoDetails.channelId,
-                title: parse.videoDetails.title,
-                subtitle: parse.videoDetails.author.replace("+", " ").slice(0, parse.videoDetails.author.indexOf("-") - 1),
-                length: Number.parseInt(parse.videoDetails.lengthSeconds),
-                thumbnail: parse.videoDetails.thumbnail.thumbnails[parse.videoDetails.thumbnail.thumbnails.length - 1].url
-            };
-
-            return titleInfo;
-        }
+    let parse = null;
+    try {
+        parse = JSON.parse(decode.substring(indexone, indextwo));
+        console.log(parse);
+    } catch {
+        return null;
     }
+
+    let titleInfo = {
+        playable: parse.playabilityStatus.status,
+        id: parse.videoDetails.videoId,
+        channelId: parse.videoDetails.channelId,
+        title: parse.videoDetails.title,
+        artist: parse.videoDetails.author.replace("+", " ").slice(0, parse.videoDetails.author.indexOf("-") - 1),
+        duration: Number.parseInt(parse.videoDetails.lengthSeconds),
+        artwork: parse.videoDetails.thumbnail.thumbnails[parse.videoDetails.thumbnail.thumbnails.length - 1].url
+    };
+
+    return titleInfo;
 }
 
 export async function digestStreams(text) {
