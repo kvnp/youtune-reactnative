@@ -9,10 +9,10 @@ export function getUrl(endpoint, apiKey) {
     return url + partialEndpoint + endpoint + parameter + apiKey;
 }
 
-export const getHttpResponse = async (url, input, type) => {
+export const getHttpResponse = (url, input, type) => {
     if (Platform.OS == "web" || settings.proxyYTM) {
         const location = window.location.protocol + "//" +
-                         window.location.host + "/proxy/";
+                            window.location.host + "/proxy/";
 
         if (url[23] == "/")
             url = location + url.slice(24);
@@ -24,23 +24,20 @@ export const getHttpResponse = async (url, input, type) => {
         }
     }
 
-    const response = await fetch(url, input);
+    return new Promise((resolve, reject) => {
+        fetch(url, input)
+            .then(response => {
+                if (type == "json")
+                    resolve(response.json());
+                else if (type == "blob")
+                    resolve(response.blob());
+                else
+                    resolve(response.text());
+            })
 
-    if (type == "json")
-        return await response.json();
-    else if (type == "blob")
-        return await response.blob();
-    else
-        return await response.text();
-}
-
-export const getPublicHttpResponse = async (url, input, type) => {
-    const response = await fetch(url, input);
-
-    if (type == "json")
-        return await response.json();
-    else if (type == "blob")
-        return await response.blob();
-    else
-        return await response.text();
+            .catch(reason => {
+                console.log(reason);
+                reject(reason);
+            })
+    })
 }
