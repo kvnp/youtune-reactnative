@@ -13,13 +13,13 @@ const videoYoutube = "https://redirector.googlevideo.com";
 if (!process.env.NODE_ENV)
     process.env.NODE_ENV = "development";
 
-console.log(process.env.NODE_ENV);
-
 module.exports = () => ({
     devServer: {
         host: "0.0.0.0",
         port: process.env.PORT || 8080,
-        public: "utune.herokuapp.com",
+        public: process.env.PORT
+            ? "utune.herokuapp.com"
+            : undefined,
         proxy: {
             '/proxy/start': {
                 target: musicYoutube,
@@ -84,7 +84,7 @@ module.exports = () => ({
                 },
             },
 
-            '/proxy/video': {
+            '/proxy/videoplayback': {
                 target: videoYoutube,
                 changeOrigin: true,
                 secure: false,
@@ -161,6 +161,7 @@ module.exports = () => ({
                         presets: [
                             'module:metro-react-native-babel-preset'
                         ],
+                        
                         plugins: [
                             ["react-native-web", { commonjs: true }]
                         ],
