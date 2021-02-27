@@ -23,6 +23,7 @@ import { searchBarStyle } from '../../styles/Search';
 import { resultHomeStyle, preResultHomeStyle } from '../../styles/Home';
 
 export default SearchTab = ({route, navigation}) => {
+    const [searchText, setSearchText] = useState("Look for music using the search bar");
     const [shelves, setShelves] = useState([]);
     const [loading, setLoading] = useState(false);
     const [message, setMessage] = useState("");
@@ -54,18 +55,35 @@ export default SearchTab = ({route, navigation}) => {
         if (query.length > 0) {
             setLoading(true);
 
-            fetchResults(query, params).then(data => {
-                if (data.suggestionOption == suggestion)
-                    data.suggestionOption = null;
+            fetchResults(query, params)
+                .then(data => {
+                    if (data.suggestionOption == suggestion)
+                        data.suggestionOption = null;
 
-                if (data.insteadOption == instead)
-                    data.insteadOption = null;
-                
-                setShelves(data.shelves);
-                setInstead(data.instead);
-                setSuggestion(data.suggestion);
-                setLoading(false);
-            });
+                    if (data.insteadOption == instead)
+                        data.insteadOption = null;
+                    
+                    if (data.shelves.length == 0) {
+                        setSearchText("No search results");
+
+                        setTimeout(() => {
+                            setSearchText("Look for music using the search bar");
+                        }, 2000);
+                    }
+
+                    setShelves(data.shelves);
+                    setInstead(data.instead);
+                    setSuggestion(data.suggestion);
+                    setLoading(false);
+                })
+                .catch(() => {
+                    setLoading(false);
+                    setSearchText("You are offline");
+
+                    setTimeout(() => {
+                        setSearchText("Look for music using the search bar");
+                    }, 2000);
+                });
         }
     }
 
@@ -80,7 +98,7 @@ export default SearchTab = ({route, navigation}) => {
 
             ListEmptyComponent={<>
                 <Text style={[preResultHomeStyle.preHomeBottomText, preResultHomeStyle.preHomeTopText, {color: colors.text}]}>🔍</Text>
-                <Text style={[preResultHomeStyle.preHomeBottomText, {color: colors.text}]}>Look for music using the search bar</Text>
+                <Text style={[preResultHomeStyle.preHomeBottomText, {color: colors.text}]}>{searchText}</Text>
             </>}
 
             renderSectionHeader={({ section: { title } }) => (

@@ -23,19 +23,31 @@ export default HomeTab = ({navigation}) => {
     const [continuation, setContinuation] = useState(null);
     const [loading, setLoading] = useState(true);
     const { colors } = useTheme();
-    const homeText = Platform.OS == "web"
-        ? "Press the home icon to load"
-        : "Pull down to load";
+    const [homeText, setHomeText] = useState(
+        Platform.OS == "web"
+            ? "Press the home icon to load"
+            : "Pull down to load"
+    );
 
     useEffect(() => {
         const _unsubscribe = navigation.addListener('focus', () => {
             setHeader({title: "Home"});
         });
 
+        const _offlineListener = Platform.OS == "web"
+            ? window.addEventListener("online", () => {
+                setLoading(true);
+                startRefresh();
+            })
+            : undefined;
+
         startRefresh();
 
         return () => {
             _unsubscribe();
+
+            if (_offlineListener)
+                _offlineListener();
         };
     }, []);
 
@@ -43,18 +55,31 @@ export default HomeTab = ({navigation}) => {
         let temp = continuation;
         setContinuation(null);
 
-        let result = await fetchHome(temp);
+        fetchHome(temp)
+            .then(result => {
+                setHomeText(
+                    Platform.OS == "web"
+                        ? "Press the home icon to load"
+                        : "Pull down to load"
+                );
 
-        if (result.background)
-            setHeader({image: result.background});
+                if (result.background)
+                    setHeader({image: result.background});
 
-        setShelves(shelves.concat(result.shelves));
+                setShelves(shelves.concat(result.shelves));
 
-        if (result.continuation)
-            setContinuation(result.continuation);
+                if (result.continuation)
+                    setContinuation(result.continuation);
 
-        if (loading)
-            setLoading(false);
+                if (loading)
+                    setLoading(false);
+            })
+            .catch(() => {
+                setHomeText("You are offline");
+                setLoading(false);
+            })
+
+        
     }
 
     return <FlatList
@@ -68,8 +93,8 @@ export default HomeTab = ({navigation}) => {
             </View>
 
             : <Pressable onPress={Platform.OS == "web" ? () => startRefresh() :null}>
-                <Text style={[preResultHomeStyle.preHomeBottomText, preResultHomeStyle.preHomeTopText]}>🏠</Text>
-                <Text style={preResultHomeStyle.preHomeBottomText}>
+                <Text style={[preResultHomeStyle.preHomeBottomText, preResultHomeStyle.preHomeTopText, {color: colors.text}]}>🏠</Text>
+                <Text style={[preResultHomeStyle.preHomeBottomText, {color: colors.text}]}>
                     {homeText}
                 </Text>
             </Pressable>
