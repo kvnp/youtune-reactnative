@@ -10,9 +10,12 @@ import {
     Platform
 } from "react-native";
 
+
 import TrackPlayer from 'react-native-track-player';
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import { useTheme } from "@react-navigation/native";
+
+import Playlist from "../../modules/models/music/playlist"
 
 import SeekBar from "../../components/player/SeekBar";
 import SwipePlaylist from "../../components/player/SwipePlaylist";
@@ -25,10 +28,12 @@ import {
     startPlaylist,
     isRepeating
 } from "../../service";
+
 import { getSongLike, likeSong } from "../../modules/storage/MediaStorage";
 
 import { showModal } from "../../components/shared/MoreModal";
 import { fetchNext } from "../../modules/remote/API";
+import { loadSongLocal, localIDs } from "../../modules/storage/SongStorage";
 
 export default PlayView = ({route, navigation}) => {
     const [playbackState, setPlayback] = useState({
@@ -44,7 +49,7 @@ export default PlayView = ({route, navigation}) => {
     const [dimensions, setDimensions] = useState(
         Platform.OS == "web"
             ? {
-                width: window.innerHeight> window.innerWidth
+                width: window.innerHeight > window.innerWidth
                     ? window.innerWidth - 50
                     : window.innerHeight - 50,
                 height: window.innerHeight > window.innerWidth
@@ -71,10 +76,44 @@ export default PlayView = ({route, navigation}) => {
                     isStopped: false
                 });
         
-                fetchNext(route.params.v, route.params.list).then(playlist => {
-                    setPlaylist(playlist.list);
-                    startPlaylist(playlist);
-                });
+                fetchNext(route.params.v, route.params.list)
+                    .then(playlist => {
+                        let load = new Promise(async(resolve) => {
+                            for (let i = 0; i < playlist.list.length; i++) {
+                                let track = playlist.list[i];
+                                if (localIDs.includes(track.id)) {
+                                    track = await loadSongLocal(track.id);
+                                    console.log(track);
+                                    playlist.list[i] = track;
+                                }
+                            }
+                            resolve(playlist);
+                        });
+                        
+                        load.then(loadedPlaylist => {
+                            setPlaylist(loadedPlaylist.list);
+                            startPlaylist(loadedPlaylist);
+                        });
+                    })
+
+                    .catch(async(reason) => {
+                        if (localIDs.length == 0) {
+                            let waitForDB = ms => {
+                                return new Promise(resolve => setTimeout(resolve, ms));
+                            }
+
+                            await waitForDB(3000);
+                        }
+
+
+                        if (localIDs.includes(route.params.v)) {
+                            let localPlaylist = new Playlist();
+                            localPlaylist.list.push(await loadSongLocal(route.params.v))
+
+                            setPlaylist(localPlaylist.list);
+                            startPlaylist(localPlaylist);
+                        }
+                    });
             }
 
         refreshUI();
@@ -166,8 +205,6 @@ export default PlayView = ({route, navigation}) => {
         var artist = null;
         var artwork = null;
     }
-    
-    
 
     return <>
         <View style={stylesTop.vertContainer}>

@@ -120,11 +120,11 @@ export const skip = async(forward) => {
 }
 
 export function startPlaylist(playlist) {
-    return new Promise(async(resolve, reject) => {
+    return new Promise(async(resolve) => {
         await TrackPlayer.reset();
         for (let i = 0; i < playlist.list.length; i++) {
             let track = playlist.list[i];
-            if (i == playlist.index || i == 0)
+            if ((i == playlist.index || i == 0) && track.url == undefined)
                 track.url = await fetchAudioStream(track.id);
 
             await TrackPlayer.add(track);
@@ -133,10 +133,9 @@ export function startPlaylist(playlist) {
                 focusedId = track.id;
                 await TrackPlayer.skip(track.id);
                 TrackPlayer.play();
-                resolve();
+                resolve(track.id);
             }
         }
-        reject();
     });
 }
 
