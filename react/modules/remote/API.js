@@ -9,7 +9,7 @@ import {
     extractConfiguration
 } from "./Extractor";
 
-import { getHttpResponse, getPublicHttpResponse, getUrl } from "./HTTP";
+import { getHttpResponse, getUrl } from "./HTTP";
 import { settings } from "../../modules/storage/SettingsStorage";
 
 const useragent = "Mozilla/5.0 (X11; Linux x86_64; rv:79.0) Gecko/20100101 Firefox/79.0";
@@ -183,20 +183,18 @@ export async function fetchVideoInfo(videoId) {
     return digestVideoInfoResults(response);
 }
 
-export async function fetchAudioStream(videoId, playlistId) {
-    while (true) {
-        let url = "https://www.youtube.com/get_video_info?video_id=" + videoId +
-                  "&el=detailpage&c=WEB_REMIX&cver=0.1&cplayer=UNIPLAYER";
-        let response = await getHttpResponse(url, {
-            method: "GET",
-            headers: headers_simple
-        }, "text");
+export async function fetchAudioStream(videoId) {
+    let url = "https://www.youtube.com/get_video_info?video_id=" + videoId +
+              "&el=detailpage&c=WEB_REMIX&cver=0.1&cplayer=UNIPLAYER";
+    let response = await getHttpResponse(url, {
+        method: "GET",
+        headers: headers_simple
+    }, "text");
 
-        let stream = await digestStreams(response);
+    let stream = await digestStreams(response);
 
-        if (stream != null)
-            return stream;
-    }
+    if (stream != null)
+        return stream;
 
     /*let url = "https://music.youtube.com/youtubei/v1/player?key=" + apiKey;
 
@@ -239,12 +237,31 @@ export async function fetchNext(videoId, playlistId) {
 }
 
 export async function downloadMedia(url, target) {
-    let responseBlob = await getPublicHttpResponse(url, {
+    let blob = await getHttpResponse(url, {
         method: "GET",
         headers: target != null
             ? {...headers_ytm, Target: target}
             : headers_ytm
     }, "blob");
 
-    return responseBlob;
+    let reader = input => {
+        let fileReader = new FileReader();
+        fileReader.readAsDataURL(input);
+
+        return new Promise(resolve => {
+            fileReader.onloadend = () => {
+                resolve(fileReader.result);
+            };
+        });
+    }
+
+    let base64 = await reader(blob);
+    return base64;
+
+    /*
+    if (blob.type.includes("image")) {
+    } else {
+        return blob;
+    }
+    */
 }
