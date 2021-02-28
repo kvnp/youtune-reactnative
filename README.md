@@ -1,5 +1,7 @@
 Youtube Music client for Android, iOS and Web built with React Native
 
+![alt text](youtune.jpg)
+
 What works:
 - Displaying home screen
 - Using search
@@ -10,28 +12,30 @@ What works:
 - Retain playlist after selecting a song from artist or playlist pages
 - Links to music streams are deobfuscated (thanks to [NewPipeExtractor](https://github.com/TeamNewPipe/NewPipeExtractor))
 - Youtube Music API requests are proxied over webpack-dev-server or Nginx using provided config
-- Control playback through notifications (Android, iOS, Web(only Chrome so far))
+- Control playback through notifications
 - Dark mode
-- PWA support with asset caching
+- PWA support with asset caching for offline use
 - Deep linking based on Youtube's URL structure
+- Downloading songs on web and storing them via Indexed DB
 
 Features that need to be fixed:
 - The next song is played back even if repeat is set
 
 Features that are being worked on:
-- Download playlists and songs
+- Download playlists and songs for Android and iOS
 - Create custom playlists that are kept locally
 - Keep track of songs that have been liked
 - Download songs for offline playback
 - Proper PWA support with offline caching
 
 How to run:
+
 - npm install
 
+denpending on your platform:
+
 - npm run ios
-or
 - npm run android
-or
 - npm run web
 
 the terminal will either display an URL to follow or additional instructions
