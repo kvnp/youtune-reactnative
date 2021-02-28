@@ -2,3 +2,9 @@ html,
 body {
     overscroll-behavior-y: contain;
 }
+
+#app > div {
+    position: fixed;
+    height: 100%;
+    width: 100%;
+}

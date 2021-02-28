@@ -6,12 +6,8 @@ import App from './react/App'
 import { register } from './react/service';
 
 const styles = `@font-face{
-    src: url(${iconFont});font-family: MaterialIcons;
-}
-#app > div {
-    position: fixed;
-    height: 100%;
-    width: 100%;
+    src: url(${iconFont});
+    font-family: MaterialIcons;
 }`;
 
 const style = document.createElement('style');
