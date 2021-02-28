@@ -91,21 +91,44 @@ export default MoreModal = ({navigation}) => {
             }
             resolve(liked);
         })
-        
     };
 
     const download = () => {
-        setContent({...content, downloading: true});
+        setContent(content => ({...content, downloading: true}));
         storeSong(videoId)
-            .then(id => {if (videoId == id) setContent(content => ({...content, downloading: false, downloaded: true}));})
-            .catch(id => {if (videoId == id) setContent(content => ({...content, downloading: false, downloaded: false}));});
+            .then(id => {
+                setContent(Content => ({
+                    ...Content,
+                    downloading: Content.videoId == content.videoId ? false : downloadQueue.includes(Content.videoId) ? true : false,
+                    downloaded: Content.videoId == content.videoId ? true : localIDs.includes(Content.videoId) ? true : false
+                }));
+            })
+            .catch(id => {
+                setContent(Content => ({
+                    ...Content,
+                    downloading: Content.videoId == content.videoId ? false : downloadQueue.includes(Content.videoId) ? true : false,
+                    downloaded: Content.videoId == content.videoId ? false : localIDs.includes(Content.videoId) ? true : false
+                }));
+            });
     }
 
     const remove = () => {
-        setContent({...content, downloading: true});
+        setContent(content => ({...content, downloading: true}));
         deleteSong(videoId)
-            .then(id => {if (videoId == id) setContent(content => ({...content, downloading: false, downloaded: false}));})
-            .catch(id => {if (videoId == id) setContent(content => ({...content, downloading: false, downloaded: false}));});
+            .then(id => {
+                setContent(Content => ({
+                    ...Content,
+                    downloading: Content.videoId == content.videoId ? false : downloadQueue.includes(Content.videoId) ? true : false,
+                    downloaded: Content.videoId == content.videoId ? false : localIDs.includes(Content.videoId) ? true : false
+                }));
+            })
+            .catch(id => {
+                setContent(Content => ({
+                    ...Content,
+                    downloading: Content.videoId == content.videoId ? false : downloadQueue.includes(Content.videoId) ? true : false,
+                    downloaded: Content.videoId == content.videoId ? true : localIDs.includes(Content.videoId) ? true : false
+                }));
+            });
         ;
     }
 
@@ -269,97 +292,102 @@ export default MoreModal = ({navigation}) => {
                 </View>
 
                 <View style={modalStyles.entryView}>
-                        <Pressable
-                            onPress={
-                                async() => {
-                                    if (playing) {
-                                        TrackPlayer.pause();
-                                        setContent(content => ({
-                                            ...content,
-                                            playing: false,
-                                            visible: false
-                                        }));
-                                        return;
-                                    } else {
-                                        if (await TrackPlayer.getCurrentTrack() == videoId) {
-                                            navigation.navigate("Music");
-                                            setContent(content => ({...content, visible: false}));
-                                            TrackPlayer.play();
-                                            return;
-                                        }
-                                    }
-
-                                    handleMedia(content, navigation);
-                                    setContent(content => ({...content, visible: false}));
-                                }
-                            }
-                            style={modalStyles.entry}
-                            android_ripple={{color: "gray"}}
-                        >
-                            {type == "Song"
-                                ? playing
-                                    ? <>
-                                        <MaterialIcons name="pause" color="black" size={25}/>
-                                        <Text style={{paddingLeft: 20}}>Pause</Text>
-                                    </>
-
-                                    : <>
-                                        <MaterialIcons name="play-arrow" color="black" size={25}/>
-                                        <Text style={{paddingLeft: 20}}>Play</Text>
-                                    </>
-                                
-                                : <>
-                                    <MaterialIcons name="launch" color="black" size={25}/>
-                                    <Text style={{paddingLeft: 20}}>Open</Text>
-                                </>
-                            }
-                        </Pressable>
-                    </View>
-                
-                <View style={modalStyles.entryView}>
                     <Pressable
                         onPress={
-                            () => downloaded
-                                ? remove()
-                                : download()
+                            async() => {
+                                if (playing) {
+                                    TrackPlayer.pause();
+                                    setContent(content => ({
+                                        ...content,
+                                        playing: false,
+                                        visible: false
+                                    }));
+                                    return;
+                                } else {
+                                    if (await TrackPlayer.getCurrentTrack() == videoId) {
+                                        navigation.navigate("Music");
+                                        setContent(content => ({...content, visible: false}));
+                                        TrackPlayer.play();
+                                        return;
+                                    }
+                                }
+
+                                handleMedia(content, navigation);
+                                setContent(content => ({...content, visible: false}));
+                            }
                         }
-                        disabled={downloading}
                         style={modalStyles.entry}
                         android_ripple={{color: "gray"}}
                     >
-                        {
-                            downloading
-                                ? <ActivityIndicator color="black"/>
-                                : <MaterialIcons
-                                    name={
-                                        downloaded
-                                            ? "delete"
-                                            : "get-app"
-                                    }
-                                    color="black"
-                                    size={25}
-                                />
+                        {type == "Song"
+                            ? playing
+                                ? <>
+                                    <MaterialIcons name="pause" color="black" size={25}/>
+                                    <Text style={{paddingLeft: 20}}>Pause</Text>
+                                </>
+
+                                : <>
+                                    <MaterialIcons name="play-arrow" color="black" size={25}/>
+                                    <Text style={{paddingLeft: 20}}>Play</Text>
+                                </>
+                            
+                            : <>
+                                <MaterialIcons name="launch" color="black" size={25}/>
+                                <Text style={{paddingLeft: 20}}>Open</Text>
+                            </>
                         }
-
-                        <Text style={{paddingLeft: 20}}>
-                            {
-                                downloading
-                                    ? "Downloading" + (downloadQueue.length > 0
-                                        ? " (" + downloadQueue.length + " in queue)"
-                                        : "")
-
-                                    : downloaded
-                                        ? "Delete" + (downloadQueue.length > 0
-                                            ? " (" + downloadQueue.length + " in queue)"
-                                            : "")
-
-                                        : "Download" + (downloadQueue.length > 0
-                                            ? " (" + downloadQueue.length + " in queue)"
-                                            : "")
-                            }
-                        </Text>
                     </Pressable>
                 </View>
+                {
+                    videoId
+                        ? <View style={modalStyles.entryView}>
+                            <Pressable
+                                onPress={
+                                    () => downloaded
+                                        ? remove()
+                                        : download()
+                                }
+                                disabled={downloading}
+                                style={modalStyles.entry}
+                                android_ripple={{color: "gray"}}
+                            >
+                                {
+                                    downloading
+                                        ? <ActivityIndicator color="black"/>
+                                        : <MaterialIcons
+                                            name={
+                                                downloaded
+                                                    ? "delete"
+                                                    : "get-app"
+                                            }
+                                            color="black"
+                                            size={25}
+                                        />
+                                }
+        
+                                <Text style={{paddingLeft: 20}}>
+                                    {
+                                        downloading
+                                            ? "Downloading" + (downloadQueue.length > 0
+                                                ? " (" + downloadQueue.length + " in queue)"
+                                                : "")
+        
+                                            : downloaded
+                                                ? "Delete" + (downloadQueue.length > 0
+                                                    ? " (" + downloadQueue.length + " in queue)"
+                                                    : "")
+        
+                                                : "Download" + (downloadQueue.length > 0
+                                                    ? " (" + downloadQueue.length + " in queue)"
+                                                    : "")
+                                    }
+                                </Text>
+                            </Pressable>
+                        </View>
+
+
+                        : undefined
+                }
 
                 <View style={modalStyles.entryView}>
                 <Pressable onPress={() => {}} style={modalStyles.entry} android_ripple={{color: "gray"}}>
