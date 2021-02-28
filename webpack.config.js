@@ -20,58 +20,9 @@ module.exports = () => ({
         public: process.env.PORT
             ? "utune.herokuapp.com"
             : undefined,
+
         proxy: {
-            '/proxy/start': {
-                target: musicYoutube,
-                secure: true,
-                changeOrigin: true,
-                pathRewrite: {'^/proxy/start' : ''},
-
-                headers: {
-                    "User-Agent": userAgent
-                }
-            },
-
-            '/proxy/youtubei': {
-                target: musicYoutube,
-                secure: true,
-                changeOrigin: true,
-                pathRewrite: {'^/proxy' : ''},
-
-                headers: {
-                    "Referer": musicYoutube,
-                    "Origin": musicYoutube,
-                    "User-Agent": userAgent
-                },
-            },
-
             '/proxy/get_video_info': {
-                target: wwwYoutube,
-                secure: true,
-                changeOrigin: true,
-                pathRewrite: {'^/proxy' : ''},
-
-                headers: {
-                    "Referer": wwwYoutube,
-                    "Origin": wwwYoutube,
-                    "User-Agent": userAgent
-                },
-            },
-
-            '/proxy/watch': {
-                target: wwwYoutube,
-                secure: true,
-                changeOrigin: true,
-                pathRewrite: {'^/proxy' : ''},
-
-                headers: {
-                    "Referer": wwwYoutube,
-                    "Origin": wwwYoutube,
-                    "User-Agent": userAgent
-                },
-            },
-
-            '/proxy/s': {
                 target: wwwYoutube,
                 secure: true,
                 changeOrigin: true,
@@ -110,6 +61,32 @@ module.exports = () => ({
                     "User-Agent": userAgent
                 }
             },
+
+            '/proxy/lh3/': {
+                target: "https://lh3.googleusercontent.com",
+                secure: true,
+                changeOrigin: true,
+                pathRewrite: {'^/proxy/lh3/' : ''},
+
+                headers: {
+                    "Referer": wwwYoutube,
+                    "Origin": wwwYoutube,
+                    "User-Agent": userAgent
+                }
+            },
+
+            '/proxy/': {
+                target: musicYoutube,
+                secure: true,
+                changeOrigin: true,
+                pathRewrite: {'^/proxy' : ''},
+
+                headers: {
+                    "Referer": musicYoutube,
+                    "Origin": musicYoutube,
+                    "User-Agent": userAgent
+                }
+            }
         },
 
         historyApiFallback: true,

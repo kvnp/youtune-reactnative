@@ -236,7 +236,6 @@ export function digestSearchResults(json) {
 }
 
 export function digestHomeResults(json) {
-    console.log(json);
     let tabRenderer = json.contents.singleColumnBrowseResultsRenderer.tabs[0].tabRenderer;
     
     let sectionList = null;
@@ -321,8 +320,6 @@ export function digestHomeResults(json) {
         
         final.shelves.push(shelf);
     }
-
-    console.log(final);
 
     return final;
 }
@@ -674,11 +671,9 @@ export function digestVideoInfoResults(text) {
     let parse = null;
     try {
         parse = JSON.parse(decode.substring(indexone, indextwo));
-        console.log(parse);
     } catch {
         return null;
     }
-
     let titleInfo = {
         playable: parse.playabilityStatus.status,
         id: parse.videoDetails.videoId,
@@ -700,7 +695,6 @@ export async function digestStreams(text) {
     let parse = null;
     try {
         parse = JSON.parse(decode.substring(indexone, indextwo));
-        console.log(parse);
     } catch {
         return null;
     }

@@ -11,17 +11,14 @@ export function getUrl(endpoint, apiKey) {
 
 export const getHttpResponse = (url, input, type) => {
     if (Platform.OS == "web" || settings.proxyYTM) {
-        const location = window.location.protocol + "//" +
-                            window.location.host + "/proxy/";
-
-        if (url[23] == "/")
-            url = location + url.slice(24);
-        else {
-            if (url.length == 26)
-                url = location + "start";
-            else if (url.length > 26)
-                url = location + url.slice(26);
-        }
+        if (url.split("/")[2] == "lh3.googleusercontent.com")
+            url = window.location.protocol + "//" +
+                  window.location.host + "/proxy/lh3/" +
+                  url.split("/").slice(3).join("/");
+        else
+            url = window.location.protocol + "//" +
+                  window.location.host + "/proxy/" +
+                  url.split("/").slice(3).join("/");
     }
 
     return new Promise((resolve, reject) => {
@@ -36,7 +33,6 @@ export const getHttpResponse = (url, input, type) => {
             })
 
             .catch(reason => {
-                console.log(reason);
                 reject(reason);
             })
     })
