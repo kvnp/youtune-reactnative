@@ -236,12 +236,10 @@ export async function fetchNext(videoId, playlistId) {
     return digestNextResults(response);
 }
 
-export async function downloadMedia(url, target) {
+export async function downloadMedia(url) {
     let blob = await getHttpResponse(url, {
         method: "GET",
-        headers: target != null
-            ? {...headers_ytm, Target: target}
-            : headers_ytm
+        headers: headers_ytm
     }, "blob");
 
     let reader = input => {
@@ -257,11 +255,4 @@ export async function downloadMedia(url, target) {
 
     let base64 = await reader(blob);
     return base64;
-
-    /*
-    if (blob.type.includes("image")) {
-    } else {
-        return blob;
-    }
-    */
 }

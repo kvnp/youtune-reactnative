@@ -1,5 +1,6 @@
 import AsyncStorage from "@react-native-community/async-storage";
 import { Platform } from "react-native";
+import { downloadCallback } from "../../components/shared/MoreModal";
 import { downloadMedia, fetchAudioStream, fetchVideoInfo } from "../remote/API";
 
 export var localIDs = null;
@@ -113,12 +114,11 @@ export async function storeSong(id, track) {
                         id: id,
                         track: track
                     });
-
+                
+                localIDs.push(id);
                 resolve(track);
             };
         });
-
-        return 
     } else {
         try {
             const string = JSON.stringify({
@@ -128,7 +128,7 @@ export async function storeSong(id, track) {
             });
     
             await AsyncStorage.setItem('@storage_Song_' + id, string);
-            loadSongList();
+            localIDs.push(id);
         } catch(e) {
             console.log(e);
             alert("Storing song failed - " + id);
@@ -137,12 +137,51 @@ export async function storeSong(id, track) {
     }
 }
 
+export var downloadQueue = [];
+
 export const downloadSong = async(id) => {
+    if (id == undefined)
+        return;
+
+    downloadQueue.push(id);
+    console.log(downloadQueue);
     let track = await fetchVideoInfo(id);
     track.url = await fetchAudioStream(id);
 
-    track.artwork = await downloadMedia(track.artwork, targetHeader);
-    track.url = await downloadMedia(track.url, targetHeader);
+    track.artwork = await downloadMedia(track.artwork);
+    track.url = await downloadMedia(track.url);
 
-    storeSong(id, track);
+    await storeSong(id, track);
+
+    let index = downloadQueue.indexOf(id);
+    downloadQueue.splice(index, 1);
+    downloadCallback(id);
+    console.log(downloadQueue);
+}
+
+export const deleteSong = id => {
+    if (id == undefined)
+        return;
+
+    if (Platform.OS == "web") {
+        var request = indexedDB.open("storage");
+
+        request.onerror = event => {
+            console.log("failed opening DB: " + request.errorCode);
+        };
+
+        request.onsuccess = event => {
+            console.log("opened DB");
+            db = request.result;
+
+            db.transaction("songs", "readwrite")
+                .objectStore("songs")
+                .delete(id);
+            
+            localIDs.splice(localIDs.indexOf(id), 1);
+            downloadCallback(id);
+        };
+    } else {
+        
+    }
 }
