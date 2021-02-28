@@ -1,6 +1,5 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Platform } from "react-native";
-import { downloadCallback } from "../../components/shared/MoreModal";
 import { downloadMedia, fetchAudioStream, fetchVideoInfo } from "../remote/API";
 
 export var localIDs = null;
@@ -26,7 +25,6 @@ async function loadSongList(db) {
         };
 
         request.onsuccess = event => {
-            console.log("opened DB");
             db = request.result;
 
             request = db.transaction("songs", "readonly")
@@ -35,7 +33,6 @@ async function loadSongList(db) {
 
             request.onsuccess = event => {
                 localIDs = request.result;
-                console.log(localIDs);
             };
         };
 
@@ -59,12 +56,10 @@ export async function loadSongLocal(id) {
             var request = indexedDB.open("storage");
 
             request.onerror = event => {
-                console.log("failed opening DB: " + request.errorCode);
                 reject("failed opening DB: " + request.errorCode);
             };
 
             request.onsuccess = event => {
-                console.log("opened DB");
                 db = request.result;
 
                 request = db.transaction("songs", "readonly")
@@ -94,20 +89,31 @@ export async function loadSongLocal(id) {
     }
 }
 
-export async function storeSong(id, track) {
-    if (Platform.OS == "web") {
-        return new Promise((resolve, reject) => {
-            var request = indexedDB.open("storage");
+export var downloadQueue = [];
 
+export function storeSong(id) {
+    return new Promise(async(resolve, reject) => {
+        if (id == undefined || id == null)
+            reject("no id");
+
+        downloadQueue.push(id);
+
+        let track = await fetchVideoInfo(id);
+        track.url = await fetchAudioStream(id);
+
+        track.artwork = await downloadMedia(track.artwork);
+        track.url = await downloadMedia(track.url);
+
+        if (Platform.OS == "web") {
+            var request = indexedDB.open("storage");
+    
             request.onerror = event => {
-                console.log("failed opening DB: " + request.errorCode);
                 reject("failed opening DB: " + request.errorCode);
             };
-
+    
             request.onsuccess = event => {
-                console.log("opened DB");
                 db = request.result;
-
+    
                 db.transaction("songs", "readwrite")
                     .objectStore("songs")
                     .add({
@@ -116,72 +122,53 @@ export async function storeSong(id, track) {
                     });
                 
                 localIDs.push(id);
-                resolve(track);
             };
-        });
-    } else {
-        try {
-            const string = JSON.stringify({
-                id: id,
-                picture: await pictureBlob.text(),
-                audio: await audioBlob.text()
-            });
-    
-            await AsyncStorage.setItem('@storage_Song_' + id, string);
-            localIDs.push(id);
-        } catch(e) {
-            console.log(e);
-            alert("Storing song failed - " + id);
-            return null;
+        } else {
+            try {
+                const string = JSON.stringify({
+                    id: id,
+                    track: track
+                });
+        
+                await AsyncStorage.setItem('@storage_Song_' + id, string);
+                localIDs.push(id);
+            } catch(e) {
+                reject("Storing song failed - " + id);
+            }
         }
-    }
-}
 
-export var downloadQueue = [];
-
-export const downloadSong = async(id) => {
-    if (id == undefined)
-        return;
-
-    downloadQueue.push(id);
-    console.log(downloadQueue);
-    let track = await fetchVideoInfo(id);
-    track.url = await fetchAudioStream(id);
-
-    track.artwork = await downloadMedia(track.artwork);
-    track.url = await downloadMedia(track.url);
-
-    await storeSong(id, track);
-
-    let index = downloadQueue.indexOf(id);
-    downloadQueue.splice(index, 1);
-    downloadCallback(id);
-    console.log(downloadQueue);
+        let index = downloadQueue.indexOf(id);
+        downloadQueue.splice(index, 1);
+        console.log(localIDs);
+        resolve(id);
+    });
 }
 
 export const deleteSong = id => {
-    if (id == undefined)
-        return;
+    return new Promise((resolve, reject) => {
+        if (id == undefined)
+            reject("id is missing");
 
-    if (Platform.OS == "web") {
-        var request = indexedDB.open("storage");
+        if (Platform.OS == "web") {
+            var request = indexedDB.open("storage");
 
-        request.onerror = event => {
-            console.log("failed opening DB: " + request.errorCode);
-        };
+            request.onerror = event => {
+                reject("failed opening DB: " + request.errorCode);
+            };
 
-        request.onsuccess = event => {
-            console.log("opened DB");
-            db = request.result;
+            request.onsuccess = event => {
+                db = request.result;
 
-            db.transaction("songs", "readwrite")
-                .objectStore("songs")
-                .delete(id);
+                db.transaction("songs", "readwrite")
+                    .objectStore("songs")
+                    .delete(id);
+                
+                localIDs.splice(localIDs.indexOf(id), 1);
+                resolve(id);
+            };
+        } else {
             
-            localIDs.splice(localIDs.indexOf(id), 1);
-            downloadCallback(id);
-        };
-    } else {
-        
-    }
+        }
+    });
+    
 }

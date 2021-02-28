@@ -26,12 +26,10 @@ import {
     getArtistLike
 } from "../../modules/storage/MediaStorage";
 
-import { downloadSong, deleteSong, localIDs, downloadQueue } from "../../modules/storage/SongStorage";
+import { storeSong, deleteSong, localIDs, downloadQueue } from "../../modules/storage/SongStorage";
 import { rippleConfig } from "../../styles/Ripple";
 
 export var showModal = null;
-
-export var downloadCallback = null;
 
 export default MoreModal = ({navigation}) => {
     const [content, setContent] = useState({
@@ -42,20 +40,15 @@ export default MoreModal = ({navigation}) => {
         browseId: null,
         playlistId: null,
         type: null,
+        liked: null,
+        visible: false,
+        playing: false,
+        downloading: false,
+        downloaded: false,
         likeFunction: () => {}
     });
 
-    const [downloading, setDownloading] = useState(false);
-    const [playing, setPlaying] = useState(false);
     const {dark, colors} = useTheme();
-
-    downloadCallback = id => {
-        if (videoId == id)
-            setDownloading(false);
-    }
-
-    const [visible, setVisible] = useState(false);
-    const [liked, setLiked] = useState(null);
 
     const onShare = async(type, url, message) => {
         try {
@@ -67,8 +60,7 @@ export default MoreModal = ({navigation}) => {
             }, {
                 dialogTitle: title
             });
-
-            setVisible(false);
+            setContent({...content, visible: false});
             
             if (result.action === Share.sharedAction) {
                 if (result.activityType)
@@ -85,97 +77,117 @@ export default MoreModal = ({navigation}) => {
     };
 
     const refresh = (type, id) => {
-        switch(type) {
-            case "Song":
-                getSongLike(id)
-                    .then(boolean => {
-                        setLiked({ isLiked: boolean });
-                    });
-                break;
-            case "Playlist":
-                getPlaylistLike(id)
-                    .then(boolean => {
-                        setLiked({ isLiked: boolean });
-                    });
-                break;
-            case "Artist":
-                getArtistLike(id)
-                    .then(boolean => {
-                        setLiked({ isLiked: boolean });
-                    });
-        }
+        return new Promise(async(resolve) => {
+            let liked = null;
+            switch(type) {
+                case "Song":
+                    liked = await getSongLike(id);
+                    break;
+                case "Playlist":
+                    liked = await getPlaylistLike(id);
+                    break;
+                case "Artist":
+                    liked = await getArtistLike(id);
+            }
+            resolve(liked);
+        })
+        
     };
 
     const download = () => {
-        downloadSong(videoId);
-        setDownloading(true);
+        setContent({...content, downloading: true});
+        storeSong(videoId)
+            .then(id => {if (videoId == id) setContent(content => ({...content, downloading: false, downloaded: true}));})
+            .catch(id => {if (videoId == id) setContent(content => ({...content, downloading: false, downloaded: false}));});
     }
 
     const remove = () => {
-        deleteSong(videoId);
-        setDownloading(true);
+        setContent({...content, downloading: true});
+        deleteSong(videoId)
+            .then(id => {if (videoId == id) setContent(content => ({...content, downloading: false, downloaded: false}));})
+            .catch(id => {if (videoId == id) setContent(content => ({...content, downloading: false, downloaded: false}));});
+        ;
     }
 
     showModal = async(info) => {
         let type;
         let likeFunction;
+        let liked;
+        let downloading = false;
+        let downloaded = false;
 
         if (info.videoId != null) {
             type = "Song";
-            refresh(type, info.videoId);
+            liked = await refresh(type, info.videoId);
     
             likeFunction = boolean => {
                 likeSong(info.videoId, boolean);
-                refresh(type, info.videoId);
+                refresh(type, info.videoId)
+                    .then(liked => {
+                        setContent(content => ({...content, liked: liked}));
+                    })
             }
         } else if (info.playlistId != null || info.browseId != null) {
             if (info.browseId != null) {
                 if (info.browseId.slice(0, 2) == "UC") {
                     type = "Artist";
-                    refresh(type, info.browseId);
+                    liked = await refresh(type, info.browseId);
                     likeFunction = (boolean) => {
                         likeArtist(info.browseId, boolean);
-                        refresh(type, info.browseId);
+                        refresh(type, info.videoId)
+                            .then(liked => {
+                                setContent(content => ({...content, liked: liked}));
+                            })
                     }
     
                 } else {
                     type = "Playlist";
-                    refresh(type, info.playlistId);
+                    liked = await refresh(type, info.playlistId);
                     likeFunction = boolean => {
                         likePlaylist(info.playlistId, boolean);
-                        refresh(type, info.playlistId);
+                        refresh(type, info.videoId)
+                            .then(liked => {
+                                setContent(content => ({...content, liked: liked}));
+                            })
                     }
     
                 }
             } else {
                 type = "Playlist";
-                refresh(type, info.playlistId);
+                liked = await refresh(type, info.playlistId);
                 likeFunction = boolean => {
                     likePlaylist(info.playlistId, boolean);
-                    refresh(type, info.playlistId);
+                    refresh(type, info.videoId)
+                        .then(liked => {
+                            setContent(content => ({...content, liked: liked}));
+                        })
                 }
             }
         }
 
-        let isPlaying = false
+        let isPlaying = false;
         if (await TrackPlayer.getCurrentTrack() == info.videoId) {
             if (await TrackPlayer.getState() == TrackPlayer.STATE_PLAYING) {
                 isPlaying = true;
             }
         }
+        
+        if (downloadQueue.includes(info.videoId))
+            downloading = true;
 
-        setPlaying(isPlaying);
+        if (localIDs.includes(info.videoId))
+            downloaded = true;
 
         setContent({
             ...info,
             type: type,
+            playing: isPlaying,
+            downloading: downloading,
+            downloaded: downloaded,
+            visible: true,
+            liked, liked,
             likeFunction: likeFunction
         });
-
-        if (videoId in downloadQueue)
-            setDownloading(true);
-
-        setVisible(true);
     };
 
     const {
@@ -183,6 +195,11 @@ export default MoreModal = ({navigation}) => {
         playlistId,
         videoId,
         type,
+        downloading,
+        downloaded,
+        visible,
+        playing,
+        liked,
         likeFunction
     } = content;
 
@@ -190,10 +207,10 @@ export default MoreModal = ({navigation}) => {
         animationType="slide"
         transparent={true}
         visible={visible}
-        onRequestClose={() => setVisible(false)}
-        onDismiss={() => setVisible(false)}
+        onRequestClose={() => setContent(content => ({...content, visible: false}))}
+        onDismiss={() => setContent(content => ({...content, visible: false}))}
         hardwareAccelerated={true}>
-        <Pressable onPress={() => setVisible(false)} style={{height: "100%", width: "100%", justifyContent: "flex-end", backgroundColor: "rgba(0, 0, 0, 0.3)"}}>
+        <Pressable onPress={() => setContent(content => ({...content, visible: false}))} style={{height: "100%", width: "100%", justifyContent: "flex-end", backgroundColor: "rgba(0, 0, 0, 0.3)"}}>
             <Pressable android_ripple={rippleConfig}
                        style={{
                             paddingHorizontal: 10,
@@ -255,23 +272,27 @@ export default MoreModal = ({navigation}) => {
                         <Pressable
                             onPress={
                                 async() => {
-                                if (playing) {
-                                    TrackPlayer.pause()
-                                    setPlaying(false);
-                                    setVisible(false);
-                                    return;
-                                } else {
-                                    if (await TrackPlayer.getCurrentTrack() == videoId) {
-                                        navigation.navigate("Music");
-                                        setVisible(false);
-                                        TrackPlayer.play();
+                                    if (playing) {
+                                        TrackPlayer.pause();
+                                        setContent(content => ({
+                                            ...content,
+                                            playing: false,
+                                            visible: false
+                                        }));
                                         return;
+                                    } else {
+                                        if (await TrackPlayer.getCurrentTrack() == videoId) {
+                                            navigation.navigate("Music");
+                                            setContent(content => ({...content, visible: false}));
+                                            TrackPlayer.play();
+                                            return;
+                                        }
                                     }
-                                }
 
-                                handleMedia(content, navigation);
-                                setVisible(false);
-                            }}
+                                    handleMedia(content, navigation);
+                                    setContent(content => ({...content, visible: false}));
+                                }
+                            }
                             style={modalStyles.entry}
                             android_ripple={{color: "gray"}}
                         >
@@ -298,11 +319,11 @@ export default MoreModal = ({navigation}) => {
                 <View style={modalStyles.entryView}>
                     <Pressable
                         onPress={
-                            () => localIDs.includes(content.videoId)
+                            () => downloaded
                                 ? remove()
                                 : download()
                         }
-                        disabled={localIDs == null ? true : false}
+                        disabled={downloading}
                         style={modalStyles.entry}
                         android_ripple={{color: "gray"}}
                     >
@@ -311,7 +332,7 @@ export default MoreModal = ({navigation}) => {
                                 ? <ActivityIndicator color="black"/>
                                 : <MaterialIcons
                                     name={
-                                        localIDs.includes(content.videoId)
+                                        downloaded
                                             ? "delete"
                                             : "get-app"
                                     }
@@ -323,12 +344,18 @@ export default MoreModal = ({navigation}) => {
                         <Text style={{paddingLeft: 20}}>
                             {
                                 downloading
-                                    ? "Downloading" + downloadQueue > 1
-                                        ? " - " + downloadQueue + " in queue"
-                                        : ""
-                                    : localIDs.includes(content.videoId)
-                                        ? "Delete"
-                                        : "Download"
+                                    ? "Downloading" + (downloadQueue.length > 0
+                                        ? " (" + downloadQueue.length + " in queue)"
+                                        : "")
+
+                                    : downloaded
+                                        ? "Delete" + (downloadQueue.length > 0
+                                            ? " (" + downloadQueue.length + " in queue)"
+                                            : "")
+
+                                        : "Download" + (downloadQueue.length > 0
+                                            ? " (" + downloadQueue.length + " in queue)"
+                                            : "")
                             }
                         </Text>
                     </Pressable>
