@@ -79,14 +79,16 @@ export default PlayView = ({route, navigation}) => {
                 fetchNext(route.params.v, route.params.list)
                     .then(playlist => {
                         let load = new Promise(async(resolve) => {
-                            for (let i = 0; i < playlist.list.length; i++) {
-                                let track = playlist.list[i];
-                                if (localIDs.includes(track.id)) {
-                                    track = await loadSongLocal(track.id);
-                                    console.log(track);
-                                    playlist.list[i] = track;
+                            if (localIDs.length != 0)
+                                for (let i = 0; i < playlist.list.length; i++) {
+                                    let track = playlist.list[i];
+                                    if (localIDs.includes(track.id)) {
+                                        track = await loadSongLocal(track.id);
+                                        console.log(track);
+                                        playlist.list[i] = track;
+                                    }
                                 }
-                            }
+                            
                             resolve(playlist);
                         });
                         
