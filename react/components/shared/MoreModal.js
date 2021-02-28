@@ -6,10 +6,13 @@ import {
     Text,
     Image,
     StyleSheet,
-    Share
+    Share,
+    ActivityIndicator
 } from "react-native";
 
+import TrackPlayer from 'react-native-track-player';
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
+import { useTheme } from "@react-navigation/native";
 
 import { appColor } from "../../styles/App";
 import { handleMedia } from "../../modules/event/mediaNavigator";
@@ -23,10 +26,12 @@ import {
     getArtistLike
 } from "../../modules/storage/MediaStorage";
 
-import { downloadSong, localIDs } from "../../modules/storage/SongStorage";
+import { downloadSong, deleteSong, localIDs, downloadQueue } from "../../modules/storage/SongStorage";
 import { rippleConfig } from "../../styles/Ripple";
 
 export var showModal = null;
+
+export var downloadCallback = null;
 
 export default MoreModal = ({navigation}) => {
     const [content, setContent] = useState({
@@ -39,6 +44,15 @@ export default MoreModal = ({navigation}) => {
         type: null,
         likeFunction: () => {}
     });
+
+    const [downloading, setDownloading] = useState(false);
+    const [playing, setPlaying] = useState(false);
+    const {dark, colors} = useTheme();
+
+    downloadCallback = id => {
+        if (videoId == id)
+            setDownloading(false);
+    }
 
     const [visible, setVisible] = useState(false);
     const [liked, setLiked] = useState(null);
@@ -58,7 +72,7 @@ export default MoreModal = ({navigation}) => {
             
             if (result.action === Share.sharedAction) {
                 if (result.activityType)
-                    console.log("shared with activity type of result.activityType");
+                    console.log("shared with activity type of " + result.activityType);
                 else
                     console.log("shared");
                 
@@ -68,11 +82,6 @@ export default MoreModal = ({navigation}) => {
         } catch (error) {
             alert(error.message);
         }
-    };
-
-    const downloadMedia = () => {
-        if (content.videoId != undefined)
-            downloadSong(content.videoId)
     };
 
     const refresh = (type, id) => {
@@ -97,53 +106,75 @@ export default MoreModal = ({navigation}) => {
         }
     };
 
-    showModal = info => {
+    const download = () => {
+        downloadSong(videoId);
+        setDownloading(true);
+    }
+
+    const remove = () => {
+        deleteSong(videoId);
+        setDownloading(true);
+    }
+
+    showModal = async(info) => {
         let type;
         let likeFunction;
 
-        if (videoId != null) {
+        if (info.videoId != null) {
             type = "Song";
-            refresh(type, videoId);
+            refresh(type, info.videoId);
     
             likeFunction = boolean => {
-                likeSong(videoId, boolean);
-                refresh(type, videoId);
+                likeSong(info.videoId, boolean);
+                refresh(type, info.videoId);
             }
-        } else if (playlistId != null || browseId != null) {
-            if (browseId != null) {
-                if (browseId.slice(0, 2) == "UC") {
+        } else if (info.playlistId != null || info.browseId != null) {
+            if (info.browseId != null) {
+                if (info.browseId.slice(0, 2) == "UC") {
                     type = "Artist";
-                    refresh(type, browseId);
+                    refresh(type, info.browseId);
                     likeFunction = (boolean) => {
-                        likeArtist(browseId, boolean);
-                        refresh(type, browseId);
+                        likeArtist(info.browseId, boolean);
+                        refresh(type, info.browseId);
                     }
     
                 } else {
                     type = "Playlist";
-                    refresh(type, playlistId);
+                    refresh(type, info.playlistId);
                     likeFunction = boolean => {
-                        likePlaylist(playlistId, boolean);
-                        refresh(type, playlistId);
+                        likePlaylist(info.playlistId, boolean);
+                        refresh(type, info.playlistId);
                     }
     
                 }
             } else {
                 type = "Playlist";
-                refresh(type, playlistId);
+                refresh(type, info.playlistId);
                 likeFunction = boolean => {
-                    likePlaylist(playlistId, boolean);
-                    refresh(type, playlistId);
+                    likePlaylist(info.playlistId, boolean);
+                    refresh(type, info.playlistId);
                 }
-    
             }
         }
+
+        let isPlaying = false
+        if (await TrackPlayer.getCurrentTrack() == info.videoId) {
+            if (await TrackPlayer.getState() == TrackPlayer.STATE_PLAYING) {
+                isPlaying = true;
+            }
+        }
+
+        setPlaying(isPlaying);
 
         setContent({
             ...info,
             type: type,
             likeFunction: likeFunction
         });
+
+        if (videoId in downloadQueue)
+            setDownloading(true);
+
         setVisible(true);
     };
 
@@ -222,7 +253,22 @@ export default MoreModal = ({navigation}) => {
 
                 <View style={modalStyles.entryView}>
                         <Pressable
-                            onPress={() => {
+                            onPress={
+                                async() => {
+                                if (playing) {
+                                    TrackPlayer.pause()
+                                    setPlaying(false);
+                                    setVisible(false);
+                                    return;
+                                } else {
+                                    if (await TrackPlayer.getCurrentTrack() == videoId) {
+                                        navigation.navigate("Music");
+                                        setVisible(false);
+                                        TrackPlayer.play();
+                                        return;
+                                    }
+                                }
+
                                 handleMedia(content, navigation);
                                 setVisible(false);
                             }}
@@ -230,10 +276,16 @@ export default MoreModal = ({navigation}) => {
                             android_ripple={{color: "gray"}}
                         >
                             {type == "Song"
-                                ? <>
-                                    <MaterialIcons name="play-arrow" color="black" size={25}/>
-                                    <Text style={{paddingLeft: 20}}>Play</Text>
-                                </>
+                                ? playing
+                                    ? <>
+                                        <MaterialIcons name="pause" color="black" size={25}/>
+                                        <Text style={{paddingLeft: 20}}>Pause</Text>
+                                    </>
+
+                                    : <>
+                                        <MaterialIcons name="play-arrow" color="black" size={25}/>
+                                        <Text style={{paddingLeft: 20}}>Play</Text>
+                                    </>
                                 
                                 : <>
                                     <MaterialIcons name="launch" color="black" size={25}/>
@@ -244,18 +296,42 @@ export default MoreModal = ({navigation}) => {
                     </View>
                 
                 <View style={modalStyles.entryView}>
-                <Pressable onPress={() => downloadMedia()} disabled={localIDs == null ? true : false} style={modalStyles.entry} android_ripple={{color: "gray"}}>
-                    <MaterialIcons name="get-app" color="black" size={25}/>
-                    <Text style={{paddingLeft: 20}}>
-                        {
-                            localIDs != null
-                                ? localIDs.includes(content.videoId)
-                                    ? "Remove"
-                                    : "Download"
-                                : "Download"
+                    <Pressable
+                        onPress={
+                            () => localIDs.includes(content.videoId)
+                                ? remove()
+                                : download()
                         }
-                    </Text>
-                </Pressable>
+                        disabled={localIDs == null ? true : false}
+                        style={modalStyles.entry}
+                        android_ripple={{color: "gray"}}
+                    >
+                        {
+                            downloading
+                                ? <ActivityIndicator color="black"/>
+                                : <MaterialIcons
+                                    name={
+                                        localIDs.includes(content.videoId)
+                                            ? "delete"
+                                            : "get-app"
+                                    }
+                                    color="black"
+                                    size={25}
+                                />
+                        }
+
+                        <Text style={{paddingLeft: 20}}>
+                            {
+                                downloading
+                                    ? "Downloading" + downloadQueue > 1
+                                        ? " - " + downloadQueue + " in queue"
+                                        : ""
+                                    : localIDs.includes(content.videoId)
+                                        ? "Delete"
+                                        : "Download"
+                            }
+                        </Text>
+                    </Pressable>
                 </View>
 
                 <View style={modalStyles.entryView}>
@@ -320,6 +396,8 @@ const modalStyles = StyleSheet.create({
     },
 
     headerText: {
+        flex: 1,
+        paddingLeft: 10,
         overflow: "hidden",
         width: 140,
     },
