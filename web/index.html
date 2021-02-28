@@ -15,6 +15,12 @@
               type="image/x-icon"
         />
 
+        <link rel="stylesheet"
+              href="<%= require('./style.css').default %>"
+              type="text/css"
+        />
+
+
         <script>
             window.setImmediate = window.setTimeout;
             if ('serviceWorker' in navigator) {
