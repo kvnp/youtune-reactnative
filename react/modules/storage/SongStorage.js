@@ -1,4 +1,4 @@
-import AsyncStorage from "@react-native-community/async-storage";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Platform } from "react-native";
 import { downloadCallback } from "../../components/shared/MoreModal";
 import { downloadMedia, fetchAudioStream, fetchVideoInfo } from "../remote/API";
