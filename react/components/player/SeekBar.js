@@ -47,7 +47,7 @@ export default SeekBar = ({ style, navigation }) => {
                 bufferedPosition: await TrackPlayer.getBufferedPosition(),
                 duration: await TrackPlayer.getDuration()
             });
-            
+
             if (await TrackPlayer.getState() == TrackPlayer.STATE_PLAYING) {
                 clearInterval(interval);
                 interval = setInterval(async() => {
@@ -62,7 +62,7 @@ export default SeekBar = ({ style, navigation }) => {
         });
 
         const trackState = TrackPlayer.addEventListener("playback-state", async(playback) => {
-            switch (await TrackPlayer.getState()) {
+            switch (playback.state) {
                 case TrackPlayer.STATE_NONE:
                 case TrackPlayer.STATE_PAUSED:
                 case TrackPlayer.STATE_STOPPED:
