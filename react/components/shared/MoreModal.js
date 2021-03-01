@@ -7,7 +7,8 @@ import {
     Image,
     StyleSheet,
     Share,
-    ActivityIndicator
+    ActivityIndicator,
+    Platform
 } from "react-native";
 
 import TrackPlayer from 'react-native-track-player';
@@ -239,7 +240,7 @@ export default MoreModal = ({navigation}) => {
                 alignSelf: "center",
                 width: "100%"
             }}>
-                <View style={[modalStyles.header, {backgroundColor: colors.border}]}>
+                <Pressable style={[modalStyles.header, {backgroundColor: colors.border}, Platform.OS == "web" ? {cursor: "default"} : undefined]}>
                     <Image source={{uri: content.thumbnail}} style={modalStyles.thumbnail}/>
                     <View style={modalStyles.headerText}>
                         <Text style={{color: colors.text}} numberOfLines={1}>{content.title}</Text>
@@ -287,7 +288,7 @@ export default MoreModal = ({navigation}) => {
                             </Pressable>
                         </View>
                     </View>
-                </View>
+                </Pressable>
 
                 <View style={modalStyles.entryView}>
                     <Pressable
