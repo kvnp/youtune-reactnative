@@ -11,6 +11,8 @@ import { useTheme } from '@react-navigation/native';
 import Slider from "@react-native-community/slider";
 
 import TrackPlayer, { useTrackPlayerProgress } from 'react-native-track-player';
+import { useEffect } from 'react';
+import Track from '../../modules/models/music/track';
 
 function pad(n, width, z = 0) {
     n = n + '';
@@ -22,15 +24,43 @@ const minutesAndSeconds = (position) => ([
     pad( ~~(position % 60), 2),
 ]);
 
-export default SeekBar = ({ style }) => {
+export default SeekBar = ({ style, navigation }) => {
     const [isSliding, setSliding] = useState(false);
     const [positionCache, setPositionCache] = useState(0);
+    const [state, setState] = useState({
+        position: 0,
+        duration: 0,
+        bufferedPosition: 0
+    });
 
-    const { position, bufferedPosition, duration } = useTrackPlayerProgress(250);
+    const { position, bufferedPosition, duration } = state;
 
     const elapsed = minutesAndSeconds(position);
     const remaining = minutesAndSeconds(duration - position);
     const { colors } = useTheme();
+
+    useEffect(() => {
+        const unsubscribe = navigation.addListener('focus', async() => {
+            setState({
+                position: await TrackPlayer.getPosition(),
+                bufferedPosition: await TrackPlayer.getBufferedPosition(),
+                duration: await TrackPlayer.getDuration()
+            });
+        });
+
+        const interval = setInterval(async() => {
+            setState({
+                position: await TrackPlayer.getPosition(),
+                bufferedPosition: await TrackPlayer.getBufferedPosition(),
+                duration: await TrackPlayer.getDuration()
+            });
+        }, 500);
+
+        return () => {
+            unsubscribe();
+            clearInterval(interval);
+        }
+    }, []);
 
     return (
         <View style={[styles.container, style]}>
