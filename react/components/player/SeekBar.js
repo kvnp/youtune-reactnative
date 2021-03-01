@@ -10,9 +10,8 @@ import {
 import { useTheme } from '@react-navigation/native';
 import Slider from "@react-native-community/slider";
 
-import TrackPlayer, { useTrackPlayerProgress } from 'react-native-track-player';
+import TrackPlayer from 'react-native-track-player';
 import { useEffect } from 'react';
-import Track from '../../modules/models/music/track';
 
 function pad(n, width, z = 0) {
     n = n + '';
@@ -68,6 +67,10 @@ export default SeekBar = ({ style, navigation }) => {
                 maximumValue={Math.max(duration, 1, position)}
                 onSlidingComplete={async(value) => {
                     await TrackPlayer.seekTo(value);
+                    setState(state => ({
+                        ...state,
+                        position: value
+                    }));
                     setSliding(false);
                 }}
                 onSlidingStart={position => {
