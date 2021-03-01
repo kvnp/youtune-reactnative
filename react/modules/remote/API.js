@@ -6,7 +6,8 @@ import {
     digestNextResults,
     digestVideoInfoResults,
     digestStreams,
-    extractConfiguration
+    extractConfiguration,
+    digestAudioInfo
 } from "./Extractor";
 
 import { getHttpResponse, getUrl } from "./HTTP";
@@ -183,20 +184,8 @@ export async function fetchVideoInfo(videoId) {
     return digestVideoInfoResults(response);
 }
 
-export async function fetchAudioStream(videoId) {
-    let url = "https://www.youtube.com/get_video_info?video_id=" + videoId +
-              "&el=detailpage&c=WEB_REMIX&cver=0.1&cplayer=UNIPLAYER";
-    let response = await getHttpResponse(url, {
-        method: "GET",
-        headers: headers_simple
-    }, "text");
-
-    let stream = await digestStreams(response);
-
-    if (stream != null)
-        return stream;
-
-    /*let url = "https://music.youtube.com/youtubei/v1/player?key=" + apiKey;
+export async function fetchAudioInfo(videoId, playlistId) {
+    let url = "https://music.youtube.com/youtubei/v1/player?key=" + apiKey;
 
     let body = getRequestBody();
     body.context["user"] = { lockedSafetyMode: settings.safetyMode }
@@ -211,10 +200,23 @@ export async function fetchAudioStream(videoId) {
         body: JSON.stringify(body)
     }, "json");
 
+    let audioInfo = digestAudioInfo(response);
+
+    return audioInfo;
+}
+
+export async function fetchAudioStream(videoId) {
+    let url = "https://www.youtube.com/get_video_info?video_id=" + videoId +
+              "&el=detailpage&c=WEB_REMIX&cver=0.1&cplayer=UNIPLAYER";
+    let response = await getHttpResponse(url, {
+        method: "GET",
+        headers: headers_simple
+    }, "text");
+
     let stream = await digestStreams(response);
 
     if (stream != null)
-        return stream;*/
+        return stream;
 }
 
 export async function fetchNext(videoId, playlistId) {

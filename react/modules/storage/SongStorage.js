@@ -1,11 +1,16 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Platform } from "react-native";
-import { downloadMedia, fetchAudioStream, fetchVideoInfo } from "../remote/API";
+import {
+    downloadMedia,
+    fetchAudioInfo,
+    fetchAudioStream,
+    fetchVideoInfo
+} from "../remote/API";
 
 export var localIDs = null;
 
 if (Platform.OS == "web")
-    var db = null; 
+    var db = null;
 
 async function loadSongList(db) {
     localIDs = [];
@@ -98,7 +103,7 @@ export function storeSong(id) {
 
         downloadQueue.push(id);
 
-        let track = await fetchVideoInfo(id);
+        let track = await fetchAudioInfo(id);
         track.url = await fetchAudioStream(id);
 
         track.artwork = await downloadMedia(track.artwork);
@@ -139,7 +144,6 @@ export function storeSong(id) {
 
         let index = downloadQueue.indexOf(id);
         downloadQueue.splice(index, 1);
-        console.log(localIDs);
         resolve(id);
     });
 }
@@ -170,5 +174,4 @@ export const deleteSong = id => {
             
         }
     });
-    
 }
