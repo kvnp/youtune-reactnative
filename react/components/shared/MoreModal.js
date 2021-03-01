@@ -173,7 +173,6 @@ export default MoreModal = ({navigation}) => {
                                 setContent(content => ({...content, liked: liked}));
                             })
                     }
-    
                 }
             } else {
                 type = "Playlist";
@@ -234,18 +233,17 @@ export default MoreModal = ({navigation}) => {
         onDismiss={() => setContent(content => ({...content, visible: false}))}
         hardwareAccelerated={true}>
         <Pressable onPress={() => setContent(content => ({...content, visible: false}))} style={{height: "100%", width: "100%", justifyContent: "flex-end", backgroundColor: "rgba(0, 0, 0, 0.3)"}}>
-            <Pressable android_ripple={rippleConfig}
-                       style={{
-                            paddingHorizontal: 10,
-                            maxWidth: 800,
-                            alignSelf: "center",
-                            width: "100%"
-                       }}>
-                <View style={modalStyles.header}>
+            <View style={{
+                paddingHorizontal: 10,
+                maxWidth: 800,
+                alignSelf: "center",
+                width: "100%"
+            }}>
+                <View style={[modalStyles.header, {backgroundColor: colors.border}]}>
                     <Image source={{uri: content.thumbnail}} style={modalStyles.thumbnail}/>
                     <View style={modalStyles.headerText}>
-                        <Text numberOfLines={1}>{content.title}</Text>
-                        <Text numberOfLines={1}>{content.subtitle}</Text>
+                        <Text style={{color: colors.text}} numberOfLines={1}>{content.title}</Text>
+                        <Text style={{color: colors.text}} numberOfLines={1}>{content.subtitle}</Text>
                     </View>
                     <View style={{width: 120, height: 50, alignItems: "center", justifyContent: "center", flexDirection: "row"}}>
                         <View style={{width: 50, height: 50, alignItems: "center", justifyContent: "center"}}>
@@ -260,7 +258,7 @@ export default MoreModal = ({navigation}) => {
                                         liked == null
                                             ? "darkgray"
                                             : !liked
-                                                ? "black"
+                                                ? colors.primary
                                                 : "darkgray"
                                     }
 
@@ -280,7 +278,7 @@ export default MoreModal = ({navigation}) => {
                                         liked == null
                                             ? "darkgray"
                                             : liked
-                                                ? "black"
+                                                ? colors.primary
                                                 : "darkgray"
                                     }
 
@@ -316,24 +314,24 @@ export default MoreModal = ({navigation}) => {
                                 setContent(content => ({...content, visible: false}));
                             }
                         }
-                        style={modalStyles.entry}
+                        style={[modalStyles.entry, {backgroundColor: colors.card}]}
                         android_ripple={{color: "gray"}}
                     >
                         {type == "Song"
                             ? playing
                                 ? <>
-                                    <MaterialIcons name="pause" color="black" size={25}/>
-                                    <Text style={{paddingLeft: 20}}>Pause</Text>
+                                    <MaterialIcons name="pause" color={colors.text} size={25}/>
+                                    <Text style={{paddingLeft: 20, color: colors.text}}>Pause</Text>
                                 </>
 
                                 : <>
-                                    <MaterialIcons name="play-arrow" color="black" size={25}/>
-                                    <Text style={{paddingLeft: 20}}>Play</Text>
+                                    <MaterialIcons name="play-arrow" color={colors.text} size={25}/>
+                                    <Text style={{paddingLeft: 20, color: colors.text}}>Play</Text>
                                 </>
                             
                             : <>
-                                <MaterialIcons name="launch" color="black" size={25}/>
-                                <Text style={{paddingLeft: 20}}>Open</Text>
+                                <MaterialIcons name="launch" color={colors.text} size={25}/>
+                                <Text style={{paddingLeft: 20, color: colors.text}}>Open</Text>
                             </>
                         }
                     </Pressable>
@@ -348,24 +346,24 @@ export default MoreModal = ({navigation}) => {
                                         : download()
                                 }
                                 disabled={downloading}
-                                style={modalStyles.entry}
+                                style={[modalStyles.entry, {backgroundColor: colors.card}]}
                                 android_ripple={{color: "gray"}}
                             >
                                 {
                                     downloading
-                                        ? <ActivityIndicator color="black"/>
+                                        ? <ActivityIndicator color={colors.text}/>
                                         : <MaterialIcons
                                             name={
                                                 downloaded
                                                     ? "delete"
                                                     : "get-app"
                                             }
-                                            color="black"
+                                            color={colors.text}
                                             size={25}
                                         />
                                 }
         
-                                <Text style={{paddingLeft: 20}}>
+                                <Text style={{paddingLeft: 20, color: colors.text}}>
                                     {
                                         downloading
                                             ? "Downloading" + (downloadQueue.length > 0
@@ -390,17 +388,17 @@ export default MoreModal = ({navigation}) => {
                 }
 
                 <View style={modalStyles.entryView}>
-                <Pressable onPress={() => {}} style={modalStyles.entry} android_ripple={{color: "gray"}}>
+                <Pressable onPress={() => {}} style={[modalStyles.entry, {backgroundColor: colors.card}]} android_ripple={{color: "gray"}}>
                     {
                         type == "Song"
                             ? <>
-                                <MaterialIcons name="playlist-add" color="black" size={25}/>
-                                <Text style={{paddingLeft: 20}}>Add to playlist</Text>
+                                <MaterialIcons name="playlist-add" color={colors.text} size={25}/>
+                                <Text style={{paddingLeft: 20, color: colors.text}}>Add to playlist</Text>
                             </>
 
                             : <>
-                                <MaterialIcons name="library-add" color="black" size={25}/>
-                                <Text style={{paddingLeft: 20}}>Add to library</Text>
+                                <MaterialIcons name="library-add" color={colors.text} size={25}/>
+                                <Text style={{paddingLeft: 20, color: colors.text}}>Add to library</Text>
                             </>
                     }
                 </Pressable>
@@ -425,13 +423,13 @@ export default MoreModal = ({navigation}) => {
                         onShare(type, "https://music.youtube.com/" + file, message);
                     }}
 
-                    style={modalStyles.entry} android_ripple={{color: "gray"}}
+                    style={[modalStyles.entry, {backgroundColor: colors.card}]} android_ripple={{color: "gray"}}
                 >
-                    <MaterialIcons name="share" color="black" size={25}/>
-                    <Text style={{paddingLeft: 20}}>Share</Text>
+                    <MaterialIcons name="share" color={colors.text} size={25}/>
+                    <Text style={{paddingLeft: 20, color: colors.text}}>Share</Text>
                 </Pressable>
                 </View>
-            </Pressable>
+            </View>
         </Pressable>
     </Modal>
 };
@@ -445,7 +443,6 @@ const modalStyles = StyleSheet.create({
         justifyContent: "space-between",
         paddingHorizontal: 20,
         width: "100%",
-        backgroundColor: "gray",
         borderTopLeftRadius: 20,
         borderTopRightRadius: 20
     },
@@ -470,7 +467,6 @@ const modalStyles = StyleSheet.create({
         paddingVertical: 10,
         paddingHorizontal: 50,
         height: 50,
-        backgroundColor: "darkgray",
     },
 
     entryView: {
