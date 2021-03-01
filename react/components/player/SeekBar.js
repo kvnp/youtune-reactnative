@@ -39,7 +39,47 @@ export default SeekBar = ({ style, navigation }) => {
     const { colors } = useTheme();
 
     useEffect(() => {
-        const unsubscribe = navigation.addListener('focus', async() => {
+        var interval;
+
+        const focus = navigation.addListener('focus', async() => {
+            setState({
+                position: await TrackPlayer.getPosition(),
+                bufferedPosition: await TrackPlayer.getBufferedPosition(),
+                duration: await TrackPlayer.getDuration()
+            });
+            
+            if (await TrackPlayer.getState() == TrackPlayer.STATE_PLAYING) {
+                clearInterval(interval);
+                interval = setInterval(async() => {
+                    setState({
+                        position: await TrackPlayer.getPosition(),
+                        bufferedPosition: await TrackPlayer.getBufferedPosition(),
+                        duration: await TrackPlayer.getDuration()
+                    });
+                }, 500);
+            }
+                
+        });
+
+        const trackState = TrackPlayer.addEventListener("playback-state", async(playback) => {
+            switch (await TrackPlayer.getState()) {
+                case TrackPlayer.STATE_NONE:
+                case TrackPlayer.STATE_PAUSED:
+                case TrackPlayer.STATE_STOPPED:
+                case TrackPlayer.STATE_BUFFERING:
+                    clearInterval(interval);
+                    break;
+                case TrackPlayer.STATE_PLAYING:
+                    clearInterval(interval);
+                    interval = setInterval(async() => {
+                        setState({
+                            position: await TrackPlayer.getPosition(),
+                            bufferedPosition: await TrackPlayer.getBufferedPosition(),
+                            duration: await TrackPlayer.getDuration()
+                        });
+                    }, 500);
+            }
+
             setState({
                 position: await TrackPlayer.getPosition(),
                 bufferedPosition: await TrackPlayer.getBufferedPosition(),
@@ -47,17 +87,10 @@ export default SeekBar = ({ style, navigation }) => {
             });
         });
 
-        const interval = setInterval(async() => {
-            setState({
-                position: await TrackPlayer.getPosition(),
-                bufferedPosition: await TrackPlayer.getBufferedPosition(),
-                duration: await TrackPlayer.getDuration()
-            });
-        }, 500);
-
         return () => {
-            unsubscribe();
             clearInterval(interval);
+            focus();
+            trackState.remove();
         }
     }, []);
 
