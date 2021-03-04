@@ -95,10 +95,7 @@ module.exports = () => ({
     
     mode: process.env.NODE_ENV,
     entry: {
-        app: './index.web.js',
-        /*index: [
-            'react-native-webpack/clients/polyfills.js'
-        ]*/
+        app: './index.web.js'
     },
 
     optimization: {
