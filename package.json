@@ -11,8 +11,8 @@
         "lint": "eslint .",
         "web": "webpack serve",
         "dist": "webpack",
-        "postinstall": "git apply --directory node_modules/react-native-track-player/ ./patches/react-native-track-player/0001-fix-web-support.patch --reject --ignore-space-change --ignore-whitespace || git apply --directory node_modules/rn-sliding-up-panel/ ./patches/rn-sliding-up-panel/0001-fix-web-support.patch --reject --ignore-space-change --ignore-whitespace || git apply --directory node_modules/react-native-webpack/ ./patches/react-native-webpack/0001-fix-require.patch --reject --ignore-space-change --ignore-whitespace",
-        "patch": "git apply --directory node_modules/react-native-track-player/ ./patches/react-native-track-player/0001-fix-web-support.patch --reject --ignore-space-change --ignore-whitespace || git apply --directory node_modules/rn-sliding-up-panel/ ./patches/rn-sliding-up-panel/0001-fix-web-support.patch --reject --ignore-space-change --ignore-whitespace || git apply --directory node_modules/react-native-webpack/ ./patches/react-native-webpack/0001-fix-require.patch --reject --ignore-space-change --ignore-whitespace"
+        "postinstall": "git apply --directory node_modules/react-native-track-player/ ./patches/react-native-track-player/0001-fix-web-support.patch --reject --ignore-space-change --ignore-whitespace || git apply --directory node_modules/rn-sliding-up-panel/ ./patches/rn-sliding-up-panel/0001-fix-web-support.patch --reject --ignore-space-change --ignore-whitespace",
+        "patch": "git apply --directory node_modules/react-native-track-player/ ./patches/react-native-track-player/0001-fix-web-support.patch --reject --ignore-space-change --ignore-whitespace || git apply --directory node_modules/rn-sliding-up-panel/ ./patches/rn-sliding-up-panel/0001-fix-web-support.patch --reject --ignore-space-change --ignore-whitespace"
     },
     "dependencies": {
         "@react-native-async-storage/async-storage": "^1.14.1",
@@ -52,7 +52,7 @@
         "react-test-renderer": "^17.0.1",
         "webpack": "^5.24.3",
         "webpack-cli": "^4.5.0",
-        "webpack-dev-server": "github:webpack/webpack-dev-server#master",
+        "webpack-dev-server": "4.0.0-beta.0",
         "webpack-pwa-manifest": "^4.3.0"
     },
     "jest": {
