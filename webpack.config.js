@@ -253,8 +253,7 @@ module.exports = () => ({
             '.jsx',
             '.js',
             '.tsx',
-            '.ts',
-            '.json'
+            '.ts'
         ],
     },
 });
