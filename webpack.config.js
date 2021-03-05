@@ -90,7 +90,7 @@ module.exports = () => ({
         },
 
         historyApiFallback: true,
-        compress: true
+        //compress: true
     },
     
     mode: process.env.NODE_ENV,
@@ -100,7 +100,7 @@ module.exports = () => ({
 
     optimization: {
         nodeEnv: process.env.NODE_ENV,
-        minimize: process.env.NODE_ENV == "production",
+        //minimize: process.env.NODE_ENV == "production",
         /*minimizer: [
             new TerserPlugin({
                 cache: true,
@@ -164,7 +164,9 @@ module.exports = () => ({
             filename: 'index.html'
         }),
 
-        new webpack.HotModuleReplacementPlugin(),
+        process.env.NODE_ENV == "production"
+            ? new webpack.HotModuleReplacementPlugin()
+            : undefined,
 
         new WebpackPwaManifest({
             name: 'YouTune',
