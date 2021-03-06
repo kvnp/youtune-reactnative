@@ -1,8 +1,9 @@
 const webpack = require('webpack');
+const TerserPlugin = require("terser-webpack-plugin");
+const HtmlMinimizerPlugin = require("html-minimizer-webpack-plugin");
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const WebpackPwaManifest = require('webpack-pwa-manifest');
 const { GenerateSW } = require('workbox-webpack-plugin');
-//const {InjectManifest} = require('workbox-webpack-plugin');
 
 const userAgent = "Mozilla/5.0 (X11; Linux x86_64; rv:79.0) Gecko/20100101 Firefox/79.0";
 const musicYoutube = "https://music.youtube.com";
@@ -100,17 +101,33 @@ module.exports = () => ({
 
     optimization: {
         nodeEnv: process.env.NODE_ENV,
-        //minimize: process.env.NODE_ENV == "production",
-        /*minimizer: [
-            new TerserPlugin({
-                cache: true,
-                parallel: true,
-                sourceMap: true, // Must be set to true if using source-maps in production
-                terserOptions: {
-                    // https://github.com/webpack-contrib/terser-webpack-plugin#terseroptions
+        minimize: process.env.NODE_ENV == "production",
+        minimizer: [
+            new TerserPlugin(),
+            new HtmlMinimizerPlugin(),
+        ],
+
+        splitChunks: {
+            chunks: 'async',
+            minSize: 20000,
+            minRemainingSize: 0,
+            minChunks: 1,
+            maxAsyncRequests: 30,
+            maxInitialRequests: 30,
+            enforceSizeThreshold: 50000,
+            cacheGroups: {
+                defaultVendors: {
+                    test: /[\\/]node_modules[\\/]/,
+                    priority: -10,
+                    reuseExistingChunk: true,
                 },
-            }),
-        ],*/
+                default: {
+                    minChunks: 2,
+                    priority: -20,
+                    reuseExistingChunk: true,
+                },
+            },
+        },
 
         runtimeChunk: 'multiple',
         moduleIds: 'deterministic',
@@ -144,7 +161,7 @@ module.exports = () => ({
             },
 
             {
-                test: /\.(png|jpe?g|gif|ico|ttf|css)$/i,
+                test: /\.(png|jpe?g|gif|ico|ttf|css|html)$/i,
                 loader: 'file-loader',
             },
         ]
@@ -164,9 +181,9 @@ module.exports = () => ({
             filename: 'index.html'
         }),
 
-        process.env.NODE_ENV == "production"
+        process.env.NODE_ENV != "production"
             ? new webpack.HotModuleReplacementPlugin()
-            : undefined,
+            : () => {},
 
         new WebpackPwaManifest({
             name: 'YouTune',
