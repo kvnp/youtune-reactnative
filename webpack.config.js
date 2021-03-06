@@ -1,6 +1,5 @@
 const webpack = require('webpack');
 const TerserPlugin = require("terser-webpack-plugin");
-const HtmlMinimizerPlugin = require("html-minimizer-webpack-plugin");
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const WebpackPwaManifest = require('webpack-pwa-manifest');
 const { GenerateSW } = require('workbox-webpack-plugin');
@@ -91,7 +90,7 @@ module.exports = () => ({
         },
 
         historyApiFallback: true,
-        //compress: true
+        compress: true
     },
     
     mode: process.env.NODE_ENV,
@@ -102,10 +101,7 @@ module.exports = () => ({
     optimization: {
         nodeEnv: process.env.NODE_ENV,
         minimize: process.env.NODE_ENV == "production",
-        minimizer: [
-            new TerserPlugin(),
-            new HtmlMinimizerPlugin(),
-        ],
+        minimizer: [ new TerserPlugin() ],
 
         splitChunks: {
             chunks: 'async',
@@ -161,7 +157,7 @@ module.exports = () => ({
             },
 
             {
-                test: /\.(png|jpe?g|gif|ico|ttf|css|html)$/i,
+                test: /\.(png|jpe?g|gif|ico|ttf|css)$/i,
                 loader: 'file-loader',
             },
         ]
@@ -178,7 +174,8 @@ module.exports = () => ({
 
         new HtmlWebpackPlugin({
             template: './web/index.html',
-            filename: 'index.html'
+            filename: 'index.html',
+            minify: true
         }),
 
         process.env.NODE_ENV != "production"
