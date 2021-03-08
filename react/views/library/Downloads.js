@@ -4,7 +4,8 @@ import {
     ScrollView,
     Text,
     View,
-    Pressable
+    Pressable,
+    ActivityIndicator
 } from "react-native";
 
 import { useTheme } from '@react-navigation/native';
@@ -13,7 +14,9 @@ import Entry from "../../components/shared/Entry";
 import { loadSongLocal, localIDs } from "../../modules/storage/SongStorage";
 import { rippleConfig } from "../../styles/Ripple";
 import { shelvesStyle } from '../../styles/Shelves';
-import { handleMedia, playLocal } from '../../modules/event/mediaNavigator';
+import { playLocal } from '../../modules/event/mediaNavigator';
+
+var downloadsInitialized = false;
 
 export default Downloads = ({ navigation }) => {
     const [entries, setEntries] = useState([]);
@@ -22,8 +25,23 @@ export default Downloads = ({ navigation }) => {
         const unsubscribe = navigation.addListener('focus', async() => {
             let entries = [];
 
+            if (!downloadsInitialized) {
+                if (localIDs == 0) {
+                    let waitForDB = ms => {
+                        return new Promise(resolve => setTimeout(resolve, ms));
+                    }
+
+                    await waitForDB(1000);
+                }
+                downloadsInitialized = true;
+            }
+
+            let playlistId = "LOCAL_DOWNLOADS";
             for (let i = 0; i < localIDs.length; i++) {
-                entries.push(await loadSongLocal(localIDs[i]));
+                let { title, artist, artwork, id } = await loadSongLocal(localIDs[i]);
+                entries.push({
+                    title, artist, artwork, id, playlistId
+                });
             }
 
             setEntries(entries);
@@ -48,8 +66,18 @@ export default Downloads = ({ navigation }) => {
         </View>
     </View>
 
-    return (
-        <ScrollView contentContainerStyle={[shelvesStyle.searchContainer, entries.length != 0 ? {flex: "none"} : undefined]}>
+    return !downloadsInitialized
+        ? <View style={{
+                flex: 1,
+                width: "100%",
+                alignItems: "center",
+                justifyContent: "center"
+            }}
+        >
+            <ActivityIndicator size="large"/>
+        </View>
+
+        : <ScrollView contentContainerStyle={[shelvesStyle.searchContainer, entries.length != 0 ? {flex: "none"} : undefined]}>
             {
                 entries.length > 0
                     ? entries.map(track => {
@@ -59,7 +87,8 @@ export default Downloads = ({ navigation }) => {
                                 title: track.title,
                                 subtitle: track.artist,
                                 thumbnail: track.artwork,
-                                videoId: track.id
+                                videoId: track.id,
+                                playlistId: track.playlistId
                             }}
                             navigation={navigation}
                         />
@@ -78,6 +107,5 @@ export default Downloads = ({ navigation }) => {
 
                     : undefined
             }
-        </ScrollView>
-    );
+        </ScrollView>;
 }

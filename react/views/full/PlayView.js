@@ -68,6 +68,12 @@ export default PlayView = ({route, navigation}) => {
     useEffect(() => {
         navigation.setOptions({title: "Loading"});
         if (route.params) {
+            TrackPlayer.reset();
+            setPlayback({
+                isPlaying: false,
+                isLoading: true,
+                isStopped: false
+            });
             if (route.params.list == "LOCAL_DOWNLOADS") {
                 let loader = new Promise(async(resolve, reject) => {
                     if (localIDs.length == 0) {
@@ -75,7 +81,7 @@ export default PlayView = ({route, navigation}) => {
                             return new Promise(resolve => setTimeout(resolve, ms));
                         }
 
-                        await waitForDB(3000);
+                        await waitForDB(1000);
                     }
 
                     let localPlaylist = new Playlist();
@@ -106,13 +112,6 @@ export default PlayView = ({route, navigation}) => {
                     startPlaylist(loadedPlaylist);
                 });
             } else if (route.params.v) {
-                TrackPlayer.reset();
-                setPlayback({
-                    isPlaying: false,
-                    isLoading: true,
-                    isStopped: false
-                });
-                
                 fetchNext(route.params.v, route.params.list)
                     .then(loadedList => {
                         setPlaylist(loadedList.list);
@@ -125,7 +124,7 @@ export default PlayView = ({route, navigation}) => {
                                 return new Promise(resolve => setTimeout(resolve, ms));
                             }
 
-                            await waitForDB(3000);
+                            await waitForDB(1000);
                         }
 
 
