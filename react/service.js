@@ -2,6 +2,7 @@ import TrackPlayer from 'react-native-track-player';
 import { fetchAudioStream } from "./modules/remote/API";
 import { StatusBar } from 'react-native';
 import { initSettings } from './modules/storage/SettingsStorage';
+import { loadSongLocal, localIDs } from './modules/storage/SongStorage';
 
 export const register = () => {
     StatusBar.setBarStyle("dark-content", true);
@@ -73,11 +74,15 @@ export const skipTo = async(id) => {
     }
 
     focusedId = id;
-    if (track.url == undefined) {
-        TrackPlayer.pause();
-        track.url = await fetchAudioStream(id);
+    if (!track.url) {
+        await TrackPlayer.pause();
+
+        if (localIDs.includes(id))
+            track.url = (await loadSongLocal(id)).url;
+        else
+            track.url = await fetchAudioStream(id);
     } else {
-        TrackPlayer.skip(id);
+        await TrackPlayer.skip(id);
         return;
     }
 
@@ -90,7 +95,7 @@ export const skipTo = async(id) => {
     await TrackPlayer.remove(id);
     await TrackPlayer.add(track, next);
     await TrackPlayer.skip(id);
-    TrackPlayer.seekTo(0);
+    TrackPlayer.play();
 }
 
 export const skip = async(forward) => {
@@ -119,24 +124,24 @@ export const skip = async(forward) => {
     skipTo(next);
 }
 
-export function startPlaylist(playlist) {
-    return new Promise(async(resolve) => {
-        await TrackPlayer.reset();
-        for (let i = 0; i < playlist.list.length; i++) {
-            let track = playlist.list[i];
-            if ((i == playlist.index || i == 0) && track.url == undefined)
+export async function startPlaylist(playlist) {
+    for (let i = 0; i < playlist.list.length; i++) {
+        let track = playlist.list[i];
+        if ((i == playlist.index || i == 0) && track.url == undefined) {
+            if (localIDs.includes(track.id))
+                track.url = (await loadSongLocal(track.id)).url;
+            else
                 track.url = await fetchAudioStream(track.id);
-
-            await TrackPlayer.add(track);
-
-            if (i == playlist.index) {
-                focusedId = track.id;
-                await TrackPlayer.skip(track.id);
-                TrackPlayer.play();
-                resolve(track.id);
-            }
         }
-    });
+
+        await TrackPlayer.add(track);
+
+        if (i == playlist.index) {
+            focusedId = track.id;
+            await TrackPlayer.skip(track.id);
+            TrackPlayer.play();
+        }
+    }
 }
 
 export function setPlay(isPlaying) {

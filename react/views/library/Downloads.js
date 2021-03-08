@@ -13,6 +13,7 @@ import Entry from "../../components/shared/Entry";
 import { loadSongLocal, localIDs } from "../../modules/storage/SongStorage";
 import { rippleConfig } from "../../styles/Ripple";
 import { shelvesStyle } from '../../styles/Shelves';
+import { handleMedia, playLocal } from '../../modules/event/mediaNavigator';
 
 export default Downloads = ({ navigation }) => {
     const [entries, setEntries] = useState([]);
@@ -20,11 +21,11 @@ export default Downloads = ({ navigation }) => {
     useEffect(() => {
         const unsubscribe = navigation.addListener('focus', async() => {
             let entries = [];
-            console.log(localIDs);
+
             for (let i = 0; i < localIDs.length; i++) {
                 entries.push(await loadSongLocal(localIDs[i]));
             }
-            console.log(entries);
+
             setEntries(entries);
         });
 
@@ -50,9 +51,10 @@ export default Downloads = ({ navigation }) => {
     return (
         <ScrollView contentContainerStyle={[shelvesStyle.searchContainer, entries.length != 0 ? {flex: "none"} : undefined]}>
             {
-                entries.length != 0
+                entries.length > 0
                     ? entries.map(track => {
                         return <Entry
+                            key={track.id}
                             entry={{
                                 title: track.title,
                                 subtitle: track.artist,
@@ -63,6 +65,18 @@ export default Downloads = ({ navigation }) => {
                         />
                     })
                     : emptyFiller
+            }
+            {
+                entries.length > 0
+                    ? <Pressable
+                        android_ripple={rippleConfig}
+                        style={{padding: 10, margin: 20, width: 100, borderRadius: 10, alignItems: "center", backgroundColor: colors.card}}
+                        onPress={() => playLocal("LOCAL_DOWNLOADS", navigation)}
+                    >
+                        <Text style={{color: colors.text, fontSize: 15, fontWeight: "700"}}>Play all</Text>
+                    </Pressable>
+
+                    : undefined
             }
         </ScrollView>
     );

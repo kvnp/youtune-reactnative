@@ -67,35 +67,56 @@ export default PlayView = ({route, navigation}) => {
 
     useEffect(() => {
         navigation.setOptions({title: "Loading"});
-        if (route.params)
-            if (route.params.v) {
+        if (route.params) {
+            if (route.params.list == "LOCAL_DOWNLOADS") {
+                let loader = new Promise(async(resolve, reject) => {
+                    if (localIDs.length == 0) {
+                        let waitForDB = ms => {
+                            return new Promise(resolve => setTimeout(resolve, ms));
+                        }
+
+                        await waitForDB(3000);
+                    }
+
+                    let localPlaylist = new Playlist();
+
+                    for (let i = 0; i < localIDs.length; i++) {
+                        let {title, artist, artwork, duration} = await loadSongLocal(localIDs[i]);
+                        let constructedTrack = {
+                            title,
+                            artist,
+                            artwork,
+                            duration,
+                            id: localIDs[i],
+                            playlistId: route.params.list,
+                            url: null
+                        };
+
+                        if (localIDs[i] == route.params.v)
+                            localPlaylist.index = i;
+
+                        localPlaylist.list.push(constructedTrack);
+                    }
+
+                    resolve(localPlaylist);
+                });
+                
+                loader.then(loadedPlaylist => {
+                    setPlaylist(loadedPlaylist.list);
+                    startPlaylist(loadedPlaylist);
+                });
+            } else if (route.params.v) {
                 TrackPlayer.reset();
                 setPlayback({
                     isPlaying: false,
                     isLoading: true,
                     isStopped: false
                 });
-        
+                
                 fetchNext(route.params.v, route.params.list)
-                    .then(playlist => {
-                        let load = new Promise(async(resolve) => {
-                            if (localIDs.length != 0)
-                                for (let i = 0; i < playlist.list.length; i++) {
-                                    let track = playlist.list[i];
-                                    if (localIDs.includes(track.id)) {
-                                        track = await loadSongLocal(track.id);
-                                        console.log(track);
-                                        playlist.list[i] = track;
-                                    }
-                                }
-                            
-                            resolve(playlist);
-                        });
-                        
-                        load.then(loadedPlaylist => {
-                            setPlaylist(loadedPlaylist.list);
-                            startPlaylist(loadedPlaylist);
-                        });
+                    .then(loadedList => {
+                        setPlaylist(loadedList.list);
+                        startPlaylist(loadedList);
                     })
 
                     .catch(async(reason) => {
@@ -117,7 +138,7 @@ export default PlayView = ({route, navigation}) => {
                         }
                     });
             }
-
+        }
         refreshUI();
 
         let _unsub = [];

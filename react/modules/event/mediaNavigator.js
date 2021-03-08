@@ -10,6 +10,10 @@ function showArtist(browseId, navigation) {
     navigation.push("Artist", {channelId: browseId});
 }
 
+export function playLocal(localPlaylistId, navigation) {
+    navigation.navigate("Music", {list: localPlaylistId});
+}
+
 export function handleMedia(media, navigation) {
     const { browseId, playlistId, videoId } = media;
 
