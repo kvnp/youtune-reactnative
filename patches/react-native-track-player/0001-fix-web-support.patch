@@ -4,15 +4,15 @@ Date: Thu, 12 Nov 2020 16:42:27 +0100
 Subject: [PATCH] fix web support
 
 ---
- lib/index.js       |  60 +++++-----
+ lib/trackPlayer.js       |  60 +++++-----
  web/TrackPlayer.js | 291 +++++++++++++++++++++++++++++++++++++++++++++
  2 files changed, 319 insertions(+), 32 deletions(-)
  create mode 100644 web/TrackPlayer.js
 
-diff --git a/lib/index.js b/lib/index.js
+diff --git a/lib/trackPlayer.js b/lib/trackPlayer.js
 index 416ffd5..b5dbb0c 100644
---- a/lib/index.js
-+++ b/lib/index.js
+--- a/lib/trackPlayer.js
++++ b/lib/trackPlayer.js
 @@ -1,17 +1,22 @@
 -import { Platform, AppRegistry, DeviceEventEmitter, NativeEventEmitter, NativeModules } from 'react-native';
 -import resolveAssetSource from 'react-native/Libraries/Image/resolveAssetSource';
