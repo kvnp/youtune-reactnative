@@ -1,0 +1,31 @@
+name: Android
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+    steps:
+    - uses: actions/checkout@v2
+    - name: Use Node.js
+      uses: actions/setup-node@v1
+      with:
+        node-version: 15.x
+
+    - name: Cache npm dependencies
+      uses: actions/cache@v2
+      with:
+        path: '~/.npm'
+        key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+        restore-keys: |
+          ${{ runner.os }}-node-
+    - run: npm ci
+
+    - run: ./gradlew assembleDebug -Dorg.gradle.logging.level=info
+      working-directory: android
+      name: Build Android apk (debug)
+
+    - uses: actions/upload-artifact@v2
+      with:
+        name: android-apk
+        path: '**/*.apk'
