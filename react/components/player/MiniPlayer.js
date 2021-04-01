@@ -4,7 +4,7 @@ import { useTheme } from "@react-navigation/native";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import TrackPlayer, { useTrackPlayerProgress } from 'react-native-track-player';
 
-import { skip, setPlay } from "../../service";
+import { skip } from "../../service";
 import { rippleConfig } from "../../styles/Ripple";
 
 export default MiniPlayer = ({navigation, style}) => {
@@ -15,6 +15,8 @@ export default MiniPlayer = ({navigation, style}) => {
         track: null
     });
 
+    const [track, setTrack] = useState(null);
+
     const {dark, colors} = useTheme();
     const { position, duration } = useTrackPlayerProgress();
 
@@ -22,15 +24,9 @@ export default MiniPlayer = ({navigation, style}) => {
     const remainingLength = 100 - positionLength;
 
     useEffect(() => {
-        refreshUI();
         let _unsub = [];
-        _unsub.push(
-            TrackPlayer.addEventListener("playback-state", params => refreshUI())
-        );
-
-        _unsub.push(
-            TrackPlayer.addEventListener("playback-track-changed", params => refreshUI())
-        );
+        _unsub.push(TrackPlayer.addEventListener("playback-state", refreshState));
+        _unsub.push(TrackPlayer.addEventListener("playback-track-changed", refreshTrack));
 
         return () => {
             for (let i = 0; i < _unsub.length; i++)
@@ -38,63 +34,67 @@ export default MiniPlayer = ({navigation, style}) => {
         }
     }, []);
 
-    const refreshUI = async() => {
-        let id = await TrackPlayer.getCurrentTrack();
-        if (id != null) {
-            let track = await TrackPlayer.getTrack(id);
-            let state = await TrackPlayer.getState();
-            let newstate = {track: track};
+    const refreshTrack = async(e) => {
+        setTrack(await TrackPlayer.getTrack(e.nextTrack));
+    }
 
-            switch (state) {
-                case TrackPlayer.STATE_NONE:
-                    break;
-                case TrackPlayer.STATE_PLAYING:
-                    newstate.isPlaying = true;
-                    newstate.isLoading = false;
-                    newstate.isStopped = false;
-                    break;
-                case TrackPlayer.STATE_PAUSED:
-                    newstate.isPlaying = false;
-                    newstate.isLoading = false;
-                    newstate.isStopped = false;
-                    break;
-                case TrackPlayer.STATE_STOPPED:
-                    newstate.isPlaying = false;
-                    newstate.isLoading = false;
-                    newstate.isStopped = true;
-                    break;
-                case TrackPlayer.STATE_BUFFERING:
-                    newstate.isPlaying = false;
-                    newstate.isLoading = true;
-                    newstate.isStopped = false;
-                    break;
-            }
-
-            setPlayer(newstate);
-        } else
-            setPlayer({
-                isPlaying: false,
-                isLoading: false,
-                isStopped: true
-            });
+    const refreshState = async(e) => {
+        switch (e.state) {
+            case TrackPlayer.STATE_NONE:
+                break;
+            case TrackPlayer.STATE_PLAYING:
+                setPlayer({
+                    isPlaying: true,
+                    isLoading: false,
+                    isStopped: false
+                });
+                break;
+            case TrackPlayer.STATE_PAUSED:
+                setPlayer({
+                    isPlaying: false,
+                    isLoading: false,
+                    isStopped: false
+                });
+                break;
+            case TrackPlayer.STATE_STOPPED:
+                setPlayer({
+                    isPlaying: true,
+                    isLoading: false,
+                    isStopped: true
+                });
+                break;
+            case TrackPlayer.STATE_BUFFERING:
+                setPlayer({
+                    isPlaying: true,
+                    isLoading: true,
+                    isStopped: false
+                });
+                break;
+        }
     }
 
     const onOpen = () => navigation.navigate("Music");
 
     const onNext = () => skip(true);
 
-    const onPlay = () => setPlay(playerState.isPlaying);
+    const onPlay = () => {
+        playerState.isPlaying
+            ? TrackPlayer.pause()
+            : TrackPlayer.play();
+    };
 
-    const onStop = () => TrackPlayer.reset().then(refreshUI);
+    const onStop = () => TrackPlayer.reset().then(() => {
+        refreshState({state: TrackPlayer.STATE_STOPPED});
+    });
 
     var title = null;
     var artist = null;
     var artwork = null;
 
     if (playerState.track != null) {
-        title = playerState.track.title;
-        artist = playerState.track.artist;
-        artwork = playerState.track.artwork;
+        title = track.title;
+        artist = track.artist;
+        artwork = track.artwork;
     }
 
     return  <View style={[style, styles.main, {height: playerState.isStopped ?0 :50, backgroundColor: colors.card}]}>

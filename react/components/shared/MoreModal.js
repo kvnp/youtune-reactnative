@@ -208,7 +208,7 @@ export default MoreModal = ({navigation}) => {
             downloading: downloading,
             downloaded: downloaded,
             visible: true,
-            liked, liked,
+            liked,
             likeFunction: likeFunction
         });
     };
@@ -289,6 +289,21 @@ export default MoreModal = ({navigation}) => {
                         </View>
                     </View>
                 </Pressable>
+
+                {
+                    type == "Song"
+                        ? <View style={modalStyles.entryView}>
+                            <Pressable onPress={() => {navigation.navigate("Music", {v: videoId});}}
+                                style={[modalStyles.entry, {backgroundColor: colors.card}]}
+                                android_ripple={{color: "gray"}}
+                            >
+                                <MaterialIcons name="radio" color={colors.text} size={25}/>
+                                <Text style={{paddingLeft: 20, color: colors.text}}>Start radio</Text>
+                            </Pressable>
+                        </View>
+
+                    : undefined
+                }
 
                 <View style={modalStyles.entryView}>
                     <Pressable
@@ -438,7 +453,6 @@ export default MoreModal = ({navigation}) => {
 const modalStyles = StyleSheet.create({
     header: {
         flexDirection: "row",
-        borderBottomWidth: 1,
         height: 70,
         alignItems: "center",
         justifyContent: "space-between",

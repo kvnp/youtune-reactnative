@@ -23,7 +23,6 @@ import SwipePlaylist from "../../components/player/SwipePlaylist";
 import { rippleConfig } from "../../styles/Ripple";
 import {
     skip,
-    setPlay,
     setRepeat,
     startPlaylist,
     isRepeating
@@ -137,7 +136,7 @@ export default PlayView = ({route, navigation}) => {
         refreshUI();
 
         let _unsub = [];
-        _unsub.push(TrackPlayer.addEventListener("playback-state", refreshUI));
+        _unsub.push(TrackPlayer.addEventListener("playback-state", updatePlayback));
         _unsub.push(TrackPlayer.addEventListener("playback-track-changed", refreshUI));
         
         let resizeListener = Platform.OS == "web"
@@ -162,6 +161,41 @@ export default PlayView = ({route, navigation}) => {
                 _unsub[i].remove();
         };
     }, []);
+
+    const updatePlayback = e => {
+        switch (e.state) {
+            case TrackPlayer.STATE_NONE:
+                break;
+            case TrackPlayer.STATE_PLAYING:
+                setPlayback({
+                    isPlaying: true,
+                    isLoading: false,
+                    isStopped: false
+                });
+                break;
+            case TrackPlayer.STATE_PAUSED:
+                setPlayback({
+                    isPlaying: false,
+                    isLoading: false,
+                    isStopped: false
+                });
+                break;
+            case TrackPlayer.STATE_STOPPED:
+                setPlayback({
+                    isPlaying: true,
+                    isLoading: false,
+                    isStopped: true
+                });
+                return;
+            case TrackPlayer.STATE_BUFFERING:
+                setPlayback({
+                    isPlaying: false,
+                    isLoading: true,
+                    isStopped: false
+                });
+                break;
+        }
+    }
 
     const refreshUI = async() => {
         let id = await TrackPlayer.getCurrentTrack();
@@ -189,7 +223,6 @@ export default PlayView = ({route, navigation}) => {
                         isLoading: false,
                         isStopped: true
                     });
-                    navigation.goBack();
                     return;
                 case TrackPlayer.STATE_BUFFERING:
                     setPlayback({
@@ -290,7 +323,13 @@ export default PlayView = ({route, navigation}) => {
                         {playbackState.isLoading
                             ?   <ActivityIndicator style={{alignSelf: "center"}} color={colors.text} size="large"/>
 
-                            :   <Pressable onPress={() => setPlay(playbackState.isPlaying)} android_ripple={rippleConfig}>
+                            :   <Pressable
+                                    android_ripple={rippleConfig}
+                                    onPress={() => {
+                                        playbackState.isPlaying
+                                            ? TrackPlayer.pause()
+                                            : TrackPlayer.play();
+                                    }}>
                                     <MaterialIcons selectable={false} name={playbackState.isPlaying ? "pause" : "play-arrow"} color={colors.text} size={40}/>
                                 </Pressable>
                         }
