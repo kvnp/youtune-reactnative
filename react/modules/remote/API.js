@@ -10,8 +10,9 @@ import {
     digestAudioInfo
 } from "./Extractor";
 
-import { getHttpResponse, getUrl } from "./HTTP";
 import { settings } from "../../modules/storage/SettingsStorage";
+import { getHttpResponse, getUrl } from "./HTTP";
+import { enableDecryption } from "./Decrypt";
 
 const useragent = "Mozilla/5.0 (X11; Linux x86_64; rv:79.0) Gecko/20100101 Firefox/79.0";
 export const headers_simple = {"User-Agent": useragent};
@@ -35,6 +36,13 @@ async function getConfig() {
     );
 
     configuration = extractConfiguration(response);
+    
+    let baseUrl = configuration
+        .WEB_PLAYER_CONTEXT_CONFIGS
+        .WEB_PLAYER_CONTEXT_CONFIG_ID_MUSIC_WATCH
+        .jsUrl
+    
+    enableDecryption({baseUrl});
     
     apiKey = configuration
         .WEB_PLAYER_CONTEXT_CONFIGS

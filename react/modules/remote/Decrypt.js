@@ -1,5 +1,5 @@
 import { getHttpResponse } from "./HTTP";
-import { configuration, headers_simple } from "./API";
+import { headers_simple } from "./API";
 
 const REGEXES = [
     "(?:\\b|[^a-zA-Z0-9$])([a-zA-Z0-9$]{2})\\s*=\\s*function\\(\\s*a\\s*\\)\\s*\\{\\s*a\\s*=\\s*a\\.split\\(\\s*\"\"\\s*\\)",
@@ -10,59 +10,20 @@ const REGEXES = [
 ];
 
 const domain = "https://www.youtube.com";
+const function_name = "decryptSignature";
 
-const function_name = "decryptionFunction";
 var functionString = null;
 
-export function getFunctionState() {
-    if (functionString == null)
-        return false;
-    else
-        return true;
-}
-
-function getFunction(code) {
-    let decryptionFunctionName;
-    for (let i = 0; i < REGEXES.length; i++) {
-        let pattern = new RegExp(REGEXES[i]);
-        let result = pattern.exec(code);
-
-        if (result != undefined) {
-            if (result[1] != undefined) {
-                decryptionFunctionName = result[1];
-                break;
-            }
-        }
-    }
-
-    let functionPattern = new RegExp("(" + decryptionFunctionName.split("$").join("\\$") + "=function\\([a-zA-Z0-9_]+\\)\\{.+?\\})");
-    let decryptionFunction = "var " + functionPattern.exec(code)[1] + ";";
-    let helperObjectName = new RegExp(";([A-Za-z0-9_\\$]{2})\\...\\(").exec(decryptionFunction)[1];
-    let helperPattern = "(var " + helperObjectName.split("$").join("\\$") + "=\\{.+?\\}\\};)";
-    let helperObject = new RegExp(helperPattern).exec(code.split("\n").join(""));
-    let callerFunction = "function " + function_name + "(a){return " + decryptionFunctionName + "(a);}";
-    
-    return helperObject + decryptionFunction + callerFunction;
-}
-
 async function fetchBaseJsLocation(videoId) {
-    let location;
-    if (!configuration) {
-        let watch = domain + "/watch?v=" + videoId;
-        let watchResponse = await getHttpResponse(watch, {
-            method: "GET",
-            headers: headers_simple
-        }, "text");
+    let watch = domain + "/watch?v=" + videoId;
+    let watchResponse = await getHttpResponse(watch, {
+        method: "GET",
+        headers: headers_simple
+    }, "text");
 
-        location = extractLocation(watchResponse);
-    } else {
-        location = configuration
-            .WEB_PLAYER_CONTEXT_CONFIGS
-            .WEB_PLAYER_CONTEXT_CONFIG_ID_MUSIC_WATCH
-            .jsUrl;
-    }
+    let location = extractLocation(watchResponse);
 
-    await fetchBaseJs(location);
+    return location;
 }
 
 function extractLocation(response) {
@@ -97,17 +58,58 @@ async function fetchBaseJs(location) {
         headers: headers_simple
     }, "text");
 
-    setFunction(getFunction(playerCode));
+    return playerCode;
 }
 
-function setFunction(functionString) {
-    gEval = function(){ (1, eval)(functionString.replace(";,", ";")); };
+function getFunction(code) {
+    let decryptionFunctionName;
+    for (let i = 0; i < REGEXES.length; i++) {
+        let pattern = new RegExp(REGEXES[i]);
+        let result = pattern.exec(code);
+
+        if (result != undefined) {
+            if (result[1] != undefined) {
+                decryptionFunctionName = result[1];
+                break;
+            }
+        }
+    }
+
+    let functionPattern = new RegExp("(" + decryptionFunctionName.split("$").join("\\$") + "=function\\([a-zA-Z0-9_]+\\)\\{.+?\\})");
+    let decryptionFunction = "var " + functionPattern.exec(code)[1] + ";";
+    let helperObjectName = new RegExp(";([A-Za-z0-9_\\$]{2})\\...\\(").exec(decryptionFunction)[1];
+    let helperPattern = "(var " + helperObjectName.split("$").join("\\$") + "=\\{.+?\\}\\};)";
+    let helperObject = new RegExp(helperPattern).exec(code.split("\n").join(""));
+    let callerFunction = "function " + function_name + "(a){return " + decryptionFunctionName + "(a);}";
+    
+    return (helperObject + decryptionFunction + callerFunction).replace(";,", ";");
+}
+
+function setFunction(fnString) {
+    const gEval = function(){ (1, eval)(fnString); };
     gEval();
 }
 
-export async function getSignature(videoId, signature) {
-    if (functionString == null)
-        await fetchBaseJsLocation(videoId);
+export function isDecryptionWorking() {
+    return functionString != null
+}
 
-    return decryptionFunction(signature);
+export async function enableDecryption({videoId, baseUrl}) {
+    if (isDecryptionWorking())
+        return;
+
+    if (videoId)
+        baseUrl = await fetchBaseJsLocation();
+
+    let playerCode = await fetchBaseJs(baseUrl);
+
+    functionString = getFunction(playerCode);
+    setFunction(functionString);
+}
+
+export async function getSignature(videoId, signature) {
+    if (!isDecryptionWorking())
+        await enableDecryption({videoId});
+
+    return decryptSignature(signature);
 }
