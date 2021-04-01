@@ -3,8 +3,7 @@ import { Platform } from "react-native";
 import {
     downloadMedia,
     fetchAudioInfo,
-    fetchAudioStream,
-    fetchVideoInfo
+    fetchAudioStream
 } from "../remote/API";
 
 export var localIDs = null;
@@ -103,11 +102,16 @@ export function storeSong(id) {
 
         downloadQueue.push(id);
 
-        let track = await fetchAudioInfo(id);
-        track.url = await fetchAudioStream(id);
+        let track;
+        try {
+            track = await fetchAudioInfo(id);
+            track.url = await fetchAudioStream(id);
 
-        track.artwork = await downloadMedia(track.artwork);
-        track.url = await downloadMedia(track.url);
+            track.artwork = await downloadMedia(track.artwork);
+            track.url = await downloadMedia(track.url);
+        } catch (e) {
+            reject(e);
+        }
 
         if (Platform.OS == "web") {
             var request = indexedDB.open("storage");
