@@ -1,6 +1,6 @@
 import TrackPlayer from 'react-native-track-player';
 import { fetchAudioStream } from "./modules/remote/API";
-import { StatusBar } from 'react-native';
+import { Platform, StatusBar } from 'react-native';
 import { initSettings } from './modules/storage/SettingsStorage';
 import { loadSongLocal, localIDs } from './modules/storage/SongStorage';
 
@@ -125,25 +125,39 @@ export const skip = async(forward) => {
     skipTo({id: next, array});
 }
 
-export async function startPlaylist(playlist) {
-    for (let i = 0; i < playlist.list.length; i++) {
-        let track = playlist.list[i];
-        if (localIDs.includes(track.id))
-            track.url = (await loadSongLocal(track.id)).url;
-        else
-            track.url = await fetchAudioStream(track.id);
+export const startPlaylist = Platform.OS == "web"
+    ? async(playlist) => {
+        for (let i = 0; i < playlist.list.length; i++) {
+            let track = playlist.list[i];
+            if (i == playlist.index) {
+                if (localIDs.includes(track.id))
+                    track.url = (await loadSongLocal(track.id)).url;
+                else
+                    track.url = await fetchAudioStream(track.id);
+            }
 
-        if (i == playlist.index) {
+            await TrackPlayer.add(track);
+            
+            if (i == playlist.index) {
+                focusedId = track.id;
+                await TrackPlayer.skip(focusedId);
+                TrackPlayer.play();
+            }
+        }
+    }
+
+    : async(playlist) => {
+        for (let i = 0; i < playlist.list.length; i++) {
+            let track = playlist.list[i];
             if (localIDs.includes(track.id))
                 track.url = (await loadSongLocal(track.id)).url;
             else
                 track.url = await fetchAudioStream(track.id);
         }
-    }
-
-    await TrackPlayer.add(playlist.list);
-
-    focusedId = playlist.list[playlist.index].id;
-    await TrackPlayer.skip(focusedId);
-    TrackPlayer.play();
-}
+    
+        await TrackPlayer.add(playlist.list);
+    
+        focusedId = playlist.list[playlist.index].id;
+        await TrackPlayer.skip(focusedId);
+        TrackPlayer.play();
+    };
