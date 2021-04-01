@@ -65,8 +65,10 @@ export default PlayView = ({route, navigation}) => {
 
     const { dark, colors } = useTheme();
 
-    useEffect(() => {
-        navigation.setOptions({title: "Loading"});
+    useEffect(async() => {
+        if (navigation.isFocused())
+            navigation.setOptions({title: "Loading"});
+
         if (route.params) {
             TrackPlayer.reset();
             setPlayback({
@@ -74,16 +76,17 @@ export default PlayView = ({route, navigation}) => {
                 isLoading: true,
                 isStopped: false
             });
-            if (route.params.list == "LOCAL_DOWNLOADS") {
+
+            if (localIDs.length == 0) {
+                let waitForDB = ms => {
+                    return new Promise(resolve => setTimeout(resolve, ms));
+                }
+
+                await waitForDB(1000);
+            }
+
+            if (route.params.list == "LOCAL_DOWNLOADS" && !route.params.v || localIDs.includes(route.params.v)) {
                 let loader = new Promise(async(resolve, reject) => {
-                    if (localIDs.length == 0) {
-                        let waitForDB = ms => {
-                            return new Promise(resolve => setTimeout(resolve, ms));
-                        }
-
-                        await waitForDB(1000);
-                    }
-
                     let localPlaylist = new Playlist();
 
                     for (let i = 0; i < localIDs.length; i++) {
@@ -119,21 +122,14 @@ export default PlayView = ({route, navigation}) => {
                     })
 
                     .catch(async(reason) => {
-                        if (localIDs.length == 0) {
-                            let waitForDB = ms => {
-                                return new Promise(resolve => setTimeout(resolve, ms));
-                            }
-
-                            await waitForDB(1000);
-                        }
-
-
                         if (localIDs.includes(route.params.v)) {
                             let localPlaylist = new Playlist();
                             localPlaylist.list.push(await loadSongLocal(route.params.v))
 
                             setPlaylist(localPlaylist.list);
                             startPlaylist(localPlaylist);
+                        } else {
+                            navigation.goBack();
                         }
                     });
             }
@@ -205,8 +201,10 @@ export default PlayView = ({route, navigation}) => {
             }
 
             let track = await TrackPlayer.getTrack(id);
-            navigation.setOptions({title: track.title});
-            navigation.setParams({v: id, list: track.playlistId});
+            if (navigation.isFocused()) {
+                navigation.setOptions({title: track.title});
+                navigation.setParams({v: id, list: track.playlistId});
+            }
             
             setTrack(track);
             setPlaylist(await TrackPlayer.getQueue())
@@ -222,10 +220,10 @@ export default PlayView = ({route, navigation}) => {
     if (track != null)
         var {title, artist, artwork, id } = track;
     else {
-        var id = null;
-        var title = null;
-        var artist = null;
-        var artwork = null;
+        id = null;
+        title = null;
+        artist = null;
+        artwork = null;
     }
 
     return <>
@@ -251,7 +249,12 @@ export default PlayView = ({route, navigation}) => {
                         />
                     </Pressable>
                     
-                    <View style={{flexGrow: 1, width: 1, paddingHorizontal: 5, alignItems: "center"}}>
+                    <View style={[
+                        {flexGrow: 1, width: 1, paddingHorizontal: 5, alignItems: "center", },
+                        Platform.OS === "web"
+                            ? {userSelect: "text"}
+                            : undefined
+                                ]}>
                         <Text adjustsFontSizeToFit={true} ellipsizeMode="tail" numberOfLines={1} style={[stylesBottom.titleText, {color: colors.text}]}>{title}</Text>
                         <Text adjustsFontSizeToFit={true} ellipsizeMode="tail" numberOfLines={1} style={[stylesBottom.subtitleText, {color: colors.text}]}>{artist}</Text>
                     </View>

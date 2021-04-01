@@ -1,6 +1,7 @@
 html,
 body {
     overscroll-behavior-y: contain;
+    user-select: none;
 }
 
 #app > div {
