@@ -11,7 +11,7 @@ import LibraryTab from "../tabs/LibraryTab";
 import SettingsTab from "../tabs/SettingsTab";
 
 import Header from "../../components/overlay/Header";
-import { headerStyle, navOptions } from "../../styles/App";
+import { headerStyle } from "../../styles/App";
 import MoreModal from "../../components/shared/MoreModal";
 import MiniPlayer from "../../components/player/MiniPlayer";
 import { getIcon } from "../../modules/utils/Icon";
@@ -24,7 +24,7 @@ const Nav = createMaterialTopTabNavigator();
 
 export default Navigator = ({navigation}) => {
     const [bottomMargin, setBottomMargin] = useState(0);
-
+    
     useEffect(() => {
         resizeContainer();
         let _unsub = TrackPlayer.addEventListener("playback-state", resizeContainer);
@@ -50,9 +50,16 @@ export default Navigator = ({navigation}) => {
         <Nav.Navigator
             initialRouteName="Home"
             tabBarPosition="bottom"
-            tabBarOptions={navOptions}
             initialLayout={{width: Dimensions.get('window').width}}
             sceneContainerStyle={{marginBottom: bottomMargin}}
+            lazy={false}
+            tabBarOptions={{
+                optimizationsEnabled: true,
+                lazy: false,
+                keyboardHidesTabBar: true,
+                showIcon: true,
+                showLabel: false
+            }}
         >
             <Nav.Screen name="Home" component={HomeTab} options={getTabOptions("home")}/>
             <Nav.Screen name="Search" component={SearchTab} options={getTabOptions("search")}/>
