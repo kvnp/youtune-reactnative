@@ -60,8 +60,10 @@ export const skipAuto = async() => {
         skip(true);
 }
 
-export const skipTo = async(id) => {
-    let array = await TrackPlayer.getQueue();
+export const skipTo = async({id, array}) => {
+    if (!array)
+        array = await TrackPlayer.getQueue();
+
     let index;
     let track;
 
@@ -75,15 +77,14 @@ export const skipTo = async(id) => {
 
     focusedId = id;
     if (!track.url) {
-        await TrackPlayer.pause();
+        TrackPlayer.pause();
 
         if (localIDs.includes(id))
             track.url = (await loadSongLocal(id)).url;
         else
             track.url = await fetchAudioStream(id);
     } else {
-        await TrackPlayer.skip(id);
-        return;
+        return TrackPlayer.skip(id);
     }
 
     let next;
@@ -121,30 +122,28 @@ export const skip = async(forward) => {
     else
         next = array[index - 1].id;
 
-    skipTo(next);
+    skipTo({id: next, array});
 }
 
 export async function startPlaylist(playlist) {
     for (let i = 0; i < playlist.list.length; i++) {
         let track = playlist.list[i];
-        if ((i == playlist.index || i == 0) && track.url == undefined) {
+        if (localIDs.includes(track.id))
+            track.url = (await loadSongLocal(track.id)).url;
+        else
+            track.url = await fetchAudioStream(track.id);
+
+        if (i == playlist.index) {
             if (localIDs.includes(track.id))
                 track.url = (await loadSongLocal(track.id)).url;
             else
                 track.url = await fetchAudioStream(track.id);
         }
-
-        await TrackPlayer.add(track);
-
-        if (i == playlist.index) {
-            focusedId = track.id;
-            await TrackPlayer.skip(track.id);
-            TrackPlayer.play();
-        }
     }
-}
 
-export function setPlay(isPlaying) {
-    if (isPlaying)  TrackPlayer.pause();
-    else            TrackPlayer.play();
+    await TrackPlayer.add(playlist.list);
+
+    focusedId = playlist.list[playlist.index].id;
+    await TrackPlayer.skip(focusedId);
+    TrackPlayer.play();
 }
