@@ -30,7 +30,7 @@ export default HomeTab = ({navigation}) => {
     );
 
     useEffect(() => {
-        const _unsubscribe = navigation.addListener('focus', () => {
+        const _unsubscribe = navigation.addListener('tabPress', () => {
             setHeader({title: "Home"});
         });
 

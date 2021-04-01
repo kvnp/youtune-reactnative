@@ -39,7 +39,7 @@ export default SearchTab = ({route, navigation}) => {
                 search(route.params.q)
             }
 
-        const _unsubscribe = navigation.addListener('focus', () => {
+        const _unsubscribe = navigation.addListener('tabPress', () => {
             setHeader({title: "Search"});
         });
 
@@ -114,7 +114,7 @@ export default SearchTab = ({route, navigation}) => {
                         onPress={() => search(bottomEndpoint.query, bottomEndpoint.params)}
                         style={{padding: 10, margin: 20, width: 100, borderRadius: 10, alignItems: "center", backgroundColor: colors.card}}
                     >
-                        <Text style={{color: colors.text, fontSize: 15, fontWeight: 700}}>{bottomEndpoint.text}</Text>
+                        <Text style={{color: colors.text, fontSize: 15, fontWeight: "700"}}>{bottomEndpoint.text}</Text>
                     </Pressable>
 
                     : null

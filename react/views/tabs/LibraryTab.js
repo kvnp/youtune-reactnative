@@ -9,12 +9,13 @@ import Artists from '../library/Artists';
 import Downloads from '../library/Downloads';
 import { tabOptions } from '../../styles/Library';
 import { setHeader } from '../../components/overlay/Header';
+import { enableSwipe} from '../full/Navigator'
 
 const Tab = createMaterialTopTabNavigator();
 
 export default LibraryTab = ({navigation}) => {
     useEffect(() => {
-        const unsubscribe = navigation.addListener('focus', () => {
+        const unsubscribe = navigation.addListener('tabPress', () => {
             setHeader({title: "Library"});
         });
 
