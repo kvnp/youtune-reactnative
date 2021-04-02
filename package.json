@@ -11,8 +11,8 @@
         "lint": "eslint .",
         "web": "webpack serve",
         "dist": "webpack",
-        "postinstall": "git apply --directory node_modules/react-native-track-player/ ./patches/react-native-track-player/0001-fix-web-support.patch --reject --ignore-space-change --ignore-whitespace",
-        "patch": "git apply --directory node_modules/react-native-track-player/ ./patches/react-native-track-player/0001-fix-web-support.patch --reject --ignore-space-change --ignore-whitespace"
+        "postinstall": "git apply --directory node_modules/ ./patches/react-native-track-player/0001-fix-web-support.patch --reject --ignore-space-change --ignore-whitespace",
+        "patch": "git apply --directory node_modules/ ./patches/react-native-track-player/0001-fix-web-support.patch --reject --ignore-space-change --ignore-whitespace"
     },
     "dependencies": {
         "@react-native-async-storage/async-storage": "^1.14.1",
