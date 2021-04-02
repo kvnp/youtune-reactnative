@@ -31,9 +31,10 @@ export default Navigator = ({navigation}) => {
         return () => _unsub.remove();
     }, []);
 
-    const resizeContainer = async() => {
-        let state = await TrackPlayer.getState();
-        switch (state) {
+    const resizeContainer = async(e) => {
+        if (!e) e = {state: await TrackPlayer.getState()}
+
+        switch (e.state) {
             case TrackPlayer.STATE_NONE:
             case TrackPlayer.STATE_STOPPED:
                 setBottomMargin(0);

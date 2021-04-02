@@ -24,9 +24,17 @@ export default MiniPlayer = ({navigation, style}) => {
     const remainingLength = 100 - positionLength;
 
     useEffect(() => {
+        refreshState();
+        refreshTrack();
+
         let _unsub = [];
         _unsub.push(TrackPlayer.addEventListener("playback-state", refreshState));
         _unsub.push(TrackPlayer.addEventListener("playback-track-changed", refreshTrack));
+
+        TrackPlayer.getCurrentTrack().then(id => {
+            if (id != null)
+                refreshTrack({nextTrack: id});
+        });
 
         return () => {
             for (let i = 0; i < _unsub.length; i++)
@@ -35,10 +43,14 @@ export default MiniPlayer = ({navigation, style}) => {
     }, []);
 
     const refreshTrack = async(e) => {
+        if (!e) e = {nextTrack: await TrackPlayer.getCurrentTrack()}
+
         setTrack(await TrackPlayer.getTrack(e.nextTrack));
     }
 
     const refreshState = async(e) => {
+        if (!e) e = {state: await TrackPlayer.getState()}
+
         switch (e.state) {
             case TrackPlayer.STATE_NONE:
                 break;
@@ -91,7 +103,7 @@ export default MiniPlayer = ({navigation, style}) => {
     var artist = null;
     var artwork = null;
 
-    if (playerState.track != null) {
+    if (track != null) {
         title = track.title;
         artist = track.artist;
         artwork = track.artwork;

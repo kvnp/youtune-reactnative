@@ -117,6 +117,7 @@ export default PlayView = ({route, navigation}) => {
                 fetchNext(route.params.v, route.params.list)
                     .then(loadedList => {
                         setPlaylist(loadedList.list);
+                        setTrack(loadedList.list[loadedList.index]);
                         startPlaylist(loadedList);
                     })
 
@@ -371,17 +372,17 @@ export default PlayView = ({route, navigation}) => {
         </View>
 
         <SwipePlaylist minimumHeight={50}
-                        backgroundColor={dark ? colors.card : colors.primary}
-                        textColor={colors.text}
-                        playlist={playlist}
-                        track={track}
-                        style={stylesRest.container}/>
+            backgroundColor={dark ? colors.card : colors.primary}
+            textColor={colors.text}
+            playlist={playlist}
+            track={track}
+            style={stylesRest.container}
+        />
     </>
 }
 
 const stylesRest = StyleSheet.create({
     container: {
-        paddingBottom: 10,
         borderTopRightRadius: 15,
         borderTopLeftRadius: 15,
         position: "absolute",
@@ -392,7 +393,6 @@ const stylesRest = StyleSheet.create({
 const stylesBottom = StyleSheet.create({
     container: {
         alignSelf: "center",
-        justifyContent: "space-around",
         alignItems: "stretch",
         justifyContent: "center",
         maxWidth: 400,
@@ -458,7 +458,6 @@ const stylesTop = StyleSheet.create({
         width: "100%",
         height: "100%",
         paddingHorizontal: "10%",
-        paddingBottom: 50,
         flexWrap: "wrap",
         alignSelf: "center",
         alignContent: "space-around",
