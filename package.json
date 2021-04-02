@@ -34,7 +34,7 @@
         "react-native-vector-icons": "^8.1.0",
         "react-native-web": "0.15.5",
         "react-native-web-linear-gradient": "^1.1.1",
-        "rn-sliding-up-panel": "^2.4.5"
+        "reanimated-bottom-sheet": "^1.0.0-alpha.22"
     },
     "devDependencies": {
         "@babel/core": "^7.13.14",

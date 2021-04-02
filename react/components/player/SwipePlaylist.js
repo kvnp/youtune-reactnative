@@ -5,77 +5,73 @@ import {
     Text,
     StyleSheet,
     Pressable,
-    Dimensions,
     FlatList,
-    Animated
+    Dimensions
 } from "react-native";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
-import SlidingUpPanel from 'rn-sliding-up-panel';
+import BottomSheet from 'reanimated-bottom-sheet';
 
 import { skipTo } from "../../service";
 import { rippleConfig } from "../../styles/Ripple";
 
-export default SwipePlaylist = ({playlist, track, backgroundColor, textColor}) => {
+export default SwipePlaylist = ({playlist, track, backgroundColor, textColor, minimumHeight}) => {
     const { height } = Dimensions.get("window");
-    const draggableRange = { top: height - 50, bottom: 50 }
+    const sheetRef = React.useRef(null);
 
-    const draggedValue = new Animated.Value(50);
+    const renderHeader = () => <Pressable 
+        android_ripple={rippleConfig}
+        style={[styles.panelHeader, {backgroundColor: backgroundColor}]}
+        onPress={() => sheetRef.current.snapTo(1)}
+    >
+        <View style={[stylesRest.smallBar, {backgroundColor: textColor}]}/>
+        <Text style={{color: textColor}}>PLAYLIST</Text>
+    </Pressable>
 
-    return (
-        <SlidingUpPanel
-            ref={c => (_panel = c)}
-            draggableRange={draggableRange}
-            animatedValue={draggedValue}
-            snappingPoints={[51]}
-            height={height}
-            friction={0.5}
-        >
-            <View style={styles.panel}>
-                <Pressable android_ripple={rippleConfig} style={[styles.panelHeader, {backgroundColor: backgroundColor}]} onPress={() => _panel.show()}>
-                    <View style={[stylesRest.smallBar, {backgroundColor: textColor}]}/>
-                    <Text style={{color: textColor}} selectable={false}>PLAYLIST</Text>
-                </Pressable>
+    const renderContent = () => <View style={{height: height - 200, backgroundColor: backgroundColor}}>
+        <FlatList
+            contentContainerStyle={[stylesRest.playlistContainer, {backgroundColor: backgroundColor}]}
 
-                <FlatList
-                    style={{height: height - 150}}
-                    contentContainerStyle={[stylesRest.playlistContainer, {backgroundColor: backgroundColor}]}
+            data={playlist}
 
-                    data={playlist}
+            keyExtractor={item => item.id}
+            renderItem={({item, index}) =>
+                <Pressable android_ripple={rippleConfig}
+                            style={{
+                                height: minimumHeight,
+                                flexDirection: "row",
+                                alignItems: "center",
+                                marginVertical: 5
+                            }}
 
-                    keyExtractor={item => item.id}
-                    renderItem={({item, index}) =>
-                        <Pressable android_ripple={rippleConfig}
-                                    style={{
-                                        height: 50,
-                                        flexDirection: "row",
-                                        alignItems: "center",
-                                        marginVertical: 5
-                                    }}
+                            onPress={() => skipTo({id: item.id})}
+                >
+                    {
+                        track != null
+                            ? track.id == item.id
+                                ? <MaterialIcons style={{width: 30, textAlign: "center", textAlignVertical: "center"}} name="play-arrow" color={textColor} size={20}/>
+                                : <Text style={{width: 30, textAlign: "center", fontSize: 15, color: textColor}}>{index + 1}</Text>
 
-                                    onPress={() => skipTo({id: item.id})}
-                        >
-                            {
-                                track != null
-                                    ? track.id == item.id
-                                        ? <MaterialIcons style={{width: 30, textAlign: "center", textAlignVertical: "center"}} name="play-arrow" color={textColor} size={20}/>
-                                        : <Text style={{width: 30, textAlign: "center", fontSize: 15, color: textColor}}>{index + 1}</Text>
-
-                                    : <Text style={{width: 30, textAlign: "center", fontSize: 15, color: textColor}}>{index + 1}</Text>
-                            }
-
-                            <Image style={{height: 50, width: 50, marginRight: 10}} source={{uri: item.artwork}}/>
-
-                            <View style={{width: 0, flexGrow: 1, flex: 1}}>
-                                <Text style={{color: textColor}} numberOfLines={2}>{item.title}</Text>
-                                <Text style={{color: textColor}} numberOfLines={1}>{item.artist}</Text>
-                            </View>
-                        </Pressable>
+                            : <Text style={{width: 30, textAlign: "center", fontSize: 15, color: textColor}}>{index + 1}</Text>
                     }
-                />
-            </View>
-        </SlidingUpPanel>
-    );
-};
+
+                    <Image style={{height: 50, width: 50, marginRight: 10}} source={{uri: item.artwork}}/>
+
+                    <View style={{width: 0, flexGrow: 1, flex: 1}}>
+                        <Text style={{color: textColor}} numberOfLines={2}>{item.title}</Text>
+                        <Text style={{color: textColor}} numberOfLines={1}>{item.artist}</Text>
+                    </View>
+                </Pressable>
+            }
+        />
+    </View>;
+
+    return <BottomSheet
+        ref={sheetRef}
+        snapPoints={[minimumHeight, height - 150]}
+        renderContent={renderContent}
+        renderHeader={renderHeader}
+    />
+}
 
 const styles = StyleSheet.create({
     container: {
@@ -111,8 +107,7 @@ const styles = StyleSheet.create({
 const stylesRest = StyleSheet.create({
     playlistContainer: {
         width: "100%",
-        paddingHorizontal: 10,
-        paddingBottom: 50
+        paddingHorizontal: 10
     },
 
     topAlign: {
