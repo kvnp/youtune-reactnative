@@ -76,15 +76,7 @@ export default PlayView = ({route, navigation}) => {
                 isStopped: false
             });
 
-            if (localIDs.length == 0) {
-                let waitForDB = ms => {
-                    return new Promise(resolve => setTimeout(resolve, ms));
-                }
-
-                await waitForDB(1000);
-            }
-
-            if (route.params.list == "LOCAL_DOWNLOADS" && !route.params.v || localIDs.includes(route.params.v)) {
+            if (route.params.list == "LOCAL_DOWNLOADS" && !route.params.v) {
                 let loader = new Promise(async(resolve, reject) => {
                     let localPlaylist = new Playlist();
 
