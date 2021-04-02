@@ -39,12 +39,17 @@ export default SearchTab = ({route, navigation}) => {
                 search(route.params.q)
             }
 
-        const _unsubscribe = navigation.addListener('tabPress', () => {
+        const unsubscribe = navigation.addListener('tabPress', () => {
+            setHeader({title: "Search"});
+        });
+
+        const unsubscribe2 = navigation.addListener('focus', () => {
             setHeader({title: "Search"});
         });
 
         return () => {
-            _unsubscribe();
+            unsubscribe();
+            unsubscribe2();
         }
 
     }, []);

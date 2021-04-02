@@ -34,6 +34,10 @@ export default HomeTab = ({navigation}) => {
             setHeader({title: "Home"});
         });
 
+        const _unsubscribe2 = navigation.addListener('focus', () => {
+            setHeader({title: "Home"});
+        });
+
         const _offlineListener = Platform.OS == "web"
             ? window.addEventListener("online", () => {
                 setLoading(true);
@@ -45,6 +49,7 @@ export default HomeTab = ({navigation}) => {
 
         return () => {
             _unsubscribe();
+            _unsubscribe2();
 
             if (_offlineListener)
                 _offlineListener();

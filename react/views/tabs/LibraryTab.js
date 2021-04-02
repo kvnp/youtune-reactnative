@@ -9,7 +9,6 @@ import Artists from '../library/Artists';
 import Downloads from '../library/Downloads';
 import { tabOptions } from '../../styles/Library';
 import { setHeader } from '../../components/overlay/Header';
-import { enableSwipe} from '../full/Navigator'
 
 const Tab = createMaterialTopTabNavigator();
 
@@ -19,7 +18,14 @@ export default LibraryTab = ({navigation}) => {
             setHeader({title: "Library"});
         });
 
-        return () => unsubscribe();
+        const unsubscribe2 = navigation.addListener('focus', () => {
+            setHeader({title: "Library"});
+        });
+
+        return () => {
+            unsubscribe();
+            unsubscribe2();
+        }
     }, []);
 
     return <Tab.Navigator tabBarOptions={tabOptions} initialRouteName="Playlists" tabBarPosition="bottom">

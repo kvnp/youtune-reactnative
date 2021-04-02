@@ -37,12 +37,17 @@ export default SettingsTab = ({navigation}) => {
     const { colors } = useTheme();
 
     useEffect(() => {
-        const _unsubscribe = navigation.addListener('tabPress', () => {
+        const unsubscribe = navigation.addListener('tabPress', () => {
+            setHeader({title: "Settings"});
+        });
+
+        const unsubscribe2 = navigation.addListener('focus', () => {
             setHeader({title: "Settings"});
         });
 
         return () => {
-            _unsubscribe();
+            unsubscribe();
+            unsubscribe2();
         }
     }, []);
 
