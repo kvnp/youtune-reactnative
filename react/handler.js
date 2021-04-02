@@ -17,7 +17,6 @@ module.exports = function() {
     });
 
     TrackPlayer.addEventListener("playback-queue-ended", params => {
-        console.log(isRepeating);
         if (isRepeating) {
             TrackPlayer.seekTo(0);
             TrackPlayer.play();
@@ -25,7 +24,6 @@ module.exports = function() {
     });
 
     TrackPlayer.addEventListener("playback-error", params => {
-        console.log(params);
         if (isRepeating) {
             TrackPlayer.seekTo(0);
             TrackPlayer.play();

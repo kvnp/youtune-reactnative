@@ -102,7 +102,7 @@ export const skipTo = async({id, array}) => {
 export const skip = async(forward) => {
     let id = await TrackPlayer.getCurrentTrack();
     let array = await TrackPlayer.getQueue();
-
+    let playing = (await TrackPlayer.getState()) == TrackPlayer.STATE_PLAYING;
     let position = await TrackPlayer.getPosition();
     let index;
 
@@ -113,14 +113,15 @@ export const skip = async(forward) => {
         }
     }
 
-    if (forward && index == array.length - 1 || !forward && position > 10 || !forward && index == 0)
-        return TrackPlayer.seekTo(0);
-
     let next;
-    if (forward)
+    if (forward) {
         next = array[index + 1].id;
-    else
+    } else {
+        if (index == array.length - 1 || playing && position > 10 || index == 0)
+            return TrackPlayer.seekTo(0);
+
         next = array[index - 1].id;
+    }
 
     skipTo({id: next, array});
 }
@@ -147,6 +148,7 @@ export const startPlaylist = Platform.OS == "web"
     }
 
     : async(playlist) => {
+        TrackPlayer.reset();
         for (let i = 0; i < playlist.list.length; i++) {
             let track = playlist.list[i];
             if (localIDs.includes(track.id))
