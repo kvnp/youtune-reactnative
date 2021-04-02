@@ -17,10 +17,21 @@ module.exports = function() {
     });
 
     TrackPlayer.addEventListener("playback-queue-ended", params => {
-
+        console.log(isRepeating);
+        if (isRepeating) {
+            TrackPlayer.seekTo(0);
+            TrackPlayer.play();
+        }
     });
 
-    TrackPlayer.addEventListener("playback-error", params => skip(true));
+    TrackPlayer.addEventListener("playback-error", params => {
+        console.log(params);
+        if (isRepeating) {
+            TrackPlayer.seekTo(0);
+            TrackPlayer.play();
+        } else
+            skip(true);
+    });
 
     TrackPlayer.addEventListener("remote-next", params => skip(true));
 
