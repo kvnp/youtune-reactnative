@@ -11,6 +11,7 @@ import {
 } from "react-native";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import SlidingUpPanel from 'rn-sliding-up-panel';
+import { localIDs } from "../../modules/storage/SongStorage";
 
 import { skipTo } from "../../service";
 import { rippleConfig } from "../../styles/Ripple";
@@ -68,6 +69,15 @@ export default SwipePlaylist = ({playlist, track, backgroundColor, textColor}) =
                                 <Text style={{color: textColor}} numberOfLines={2}>{item.title}</Text>
                                 <Text style={{color: textColor}} numberOfLines={1}>{item.artist}</Text>
                             </View>
+
+                            {
+                                item != null 
+                                ? localIDs.includes(item.id)
+                                    ? <MaterialIcons style={{width: 30, textAlign: "center", textAlignVertical: "center"}} name="file-download-done" color={textColor} size={20}/>
+                                    : undefined
+                                : undefined
+                            }
+                            
                         </Pressable>
                     }
                 />
