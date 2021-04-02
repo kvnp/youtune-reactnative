@@ -90,7 +90,17 @@ module.exports = () => ({
         },
 
         historyApiFallback: true,
-        compress: true
+        compress: true,
+
+        /*watchOptions: {
+            ignored: [
+                "./.git",
+                "./node_modules",
+                "./.github",
+                "./android",
+                "./ios"
+            ]
+        }*/
     },
     
     mode: process.env.NODE_ENV,
@@ -259,6 +269,7 @@ module.exports = () => ({
         alias: {
             'react-native': 'react-native-web',
             'react-native-linear-gradient': 'react-native-web-linear-gradient',
+            'react-native-track-player': 'react-native-track-player-web'
         },
 
         extensions: [

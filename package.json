@@ -11,8 +11,8 @@
         "lint": "eslint .",
         "web": "webpack serve",
         "dist": "webpack",
-        "postinstall": "git apply --directory node_modules/react-native-track-player/ ./patches/react-native-track-player/0001-fix-web-support.patch --reject --ignore-space-change --ignore-whitespace || git apply --directory node_modules/rn-sliding-up-panel/ ./patches/rn-sliding-up-panel/0001-fix-web-support.patch --reject --ignore-space-change --ignore-whitespace",
-        "patch": "git apply --directory node_modules/react-native-track-player/ ./patches/react-native-track-player/0001-fix-web-support.patch --reject --ignore-space-change --ignore-whitespace || git apply --directory node_modules/rn-sliding-up-panel/ ./patches/rn-sliding-up-panel/0001-fix-web-support.patch --reject --ignore-space-change --ignore-whitespace"
+        "postinstall": "git apply --directory node_modules/rn-sliding-up-panel/ ./patches/rn-sliding-up-panel/0001-fix-web-support.patch --reject --ignore-space-change --ignore-whitespace",
+        "patch": "git apply --directory node_modules/rn-sliding-up-panel/ ./patches/rn-sliding-up-panel/0001-fix-web-support.patch --reject --ignore-space-change --ignore-whitespace"
     },
     "dependencies": {
         "@react-native-async-storage/async-storage": "^1.15.0",
@@ -31,6 +31,7 @@
         "react-native-screens": "^3.0.0",
         "react-native-tab-view": "^3.0.0",
         "react-native-track-player": "^1.2.7",
+        "react-native-track-player-web": "github:kvnp/react-native-track-player-web",
         "react-native-vector-icons": "^8.1.0",
         "react-native-web": "0.15.5",
         "react-native-web-linear-gradient": "^1.1.1",
