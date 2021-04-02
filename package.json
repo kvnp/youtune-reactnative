@@ -11,11 +11,11 @@
         "lint": "eslint .",
         "web": "webpack serve",
         "dist": "webpack",
-        "postinstall": "git apply --directory node_modules/react-native-track-player ./patches/react-native-track-player/0001-fix-web-support.patch --reject --ignore-space-change --ignore-whitespace",
-        "patch": "git apply --directory node_modules/react-native-track-player ./patches/react-native-track-player/0001-fix-web-support.patch --reject --ignore-space-change --ignore-whitespace"
+        "postinstall": "git apply --directory node_modules/react-native-track-player/ ./patches/react-native-track-player/0001-fix-web-support.patch --reject --ignore-space-change --ignore-whitespace || git apply --directory node_modules/rn-sliding-up-panel/ ./patches/rn-sliding-up-panel/0001-fix-web-support.patch --reject --ignore-space-change --ignore-whitespace",
+        "patch": "git apply --directory node_modules/react-native-track-player/ ./patches/react-native-track-player/0001-fix-web-support.patch --reject --ignore-space-change --ignore-whitespace || git apply --directory node_modules/rn-sliding-up-panel/ ./patches/rn-sliding-up-panel/0001-fix-web-support.patch --reject --ignore-space-change --ignore-whitespace"
     },
     "dependencies": {
-        "@react-native-async-storage/async-storage": "^1.14.1",
+        "@react-native-async-storage/async-storage": "^1.15.0",
         "@react-native-community/slider": "^3.0.3",
         "@react-navigation/material-top-tabs": "^5.3.14",
         "@react-navigation/native": "^5.9.3",
@@ -34,7 +34,8 @@
         "react-native-vector-icons": "^8.1.0",
         "react-native-web": "0.15.5",
         "react-native-web-linear-gradient": "^1.1.1",
-        "reanimated-bottom-sheet": "^1.0.0-alpha.22"
+        "reanimated-bottom-sheet": "^1.0.0-alpha.22",
+        "rn-sliding-up-panel": "^2.4.5"
     },
     "devDependencies": {
         "@babel/core": "^7.13.14",
