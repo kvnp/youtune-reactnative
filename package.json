@@ -1,7 +1,10 @@
 {
     "name": "youtune",
     "version": "0.0.1",
-    "private": true,
+    "engines": {
+        "node": "15.x",
+        "npm": "7.x"
+    },
     "scripts": {
         "android": "react-native run-android",
         "ios": "react-native run-ios",
