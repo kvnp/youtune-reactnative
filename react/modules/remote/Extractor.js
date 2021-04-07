@@ -738,7 +738,8 @@ export function digestNextResults(json) {
     playlist.index = json.currentVideoEndpoint.watchEndpoint.index;
 
     for (let i = 0; i < playlistRenderer.contents.length; i++) {
-        if (playlistRenderer.contents[i].hasOwnProperty("automixPreviewVideoRenderer")) {
+        // skips automixPreviewVideoRenderer and playlistExpandableMessageRenderer
+        if (!playlistRenderer.contents[i].hasOwnProperty("playlistPanelVideoRenderer")) {
             continue;
         }
 
