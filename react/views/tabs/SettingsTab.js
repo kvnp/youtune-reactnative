@@ -32,9 +32,7 @@ export default SettingsTab = ({navigation}) => {
     const [language, setLanguage] = useState(settings.transmitLanguage);
     const [proxy, setProxy] = useState(settings.proxyYTM);
     const [safety, setSafety] = useState(settings.safetyMode);
-    const [dark, setDark] = useState(settings.darkMode);
-
-    const { colors } = useTheme();
+    const { colors, dark } = useTheme();
 
     useEffect(() => {
         const unsubscribe = navigation.addListener('tabPress', () => {
@@ -78,7 +76,6 @@ export default SettingsTab = ({navigation}) => {
 
     const toggleDarkMode = boolean => {
         setDarkMode(boolean);
-        setDark(boolean);
     };
 
     const drawItem = ({item}) => {
