@@ -12,9 +12,7 @@ export const initSettings = () => {
     getSettings().then(storage => {
         if (storage != null) {
             settings = storage;
-
-            if (settings.darkMode)
-                darkCallback(settings.darkMode);
+            darkCallback(settings.darkMode);
         }
     });
 }
@@ -23,7 +21,7 @@ export async function getSettings() {
     try {
         const value = await AsyncStorage.getItem('@storage_Settings');
 
-        if(value !== null)
+        if (value !== null)
             return JSON.parse(value);
         else
             return null;
