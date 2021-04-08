@@ -115,9 +115,12 @@ export const skip = async(forward) => {
 
     let next;
     if (forward) {
+        if (index == array.length - 1)
+            return TrackPlayer.seekTo(0);
+        
         next = array[index + 1].id;
     } else {
-        if (index == array.length - 1 || playing && position > 10 || index == 0)
+        if (playing && position > 10 || index == 0)
             return TrackPlayer.seekTo(0);
 
         next = array[index - 1].id;
