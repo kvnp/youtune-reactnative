@@ -76,7 +76,7 @@ export default App = () => {
     };
 
     return <NavigationContainer linking={linking} theme={dark ? DarkTheme : DefaultTheme}>
-        <Stack.Navigator detachInactiveScreens={false} options={{animationEnabled: true, detachPreviousScreen: false}}>
+        <Stack.Navigator screenOptions={{gestureEnabled: true, swipeEnabled: true, animationEnabled: true}}>
             <Stack.Screen name="App" component={Navigator} options={navigationOptions}/>
             <Stack.Screen name="Music" component={PlayView} options={navigationOptions}/>
             <Stack.Screen name="Captcha" component={CaptchaView}/>
