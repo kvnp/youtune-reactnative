@@ -12,9 +12,9 @@ import {
 
 import { storePlaylists, getPlaylists } from "../../modules/storage/PlaylistStorage";
 import Playlist from '../../components/shared/Playlist';
-import PlaylistCreator from "../../components/overlay/PlaylistCreator";
 import { rippleConfig } from "../../styles/Ripple";
 import { useTheme } from "@react-navigation/native";
+import AddPlaylistModal from "../../components/modals/AddPlaylistModal";
 
 export default Playlists = ({navigation}) => {
     const [modalVisible, setModalVisible] = useState(false);
@@ -33,18 +33,24 @@ export default Playlists = ({navigation}) => {
         }
     }, []);
 
-    const createPlaylist = ({title, description}) => {
+    const addPlaylist = ({title, description}) => {
         let sum = title + description;
 
         for (let i = 0; i < playlists.length; i++) {
             if (playlists[i].title + playlists[i].subtitle == sum) {
                 showWarning("playlist already exists");
+                setModalVisible(false);
                 return;
             }
         }
 
         storePlaylists([...playlists, {title: title, subtitle: description}]);
         setPlaylists([...playlists, {title: title, subtitle: description}]);
+        setModalVisible(false);
+    }
+
+    const cancelModal = () => {
+        setModalVisible(false);
     }
 
     const showWarning = message => {
@@ -60,46 +66,19 @@ export default Playlists = ({navigation}) => {
                     <Text style={[styles.playlistTitle, {color: colors.text}]}>Add Playlist</Text>
                 </Pressable>
 
-                {
-                    playlists.map(
-                        playlist => {
-                            return <Playlist key={playlist.title + playlist.subtitle}
-                                                playlist={playlist}
-                                                navigation={navigation}
-                                                style={styles.playlist}
-                                                local={true}/>
-                        }
-                    )
-                }
+                {playlists.map(playlist => {
+                    return <Playlist
+                        key={playlist.title + playlist.subtitle}
+                        playlist={playlist}
+                        navigation={navigation}
+                        style={styles.playlist}
+                        local={true}
+                    />;
+                })}
             </>
             </ScrollView>
 
-            <Modal
-                animationType="slide"
-                transparent={true}
-                visible={modalVisible}
-                hardwareAccelerated={true}
-
-                onRequestClose={() => setModalVisible(false)}
-                onDismiss={() => setModalVisible(false)}
-            >
-                <Pressable 
-                    onPress={() => setModalVisible(false)}
-                    style={{height: "100%", width: "100%", justifyContent: "flex-end", backgroundColor: "rgba(0, 0, 0, 0.3)"}}
-                >
-                    <Pressable android_ripple={rippleConfig} style={{marginBottom: 100}}>
-                        <PlaylistCreator
-                            style={styles.modalChild}
-                            callback={
-                                obj => {
-                                    if (obj != undefined) createPlaylist(obj);
-                                    setModalVisible(false);
-                                }
-                            }
-                        />
-                    </Pressable>
-                </Pressable>
-            </Modal>
+            <AddPlaylistModal visible={modalVisible} addCallback={ info => addPlaylist(info)} cancelCallback={() => cancelModal()}/>
         </>
         : <View style={{
                 flex: 1,
