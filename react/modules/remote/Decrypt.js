@@ -13,6 +13,7 @@ const domain = "https://www.youtube.com";
 const function_name = "decryptSignature";
 
 var functionString = null;
+export var signatureTimestamp = null;
 
 async function fetchBaseJsLocation(videoId) {
     let watch = domain + "/watch?v=" + videoId;
@@ -61,6 +62,19 @@ async function fetchBaseJs(location) {
     return playerCode;
 }
 
+function extractTimestamp(code) {
+    code = code.substring(code.indexOf("d.sts=\"") + 7);
+    code = code.substring(0, code.indexOf("\""));
+    return code;
+}
+
+function getSignatureTimestamp() {
+    if (!signatureTimestamp)
+        return signatureTimestamp;
+
+    extractTimestamp();
+}
+
 function getFunction(code) {
     let decryptionFunctionName;
     for (let i = 0; i < REGEXES.length; i++) {
@@ -75,8 +89,8 @@ function getFunction(code) {
         }
     }
 
-    let functionPattern = new RegExp("(" + decryptionFunctionName.split("$").join("\\$") + "=function\\([a-zA-Z0-9_]+\\)\\{.+?\\})");
-    let decryptionFunction = "var " + functionPattern.exec(code)[1] + ";";
+    let functionPattern = "(" + decryptionFunctionName.split("$").join("\\$") + "=function\\([a-zA-Z0-9_]+\\)\\{.+?\\})";
+    let decryptionFunction = "var " + new RegExp(functionPattern).exec(code)[1] + ";";
     let helperObjectName = new RegExp(";([A-Za-z0-9_\\$]{2})\\...\\(").exec(decryptionFunction)[1];
     let helperPattern = "(var " + helperObjectName.split("$").join("\\$") + "=\\{.+?\\}\\};)";
     let helperObject = new RegExp(helperPattern).exec(code.split("\n").join(""));
@@ -104,12 +118,10 @@ export async function enableDecryption({videoId, baseUrl}) {
     let playerCode = await fetchBaseJs(baseUrl);
 
     functionString = getFunction(playerCode);
+    signatureTimestamp = extractTimestamp(playerCode);
     setFunction(functionString);
 }
 
 export async function getSignature(videoId, signature) {
-    if (!isDecryptionWorking())
-        await enableDecryption({videoId});
-
     return decryptSignature(signature);
 }

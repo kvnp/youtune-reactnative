@@ -4,7 +4,6 @@ import {
     digestSearchResults,
     digestBrowseResults,
     digestNextResults,
-    digestVideoInfoResults,
     digestStreams,
     extractConfiguration,
     digestAudioInfo
@@ -12,7 +11,7 @@ import {
 
 import { settings } from "../../modules/storage/SettingsStorage";
 import { getHttpResponse, getUrl } from "./HTTP";
-import { enableDecryption } from "./Decrypt";
+import { enableDecryption, signatureTimestamp, isDecryptionWorking } from "./Decrypt";
 
 const useragent = "Mozilla/5.0 (X11; Linux x86_64; rv:79.0) Gecko/20100101 Firefox/79.0";
 export const headers_simple = {"User-Agent": useragent};
@@ -180,24 +179,17 @@ export async function fetchBrowse(browseId) {
     return digestBrowseResults(response, browseId);
 }
 
-export async function fetchVideoInfo(videoId) {
-    let url = "https://www.youtube.com/get_video_info?video_id=" + videoId +
-              "&el=detailpage&c=WEB_REMIX&cver=0.1&cplayer=UNIPLAYER";
-
-    let response = await getHttpResponse(url, {
-        method: "GET",
-        headers: headers_simple
-    }, "text");
-
-    return digestVideoInfoResults(response);
-}
-
 export async function fetchAudioInfo(videoId, playlistId) {
     let url = "https://music.youtube.com/youtubei/v1/player?key=" + apiKey;
 
     let body = getRequestBody();
     body.context["user"] = { lockedSafetyMode: settings.safetyMode }
     body["videoId"] = videoId;
+    
+    if (!isDecryptionWorking())
+        await enableDecryption({videoId});
+
+    body["playbackContext"] = {contentPlaybackContext: {signatureTimestamp: signatureTimestamp}};
 
     if (playlistId)
         body["playlistId"] = playlistId;
@@ -214,17 +206,25 @@ export async function fetchAudioInfo(videoId, playlistId) {
 }
 
 export async function fetchAudioStream(videoId) {
-    let url = "https://www.youtube.com/get_video_info?video_id=" + videoId +
-              "&el=detailpage&c=WEB_REMIX&cver=0.1&cplayer=UNIPLAYER";
+    let url = "https://music.youtube.com/youtubei/v1/player?key=" + apiKey;
+
+    let body = getRequestBody();
+    body.context["user"] = { lockedSafetyMode: settings.safetyMode }
+    body["videoId"] = videoId;
+
+    if (!isDecryptionWorking())
+        await enableDecryption({videoId});
+
+    body["playbackContext"] = {contentPlaybackContext: {signatureTimestamp: signatureTimestamp}};
+
     let response = await getHttpResponse(url, {
-        method: "GET",
-        headers: headers_simple
-    }, "text");
+        method: "POST",
+        headers: headers_ytm,
+        body: JSON.stringify(body)
+    }, "json");
 
-    let stream = await digestStreams(response);
-
-    if (stream != null)
-        return stream;
+    let stream = digestStreams(response);
+    return stream;
 }
 
 export async function fetchNext(videoId, playlistId) {

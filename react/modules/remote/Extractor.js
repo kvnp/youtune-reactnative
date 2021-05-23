@@ -663,42 +663,7 @@ export function digestBrowseResults(json, browseId) {
         return getAlbum(json);
 }
 
-export function digestVideoInfoResults(text) {
-    let decode = decodeURIComponent(text);
-    let indexone = decode.indexOf("player_response=") + 16;
-    let indextwo = decode.indexOf("}&") + 1;
-
-    let parse = null;
-    try {
-        parse = JSON.parse(decode.substring(indexone, indextwo));
-    } catch {
-        return null;
-    }
-    let titleInfo = {
-        playable: parse.playabilityStatus.status,
-        id: parse.videoDetails.videoId,
-        channelId: parse.videoDetails.channelId,
-        title: parse.videoDetails.title,
-        artist: parse.videoDetails.author.replace("+", " ").slice(0, parse.videoDetails.author.indexOf("-") - 1),
-        duration: Number.parseInt(parse.videoDetails.lengthSeconds),
-        artwork: parse.videoDetails.thumbnail.thumbnails[parse.videoDetails.thumbnail.thumbnails.length - 1].url
-    };
-
-    return titleInfo;
-}
-
-export async function digestStreams(text) {
-    let decode = decodeURIComponent(text);
-    let indexone = decode.indexOf("player_response=") + 16;
-    let indextwo = decode.indexOf("}&") + 1;
-
-    let parse = null;
-    try {
-        parse = JSON.parse(decode.substring(indexone, indextwo));
-    } catch {
-        return null;
-    }
-
+export async function digestStreams(parse) {
     let videoId = parse.videoDetails.videoId;
 
     for (let i = 0; i < parse.streamingData.adaptiveFormats.length; i++) {
