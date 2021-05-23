@@ -60,11 +60,11 @@ export default AddPlaylistModal = ({navigation, visible, addCallback, cancelCall
 
                 <Pressable style={{height: 50, width: "100%", backgroundColor: colors.card, flexDirection: "row", justifyContent: "center", cursor: Platform.OS == "web" ? "default" : undefined}}>
                     <Pressable style={{marginHorizontal: 20, alignSelf: "center"}} onPress={() => cancelCallback()}>
-                        CANCEL
+                        <Text>CANCEL</Text>
                     </Pressable>
 
                     <Pressable style={{marginHorizontal: 20, alignSelf: "center"}} onPress={() => addCallback()}>
-                        CREATE
+                        <Text>CREATE</Text>
                     </Pressable>
                 </Pressable>
             </View>
