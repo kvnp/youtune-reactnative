@@ -12,7 +12,7 @@ import SettingsTab from "../tabs/SettingsTab";
 
 import Header from "../../components/overlay/Header";
 import { headerStyle } from "../../styles/App";
-import MoreModal from "../../components/shared/MoreModal";
+import MoreModal from "../../components/modals/MoreModal";
 import MiniPlayer from "../../components/player/MiniPlayer";
 import { getIcon } from "../../modules/utils/Icon";
 

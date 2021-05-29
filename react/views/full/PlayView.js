@@ -30,7 +30,7 @@ import {
 
 import { getSongLike, likeSong } from "../../modules/storage/MediaStorage";
 
-import { showModal } from "../../components/shared/MoreModal";
+import { showModal } from "../../components/modals/MoreModal";
 import { fetchNext } from "../../modules/remote/API";
 import { loadSongLocal, localIDs } from "../../modules/storage/SongStorage";
 
@@ -64,12 +64,14 @@ export default PlayView = ({route, navigation}) => {
 
     const { dark, colors } = useTheme();
 
-    useEffect(async() => {
+    useEffect(() => {
         if (navigation.isFocused())
             navigation.setOptions({title: "Loading"});
 
         if (route.params) {
             TrackPlayer.reset();
+            setPlaylist(null);
+            setTrack(null);
             setPlayback({
                 isPlaying: false,
                 isLoading: true,
@@ -108,12 +110,13 @@ export default PlayView = ({route, navigation}) => {
             } else if (route.params.v) {
                 fetchNext(route.params.v, route.params.list)
                     .then(loadedList => {
-                        setPlaylist(loadedList.list);
                         setTrack(loadedList.list[loadedList.index]);
+                        setPlaylist(loadedList.list);
                         startPlaylist(loadedList);
                     })
 
                     .catch(async(reason) => {
+                        console.log(reason);
                         if (localIDs.includes(route.params.v)) {
                             let localPlaylist = new Playlist();
                             localPlaylist.list.push(await loadSongLocal(route.params.v))
@@ -233,7 +236,7 @@ export default PlayView = ({route, navigation}) => {
             }
             
             setTrack(track);
-            setPlaylist(await TrackPlayer.getQueue())
+            setPlaylist(await TrackPlayer.getQueue());
             setLiked(await getSongLike(id));
         }
     }
@@ -276,7 +279,7 @@ export default PlayView = ({route, navigation}) => {
                     </Pressable>
                     
                     <View style={[
-                        {flexGrow: 1, width: 1, paddingHorizontal: 5, alignItems: "center", },
+                        {flexGrow: 1, width: 1, paddingHorizontal: 5, alignItems: "center"},
                         Platform.OS === "web"
                             ? {userSelect: "text"}
                             : undefined
@@ -339,7 +342,7 @@ export default PlayView = ({route, navigation}) => {
 
                 <View style={{justifyContent: "space-between", flexDirection: "row", paddingTop: 30}}>
                     <Pressable android_ripple={rippleConfig} style={stylesTop.topFirst}
-                               onPress={() => navigation.goBack()}>
+                               onPress={() => navigation.navigate("App")}>
                         <MaterialIcons selectable={false} name="keyboard-arrow-down" color={colors.text} size={30}/>
                     </Pressable>
 

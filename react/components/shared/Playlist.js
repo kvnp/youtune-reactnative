@@ -10,7 +10,7 @@ import { playlistStyle } from '../../styles/Playlist';
 import { handleMedia } from '../../modules/event/mediaNavigator';
 import { rippleConfig } from '../../styles/Ripple';
 import { useTheme } from '@react-navigation/native';
-import { showModal } from './MoreModal';
+import { showModal } from '../modals/MoreModal';
 
 export default Playlist = ({ playlist, navigation, style }) => {
     let { title, subtitle, thumbnail } = playlist;

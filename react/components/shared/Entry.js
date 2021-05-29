@@ -13,7 +13,7 @@ import { resultStyle } from '../../styles/Search';
 import { handleMedia } from '../../modules/event/mediaNavigator';
 import { rippleConfig } from '../../styles/Ripple';
 import { useTheme } from '@react-navigation/native';
-import { showModal } from './MoreModal';
+import { showModal } from '../modals/MoreModal';
 
 export default Entry = ({ entry, navigation, index }) => {
     let { title, subtitle, thumbnail } = entry;
