@@ -10,8 +10,11 @@ const wwwYoutube = "https://www.youtube.com";
 const imgYoutube = "https://i.ytimg.com";
 const videoYoutube = "https://redirector.googlevideo.com";
 
-if (!process.env.NODE_ENV)
+if (!process.env.NODE_ENV && !process.env.PORT)
     process.env.NODE_ENV = "development";
+else
+    process.env.NODE_ENV = "production";
+
 
 module.exports = () => ({
     devServer: {
@@ -22,19 +25,6 @@ module.exports = () => ({
             : undefined,
 
         proxy: {
-            '/proxy/get_video_info': {
-                target: wwwYoutube,
-                secure: true,
-                changeOrigin: true,
-                pathRewrite: {'^/proxy' : ''},
-
-                headers: {
-                    "Referer": wwwYoutube,
-                    "Origin": wwwYoutube,
-                    "User-Agent": userAgent
-                },
-            },
-
             '/proxy/videoplayback': {
                 target: videoYoutube,
                 changeOrigin: true,
@@ -110,7 +100,7 @@ module.exports = () => ({
 
     optimization: {
         nodeEnv: process.env.NODE_ENV,
-        minimize: process.env.NODE_ENV == "production",
+        minimize: process.env.NODE_ENV == "production" && !process.env.PORT,
         minimizer: [ new TerserPlugin() ],
 
         splitChunks: {
@@ -228,6 +218,7 @@ module.exports = () => ({
                 navigateFallback: "/index.html",
                 maximumFileSizeToCacheInBytes: 3e+6,
                 cleanupOutdatedCaches: true,
+                inlineWorkboxRuntime: false,
                 clientsClaim: true,
                 runtimeCaching: [
                     {
