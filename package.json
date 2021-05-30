@@ -1,10 +1,19 @@
 {
     "name": "youtune",
     "version": "0.0.1",
+    "author": "Kevin Pfeifer <kevin1174@schule.bremen.de>",
+    "repository": "github:kvnp/youtune-reactnative",
+    "license": "GPL-3.0",
+    "funding": {
+        "type" : "patreon",
+        "url" : "https://www.patreon.com/kvnp"
+    },
+
     "engines": {
         "node": "15.x",
         "npm": "7.x"
     },
+
     "scripts": {
         "android": "react-native run-android",
         "ios": "react-native run-ios",
