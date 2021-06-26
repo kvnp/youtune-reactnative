@@ -212,7 +212,13 @@ export function digestSearchResults(json) {
                             else if (type == "MUSIC_PAGE_TYPE_PLAYLIST")
                                 entry.type = "Playlist";
 
-                            entry.playlistId = responsiveMusicItem.overlay.musicItemThumbnailOverlayRenderer.content.musicPlayButtonRenderer.playNavigationEndpoint.watchPlaylistEndpoint.playlistId;
+                            let playNavigationEndpoint = responsiveMusicItem.overlay.musicItemThumbnailOverlayRenderer.content.musicPlayButtonRenderer.playNavigationEndpoint;
+
+                            if (playNavigationEndpoint.hasOwnProperty("watchPlaylistEndpoint"))
+                                entry.playlistId = playNavigationEndpoint.watchPlaylistEndpoint.playlistId;
+                            else
+                                entry.playlistId = playNavigationEndpoint.watchEndpoint.playlistId;
+                            
                         }
 
                         entry.browseId = responsiveMusicItem.navigationEndpoint.browseEndpoint.browseId;
