@@ -270,10 +270,10 @@ export function digestHomeResults(json) {
             let index = shelfRenderer.backgroundImage.simpleVideoThumbnailRenderer.thumbnail.thumbnails.length - 1;
             final.background = shelfRenderer.backgroundImage.simpleVideoThumbnailRenderer.thumbnail.thumbnails[index].url;
 
-        } else if (contentList[y].hasOwnProperty("musicCarouselShelfRenderer")) {
+        } else if (contentList[y].hasOwnProperty("musicCarouselShelfRenderer"))
             shelfRenderer = contentList[y].musicCarouselShelfRenderer;
 
-        } else continue;
+        else continue;
 
         for (let l = 0; l < shelfRenderer.header.musicCarouselShelfBasicHeaderRenderer.title.runs.length; l++)
             shelf.title += shelfRenderer.header.musicCarouselShelfBasicHeaderRenderer.title.runs[l].text;
@@ -281,33 +281,50 @@ export function digestHomeResults(json) {
         for (let m = 0; m < shelfRenderer.contents.length; m++) {
             let album = {title: "", subtitle: ""};
             
-            for (let k = 0; k < shelfRenderer.contents[m].musicTwoRowItemRenderer.title.runs.length; k++) {
-                album.title += shelfRenderer.contents[m].musicTwoRowItemRenderer.title.runs[k].text;
-            }
+            let itemRenderer;
+            if (shelfRenderer.contents[m].hasOwnProperty("musicTwoRowItemRenderer")) {
+                itemRenderer = shelfRenderer.contents[m].musicTwoRowItemRenderer;
 
-            for (let k = 0; k < shelfRenderer.contents[m].musicTwoRowItemRenderer.subtitle.runs.length; k++) {
-                album.subtitle += shelfRenderer.contents[m].musicTwoRowItemRenderer.subtitle.runs[k].text;
+                for (let k = 0; k < itemRenderer.title.runs.length; k++)
+                    album.title += itemRenderer.title.runs[k].text;
+
+                for (let k = 0; k < itemRenderer.subtitle.runs.length; k++)
+                    album.subtitle += itemRenderer.subtitle.runs[k].text;
+
+                album.thumbnail = itemRenderer.thumbnailRenderer.musicThumbnailRenderer.thumbnail.thumbnails[0].url;
+            } else {
+                itemRenderer = shelfRenderer.contents[m].musicResponsiveListItemRenderer;
+
+                for (let k = 0; k < itemRenderer.flexColumns[0].musicResponsiveListItemFlexColumnRenderer.text.runs.length; k++)
+                    album.title += itemRenderer.flexColumns[0].musicResponsiveListItemFlexColumnRenderer.text.runs[k].text;
+
+                for (let k = 0; k < itemRenderer.flexColumns[1].musicResponsiveListItemFlexColumnRenderer.text.runs.length; k++)
+                    album.subtitle += itemRenderer.flexColumns[1].musicResponsiveListItemFlexColumnRenderer.text.runs[k].text;
+
+                album.thumbnail = itemRenderer.thumbnail.musicThumbnailRenderer.thumbnail.thumbnails[0].url;
             }
 
             let videoId;
             let browseId;
             let playlistId;
 
-            let musicItem = shelfRenderer.contents[m].musicTwoRowItemRenderer;
-            if (musicItem.hasOwnProperty("navigationEndpoint")) {
-                let navigationEndpoint = shelfRenderer.contents[m].musicTwoRowItemRenderer.navigationEndpoint;
-                if (navigationEndpoint.hasOwnProperty("watchEndpoint")) {
-                    if (navigationEndpoint.watchEndpoint.hasOwnProperty("watchPlaylistEndpoint"))
-                        playlistId = playNavigationEndpoint.watchPlaylistEndpoint.playlistId;
+            let navigationEndpoint;
+            if (itemRenderer.hasOwnProperty("navigationEndpoint"))
+                navigationEndpoint = itemRenderer.navigationEndpoint;
+            else
+                navigationEndpoint = itemRenderer.overlay.musicItemThumbnailOverlayRenderer.content.musicPlayButtonRenderer.playNavigationEndpoint;
 
-                    if (navigationEndpoint.watchEndpoint.hasOwnProperty("videoId"))
-                        videoId = navigationEndpoint.watchEndpoint.videoId;
-                }
+            if (navigationEndpoint.hasOwnProperty("watchEndpoint")) {
+                if (navigationEndpoint.watchEndpoint.hasOwnProperty("watchPlaylistEndpoint"))
+                    playlistId = playNavigationEndpoint.watchPlaylistEndpoint.playlistId;
 
-                if (navigationEndpoint.hasOwnProperty("browseEndpoint")) {
-                    if (navigationEndpoint.browseEndpoint.hasOwnProperty("browseId"))
-                        browseId = navigationEndpoint.browseEndpoint.browseId;
-                }
+                if (navigationEndpoint.watchEndpoint.hasOwnProperty("videoId"))
+                    videoId = navigationEndpoint.watchEndpoint.videoId;
+            }
+
+            if (navigationEndpoint.hasOwnProperty("browseEndpoint")) {
+                if (navigationEndpoint.browseEndpoint.hasOwnProperty("browseId"))
+                    browseId = navigationEndpoint.browseEndpoint.browseId;
             }
 
             if (browseId != undefined)
@@ -318,8 +335,6 @@ export function digestHomeResults(json) {
 
             if (videoId != undefined)
                 album.videoId = videoId;
-
-            album.thumbnail = shelfRenderer.contents[m].musicTwoRowItemRenderer.thumbnailRenderer.musicThumbnailRenderer.thumbnail.thumbnails[0].url;
 
             shelf.albums.push(album);
         }
