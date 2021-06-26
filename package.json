@@ -5,15 +5,13 @@
     "repository": "github:kvnp/youtune-reactnative",
     "license": "GPL-3.0",
     "funding": {
-        "type" : "patreon",
-        "url" : "https://www.patreon.com/kvnp"
+        "type": "patreon",
+        "url": "https://www.patreon.com/kvnp"
     },
-
     "engines": {
         "node": "15.x",
         "npm": "7.x"
     },
-
     "scripts": {
         "android": "react-native run-android",
         "ios": "react-native run-ios",
@@ -27,7 +25,7 @@
         "patch": "git apply --directory node_modules/rn-sliding-up-panel/ ./patches/rn-sliding-up-panel/0001-fix-web-support.patch --reject --ignore-space-change --ignore-whitespace"
     },
     "dependencies": {
-        "@react-native-async-storage/async-storage": "^1.15.4",
+        "@react-native-async-storage/async-storage": "^1.15.5",
         "@react-native-community/slider": "^3.0.3",
         "@react-native-masked-view/masked-view": "^0.2.4",
         "@react-navigation/material-top-tabs": "^5.3.15",
@@ -35,39 +33,39 @@
         "@react-navigation/stack": "^6.0.0-next.24",
         "react": "^17.0.2",
         "react-dom": "^17.0.2",
-        "react-native": "^0.64.1",
+        "react-native": "^0.64.2",
         "react-native-gesture-handler": "^1.10.3",
         "react-native-linear-gradient": "^2.5.6",
-        "react-native-pager-view": "^5.1.10",
+        "react-native-pager-view": "^5.2.1",
         "react-native-reanimated": "^2.2.0",
         "react-native-safe-area-context": "^3.2.0",
-        "react-native-screens": "^3.3.0",
+        "react-native-screens": "^3.4.0",
         "react-native-tab-view": "^3.0.1",
         "react-native-track-player": "^1.2.7",
         "react-native-track-player-web": "github:kvnp/react-native-track-player-web",
         "react-native-vector-icons": "^8.1.0",
-        "react-native-web": "0.16.3",
-        "react-native-web-linear-gradient": "^1.1.1",
+        "react-native-web": "0.17.1",
+        "react-native-web-linear-gradient": "^1.1.2",
         "reanimated-bottom-sheet": "^1.0.0-alpha.22",
         "rn-sliding-up-panel": "^2.4.5"
     },
     "devDependencies": {
-        "@babel/core": "^7.14.3",
-        "@babel/preset-env": "^7.14.4",
-        "@babel/runtime": "^7.14.0",
-        "@react-native-community/eslint-config": "^2.0.0",
-        "babel-jest": "^27.0.2",
+        "@babel/core": "^7.14.6",
+        "@babel/preset-env": "^7.14.7",
+        "@babel/runtime": "^7.14.6",
+        "@react-native-community/eslint-config": "^3.0.0",
+        "babel-jest": "^27.0.5",
         "babel-loader": "^8.2.2",
-        "babel-plugin-react-native-web": "^0.16.3",
+        "babel-plugin-react-native-web": "^0.17.1",
         "babel-preset-react-native": "^4.0.1",
-        "eslint": "^7.27.0",
+        "eslint": "^7.29.0",
         "file-loader": "^6.2.0",
-        "html-webpack-plugin": "^5.3.1",
-        "jest": "^27.0.3",
+        "html-webpack-plugin": "^5.3.2",
+        "jest": "^27.0.5",
         "metro-react-native-babel-preset": "^0.66.0",
         "react-test-renderer": "^17.0.2",
-        "webpack": "^5.38.1",
-        "webpack-cli": "^4.7.0",
+        "webpack": "^5.40.0",
+        "webpack-cli": "^4.7.2",
         "webpack-dev-server": "4.0.0-beta.3",
         "webpack-pwa-manifest": "^4.3.0",
         "workbox-webpack-plugin": "^6.1.5"
