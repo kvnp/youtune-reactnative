@@ -17,7 +17,6 @@ module.exports = () => {
     });
 
     TrackPlayer.addEventListener("playback-queue-ended", params => {
-        console.log(params);
         if (isRepeating)
             TrackPlayer.seekTo(0).then(() => {
                 TrackPlayer.play();
@@ -33,15 +32,9 @@ module.exports = () => {
             skip(true);
     });
 
-    TrackPlayer.addEventListener("remote-next", params => {
-        console.log("remote-next");
-        skip(true);
-    });
+    TrackPlayer.addEventListener("remote-next", params => skip(true));
 
-    TrackPlayer.addEventListener("remote-previous", params => {
-        console.log("remote-previous");
-        skip(false);
-    });
+    TrackPlayer.addEventListener("remote-previous", params => skip(false));
 
     TrackPlayer.addEventListener("remote-play", params => TrackPlayer.play());
 
