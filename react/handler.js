@@ -10,30 +10,38 @@
 import TrackPlayer from 'react-native-track-player';
 import { skip, isRepeating, focusedId } from './service';
 
-module.exports = function() {
+module.exports = () => {
     TrackPlayer.addEventListener("playback-track-changed", params => {
         if (isRepeating && params["nextTrack"] != focusedId)
             TrackPlayer.skipToPrevious();
     });
 
     TrackPlayer.addEventListener("playback-queue-ended", params => {
-        if (isRepeating) {
-            TrackPlayer.seekTo(0);
-            TrackPlayer.play();
-        }
+        console.log(params);
+        if (isRepeating)
+            TrackPlayer.seekTo(0).then(() => {
+                TrackPlayer.play();
+            });
     });
 
     TrackPlayer.addEventListener("playback-error", params => {
-        if (isRepeating) {
-            TrackPlayer.seekTo(0);
-            TrackPlayer.play();
-        } else
+        if (isRepeating)
+            TrackPlayer.seekTo(0).then(() => {
+                TrackPlayer.play();
+            });
+        else
             skip(true);
     });
 
-    TrackPlayer.addEventListener("remote-next", params => skip(true));
+    TrackPlayer.addEventListener("remote-next", params => {
+        console.log("remote-next");
+        skip(true);
+    });
 
-    TrackPlayer.addEventListener("remote-previous", params => skip(false));
+    TrackPlayer.addEventListener("remote-previous", params => {
+        console.log("remote-previous");
+        skip(false);
+    });
 
     TrackPlayer.addEventListener("remote-play", params => TrackPlayer.play());
 
