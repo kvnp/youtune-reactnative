@@ -1,10 +1,6 @@
 import React, { useState } from 'react';
 
-import {
-    ImageBackground,
-    Text,
-    Pressable,
-} from "react-native";
+import { ImageBackground, Text } from "react-native";
 
 import { useTheme } from '@react-navigation/native';
 import LinearGradient from 'react-native-linear-gradient';
@@ -41,11 +37,9 @@ export default Header = ({style, onPress}) => {
                                 dark ? gradientColorsDark
                                      : gradientColors
                             }>
-                <Pressable onPress={onPress}>
-                    <Text style={[headerStyle.text, {color: colors.text}]}>
-                        {header.title}
-                    </Text>
-                </Pressable>
+                <Text style={[headerStyle.text, {color: colors.text}]}>
+                    {header.title}
+                </Text>
             </LinearGradient>
         </ImageBackground>
     )
