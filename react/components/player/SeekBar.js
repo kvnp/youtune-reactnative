@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 import {
     View,
@@ -8,17 +8,18 @@ import {
 } from 'react-native';
 
 import { useTheme } from '@react-navigation/native';
-import Slider from "@react-native-community/slider";
+import Slider from '@react-native-community/slider';
 
 import TrackPlayer from 'react-native-track-player';
-import { useEffect } from 'react';
 
 function pad(n, width, z = 0) {
     n = n + '';
-    return n.length >= width ? n : new Array(width - n.length + 1).join(z) + n;
+    return n.length >= width
+        ? n
+        : new Array(width - n.length + 1).join(z) + n;
 }
 
-const minutesAndSeconds = (position) => ([
+const minutesAndSeconds = position => ([
     pad( ~~(position / 60), 2),
     pad( ~~(position % 60), 2),
 ]);
@@ -38,53 +39,37 @@ export default SeekBar = ({ style, navigation }) => {
     const remaining = minutesAndSeconds(duration - position);
     const { colors } = useTheme();
 
+    const updateSeekbar = async() => {
+        setState({
+            position: await TrackPlayer.getPosition(),
+            bufferedPosition: await TrackPlayer.getBufferedPosition(),
+            duration: await TrackPlayer.getDuration()
+        });
+    }
+
     useEffect(() => {
         var interval;
 
         const focus = navigation.addListener('focus', async() => {
-            setState({
-                position: await TrackPlayer.getPosition(),
-                bufferedPosition: await TrackPlayer.getBufferedPosition(),
-                duration: await TrackPlayer.getDuration()
-            });
-
             if (await TrackPlayer.getState() == TrackPlayer.STATE_PLAYING) {
                 clearInterval(interval);
-                interval = setInterval(async() => {
-                    setState({
-                        position: await TrackPlayer.getPosition(),
-                        bufferedPosition: await TrackPlayer.getBufferedPosition(),
-                        duration: await TrackPlayer.getDuration()
-                    });
-                }, 500);
-            }
-                
+                interval = setInterval(() => updateSeekbar(), 500);
+            } else
+                updateSeekbar();
         });
 
-        const trackState = TrackPlayer.addEventListener("playback-state", async(playback) => {
+        const trackState = TrackPlayer.addEventListener('playback-state', playback => {
+            clearInterval(interval);
             switch (playback.state) {
+                case TrackPlayer.STATE_PLAYING:
+                    interval = setInterval(() => updateSeekbar(), 500);
+                    break;
                 case TrackPlayer.STATE_NONE:
                 case TrackPlayer.STATE_PAUSED:
                 case TrackPlayer.STATE_STOPPED:
                 case TrackPlayer.STATE_BUFFERING:
-                    clearInterval(interval);
-                    break;
-                case TrackPlayer.STATE_PLAYING:
-                    clearInterval(interval);
-                    interval = setInterval(async() => {
-                        setState({
-                            position: await TrackPlayer.getPosition(),
-                            bufferedPosition: await TrackPlayer.getBufferedPosition(),
-                            duration: await TrackPlayer.getDuration()
-                        });
-                    }, 500);
+                    updateSeekbar();
             }
-
-            setState({
-                position: await TrackPlayer.getPosition(),
-                bufferedPosition: await TrackPlayer.getBufferedPosition(),
-                duration: await TrackPlayer.getDuration()
-            });
         });
 
         return () => {
@@ -98,18 +83,19 @@ export default SeekBar = ({ style, navigation }) => {
         <View style={[styles.container, style]}>
             <Slider
                 maximumValue={Math.max(duration, 1, position)}
-                onSlidingComplete={async(value) => {
-                    await TrackPlayer.seekTo(value);
-                    setState(state => ({
-                        ...state,
-                        position: value
+                onSlidingComplete={async(newPosition) => {
+                    await TrackPlayer.seekTo(newPosition);
+                    setState(oldState => ({
+                        ...oldState,
+                        position: newPosition
                     }));
                     setSliding(false);
                 }}
-                onSlidingStart={position => {
+                onSlidingStart={currentPosition => {
                     setSliding(true);
-                    setPositionCache(position);
+                    setPositionCache(currentPosition);
                 }}
+
                 value={isSliding != true ? position : positionCache}
                 bufferedPosition={bufferedPosition}
                 minimumTrackTintColor={colors.text}
@@ -121,11 +107,11 @@ export default SeekBar = ({ style, navigation }) => {
 
             <View style={{ flexDirection: 'row', paddingRight: 15, paddingLeft: 15 }}>
                 <Text style={[styles.text, {color: colors.text}]}>
-                    {elapsed[0] + ":" + elapsed[1]}
+                    {elapsed[0] + ':' + elapsed[1]}
                 </Text>
                 <View style={{ flex: 1 }} />
-                <Text style={[styles.text, {textAlign: "right", color: colors.text}]}>
-                    {"-" + remaining[0] + ":" + remaining[1]}
+                <Text style={[styles.text, {textAlign: 'right', color: colors.text}]}>
+                    {'-' + remaining[0] + ':' + remaining[1]}
                 </Text>
             </View>
         </View>
@@ -137,7 +123,7 @@ const styles = StyleSheet.create({
         marginTop: -12
     },
 
-    container: Platform.OS == "android"
+    container: Platform.OS == 'android'
         ? {
             paddingTop: 16,
             marginLeft: -15,
@@ -153,7 +139,7 @@ const styles = StyleSheet.create({
         borderRadius: 1
     },
 
-    text: Platform.OS == "ios"
+    text: Platform.OS == 'ios'
     ? {
         fontSize: 12,
         textAlign: 'center',
