@@ -1,11 +1,12 @@
 import 'react-native-gesture-handler';
-import React, { useState } from "react";
-import { StatusBar } from "react-native";
+import React, { useCallback, useState } from "react";
+import { Platform, StatusBar } from "react-native";
 
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import { DefaultTheme, DarkTheme } from '@react-navigation/native';
 import { enableScreens } from 'react-native-screens';
+import Toast from 'react-native-toast-message'
 
 import { settings } from "./modules/storage/SettingsStorage";
 import PlayView from "./views/full/PlayView";
@@ -26,43 +27,43 @@ export const navigationOptions = {
 
 const Stack = createStackNavigator();
 
-const config = {
-    initialRouteName: "App",
-    screens: {
-        App: {
-            initialRouteName: "Home",
-            path: "",
-            screens: {
-                Home: "",
-                Search: "search",
-                Settings: "settings",
-                
-                Library: {
-                    path: "library",
-                    screens: {
-                        Playlists: "playlists",
-                        Albums: "albums",
-                        Songs: "songs",
-                        Artists: "artists",
-                        Downloads: "downloads"
+const linking = {
+    prefixes: ["https://youtune.kvnp.eu"],
+    config: {
+        initialRouteName: "App",
+        screens: {
+            App: {
+                initialRouteName: "Home",
+                path: "",
+                screens: {
+                    Home: "",
+                    Search: "search",
+                    Settings: "settings",
+                    
+                    Library: {
+                        path: "library",
+                        screens: {
+                            Playlists: "playlists",
+                            Albums: "albums",
+                            Songs: "songs",
+                            Artists: "artists",
+                            Downloads: "downloads"
+                        }
                     }
                 }
-            }
-        },
-
-        Music: "watch",
-        Artist: "channel/:channelId",
-        Playlist: "playlist",
+            },
+    
+            Music: "watch",
+            Artist: "channel/:channelId",
+            Playlist: "playlist",
+        }
     }
-};
-
-const linking = {
-    prefixes: ["https://youtune.kvnp.eu", "http://127.0.0.1"],
-    config
 };
 
 export default App = () => {
     const [dark, setDark] = useState(settings.darkMode);
+    const toastRef = useCallback(ref => Toast.setRef(ref), []);
+
     if (settings.darkMode)
         StatusBar.setBarStyle("light-content", true);
     else
@@ -75,6 +76,26 @@ export default App = () => {
         else
             StatusBar.setBarStyle("dark-content", true);
     };
+
+    if (Platform.OS == "web") {
+        window['isUpdateAvailable']
+            .then(isAvailable => {
+                if (isAvailable) {
+                    Toast.show({
+                        type: 'info',
+                        position: 'bottom',
+                        text1: 'New Update available!',
+                        text2: 'Reload the webapp to see the latest juicy changes.',
+                        visibilityTime: 4000,
+                        autoHide: true,
+                        bottomOffset: 48,
+                        onShow: () => {},
+                        onHide: () => {}, // called when Toast hides (if `autoHide` was set to `true`)
+                        onPress: () => location.reload(),
+                    });
+                }
+            });
+    }
 
     return <NavigationContainer linking={linking} theme={dark ? DarkTheme : DefaultTheme}>
         <Stack.Navigator screenOptions={{gestureEnabled: true, swipeEnabled: true, animationEnabled: true}}>
@@ -90,5 +111,6 @@ export default App = () => {
                           options={{headerBackImage: () => getIcon({title: "arrow-back"})}}
             />
         </Stack.Navigator>
+        <Toast ref={toastRef}/>
     </NavigationContainer>
 }

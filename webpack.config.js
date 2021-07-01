@@ -216,10 +216,11 @@ module.exports = () => ({
             {
                 mode: process.env.NODE_ENV,
                 navigateFallback: "/index.html",
-                maximumFileSizeToCacheInBytes: 3e+6,
+                maximumFileSizeToCacheInBytes: 10e+6,
                 cleanupOutdatedCaches: true,
                 inlineWorkboxRuntime: false,
                 clientsClaim: true,
+                skipWaiting: true,
                 runtimeCaching: [
                     {
                         urlPattern: /\.(?:ico|html|js|css|json)$/,
