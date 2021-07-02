@@ -93,12 +93,25 @@ export function storeSong(id) {
         request.onsuccess = event => {
             db = request.result;
 
-            db.transaction("songs", "readwrite")
-                .objectStore("songs")
-                .add({
-                    id: id,
-                    track: track
-                });
+            try {
+                db.transaction("songs", "readwrite")
+                    .objectStore("songs")
+                    .add({
+                        id: id,
+                        track: track
+                    });
+            } catch (e) {
+                if (!db.objectStoreNames.contains('songs'))
+                    db.createObjectStore('songs', {keyPath: 'id'});
+
+                db.transaction("songs", "readwrite")
+                    .objectStore("songs")
+                    .add({
+                        id: id,
+                        track: track
+                    });
+            }
+            
             
             localIDs.push(id);
         };
@@ -129,7 +142,7 @@ export const deleteSong = id => {
 
             let index = localIDs.indexOf(id);
             localIDs.splice(index, 1);
-            
+
             resolve(id);
         };
     });
