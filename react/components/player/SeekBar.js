@@ -51,11 +51,11 @@ export default SeekBar = ({ style, navigation }) => {
         var interval;
 
         const focus = navigation.addListener('focus', async() => {
+            updateSeekbar();
             if (await TrackPlayer.getState() == TrackPlayer.STATE_PLAYING) {
                 clearInterval(interval);
                 interval = setInterval(() => updateSeekbar(), 500);
-            } else
-                updateSeekbar();
+            }
         });
 
         const trackState = TrackPlayer.addEventListener('playback-state', playback => {
