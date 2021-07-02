@@ -82,7 +82,7 @@ export const skipTo = async({id, array}) => {
         if (localIDs.includes(id))
             track.url = (await loadSongLocal(id)).url;
         else
-            track.url = await fetchAudioStream(id);
+            track.url = await fetchAudioStream({videoId: id});
     } else {
         return TrackPlayer.skip(id);
     }
@@ -137,7 +137,7 @@ export const startPlaylist = Platform.OS == "web"
                 if (localIDs.includes(track.id))
                     track.url = (await loadSongLocal(track.id)).url;
                 else
-                    track.url = await fetchAudioStream(track.id);
+                    track.url = await fetchAudioStream({videoId: track.id});
             }
 
             await TrackPlayer.add(track);
@@ -157,7 +157,7 @@ export const startPlaylist = Platform.OS == "web"
             if (localIDs.includes(track.id))
                 track.url = (await loadSongLocal(track.id)).url;
             else
-                track.url = await fetchAudioStream(track.id);
+                track.url = await fetchAudioStream({videoId: track.id});
         }
     
         await TrackPlayer.add(playlist.list);
