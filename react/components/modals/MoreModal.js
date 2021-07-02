@@ -28,6 +28,8 @@ import {
 } from "../../modules/storage/MediaStorage";
 
 import { storeSong, deleteSong, localIDs, downloadQueue } from "../../modules/storage/SongStorage";
+import { displayNotification } from "../../modules/utils/Notification";
+import Toast from "react-native-toast-message";
 
 export var showModal = null;
 
@@ -97,6 +99,21 @@ export default MoreModal = ({navigation}) => {
         setContent(content => ({...content, downloading: true}));
         storeSong(videoId)
             .then(id => {
+                const title = 'Download Finished';
+                const text = 'Download of ' + content.title + ' complete';
+                displayNotification({title: title, text: text, icon: content.thumbnail});
+                Toast.show({
+                    type: 'info',
+                    position: 'top',
+                    text1: title,
+                    text2: text,
+                    visibilityTime: 2000,
+                    autoHide: true,
+                    bottomOffset: 48,
+                    onShow: () => {},
+                    onHide: () => {}, // called when Toast hides (if `autoHide` was set to `true`)
+                    onPress: () => {},
+                });
                 setContent(Content => ({
                     ...Content,
                     downloading: Content.videoId == content.videoId ? false : downloadQueue.includes(Content.videoId) ? true : false,
@@ -104,6 +121,21 @@ export default MoreModal = ({navigation}) => {
                 }));
             })
             .catch(id => {
+                const title = 'Download Failed';
+                const text = 'Download of ' + content.title + ' did not finish';
+                displayNotification({title: title, text: text, icon: content.thumbnail});
+                Toast.show({
+                    type: 'error',
+                    position: 'top',
+                    text1: title,
+                    text2: text,
+                    visibilityTime: 2000,
+                    autoHide: true,
+                    bottomOffset: 48,
+                    onShow: () => {},
+                    onHide: () => {}, // called when Toast hides (if `autoHide` was set to `true`)
+                    onPress: () => {},
+                });
                 setContent(Content => ({
                     ...Content,
                     downloading: Content.videoId == content.videoId ? false : downloadQueue.includes(Content.videoId) ? true : false,

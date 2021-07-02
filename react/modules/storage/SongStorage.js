@@ -53,11 +53,7 @@ export function storeSong(id) {
 
             track.artwork = await downloadMedia(track.artwork);
             track.url = await downloadMedia(track.url);
-        } catch (e) {
-            reject(e);
-        }
 
-        try {
             const string = JSON.stringify({
                 id: id,
                 track: track
@@ -65,7 +61,7 @@ export function storeSong(id) {
     
             await AsyncStorage.setItem('@storage_Song_' + id, string);
             localIDs.push(id);
-        } catch(e) {
+        } catch (e) {
             reject("Storing song failed - " + id);
         }
 
@@ -80,5 +76,13 @@ export const deleteSong = id => {
         if (id == undefined)
             reject("id is missing");
 
+    try {
+            await AsyncStorage.removeItem('@storage_Song_' + id);
+
+            let index = localIDs.indexOf(id);
+            localIDs.splice(index, 1);
+        } catch (e) {
+            reject("Removing song failed - " + id);
+        }
     });
 }

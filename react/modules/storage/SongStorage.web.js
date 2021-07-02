@@ -80,6 +80,7 @@ export function storeSong(id) {
             track.artwork = await downloadMedia(track.artwork);
             track.url = await downloadMedia(track.url);
         } catch (e) {
+            console.log(e);
             reject(e);
         }
 
@@ -125,8 +126,10 @@ export const deleteSong = id => {
             db.transaction("songs", "readwrite")
                 .objectStore("songs")
                 .delete(id);
+
+            let index = localIDs.indexOf(id);
+            localIDs.splice(index, 1);
             
-            localIDs.splice(localIDs.indexOf(id), 1);
             resolve(id);
         };
     });
