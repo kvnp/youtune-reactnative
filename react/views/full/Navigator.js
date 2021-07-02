@@ -21,6 +21,12 @@ const getTabOptions = (title) => {
 }
 
 const Nav = createMaterialTopTabNavigator();
+const tabOptions = {
+    lazy: false,
+    optimizationsEnabled: true,
+    tabBarHideOnKeyboards: true,
+    tabBarShowLabel: false
+};
 
 export default Navigator = ({navigation}) => {
     const [bottomMargin, setBottomMargin] = useState(0);
@@ -54,18 +60,11 @@ export default Navigator = ({navigation}) => {
             initialLayout={{width: Dimensions.get('window').width}}
             sceneContainerStyle={{marginBottom: bottomMargin}}
             lazy={false}
-            tabBarOptions={{
-                optimizationsEnabled: true,
-                lazy: false,
-                keyboardHidesTabBar: true,
-                showIcon: true,
-                showLabel: false
-            }}
         >
-            <Nav.Screen name="Home" component={HomeTab} options={getTabOptions("home")}/>
-            <Nav.Screen name="Search" component={SearchTab} options={getTabOptions("search")}/>
-            <Nav.Screen name="Library" component={LibraryTab} options={getTabOptions("folder")}/>
-            <Nav.Screen name="Settings" component={SettingsTab} options={getTabOptions("settings")}/>
+            <Nav.Screen name="Home" component={HomeTab} options={{...getTabOptions("home"), ...tabOptions}}/>
+            <Nav.Screen name="Search" component={SearchTab} options={{...getTabOptions("search"), ...tabOptions}}/>
+            <Nav.Screen name="Library" component={LibraryTab} options={{...getTabOptions("folder"), ...tabOptions}}/>
+            <Nav.Screen name="Settings" component={SettingsTab} options={{...getTabOptions("settings"), ...tabOptions}}/>
         </Nav.Navigator>
         <MiniPlayer style={{position: "absolute", bottom: 48, width: "100%"}} navigation={navigation}/>
         <MoreModal navigation={navigation}/>

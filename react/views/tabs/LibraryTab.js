@@ -7,10 +7,22 @@ import Albums from '../library/Albums';
 import Songs from '../library/Songs';
 import Artists from '../library/Artists';
 import Downloads from '../library/Downloads';
-import { tabOptions } from '../../styles/Library';
 import { setHeader } from '../../components/overlay/Header';
 
 const Tab = createMaterialTopTabNavigator();
+const tabOptions = {
+    scrollEnabled: true,
+    optimizationsEnabled: true,
+    lazy: true,
+
+    tabBarItemStyle: {
+        width: "auto",
+        paddingRight: 14,
+        paddingLeft: 14
+    },
+
+    bounces: true
+}
 
 export default LibraryTab = ({navigation}) => {
     useEffect(() => {
@@ -28,11 +40,11 @@ export default LibraryTab = ({navigation}) => {
         }
     }, []);
 
-    return <Tab.Navigator tabBarOptions={tabOptions} initialRouteName="Playlists" tabBarPosition="bottom">
-        <Tab.Screen name="Playlists" component={Playlists} options={navigationOptions}/>
-        <Tab.Screen name="Albums" component={Albums} options={navigationOptions}/>
-        <Tab.Screen name="Songs" component={Songs} options={navigationOptions}/>
-        <Tab.Screen name="Artists" component={Artists} options={navigationOptions}/>
-        <Tab.Screen name="Downloads" component={Downloads} options={navigationOptions}/>
+    return <Tab.Navigator initialRouteName="Playlists" tabBarPosition="bottom">
+        <Tab.Screen name="Playlists" component={Playlists} options={{...navigationOptions, ...tabOptions}}/>
+        <Tab.Screen name="Albums" component={Albums} options={{...navigationOptions, ...tabOptions}}/>
+        <Tab.Screen name="Songs" component={Songs} options={{...navigationOptions, ...tabOptions}}/>
+        <Tab.Screen name="Artists" component={Artists} options={{...navigationOptions, ...tabOptions}}/>
+        <Tab.Screen name="Downloads" component={Downloads} options={{...navigationOptions, ...tabOptions}}/>
     </Tab.Navigator>
 };
