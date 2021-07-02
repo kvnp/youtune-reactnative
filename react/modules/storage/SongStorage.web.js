@@ -70,22 +70,32 @@ export function storeSong(id) {
         if (id == undefined || id == null)
             reject("no id");
 
-        downloadQueue.push(id);
+        let index = downloadQueue.findIndex(entry => id in entry);
+        if (index > -1)
+            reject("still downloading");
 
-        let track;
-        try {
-            track = await fetchAudioInfo(id);
-            track.url = await fetchAudioStream(id);
+        let controllerCallback = controller => {
+            let index = downloadQueue.findIndex(entry => id in entry);
+            if (index > -1)
+                downloadQueue[index][id] = controller;
+            else
+                downloadQueue.push({[id] : controller});
 
-            track.artwork = await downloadMedia(track.artwork);
-            track.url = await downloadMedia(track.url);
-        } catch (e) {
-            console.log(e);
-            reject(e);
+            controller.signal.onabort = () => {
+                console.log("download aborted");
+                reject(id);
+            };
         }
+        
+        index = downloadQueue.findIndex(entry => id in entry);
+
+        let track = await fetchAudioInfo({videoId: id, controllerCallback});
+        track.url = await fetchAudioStream({videoId: id, controllerCallback});
+        track.artwork = await downloadMedia({url: track.artwork, controllerCallback});
+        track.url = await downloadMedia({url: track.url, controllerCallback});
 
         var request = indexedDB.open("storage");
-    
+
         request.onerror = event => {
             reject("failed opening DB: " + request.errorCode);
         };
@@ -111,14 +121,26 @@ export function storeSong(id) {
                         track: track
                     });
             }
-            
-            
             localIDs.push(id);
         };
-
-        let index = downloadQueue.indexOf(id);
+        
+        index = downloadQueue.findIndex(entry => id in entry);
         downloadQueue.splice(index, 1);
         resolve(id);
+    });
+}
+
+export const abortSongDownload = id => {
+    return new Promise((resolve, reject) => {
+        let index = downloadQueue.findIndex(entry => id in entry);
+        if (index > -1) {
+            let abortController = downloadQueue[index][id];
+            abortController.abort();
+            downloadQueue.splice(index, 1);
+            resolve(id);
+        } else {
+            reject(id);
+        }
     });
 }
 

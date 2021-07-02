@@ -9,7 +9,7 @@ export function getUrl(endpoint, apiKey) {
     return url + partialEndpoint + endpoint + parameter + apiKey;
 }
 
-export const getHttpResponse = (url, input, type) => {
+export const getHttpResponse = (url, input, type, controllerCallback) => {
     if (Platform.OS == "web" || settings.proxyYTM) {
         if (url.split("/")[2] == "lh3.googleusercontent.com")
             url = window.location.protocol + "//" +
@@ -21,7 +21,16 @@ export const getHttpResponse = (url, input, type) => {
                   url.split("/").slice(3).join("/");
     }
 
+    if (controllerCallback) {
+        let controller = new AbortController();
+        let signal = controller.signal;
+
+        input = {...input, signal};
+        controllerCallback(controller);
+    }
+
     return new Promise((resolve, reject) => {
+        console.log(input);
         fetch(url, input)
             .then(response => {
                 if (type == "json")

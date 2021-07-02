@@ -30,6 +30,7 @@ import {
 import { storeSong, deleteSong, localIDs, downloadQueue } from "../../modules/storage/SongStorage";
 import { displayNotification } from "../../modules/utils/Notification";
 import Toast from "react-native-toast-message";
+import { abortSongDownload } from "../../modules/storage/SongStorage";
 
 export var showModal = null;
 
@@ -116,8 +117,8 @@ export default MoreModal = ({navigation}) => {
                 });
                 setContent(Content => ({
                     ...Content,
-                    downloading: Content.videoId == content.videoId ? false : downloadQueue.includes(Content.videoId) ? true : false,
-                    downloaded: Content.videoId == content.videoId ? true : localIDs.includes(Content.videoId) ? true : false
+                    downloading: Content.videoId == content.videoId ? false : downloadQueue.findIndex(entry => Content.videoId in entry) > -1 ? true : false,
+                    downloaded: Content.videoId == content.videoId ? true : downloadQueue.findIndex(entry => Content.videoId in entry) > -1 ? true : false
                 }));
             })
             .catch(id => {
@@ -138,10 +139,16 @@ export default MoreModal = ({navigation}) => {
                 });
                 setContent(Content => ({
                     ...Content,
-                    downloading: Content.videoId == content.videoId ? false : downloadQueue.includes(Content.videoId) ? true : false,
+                    downloading: Content.videoId == content.videoId ? false : downloadQueue.findIndex(entry => Content.videoId in entry) > -1 ? true : false,
                     downloaded: Content.videoId == content.videoId ? false : localIDs.includes(Content.videoId) ? true : false
                 }));
             });
+    }
+
+    const abort = () => {
+        abortSongDownload(videoId).then(() => {
+            setContent(content => ({...content, downloading: false, downloaded: false}));
+        });
     }
 
     const remove = () => {
@@ -150,14 +157,14 @@ export default MoreModal = ({navigation}) => {
             .then(id => {
                 setContent(Content => ({
                     ...Content,
-                    downloading: Content.videoId == content.videoId ? false : downloadQueue.includes(Content.videoId) ? true : false,
+                    downloading: Content.videoId == content.videoId ? false : downloadQueue.findIndex(entry => Content.videoId in entry) > -1 ? true : false,
                     downloaded: Content.videoId == content.videoId ? false : localIDs.includes(Content.videoId) ? true : false
                 }));
             })
             .catch(id => {
                 setContent(Content => ({
                     ...Content,
-                    downloading: Content.videoId == content.videoId ? false : downloadQueue.includes(Content.videoId) ? true : false,
+                    downloading: Content.videoId == content.videoId ? false : downloadQueue.findIndex(entry => Content.videoId in entry) > -1 ? true : false,
                     downloaded: Content.videoId == content.videoId ? true : localIDs.includes(Content.videoId) ? true : false
                 }));
             });
@@ -226,7 +233,7 @@ export default MoreModal = ({navigation}) => {
             }
         }
         
-        if (downloadQueue.includes(info.videoId))
+        if (downloadQueue.findIndex(entry => info.videoId in entry) > -1)
             downloading = true;
 
         if (localIDs.includes(info.videoId))
@@ -384,11 +391,12 @@ export default MoreModal = ({navigation}) => {
                         ? <View style={modalStyles.entryView}>
                             <Pressable
                                 onPress={
-                                    () => downloaded
-                                        ? remove()
-                                        : download()
+                                    () => downloading
+                                        ? abort()
+                                        : downloaded
+                                            ? remove()
+                                            : download()
                                 }
-                                disabled={downloading}
                                 style={[modalStyles.entry, {backgroundColor: colors.card}]}
                                 android_ripple={{color: "gray"}}
                             >

@@ -44,16 +44,31 @@ export function storeSong(id) {
         if (id == undefined || id == null)
             reject("no id");
 
-        downloadQueue.push(id);
+        let index = downloadQueue.findIndex(entry => id in entry);
+        if (index > -1)
+            reject("still downloading");
 
-        let track;
+        let controllerCallback = controller => {
+            let index = downloadQueue.findIndex(entry => id in entry);
+            if (index > -1)
+                downloadQueue[index][id] = controller;
+            else
+                downloadQueue.push({[id] : controller});
+
+            controller.signal.onabort = () => {
+                console.log("download aborted");
+                reject(id);
+            };
+        }
+        
+        index = downloadQueue.findIndex(entry => id in entry);
+
+        let track = await fetchAudioInfo({videoId: id, controllerCallback});
+        track.url = await fetchAudioStream({videoId: id, controllerCallback});
+        track.artwork = await downloadMedia({url: track.artwork, controllerCallback});
+        track.url = await downloadMedia({url: track.url, controllerCallback});
+
         try {
-            track = await fetchAudioInfo(id);
-            track.url = await fetchAudioStream(id);
-
-            track.artwork = await downloadMedia(track.artwork);
-            track.url = await downloadMedia(track.url);
-
             const string = JSON.stringify({
                 id: id,
                 track: track
@@ -65,9 +80,23 @@ export function storeSong(id) {
             reject("Storing song failed - " + id);
         }
 
-        let index = downloadQueue.indexOf(id);
+        let index = downloadQueue.findIndex(entry => id in entry);
         downloadQueue.splice(index, 1);
         resolve(id);
+    });
+}
+
+export const abortSongDownload = id => {
+    return new Promise((resolve, reject) => {
+        let index = downloadQueue.findIndex(entry => id in entry);
+        if (index > -1) {
+            let abortController = downloadQueue[index][id];
+            abortController.abort();
+            downloadQueue.splice(index, 1);
+            resolve(id);
+        } else {
+            reject(id);
+        }
     });
 }
 
@@ -76,7 +105,7 @@ export const deleteSong = id => {
         if (id == undefined)
             reject("id is missing");
 
-    try {
+        try {
             await AsyncStorage.removeItem('@storage_Song_' + id);
 
             let index = localIDs.indexOf(id);

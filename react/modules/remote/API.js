@@ -179,7 +179,7 @@ export async function fetchBrowse(browseId) {
     return digestBrowseResults(response, browseId);
 }
 
-export async function fetchAudioInfo(videoId, playlistId) {
+export async function fetchAudioInfo({videoId, playlistId, controllerCallback}) {
     let url = "https://music.youtube.com/youtubei/v1/player?key=" + apiKey;
 
     let body = getRequestBody();
@@ -198,14 +198,14 @@ export async function fetchAudioInfo(videoId, playlistId) {
         method: "POST",
         headers: headers_ytm,
         body: JSON.stringify(body)
-    }, "json");
+    }, "json", controllerCallback);
 
     let audioInfo = digestAudioInfo(response);
 
     return audioInfo;
 }
 
-export async function fetchAudioStream(videoId) {
+export async function fetchAudioStream({videoId, controllerCallback}) {
     let url = "https://music.youtube.com/youtubei/v1/player?key=" + apiKey;
 
     let body = getRequestBody();
@@ -221,7 +221,7 @@ export async function fetchAudioStream(videoId) {
         method: "POST",
         headers: headers_ytm,
         body: JSON.stringify(body)
-    }, "json");
+    }, "json", controllerCallback);
 
     let stream = digestStreams(response);
     return stream;
@@ -246,11 +246,11 @@ export async function fetchNext(videoId, playlistId) {
     return digestNextResults(response);
 }
 
-export async function downloadMedia(url) {
+export async function downloadMedia({url, controllerCallback}) {
     let blob = await getHttpResponse(url, {
         method: "GET",
         headers: headers_ytm
-    }, "blob");
+    }, "blob", controllerCallback);
 
     let reader = input => {
         let fileReader = new FileReader();
