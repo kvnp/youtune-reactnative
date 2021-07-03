@@ -13,12 +13,10 @@ import { settings } from "../../modules/storage/SettingsStorage";
 import { getHttpResponse, getUrl } from "./HTTP";
 import { enableDecryption, signatureTimestamp, isDecryptionWorking } from "./Decrypt";
 
-const useragent = "Mozilla/5.0 (X11; Linux x86_64; rv:79.0) Gecko/20100101 Firefox/79.0";
-export const headers_simple = {"User-Agent": useragent};
+export const headers_simple = {"User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:79.0) Gecko/20100101 Firefox/79.0"};
 const headers_ytm = {
     "Referer":      "https://music.youtube.com/",
-    "Content-Type": "application/json",
-    "User-Agent": useragent
+    "Content-Type": "application/json"
 };
 
 export var configuration = null;
@@ -74,7 +72,7 @@ export async function fetchResults(query, params) {
     const url = getUrl("search", apiKey);
 
     let body = getRequestBody();
-    body.context["user"] = { enableSafetyMode: settings.safetyMode }
+    body.context["user"] = {enableSafetyMode: settings.safetyMode};
     body["query"] = query;
     
     if (params)

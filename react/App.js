@@ -63,7 +63,6 @@ const linking = {
 export default App = () => {
     const [dark, setDark] = useState(settings.darkMode);
     const toastRef = useCallback(ref => Toast.setRef(ref), []);
-
     if (settings.darkMode)
         StatusBar.setBarStyle("light-content", true);
     else
@@ -79,28 +78,26 @@ export default App = () => {
 
     if (Platform.OS == "web") {
         window['isUpdateAvailable']
-            .then(isAvailable => {
-                if (isAvailable) {
-                    Toast.show({
-                        type: 'info',
-                        position: 'bottom',
-                        text1: 'New Update available!',
-                        text2: 'Reload the webapp to see the latest juicy changes.',
-                        visibilityTime: 4000,
-                        autoHide: true,
-                        bottomOffset: 48,
-                        onShow: () => {},
-                        onHide: () => {}, // called when Toast hides (if `autoHide` was set to `true`)
-                        onPress: () => location.reload(),
-                    });
-                }
-            });
+            .then(isAvailable => { if (isAvailable) {
+                Toast.show({
+                    type: 'info',
+                    position: 'bottom',
+                    text1: 'New Update available!',
+                    text2: 'Reload the webapp to see the latest juicy changes.',
+                    visibilityTime: 4000,
+                    autoHide: true,
+                    bottomOffset: 48,
+                    onShow: () => {},
+                    onHide: () => {}, // called when Toast hides (if `autoHide` was set to `true`)
+                    onPress: () => location.reload(),
+                });
+            }});
     }
 
     return <NavigationContainer linking={linking} theme={dark ? DarkTheme : DefaultTheme}>
         <Stack.Navigator screenOptions={{gestureEnabled: true, swipeEnabled: true, animationEnabled: true}}>
             <Stack.Screen name="App" component={Navigator} options={navigationOptions}/>
-            <Stack.Screen name="Music" component={PlayView} options={navigationOptions}/>
+            <Stack.Screen name="Music" component={PlayView} options={{...navigationOptions, presentation: "modal"}}/>
             <Stack.Screen name="Captcha" component={CaptchaView}/>
             
             <Stack.Screen name="Playlist" component={PlaylistView}

@@ -18,7 +18,7 @@ import { refreshStyle, preResultHomeStyle } from '../../styles/Home';
 import { useTheme } from '@react-navigation/native';
 import { setHeader } from '../../components/overlay/Header';
 
-export default HomeTab = ({navigation}) => {
+export default HomeTab = ({navigation, route}) => {
     const [shelves, setShelves] = useState([]);
     const [continuation, setContinuation] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -58,7 +58,6 @@ export default HomeTab = ({navigation}) => {
 
     const startRefresh = async() => {
         let temp = continuation;
-        setContinuation(null);
 
         fetchHome(temp)
             .then(result => {
@@ -71,7 +70,7 @@ export default HomeTab = ({navigation}) => {
                 if (result.background)
                     setHeader({image: result.background});
 
-                setShelves(shelves.concat(result.shelves));
+                setShelves(result.shelves);
 
                 if (result.continuation)
                     setContinuation(result.continuation);
@@ -79,6 +78,7 @@ export default HomeTab = ({navigation}) => {
                 if (loading)
                     setLoading(false);
             })
+
             .catch(() => {
                 setHomeText("You are offline");
                 setLoading(false);

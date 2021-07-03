@@ -13,7 +13,6 @@ const Tab = createMaterialTopTabNavigator();
 const tabOptions = {
     scrollEnabled: true,
     optimizationsEnabled: true,
-    lazy: true,
 
     tabBarItemStyle: {
         width: "auto",
@@ -40,11 +39,11 @@ export default LibraryTab = ({navigation}) => {
         }
     }, []);
 
-    return <Tab.Navigator initialRouteName="Playlists" tabBarPosition="bottom">
-        <Tab.Screen name="Playlists" component={Playlists} options={{...navigationOptions, ...tabOptions}}/>
-        <Tab.Screen name="Albums" component={Albums} options={{...navigationOptions, ...tabOptions}}/>
-        <Tab.Screen name="Songs" component={Songs} options={{...navigationOptions, ...tabOptions}}/>
-        <Tab.Screen name="Artists" component={Artists} options={{...navigationOptions, ...tabOptions}}/>
-        <Tab.Screen name="Downloads" component={Downloads} options={{...navigationOptions, ...tabOptions}}/>
+    return <Tab.Navigator initialRouteName="Playlists" tabBarPosition="bottom" screenOptions={{...navigationOptions, ...tabOptions}}>
+        <Tab.Screen name="Playlists" component={Playlists}/>
+        <Tab.Screen name="Albums" component={Albums}/>
+        <Tab.Screen name="Songs" component={Songs}/>
+        <Tab.Screen name="Artists" component={Artists}/>
+        <Tab.Screen name="Downloads" component={Downloads} options={{lazy: true}}/>
     </Tab.Navigator>
 };
