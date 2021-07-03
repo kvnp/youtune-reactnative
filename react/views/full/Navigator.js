@@ -50,7 +50,7 @@ export default Navigator = ({navigation}) => {
         switch (e.state) {
             case TrackPlayer.STATE_NONE:
             case TrackPlayer.STATE_STOPPED:
-                setBottomMargin(0);
+                setBottomMargin(50);
                 break;
             case TrackPlayer.STATE_PLAYING:
             case TrackPlayer.STATE_PAUSED:
