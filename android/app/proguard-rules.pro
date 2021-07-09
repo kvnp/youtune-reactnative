@@ -93,6 +93,7 @@
 # hermes
 
 -keep class com.facebook.jni.** { *; }
+-keep class com.facebook.react.turbomodule.** { *; }
 
 # okhttp
 

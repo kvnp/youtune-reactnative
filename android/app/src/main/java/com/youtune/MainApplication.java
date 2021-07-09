@@ -7,8 +7,8 @@ import androidx.multidex.MultiDex;
 
 import com.facebook.react.PackageList;
 import com.facebook.react.ReactApplication;
-import com.swmansion.reanimated.ReanimatedPackage;
-import com.swmansion.reanimated.ReanimatedPackage;
+import com.facebook.react.bridge.JSIModulePackage;
+import com.swmansion.reanimated.ReanimatedJSIModulePackage;
 import com.facebook.react.ReactInstanceManager;
 import com.facebook.react.ReactNativeHost;
 import com.facebook.react.ReactPackage;
@@ -16,47 +16,50 @@ import com.facebook.soloader.SoLoader;
 import java.util.List;
 
 public class MainApplication extends Application implements ReactApplication {
+    private final ReactNativeHost mReactNativeHost =
+        new ReactNativeHost(this) {
+            @Override
+            public boolean getUseDeveloperSupport() {
+            return BuildConfig.DEBUG;
+            }
 
-  private final ReactNativeHost mReactNativeHost =
-      new ReactNativeHost(this) {
-        @Override
-        public boolean getUseDeveloperSupport() {
-          return BuildConfig.DEBUG;
-        }
+            @Override
+            protected List<ReactPackage> getPackages() {
+                // Packages that cannot be autolinked yet can be added manually here, for example:
+                // packages.add(new MyReactNativePackage());
+                return new PackageList(this).getPackages();
+            }
 
-        @Override
-        protected List<ReactPackage> getPackages() {
-          List<ReactPackage> packages = new PackageList(this).getPackages();
-          // Packages that cannot be autolinked yet can be added manually here, for example:
-          // packages.add(new MyReactNativePackage());
-          return packages;
-        }
+            @Override
+            protected String getJSMainModuleName() {
+                return "index";
+            }
 
-        @Override
-        protected String getJSMainModuleName() {
-          return "index";
-        }
-      };
+            @Override
+            protected JSIModulePackage getJSIModulePackage() {
+                return new ReanimatedJSIModulePackage(); // <- add
+            }
+    };
 
-  @Override
-  public ReactNativeHost getReactNativeHost() {
-    return mReactNativeHost;
-  }
+    @Override
+    public ReactNativeHost getReactNativeHost() {
+        return mReactNativeHost;
+    }
 
-  @Override
-  public void onCreate() {
-    super.onCreate();
-    SoLoader.init(this, /* native exopackage */ false);
-    initializeFlipper(this, getReactNativeHost().getReactInstanceManager());
-  }
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        SoLoader.init(this, /* native exopackage */ false);
+        initializeFlipper(this, getReactNativeHost().getReactInstanceManager());
+    }
 
-  /**
-   * Loads Flipper in React Native templates. Call this in the onCreate method with something like
-   * initializeFlipper(this, getReactNativeHost().getReactInstanceManager());
-   *
-   * @param context
-   * @param reactInstanceManager
-   */
+    /**
+    * Loads Flipper in React Native templates. Call this in the onCreate method with something like
+    * initializeFlipper(this, getReactNativeHost().getReactInstanceManager());
+    *
+    * @param context
+    * @param reactInstanceManager
+    */
     private static void initializeFlipper(
     Context context, ReactInstanceManager reactInstanceManager) {
         if (BuildConfig.DEBUG) {
