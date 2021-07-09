@@ -4,6 +4,10 @@
     "author": "Kevin Pfeifer <kevin1174@schule.bremen.de>",
     "repository": "github:kvnp/youtune-reactnative",
     "license": "GPL-3.0",
+    "engines": {
+        "node": "15.x",
+        "npm": "7.x"
+    },
     "funding": {
         "type": "patreon",
         "url": "https://www.patreon.com/kvnp"
@@ -11,13 +15,15 @@
     "scripts": {
         "android": "react-native run-android",
         "ios": "react-native run-ios",
+        "windows": "react-native run-windows",
+        "web": "webpack serve",
         "bundle": "react-native start",
         "start": "webpack serve",
         "test": "jest",
         "lint": "eslint .",
-        "web": "webpack serve",
         "dist": "webpack",
-        "windows": "react-native run-windows"
+        "postinstall": "git apply --directory node_modules/rn-sliding-up-panel/ ./patches/rn-sliding-up-panel/0001-fix-web-support.patch --reject --ignore-space-change --ignore-whitespace",
+        "patch": "git apply --directory node_modules/rn-sliding-up-panel/ ./patches/rn-sliding-up-panel/0001-fix-web-support.patch --reject --ignore-space-change --ignore-whitespace"
     },
     "dependencies": {
         "@react-native-async-storage/async-storage": "^1.15.5",
