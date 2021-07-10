@@ -1,9 +1,9 @@
 import { AppRegistry } from 'react-native'
 import iconFont from 'react-native-vector-icons/Fonts/MaterialIcons.ttf';
 
-import { name } from './react/app.json'
-import App from './react/App'
-import { register } from './react/service';
+import { name } from '../react/app.json'
+import App from '../react/App'
+import { register } from '../react/service';
 
 const styles = `@font-face{
     src: url(${iconFont});

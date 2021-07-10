@@ -6,6 +6,15 @@
 // Includes from @react-native-async-storage/async-storage
 #include <winrt/ReactNativeAsyncStorage.h>
 
+// Includes from @react-native-community/slider
+#include <winrt/SliderWindows.h>
+
+// Includes from react-native-linear-gradient
+#include <winrt/BVLinearGradient.h>
+
+// Includes from react-native-track-player
+#include <winrt/RNTrackPlayer.h>
+
 namespace winrt::Microsoft::ReactNative
 {
 
@@ -13,6 +22,12 @@ void RegisterAutolinkedNativeModulePackages(winrt::Windows::Foundation::Collecti
 { 
     // IReactPackageProviders from @react-native-async-storage/async-storage
     packageProviders.Append(winrt::ReactNativeAsyncStorage::ReactPackageProvider());
+    // IReactPackageProviders from @react-native-community/slider
+    packageProviders.Append(winrt::SliderWindows::ReactPackageProvider());
+    // IReactPackageProviders from react-native-linear-gradient
+    packageProviders.Append(winrt::BVLinearGradient::ReactPackageProvider());
+    // IReactPackageProviders from react-native-track-player
+    packageProviders.Append(winrt::RNTrackPlayer::ReactPackageProvider());
 }
 
 }

@@ -6,5 +6,17 @@
     <ProjectReference Include="$(ProjectDir)..\..\node_modules\@react-native-async-storage\async-storage\windows\ReactNativeAsyncStorage\ReactNativeAsyncStorage.vcxproj">
       <Project>{4855D892-E16C-404D-8286-0089E0F7F9C4}</Project>
     </ProjectReference>
+    <!-- Projects from @react-native-community/slider -->
+    <ProjectReference Include="$(ProjectDir)..\..\node_modules\@react-native-community\slider\windows\SliderWindows\SliderWindows.vcxproj">
+      <Project>{685a83ae-36bc-4e9d-bdc6-417ebf168463}</Project>
+    </ProjectReference>
+    <!-- Projects from react-native-linear-gradient -->
+    <ProjectReference Include="$(ProjectDir)..\..\node_modules\react-native-linear-gradient\windows\BVLinearGradient\BVLinearGradient\BVLinearGradient.vcxproj">
+      <Project>{193df456-3f97-4cc1-a7d4-809857cc064e}</Project>
+    </ProjectReference>
+    <!-- Projects from react-native-track-player -->
+    <ProjectReference Include="$(ProjectDir)..\..\node_modules\react-native-track-player\windows\RNTrackPlayer\RNTrackPlayer.vcxproj">
+      <Project>{CC51D49E-7FAB-42D2-825D-5E93AC57262C}</Project>
+    </ProjectReference>
   </ItemGroup>
 </Project>

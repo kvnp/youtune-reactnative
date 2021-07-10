@@ -95,10 +95,10 @@ module.exports = () => ({
     
     mode: process.env.NODE_ENV,
     entry: {
-        app: './index.web.js'
+        app: './web/index.web.js'
     },
 
-    optimization: {
+    /*optimization: {
         nodeEnv: process.env.NODE_ENV,
         minimize: process.env.NODE_ENV == "production" && !process.env.PORT,
         minimizer: [ new TerserPlugin() ],
@@ -127,7 +127,7 @@ module.exports = () => ({
 
         runtimeChunk: 'multiple',
         moduleIds: 'deterministic',
-    },
+    },*/
 
     output: {
         path: __dirname + '/dist',
@@ -260,8 +260,7 @@ module.exports = () => ({
     resolve: {
         alias: {
             'react-native': 'react-native-web',
-            'react-native-linear-gradient': 'react-native-web-linear-gradient',
-            'react-native-track-player': 'react-native-track-player-web'
+            'react-native-linear-gradient': 'react-native-web-linear-gradient'
         },
 
         extensions: [
