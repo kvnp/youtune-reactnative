@@ -8,81 +8,51 @@ import { skip } from "../../service";
 import { rippleConfig } from "../../styles/Ripple";
 
 export default MiniPlayer = ({navigation, style}) => {
-    const [playerState, setPlayer] = useState({
-        isPlaying: false,
-        isStopped: true,
-        isLoading: false,
-        track: null
-    });
+    const [state, setState] = useState(TrackPlayer.STATE_STOPPED);
 
-    const [track, setTrack] = useState(null);
+    const [track, setTrack] = useState({
+        title: null,
+        artist: null,
+        artwork: null
+    });
 
     const {dark, colors} = useTheme();
     const { position, duration } = useTrackPlayerProgress();
 
-    const positionLength = 100 / duration * position;
-    const remainingLength = 100 - positionLength;
+    const positionLength = (100 / duration * position);
+
+    const positionWidth = positionLength + "%";
+    const remainingWidth = (100 - positionLength) + "%";
 
     useEffect(() => {
-        refreshState();
-        refreshTrack();
+        const _unsubscribe = navigation.addListener('focus', () => {
+            TrackPlayer.getState().then(state => setState(state));
 
-        let _unsub = [];
-        _unsub.push(TrackPlayer.addEventListener("playback-state", refreshState));
-        _unsub.push(TrackPlayer.addEventListener("playback-track-changed", refreshTrack));
-
-        TrackPlayer.getCurrentTrack().then(id => {
-            if (id != null)
-                refreshTrack({nextTrack: id});
+            TrackPlayer.getCurrentTrack().then(id => {
+                if (id != null)
+                    refreshTrack({nextTrack: id});
+            });
         });
 
+        const playback = TrackPlayer.addEventListener("playback-state", e => setState(e.state));
+        const trackChanged = TrackPlayer.addEventListener("playback-track-changed", refreshTrack);
+
         return () => {
-            for (let i = 0; i < _unsub.length; i++)
-                _unsub[i].remove();
+            _unsubscribe();
+            playback.remove();
+            trackChanged.remove();
         }
     }, []);
 
     const refreshTrack = async(e) => {
-        if (!e) e = {nextTrack: await TrackPlayer.getCurrentTrack()}
+        if (!e) e = {nextTrack: await TrackPlayer.getCurrentTrack()};
+        let track = await TrackPlayer.getTrack(e.nextTrack);
 
-        setTrack(await TrackPlayer.getTrack(e.nextTrack));
-    }
-
-    const refreshState = async(e) => {
-        if (!e) e = {state: await TrackPlayer.getState()}
-
-        switch (e.state) {
-            case TrackPlayer.STATE_NONE:
-                break;
-            case TrackPlayer.STATE_PLAYING:
-                setPlayer({
-                    isPlaying: true,
-                    isLoading: false,
-                    isStopped: false
-                });
-                break;
-            case TrackPlayer.STATE_PAUSED:
-                setPlayer({
-                    isPlaying: false,
-                    isLoading: false,
-                    isStopped: false
-                });
-                break;
-            case TrackPlayer.STATE_STOPPED:
-                setPlayer({
-                    isPlaying: true,
-                    isLoading: false,
-                    isStopped: true
-                });
-                break;
-            case TrackPlayer.STATE_BUFFERING:
-                setPlayer({
-                    isPlaying: true,
-                    isLoading: true,
-                    isStopped: false
-                });
-                break;
-        }
+        setTrack({
+            title: track.title,
+            artist: track.artist,
+            artwork: track.artwork
+        });
     }
 
     const onOpen = () => navigation.navigate("Music");
@@ -90,14 +60,12 @@ export default MiniPlayer = ({navigation, style}) => {
     const onNext = () => skip(true);
 
     const onPlay = () => {
-        playerState.isPlaying
+        state == TrackPlayer.STATE_PLAYING
             ? TrackPlayer.pause()
             : TrackPlayer.play();
     };
 
-    const onStop = () => TrackPlayer.reset().then(() => {
-        refreshState({state: TrackPlayer.STATE_STOPPED});
-    });
+    const onStop = () => TrackPlayer.reset();
 
     var title = null;
     var artist = null;
@@ -109,11 +77,11 @@ export default MiniPlayer = ({navigation, style}) => {
         artwork = track.artwork;
     }
 
-    return  <View style={[style, styles.main, {height: playerState.isStopped ?0 :50, backgroundColor: colors.card}]}>
+    return  <View style={[style, styles.main, {height: state in [TrackPlayer.STATE_STOPPED, TrackPlayer.STATE_NONE] ?0 :50, backgroundColor: colors.card}]}>
         <View style={[styles.main, {justifyContent: "space-evenly", width: "100%", maxWidth: 800, alignSelf: "center"}]}>
             <View style={styles.playback}>
-                <View style={{width: positionLength + "%", backgroundColor: colors.text}}></View>
-                <View style={{width: remainingLength + "%", backgroundColor: colors.card}}></View>
+                <View style={{width: positionWidth, backgroundColor: colors.text}}></View>
+                <View style={{width: remainingWidth, backgroundColor: colors.card}}></View>
             </View>
             <View style={styles.container}>
                 <Image source={{uri: artwork}} style={styles.image}/>
@@ -126,19 +94,35 @@ export default MiniPlayer = ({navigation, style}) => {
 
                 <View style={[styles.button, {color: colors.card}]}>
                     <Pressable android_ripple={rippleConfig} onPress={onStop}>
-                        <MaterialIcons name="clear" color={colors.text} size={29}/>
+                        <MaterialIcons
+                            name="clear"
+                            color={colors.text}
+                            size={29}
+                        />
                     </Pressable>
                 </View>
 
                 <View style={[styles.button, {color: colors.card}]}>
                     <Pressable android_ripple={rippleConfig} onPress={onPlay}>
-                        <MaterialIcons name={playerState.isPlaying ?"pause" :"play-arrow"} color={colors.text} size={29}/>
+                        <MaterialIcons
+                            name={
+                                state == TrackPlayer.STATE_PLAYING
+                                    ? "pause"
+                                    : "play-arrow"
+                            }
+                            color={colors.text}
+                            size={29}
+                        />
                     </Pressable>
                 </View>
 
                 <View style={[styles.button, {color: colors.card}]}>
                     <Pressable android_ripple={rippleConfig} onPress={onNext}>
-                        <MaterialIcons name="skip-next" color={colors.text} size={29}/>
+                        <MaterialIcons
+                            name="skip-next"
+                            color={colors.text}
+                            size={29}
+                        />
                     </Pressable>
                 </View>
             </View>
