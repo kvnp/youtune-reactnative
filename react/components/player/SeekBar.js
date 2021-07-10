@@ -7,7 +7,7 @@ import {
     Platform
 } from 'react-native';
 
-import { useTheme } from '@react-navigation/native';
+import { useNavigation, useTheme } from '@react-navigation/native';
 import Slider from '@react-native-community/slider';
 
 import TrackPlayer from 'react-native-track-player';
@@ -24,16 +24,16 @@ const minutesAndSeconds = position => ([
     pad( ~~(position % 60), 2),
 ]);
 
-export default SeekBar = ({ style, navigation }) => {
+export default SeekBar = ({style, duration}) => {
+    const navigation = useNavigation();
     const [isSliding, setSliding] = useState(false);
     const [positionCache, setPositionCache] = useState(0);
     const [state, setState] = useState({
         position: 0,
-        duration: 0,
         bufferedPosition: 0
     });
 
-    const { position, bufferedPosition, duration } = state;
+    const { position, bufferedPosition } = state;
 
     const elapsed = minutesAndSeconds(position);
     const remaining = minutesAndSeconds(duration - position);
@@ -42,8 +42,7 @@ export default SeekBar = ({ style, navigation }) => {
     const updateSeekbar = async() => {
         setState({
             position: await TrackPlayer.getPosition(),
-            bufferedPosition: await TrackPlayer.getBufferedPosition(),
-            duration: await TrackPlayer.getDuration()
+            bufferedPosition: await TrackPlayer.getBufferedPosition()
         });
     }
 
