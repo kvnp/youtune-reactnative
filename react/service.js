@@ -8,35 +8,36 @@ export const register = () => {
     StatusBar.setBarStyle("dark-content", true);
     StatusBar.setTranslucent(true);
     StatusBar.setBackgroundColor("transparent", true);
+    
+    TrackPlayer.setupPlayer({}).then(() => {
+        TrackPlayer.registerPlaybackService(() => require("./handler"));
+        TrackPlayer.updateOptions({
+            stopWithApp: true,
+            alwaysPauseOnInterruption: true,
 
-    TrackPlayer.registerPlaybackService(() => require("./handler"));
+            capabilities: [
+                TrackPlayer.CAPABILITY_PLAY,
+                TrackPlayer.CAPABILITY_PAUSE,
+                TrackPlayer.CAPABILITY_SKIP_TO_NEXT,
+                TrackPlayer.CAPABILITY_SKIP_TO_PREVIOUS,
+                TrackPlayer.CAPABILITY_STOP,
+                TrackPlayer.CAPABILITY_SEEK_TO
+            ],
 
-    TrackPlayer.updateOptions({
-        stopWithApp: true,
-        alwaysPauseOnInterruption: true,
+            notificationCapabilities: [
+                TrackPlayer.CAPABILITY_PLAY,
+                TrackPlayer.CAPABILITY_PAUSE,
+                TrackPlayer.CAPABILITY_SKIP_TO_NEXT,
+                TrackPlayer.CAPABILITY_SKIP_TO_PREVIOUS,
+                TrackPlayer.CAPABILITY_STOP
+            ],
 
-        capabilities: [
-            TrackPlayer.CAPABILITY_PLAY,
-            TrackPlayer.CAPABILITY_PAUSE,
-            TrackPlayer.CAPABILITY_SKIP_TO_NEXT,
-            TrackPlayer.CAPABILITY_SKIP_TO_PREVIOUS,
-            TrackPlayer.CAPABILITY_STOP,
-            TrackPlayer.CAPABILITY_SEEK_TO
-        ],
-
-        notificationCapabilities: [
-            TrackPlayer.CAPABILITY_PLAY,
-            TrackPlayer.CAPABILITY_PAUSE,
-            TrackPlayer.CAPABILITY_SKIP_TO_NEXT,
-            TrackPlayer.CAPABILITY_SKIP_TO_PREVIOUS,
-            TrackPlayer.CAPABILITY_STOP
-        ],
-
-        compactCapabilities: [
-            TrackPlayer.CAPABILITY_PLAY,
-            TrackPlayer.CAPABILITY_PAUSE,
-            TrackPlayer.CAPABILITY_SKIP_TO_NEXT
-        ],
+            compactCapabilities: [
+                TrackPlayer.CAPABILITY_PLAY,
+                TrackPlayer.CAPABILITY_PAUSE,
+                TrackPlayer.CAPABILITY_SKIP_TO_NEXT
+            ],
+        });
     });
 
     initSettings();

@@ -10,7 +10,7 @@
 import TrackPlayer from 'react-native-track-player';
 import { skip, isRepeating, focusedId } from './service';
 
-module.exports = () => {
+module.exports = async function() {
     TrackPlayer.addEventListener("playback-track-changed", params => {
         if (isRepeating && params["nextTrack"] != focusedId)
             TrackPlayer.skipToPrevious();
