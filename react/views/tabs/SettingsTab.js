@@ -6,11 +6,11 @@ import {
     Text,
     Pressable,
     Platform,
-    Linking
+    Linking,
+    FlatList
 } from 'react-native';
 
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
-import { FlatList } from 'react-native-gesture-handler';
 
 import {
     setTransmitLanguage,

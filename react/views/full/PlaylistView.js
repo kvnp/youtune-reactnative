@@ -25,13 +25,17 @@ export default PlaylistView = ({ route, navigation }) => {
     navigation.setOptions({ title: "Loading" });
 
     useEffect(() => {
-        fetchBrowse(route.params.list)
+        const _unsubscribe = navigation.addListener('focus', () => {
+            fetchBrowse(route.params.list)
             .then(playlist => {
                 if (navigation.isFocused()) {
                     setPlaylist(playlist);
                     navigation.setOptions({ title: playlist.title });
                 }
             });
+        });
+        
+        return () => _unsubscribe();
     }, []);
 
     var entries;

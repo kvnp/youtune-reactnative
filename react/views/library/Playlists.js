@@ -23,14 +23,18 @@ export default Playlists = ({navigation}) => {
     const { colors } = useTheme();
 
     useEffect(() => {
-        setModalVisible(false);
-        if (loading) {
-            getPlaylists()
-                .then(playlists => {
-                    setPlaylists(playlists);
-                    setLoading(false);
-                });
-        }
+        const unsubscribe = navigation.addListener('focus', () => {
+            setModalVisible(false);
+            if (loading) {
+                getPlaylists()
+                    .then(playlists => {
+                        setPlaylists(playlists);
+                        setLoading(false);
+                    });
+            }
+        });
+
+        return () => unsubscribe();
     }, []);
 
     const addPlaylist = ({title, description}) => {

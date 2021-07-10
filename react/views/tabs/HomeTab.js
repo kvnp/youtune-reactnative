@@ -30,12 +30,10 @@ export default HomeTab = ({navigation, route}) => {
     );
 
     useEffect(() => {
-        const _unsubscribe = navigation.addListener('tabPress', () => {
+        const _unsubscribe = navigation.addListener('focus', () => {
             setHeader({title: "Home"});
-        });
-
-        const _unsubscribe2 = navigation.addListener('focus', () => {
-            setHeader({title: "Home"});
+            if (shelves.length == 0)
+                startRefresh();
         });
 
         const _offlineListener = Platform.OS == "web"
@@ -45,11 +43,8 @@ export default HomeTab = ({navigation, route}) => {
             })
             : undefined;
 
-        startRefresh();
-
         return () => {
             _unsubscribe();
-            _unsubscribe2();
 
             if (_offlineListener)
                 _offlineListener();
@@ -79,7 +74,7 @@ export default HomeTab = ({navigation, route}) => {
                     setLoading(false);
             })
 
-            .catch(() => {
+            .catch(e => {
                 setHomeText("You are offline");
                 setLoading(false);
             })

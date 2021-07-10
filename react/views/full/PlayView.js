@@ -76,56 +76,61 @@ export default PlayView = ({route, navigation}) => {
     const { dark, colors } = useTheme();
 
     useEffect(() => {
-        if (route.params) {
-            TrackPlayer.reset();
-
-            if (route.params.list == "LOCAL_DOWNLOADS" && !route.params.v) {
-                let loader = new Promise(async(resolve, reject) => {
-                    let localPlaylist = new Playlist();
-
-                    for (let i = 0; i < localIDs.length; i++) {
-                        let {title, artist, artwork, duration} = await loadSongLocal(localIDs[i]);
-                        let constructedTrack = {
-                            title,
-                            artist,
-                            artwork,
-                            duration,
-                            id: localIDs[i],
-                            playlistId: route.params.list,
-                            url: null
-                        };
-
-                        if (localIDs[i] == route.params.v)
-                            localPlaylist.index = i;
-
-                        localPlaylist.list.push(constructedTrack);
-                    }
-
-                    resolve(localPlaylist);
-                });
-                
-                loader.then(loadedPlaylist => {
-                    startPlaylist(loadedPlaylist);
-                });
-            } else if (route.params.v) {
-                fetchNext(route.params.v, route.params.list)
-                    .then(loadedList => startPlaylist(loadedList))
-
-                    .catch(async(reason) => {
-                        if (localIDs.includes(route.params.v)) {
-                            let localPlaylist = new Playlist();
-                            localPlaylist.list.push(await loadSongLocal(route.params.v));
-                            startPlaylist(localPlaylist);
-                        } else {
-                            navigation.goBack();
+        const _unsubscribe = navigation.addListener('focus', () => {
+            if (route.params) {
+                TrackPlayer.reset();
+    
+                if (route.params.list == "LOCAL_DOWNLOADS" && !route.params.v) {
+                    let loader = new Promise(async(resolve, reject) => {
+                        let localPlaylist = new Playlist();
+    
+                        for (let i = 0; i < localIDs.length; i++) {
+                            let {title, artist, artwork, duration} = await loadSongLocal(localIDs[i]);
+                            let constructedTrack = {
+                                title,
+                                artist,
+                                artwork,
+                                duration,
+                                id: localIDs[i],
+                                playlistId: route.params.list,
+                                url: null
+                            };
+    
+                            if (localIDs[i] == route.params.v)
+                                localPlaylist.index = i;
+    
+                            localPlaylist.list.push(constructedTrack);
                         }
+    
+                        resolve(localPlaylist);
                     });
+                    
+                    loader.then(loadedPlaylist => {
+                        startPlaylist(loadedPlaylist);
+                    });
+                } else if (route.params.v) {
+                    fetchNext(route.params.v, route.params.list)
+                        .then(loadedList => startPlaylist(loadedList))
+    
+                        .catch(async(reason) => {
+                            if (localIDs.includes(route.params.v)) {
+                                let localPlaylist = new Playlist();
+                                localPlaylist.list.push(await loadSongLocal(route.params.v));
+                                startPlaylist(localPlaylist);
+                            } else {
+                                navigation.goBack();
+                            }
+                        });
+                }
+            } else {
+                changeCallback();
             }
-        } else {
-            changeCallback();
-        }
+        });
 
-        return () => changeCallback = null;
+        return () => {
+            changeCallback = null;
+            _unsubscribe();
+        };
     }, []);
 
     const refreshLike = async() => {

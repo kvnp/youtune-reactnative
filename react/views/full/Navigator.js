@@ -39,9 +39,15 @@ export default Navigator = ({navigation}) => {
     const { colors } = useTheme();
     
     useEffect(() => {
-        resizeContainer();
-        let _unsub = TrackPlayer.addEventListener("playback-state", resizeContainer);
-        return () => _unsub.remove();
+        const _unsubscribe = navigation.addListener('focus', () => {
+            resizeContainer();
+        });
+
+        let playbackState = TrackPlayer.addEventListener("playback-state", resizeContainer);
+        return () => {
+            _unsubscribe();
+            playbackState.remove();
+        };
     }, []);
 
     const resizeContainer = async(e) => {
