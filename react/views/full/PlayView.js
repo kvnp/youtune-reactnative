@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useReducer } from "react";
 import {
     View,
     Text,
@@ -6,10 +6,9 @@ import {
     Image,
     Pressable,
     ActivityIndicator,
-    Dimensions,
-    Platform
+    Platform,
+    Dimensions
 } from "react-native";
-
 
 import TrackPlayer from 'react-native-track-player';
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
@@ -34,49 +33,51 @@ import { showModal } from "../../components/modals/MoreModal";
 import { fetchNext } from "../../modules/remote/API";
 import { loadSongLocal, localIDs } from "../../modules/storage/SongStorage";
 
+var track = null; 
+var playlist = null;
+
+var playback = TrackPlayer.STATE_BUFFERING;
+
+const trackListener = TrackPlayer.addEventListener("playback-track-changed", async() => {
+    let id = await TrackPlayer.getCurrentTrack();
+    if (id != null) {
+        track = await TrackPlayer.getTrack(id);
+        playlist = await TrackPlayer.getQueue();
+    }
+    if (changeCallback) changeCallback();
+});
+
+const stateListener = TrackPlayer.addEventListener("playback-state", e => {
+    playback = e.state;
+    if (changeCallback) changeCallback();
+});
+
+var changeCallback = null;
+
 export default PlayView = ({route, navigation}) => {
-    const [playbackState, setPlayback] = useState({
-        isPlaying: false,
-        isStopped: false,
-        isLoading: true
-    });
+    const [, forceUpdate] = useReducer(x => x + 1, 0);
 
-    const [willRepeat, setRepeating] = useState(isRepeating);
-    const [track, setTrack] = useState(null);
-    const [playlist, setPlaylist] = useState(null);
+    changeCallback = () => {
+        forceUpdate();
+        if (track != null) {
+            navigation.setOptions({title: track.title});
+            navigation.setParams({v: track.id, list: track.playlistId});
+        }
+    };
+
+    const setRepeating = () => {
+        isRepeating = !isRepeating;
+        setRepeat(isRepeating);
+        forceUpdate();
+    };
+
     const [isLiked, setLiked] = useState(null);
-    const [dimensions, setDimensions] = useState(
-        Platform.OS == "web"
-            ? {
-                width: window.innerHeight > window.innerWidth
-                    ? window.innerWidth - 50
-                    : window.innerHeight - 50,
-                height: window.innerHeight > window.innerWidth
-                    ? window.innerHeight / 2.6
-                    : window.innerWidth / 2.6
-            }
-
-            : {
-                width: Dimensions.get("window").width - 50,
-                height: Dimensions.get("window").height / 2.6
-            }
-    );
 
     const { dark, colors } = useTheme();
 
     useEffect(() => {
-        if (navigation.isFocused())
-            navigation.setOptions({title: "Loading"});
-
         if (route.params) {
             TrackPlayer.reset();
-            setPlaylist(null);
-            setTrack(null);
-            setPlayback({
-                isPlaying: false,
-                isLoading: true,
-                isStopped: false
-            });
 
             if (route.params.list == "LOCAL_DOWNLOADS" && !route.params.v) {
                 let loader = new Promise(async(resolve, reject) => {
@@ -104,146 +105,31 @@ export default PlayView = ({route, navigation}) => {
                 });
                 
                 loader.then(loadedPlaylist => {
-                    setPlaylist(loadedPlaylist.list);
                     startPlaylist(loadedPlaylist);
                 });
             } else if (route.params.v) {
                 fetchNext(route.params.v, route.params.list)
-                    .then(loadedList => {
-                        setTrack(loadedList.list[loadedList.index]);
-                        setPlaylist(loadedList.list);
-                        startPlaylist(loadedList);
-                    })
+                    .then(loadedList => startPlaylist(loadedList))
 
                     .catch(async(reason) => {
-                        console.log(reason);
                         if (localIDs.includes(route.params.v)) {
                             let localPlaylist = new Playlist();
-                            localPlaylist.list.push(await loadSongLocal(route.params.v))
-
-                            setPlaylist(localPlaylist.list);
+                            localPlaylist.list.push(await loadSongLocal(route.params.v));
                             startPlaylist(localPlaylist);
                         } else {
                             navigation.goBack();
                         }
                     });
             }
+        } else {
+            changeCallback();
         }
-        refreshUI();
 
-        let _unsub = [];
-        _unsub.push(TrackPlayer.addEventListener("playback-state", updatePlayback));
-        _unsub.push(TrackPlayer.addEventListener("playback-track-changed", refreshUI));
-        
-        let resizeListener = Platform.OS == "web"
-            ? window.addEventListener(
-                "resize", () => setDimensions({
-                    width: window.innerHeight > window.innerWidth
-                        ? window.innerWidth - 50
-                        : window.innerHeight - 50,
-                    height: window.innerHeight > window.innerWidth
-                        ? window.innerHeight / 2.6
-                        : window.innerWidth / 2.6
-                })
-            )
-        
-            : undefined;
-
-        return () => {
-            if (resizeListener)
-                resizeListener.removeEventListener("resize");
-
-            for (let i = 0; i < _unsub.length; i++)
-                _unsub[i].remove();
-        };
+        return () => changeCallback = null;
     }, []);
 
-    const updatePlayback = e => {
-        switch (e.state) {
-            case TrackPlayer.STATE_NONE:
-                break;
-            case TrackPlayer.STATE_PLAYING:
-                setPlayback({
-                    isPlaying: true,
-                    isLoading: false,
-                    isStopped: false
-                });
-                break;
-            case TrackPlayer.STATE_PAUSED:
-                setPlayback({
-                    isPlaying: false,
-                    isLoading: false,
-                    isStopped: false
-                });
-                break;
-            case TrackPlayer.STATE_STOPPED:
-                setPlayback({
-                    isPlaying: true,
-                    isLoading: false,
-                    isStopped: true
-                });
-                return;
-            case TrackPlayer.STATE_BUFFERING:
-                setPlayback({
-                    isPlaying: false,
-                    isLoading: true,
-                    isStopped: false
-                });
-                break;
-        }
-    }
-
-    const refreshUI = async() => {
-        let id = await TrackPlayer.getCurrentTrack();
-        if (id != null) {
-            switch ( await TrackPlayer.getState() ) {
-                case TrackPlayer.STATE_NONE:
-                    break;
-                case TrackPlayer.STATE_PLAYING:
-                    setPlayback({
-                        isPlaying: true,
-                        isLoading: false,
-                        isStopped: false
-                    });
-                    break;
-                case TrackPlayer.STATE_PAUSED:
-                    setPlayback({
-                        isPlaying: false,
-                        isLoading: false,
-                        isStopped: false
-                    });
-                    break;
-                case TrackPlayer.STATE_STOPPED:
-                    setPlayback({
-                        isPlaying: true,
-                        isLoading: false,
-                        isStopped: true
-                    });
-                    return;
-                case TrackPlayer.STATE_BUFFERING:
-                    setPlayback({
-                        isPlaying: false,
-                        isLoading: true,
-                        isStopped: false
-                    });
-                    break;
-            }
-
-            let track = await TrackPlayer.getTrack(id);
-            if (navigation.isFocused()) {
-                navigation.setOptions({title: track.title});
-                navigation.setParams({v: id, list: track.playlistId});
-            }
-            
-            setTrack(track);
-            setPlaylist(await TrackPlayer.getQueue());
-            setLiked(await getSongLike(id));
-        }
-    }
-
-    const setRepeatLocal = () => {
-        setRepeating(!willRepeat);
-        setRepeat(!willRepeat);
+    const refreshLike = async() => {
+        setLiked(await getSongLike(id));
     }
 
     if (track != null)
@@ -257,13 +143,13 @@ export default PlayView = ({route, navigation}) => {
 
     return <>
         <View style={stylesTop.vertContainer}>
-            <View style={[imageStyles.view, {height: dimensions.height, width: dimensions.width}]}>
+            <View style={[imageStyles.view, {height: Dimensions.get("window").height / 2.6, width: Dimensions.get("window").width - 50}]}>
                 <Image resizeMode="contain" style={imageStyles.image} source={{uri: artwork}}/>
             </View>
 
-            <View style={[stylesBottom.container, {width: dimensions.width, height: dimensions.height}]}>
+            <View style={[stylesBottom.container, {width: Dimensions.get("window").width - 50, height: Dimensions.get("window").height / 2.6}]}>
                 <View style={controlStyles.container}>
-                    <Pressable onPress={() => { likeSong(id, false); refreshUI(); }} style={{paddingTop: 5}} android_ripple={rippleConfig}>
+                    <Pressable onPress={async() => { await likeSong(id, false); await refreshLike(); }} style={{paddingTop: 5}} android_ripple={rippleConfig}>
                         <MaterialIcons selectable={false}
                             name="thumb-down"
                             color={
@@ -288,7 +174,7 @@ export default PlayView = ({route, navigation}) => {
                         <Text adjustsFontSizeToFit={true} ellipsizeMode="tail" numberOfLines={1} style={[stylesBottom.subtitleText, {color: colors.text}]}>{artist}</Text>
                     </View>
 
-                    <Pressable onPress={() => { likeSong(id, true); refreshUI(); }} style={{paddingTop: 5}} android_ripple={rippleConfig}>
+                    <Pressable onPress={async() => { await likeSong(id, true); await refreshLike(); }} style={{paddingTop: 5}} android_ripple={rippleConfig}>
                         <MaterialIcons selectable={false}
                             name="thumb-up"
                             color={
@@ -304,11 +190,11 @@ export default PlayView = ({route, navigation}) => {
                     </Pressable>
                 </View>
 
-                <SeekBar navigation={navigation}/>
+                <SeekBar duration={track != null ? track.duration : 0}/>
                 
                 <View style={stylesBottom.buttonContainer}>
                     <Pressable onPress={() => {}} android_ripple={rippleConfig}>
-                        <MaterialIcons selectable={false} name="shuffle" color={colors.text} size={30}/>
+                        <MaterialIcons selectable={false} name="cast" color={colors.text} size={30}/>
                     </Pressable>
 
                     <Pressable onPress={() => skip(false)} android_ripple={rippleConfig}>
@@ -316,17 +202,17 @@ export default PlayView = ({route, navigation}) => {
                     </Pressable>
 
                     <View style={{alignSelf: "center", alignItems: "center", justifyContent: "center", backgroundColor: dark ? colors.card : colors.primary, width: 60, height: 60, borderRadius: 30}}>
-                        {playbackState.isLoading
+                        {playback == TrackPlayer.STATE_BUFFERING
                             ?   <ActivityIndicator style={{alignSelf: "center"}} color={colors.text} size="large"/>
 
                             :   <Pressable
                                     android_ripple={rippleConfig}
                                     onPress={() => {
-                                        playbackState.isPlaying
+                                        playback == TrackPlayer.STATE_PLAYING
                                             ? TrackPlayer.pause()
                                             : TrackPlayer.play();
                                     }}>
-                                    <MaterialIcons selectable={false} name={playbackState.isPlaying ? "pause" : "play-arrow"} color={colors.text} size={40}/>
+                                    <MaterialIcons selectable={false} name={playback == TrackPlayer.STATE_PLAYING ? "pause" : "play-arrow"} color={colors.text} size={40}/>
                                 </Pressable>
                         }
                     </View>
@@ -335,8 +221,8 @@ export default PlayView = ({route, navigation}) => {
                         <MaterialIcons selectable={false} name="skip-next" color={colors.text} size={40}/>
                     </Pressable>
 
-                    <Pressable onPress={() => setRepeatLocal()} android_ripple={rippleConfig}>
-                        <MaterialIcons selectable={false} name={willRepeat ?"repeat-one" :"repeat"} color={colors.text} size={30}/>
+                    <Pressable onPress={() => setRepeating()} android_ripple={rippleConfig}>
+                        <MaterialIcons selectable={false} name={isRepeating ? "repeat-one" : "repeat"} color={colors.text} size={30}/>
                     </Pressable>
                 </View>
 
