@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Dimensions, Platform } from "react-native";
 
-import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 
 import TrackPlayer from 'react-native-track-player';
 
@@ -22,7 +22,7 @@ const getTabOptions = title => {
     return { tabBarIcon: ({ color }) => getIcon({title, color}) };
 }
 
-const Nav = createMaterialBottomTabNavigator();
+const Nav = createBottomTabNavigator();
 
 const tabOptions = {
     lazy: false,
@@ -50,12 +50,12 @@ export default Navigator = ({navigation}) => {
         switch (e.state) {
             case TrackPlayer.STATE_NONE:
             case TrackPlayer.STATE_STOPPED:
-                setBottomMargin(50);
+                setBottomMargin(0);
                 break;
             case TrackPlayer.STATE_PLAYING:
             case TrackPlayer.STATE_PAUSED:
             case TrackPlayer.STATE_BUFFERING:
-                setBottomMargin(98);
+                setBottomMargin(50);
         }
     }
 
@@ -65,9 +65,8 @@ export default Navigator = ({navigation}) => {
             initialRouteName="Home"
             tabBarPosition="bottom"
             initialLayout={{width: Dimensions.get('window').width}}
-
-            style={{marginBottom: bottomMargin}}
-            barStyle={{backgroundColor: colors.card, position: Platform.OS == "web" ? "fixed" : "absolute", bottom: 0}}
+            sceneContainerStyle={{marginBottom: bottomMargin}}
+            
             screenOptions={{
                 ...tabOptions,
                 ...navigationOptions

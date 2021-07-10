@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 
 import { navigationOptions } from '../../App';
 import Playlists from '../library/Playlists';
@@ -9,19 +9,8 @@ import Artists from '../library/Artists';
 import Downloads from '../library/Downloads';
 import { setHeader } from '../../components/overlay/Header';
 
-const Tab = createMaterialTopTabNavigator();
-const tabOptions = {
-    scrollEnabled: true,
-    optimizationsEnabled: true,
-
-    tabBarItemStyle: {
-        width: "auto",
-        paddingRight: 14,
-        paddingLeft: 14
-    },
-
-    bounces: true
-}
+const Tab = createBottomTabNavigator();
+const tabOptions = {};
 
 export default LibraryTab = ({navigation}) => {
     useEffect(() => {
