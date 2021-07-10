@@ -80,7 +80,7 @@ export function storeSong(id) {
             reject("Storing song failed - " + id);
         }
 
-        let index = downloadQueue.findIndex(entry => id in entry);
+        index = downloadQueue.findIndex(entry => id in entry);
         downloadQueue.splice(index, 1);
         resolve(id);
     });
@@ -106,7 +106,7 @@ export const deleteSong = id => {
             reject("id is missing");
 
         try {
-            await AsyncStorage.removeItem('@storage_Song_' + id);
+            AsyncStorage.removeItem('@storage_Song_' + id);
 
             let index = localIDs.indexOf(id);
             localIDs.splice(index, 1);
