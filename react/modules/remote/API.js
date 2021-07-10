@@ -83,7 +83,6 @@ export async function fetchResults(query, params) {
         headers: headers_ytm,
         body: JSON.stringify(body)
     }, "json");
-
     
     return digestSearchResults(response);
 }

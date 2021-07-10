@@ -30,7 +30,6 @@ export const getHttpResponse = (url, input, type, controllerCallback) => {
     }
 
     return new Promise((resolve, reject) => {
-        console.log(input);
         fetch(url, input)
             .then(response => {
                 if (type == "json")
