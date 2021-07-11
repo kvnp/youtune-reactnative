@@ -42,7 +42,6 @@ export const getHttpResponse = (url, input, type, controllerCallback) => {
             })
 
             .catch(reason => {
-                console.log(reason);
                 Toast.show({
                     type: 'error',
                     position: 'bottom',

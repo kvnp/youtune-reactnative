@@ -48,8 +48,6 @@ async function getConfig(path) {
         .WEB_PLAYER_CONTEXT_CONFIGS
         .WEB_PLAYER_CONTEXT_CONFIG_ID_MUSIC_WATCH
         .innertubeApiKey;
-
-    console.log(configuration);
 }
 
 function getRequestBody() {
@@ -168,7 +166,6 @@ export async function fetchBrowse(browseId) {
                 if (configuration.YTMUSIC_INITIAL_DATA[i].params.browseId == "FEmusic_home")
                     await getConfig("/playlist?list=" + browseId);
                 
-                console.log(configuration.YTMUSIC_INITIAL_DATA[i].data)
                 return digestBrowseResults(
                     configuration.YTMUSIC_INITIAL_DATA[i].data,
                     configuration.YTMUSIC_INITIAL_DATA[i].params.browseId
