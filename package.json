@@ -22,8 +22,7 @@
         "test": "jest",
         "lint": "eslint .",
         "dist": "webpack",
-        "postinstall": "git apply --directory node_modules/rn-sliding-up-panel/ ./patches/rn-sliding-up-panel/0001-fix-web-support.patch --reject --ignore-space-change --ignore-whitespace",
-        "patch": "git apply --directory node_modules/rn-sliding-up-panel/ ./patches/rn-sliding-up-panel/0001-fix-web-support.patch --reject --ignore-space-change --ignore-whitespace"
+        "postinstall": "git apply --directory node_modules/rn-sliding-up-panel/ ./patches/rn-sliding-up-panel/0001-fix-web-support.patch --reject --ignore-space-change --ignore-whitespace"
     },
     "dependencies": {
         "@react-native-async-storage/async-storage": "^1.15.5",
