@@ -6,6 +6,10 @@ import Entry from '../shared/Entry';
 
 export var hackTracks = null;
 
+export const setHackTracks = playlist => {
+    hackTracks = playlist;
+}
+
 const entriesToPlaylist = (entries, playlistId) => {
     let tracks = {
         list: [],

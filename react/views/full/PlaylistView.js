@@ -10,7 +10,7 @@ import { useTheme } from "@react-navigation/native";
 
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 
-import FlatEntries from "../../components/collections/FlatEntries";
+import FlatEntries, { setHackTracks } from "../../components/collections/FlatEntries";
 import { fetchBrowse } from "../../modules/remote/API";
 
 import {
@@ -46,7 +46,10 @@ export default PlaylistView = ({ route, navigation }) => {
             }
         });
         
-        return () => _unsubscribe();
+        return () => {
+            setHackTracks(null);
+            _unsubscribe();
+        }
     }, []);
 
     var entries;

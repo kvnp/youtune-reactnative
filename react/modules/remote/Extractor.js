@@ -720,7 +720,7 @@ export function digestNextResults(json) {
                                 .playlist.playlistPanelRenderer;
     else {
         let musicQueueRenderer = json.contents.singleColumnMusicWatchNextResultsRenderer.tabbedRenderer.watchNextTabbedResultsRenderer.tabs[0].tabRenderer.content.musicQueueRenderer;
-        if (musicQueueRenderer.hasOwnProperty("hack")) {
+        if (musicQueueRenderer.hasOwnProperty("hack") && hackTracks != null) {
             playlist = hackTracks;
             let currentVideoId = json.currentVideoEndpoint.watchEndpoint.videoId;
             
