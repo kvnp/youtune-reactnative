@@ -27,12 +27,10 @@ export default PlaylistView = ({ route, navigation }) => {
     useEffect(() => {
         const _unsubscribe = navigation.addListener('focus', () => {
             fetchBrowse(route.params.list)
-            .then(playlist => {
-                if (navigation.isFocused()) {
+                .then(playlist => {
                     setPlaylist(playlist);
                     navigation.setOptions({ title: playlist.title });
-                }
-            });
+                });
         });
         
         return () => _unsubscribe();
@@ -48,6 +46,7 @@ export default PlaylistView = ({ route, navigation }) => {
         <FlatEntries 
             entries={entries}
             isPlaylist={true}
+            playlistId={route.params.list}
             navigation={navigation}
         />
 

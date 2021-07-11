@@ -15,7 +15,7 @@ import { rippleConfig } from '../../styles/Ripple';
 import { useTheme } from '@react-navigation/native';
 import { showModal } from '../modals/MoreModal';
 
-export default Entry = ({ entry, navigation, index }) => {
+export default Entry = ({ entry, navigation, index, forcedPlaylistId }) => {
     let { title, subtitle, thumbnail } = entry;
     let { videoId, browseId, playlistId } = entry;
 
@@ -25,7 +25,9 @@ export default Entry = ({ entry, navigation, index }) => {
         thumbnail: thumbnail,
         videoId: videoId,
         browseId: browseId,
-        playlistId: playlistId,
+        playlistId: forcedPlaylistId
+            ? forcedPlaylistId
+            : playlistId,
     };
 
     const { colors } = useTheme();

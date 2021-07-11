@@ -3,6 +3,7 @@ import Track from "../models/music/track";
 import Playlist from "../models/music/playlist";
 import { decodeNestedURI } from "../utils/Decoder";
 import { getSignature } from "./Decrypt";
+import { hackTracks } from "../../components/collections/FlatEntries";
 
 export function extractConfiguration(html) {
     let ytData = {};
@@ -194,7 +195,7 @@ export function digestSearchResults(json) {
                 }
                 
                 let thumbnaillist = responsiveMusicItem.thumbnail.musicThumbnailRenderer.thumbnail.thumbnails;
-                entry.thumbnail = thumbnaillist[0].url;
+                entry.thumbnail = thumbnaillist[thumbnaillist.length - 1].url;
                 
                 if (responsiveMusicItem.hasOwnProperty("navigationEndpoint")) {
                     if (responsiveMusicItem.navigationEndpoint.hasOwnProperty("watchEndpoint")) {
@@ -291,7 +292,7 @@ export function digestHomeResults(json) {
                 for (let k = 0; k < itemRenderer.subtitle.runs.length; k++)
                     album.subtitle += itemRenderer.subtitle.runs[k].text;
 
-                album.thumbnail = itemRenderer.thumbnailRenderer.musicThumbnailRenderer.thumbnail.thumbnails[0].url;
+                album.thumbnail = itemRenderer.thumbnailRenderer.musicThumbnailRenderer.thumbnail.thumbnails.slice(-1)[0].url;
             } else {
                 itemRenderer = shelfRenderer.contents[m].musicResponsiveListItemRenderer;
 
@@ -301,7 +302,7 @@ export function digestHomeResults(json) {
                 for (let k = 0; k < itemRenderer.flexColumns[1].musicResponsiveListItemFlexColumnRenderer.text.runs.length; k++)
                     album.subtitle += itemRenderer.flexColumns[1].musicResponsiveListItemFlexColumnRenderer.text.runs[k].text;
 
-                album.thumbnail = itemRenderer.thumbnail.musicThumbnailRenderer.thumbnail.thumbnails[0].url;
+                album.thumbnail = itemRenderer.thumbnail.musicThumbnailRenderer.thumbnail.thumbnails.slice(-1)[0].url;
             }
 
             let videoId;
@@ -372,7 +373,7 @@ function getPlaylist(json, playlistId) {
     }
 
     let thumbnaillist = musicHeader.thumbnail.croppedSquareThumbnailRenderer.thumbnail.thumbnails;
-    browse.thumbnail = thumbnaillist[0].url;
+    browse.thumbnail = thumbnaillist.slice(-1)[0].url;
 
 
     let songTabs = json.contents.singleColumnBrowseResultsRenderer.tabs;
@@ -412,7 +413,7 @@ function getPlaylist(json, playlistId) {
                 }
 
                 //entry.thumbnail = songThumbnaillist[songThumbnaillist.length - 1].url;
-                entry.thumbnail = songThumbnaillist[0].url;
+                entry.thumbnail = songThumbnaillist.slice(-1)[0].url;
 
                 if (responsiveMusicItem.menu == undefined) continue; // ??
 
@@ -463,7 +464,7 @@ function getAlbum(json) {
             entry.title = musicTrack.title;
             entry.subtitle = musicTrack.artistNames;
             entry.videoId = musicTrack.videoId;
-            entry.thumbnail = thumbnaillist[0].url;
+            entry.thumbnail = thumbnaillist.slice(-1)[0].url;
             entry.secondTitle = msToMMSS(musicTrack.lengthMs);
             browse.entries.push(entry);
         }
@@ -477,7 +478,7 @@ function getAlbum(json) {
             //browse.subtitle = "Album • " + albumRelease.artistDisplayName + " • " + albumRelease.releaseDate.year;
             browse.subtitle = albumRelease.artistDisplayName + " • " + albumRelease.releaseDate.year;
             browse.secondSubtitle = albumRelease.trackCount + " songs" + " • " + minutes + " minutes";
-            browse.thumbnail = thumbnaillist[0].url;
+            browse.thumbnail = thumbnaillist.slice(-1)[0].url;
         }
 
         if (payload.hasOwnProperty("musicAlbumReleaseDetail")) {
@@ -715,11 +716,22 @@ export function digestNextResults(json) {
     if (json.contents.singleColumnMusicWatchNextResultsRenderer.hasOwnProperty("playlist"))
         playlistRenderer = json.contents.singleColumnMusicWatchNextResultsRenderer
                                 .playlist.playlistPanelRenderer;
-    else
-        playlistRenderer = json.contents.singleColumnMusicWatchNextResultsRenderer
-                                .tabbedRenderer.watchNextTabbedResultsRenderer.tabs[0]
-                                .tabRenderer.content.musicQueueRenderer.content
-                                .playlistPanelRenderer;
+    else {
+        let musicQueueRenderer = json.contents.singleColumnMusicWatchNextResultsRenderer.tabbedRenderer.watchNextTabbedResultsRenderer.tabs[0].tabRenderer.content.musicQueueRenderer;
+        if (musicQueueRenderer.hasOwnProperty("content"))
+            playlistRenderer = musicQueueRenderer.content.playlistPanelRenderer;
+        else {
+            playlist = hackTracks;
+            let currentVideoId = json.currentVideoEndpoint.watchEndpoint.videoId;
+            
+            for (let i = 0; i < playlist.list.length; i++) {
+                if (playlist.list[i].id == currentVideoId) {
+                    playlist.index = i;
+                    return playlist;
+                }
+            }
+        }
+    }
 
     playlist.index = json.currentVideoEndpoint.watchEndpoint.index;
 

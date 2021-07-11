@@ -233,6 +233,7 @@ export async function fetchNext(videoId, playlistId) {
     body["enablePersistentPlaylistPanel"] = true;
     body["videoId"] = videoId;
     body["playlistId"] = playlistId;
+    body["isAudioOnly"] = true;
 
     let response = await getHttpResponse(url, {
         method: "POST",
