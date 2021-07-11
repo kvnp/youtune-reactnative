@@ -158,7 +158,11 @@ export async function fetchSuggestions(input) {
 }
 
 export async function fetchBrowse(browseId) {
-    if (!apiKey && browseId.slice(0, 2) == "OL") {
+    let slice = browseId.slice(0, 2)
+    if (!apiKey && (slice == "OL" || slice == "VL" || slice == "RD")) {
+        if (slice == "VL")
+            browseId = browseId.slice(2);
+
         await getConfig("/playlist?list=" + browseId);
 
         for (let i = 0; i < configuration.YTMUSIC_INITIAL_DATA.length; i++) {
@@ -172,7 +176,7 @@ export async function fetchBrowse(browseId) {
                 );
             }
         }
-    } else {
+    } else if (!apiKey) {
         await getConfig();
     }
 
@@ -180,6 +184,10 @@ export async function fetchBrowse(browseId) {
 
     let body = getRequestBody();
     body.context["user"] = { enableSafetyMode: settings.safetyMode }
+
+    if (slice == "RD")
+        browseId = "VL" + browseId;
+
     body["browseId"] = browseId;
 
     let response = await getHttpResponse(url, {

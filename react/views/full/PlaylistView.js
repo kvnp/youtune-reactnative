@@ -25,12 +25,25 @@ export default PlaylistView = ({ route, navigation }) => {
 
     useEffect(() => {
         const _unsubscribe = navigation.addListener('focus', () => {
-            fetchBrowse(route.params.list)
-                .then(playlist => {
-                    setPlaylist(playlist);
-                    navigation.setOptions({ title: playlist.title });
-                    navigation.setParams({ list: playlist.playlistId});
-                });
+            if (playlist != null) {
+                if (playlist.playlistId != route.params.list) {
+                    fetchBrowse(route.params.list)
+                        .then(playlist => {
+                            setPlaylist(playlist);
+                            navigation.setOptions({ title: playlist.title });
+                            navigation.setParams({ list: playlist.playlistId});
+                        });
+                }
+            }
+            
+            if (playlist == null) {
+                fetchBrowse(route.params.list)
+                    .then(playlist => {
+                        navigation.setOptions({ title: playlist.title });
+                        navigation.setParams({ list: playlist.playlistId});
+                        setPlaylist(playlist);
+                    });
+            }
         });
         
         return () => _unsubscribe();

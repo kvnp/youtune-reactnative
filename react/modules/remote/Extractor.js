@@ -347,7 +347,7 @@ export function digestHomeResults(json) {
 }
 
 function getPlaylist(json, playlistId) {
-    let browse = {title: "", subtitle: "", secondSubtitle: "", description: "", thumbnail: null, entries: []};
+    let browse = {playlistId: "", title: "", subtitle: "", secondSubtitle: "", description: "", thumbnail: null, entries: []};
     let musicHeader = json.header.musicDetailHeaderRenderer;
 
     let titlelist = musicHeader.title.runs;
@@ -383,6 +383,7 @@ function getPlaylist(json, playlistId) {
         
         for (let sl = 0; sl < songList.length; sl++) {
             let songs = songList[sl].musicPlaylistShelfRenderer.contents;
+            browse.playlistId = songList[sl].musicPlaylistShelfRenderer.playlistId;
             
             for (let songIndex = 0; songIndex < songs.length; songIndex++) {
                 let responsiveMusicItem = songs[songIndex].musicResponsiveListItemRenderer;
@@ -719,9 +720,7 @@ export function digestNextResults(json) {
                                 .playlist.playlistPanelRenderer;
     else {
         let musicQueueRenderer = json.contents.singleColumnMusicWatchNextResultsRenderer.tabbedRenderer.watchNextTabbedResultsRenderer.tabs[0].tabRenderer.content.musicQueueRenderer;
-        if (musicQueueRenderer.hasOwnProperty("content"))
-            playlistRenderer = musicQueueRenderer.content.playlistPanelRenderer;
-        else {
+        if (musicQueueRenderer.hasOwnProperty("hack")) {
             playlist = hackTracks;
             let currentVideoId = json.currentVideoEndpoint.watchEndpoint.videoId;
             
@@ -731,6 +730,8 @@ export function digestNextResults(json) {
                     return playlist;
                 }
             }
+        } else {
+            playlistRenderer = musicQueueRenderer.content.playlistPanelRenderer;
         }
     }
 
