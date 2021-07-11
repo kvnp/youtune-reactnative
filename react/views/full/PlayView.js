@@ -66,8 +66,7 @@ export default PlayView = ({route, navigation}) => {
     };
 
     const setRepeating = () => {
-        isRepeating = !isRepeating;
-        setRepeat(isRepeating);
+        setRepeat(!isRepeating);
         forceUpdate();
     };
 
@@ -138,7 +137,7 @@ export default PlayView = ({route, navigation}) => {
     }
 
     if (track != null)
-        var {title, artist, artwork, id } = track;
+        var { title, artist, artwork, id } = track;
     else {
         id = null;
         title = null;
