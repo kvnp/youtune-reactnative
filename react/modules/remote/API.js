@@ -23,9 +23,12 @@ export var configuration = null;
 
 var apiKey = null;
 
-async function getConfig() {
+async function getConfig(path) {
+    if (!path)
+        path = ""
+
     let response = await getHttpResponse(
-        "https://music.youtube.com/", {
+        "https://music.youtube.com" + path, {
             method: "GET",
             headers: headers_simple
         },
@@ -45,6 +48,8 @@ async function getConfig() {
         .WEB_PLAYER_CONTEXT_CONFIGS
         .WEB_PLAYER_CONTEXT_CONFIG_ID_MUSIC_WATCH
         .innertubeApiKey;
+
+    console.log(configuration);
 }
 
 function getRequestBody() {
@@ -110,32 +115,29 @@ export async function fetchHome(continuation) {
     if (!apiKey)
         await getConfig();
 
-    if (!continuation) {
-        for (let element of configuration.YTMUSIC_INITIAL_DATA)
-            if (element.path == "/browse")
-                return digestHomeResults(element.data);
+    for (let element of configuration.YTMUSIC_INITIAL_DATA)
+        if (element.path == "/browse" && element.params.browseId == "FEmusic_home")
+            return digestHomeResults(element.data);
 
-    } else {
-        let url = getUrl("browse", apiKey);
+    let url = getUrl("browse", apiKey);
 
-        let body = getRequestBody();
-        body.context["user"] = { enableSafetyMode: settings.safetyMode }
+    let body = getRequestBody();
+    body.context["user"] = { enableSafetyMode: settings.safetyMode }
 
-        if (continuation)
-            url = url + "&ctoken=" + continuation.continuation + 
-                        "&continuation=" + continuation.continuation +
-                        "&itct=" + continuation.itct
-        else
-            body["browseId"] = "FEmusic_home";
+    if (continuation)
+        url = url + "&ctoken=" + continuation.continuation + 
+                    "&continuation=" + continuation.continuation +
+                    "&itct=" + continuation.itct
+    else
+        body["browseId"] = "FEmusic_home";
 
-        let response = await getHttpResponse(url, {
-            method: "POST",
-            headers: headers_ytm,
-            body: JSON.stringify(body)
-        }, "json");
+    let response = await getHttpResponse(url, {
+        method: "POST",
+        headers: headers_ytm,
+        body: JSON.stringify(body)
+    }, "json");
 
-        return digestHomeResults(response);
-    }
+    return digestHomeResults(response);
 }
 
 export async function fetchSuggestions(input) {
@@ -158,8 +160,24 @@ export async function fetchSuggestions(input) {
 }
 
 export async function fetchBrowse(browseId) {
-    if (!apiKey)
+    if (!apiKey && browseId.slice(0, 2) == "OL") {
+        await getConfig("/playlist?list=" + browseId);
+
+        for (let i = 0; i < configuration.YTMUSIC_INITIAL_DATA.length; i++) {
+            if (configuration.YTMUSIC_INITIAL_DATA[i].path == "/browse") {
+                if (configuration.YTMUSIC_INITIAL_DATA[i].params.browseId == "FEmusic_home")
+                    await getConfig("/playlist?list=" + browseId);
+                
+                console.log(configuration.YTMUSIC_INITIAL_DATA[i].data)
+                return digestBrowseResults(
+                    configuration.YTMUSIC_INITIAL_DATA[i].data,
+                    configuration.YTMUSIC_INITIAL_DATA[i].params.browseId
+                );
+            }
+        }
+    } else {
         await getConfig();
+    }
 
     const url = getUrl("browse", apiKey);
 

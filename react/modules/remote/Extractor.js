@@ -451,7 +451,7 @@ function getPlaylist(json, playlistId) {
 function getAlbum(json) {
     let updatelist = json.frameworkUpdates.entityBatchUpdate.mutations
 
-    let browse = {title: "", subtitle: "", secondSubtitle: "", description: "", thumbnail: null, entries: []};
+    let browse = {playlistId: "", title: "", subtitle: "", secondSubtitle: "", description: "", thumbnail: null, entries: []};
 
     for (let ul = 0; ul < updatelist.length; ul++) {
         let payload = updatelist[ul].payload;
@@ -479,6 +479,7 @@ function getAlbum(json) {
             browse.subtitle = albumRelease.artistDisplayName + " • " + albumRelease.releaseDate.year;
             browse.secondSubtitle = albumRelease.trackCount + " songs" + " • " + minutes + " minutes";
             browse.thumbnail = thumbnaillist.slice(-1)[0].url;
+            browse.playlistId = albumRelease.audioPlaylistId;
         }
 
         if (payload.hasOwnProperty("musicAlbumReleaseDetail")) {

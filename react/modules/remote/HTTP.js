@@ -1,4 +1,5 @@
 import { Platform } from "react-native";
+import Toast from "react-native-toast-message";
 import { settings } from "../storage/SettingsStorage";
 
 const url = "https://music.youtube.com/"
@@ -41,6 +42,19 @@ export const getHttpResponse = (url, input, type, controllerCallback) => {
             })
 
             .catch(reason => {
+                console.log(reason);
+                Toast.show({
+                    type: 'error',
+                    position: 'bottom',
+                    text1: 'Request failed',
+                    text2: 'Check your internet connection',
+                    visibilityTime: 4000,
+                    autoHide: true,
+                    bottomOffset: 48,
+                    onShow: () => {},
+                    onHide: () => {}, // called when Toast hides (if `autoHide` was set to `true`)
+                    onPress: () => {}
+                });
                 reject(reason);
             })
     })

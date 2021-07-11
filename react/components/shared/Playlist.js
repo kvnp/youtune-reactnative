@@ -22,8 +22,7 @@ export default Playlist = ({ playlist, navigation, style }) => {
         thumbnail: thumbnail,
         videoId: videoId,
         browseId: browseId,
-        playlistId: playlistId,
-        ...navigation
+        playlistId: playlistId
     };
 
     const { colors } = useTheme();

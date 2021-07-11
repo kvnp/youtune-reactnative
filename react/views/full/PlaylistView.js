@@ -22,7 +22,6 @@ import { rippleConfig } from "../../styles/Ripple";
 export default PlaylistView = ({ route, navigation }) => {
     const {dark, colors} = useTheme();
     const [playlist, setPlaylist] = useState(null);
-    navigation.setOptions({ title: "Loading" });
 
     useEffect(() => {
         const _unsubscribe = navigation.addListener('focus', () => {
@@ -30,6 +29,7 @@ export default PlaylistView = ({ route, navigation }) => {
                 .then(playlist => {
                     setPlaylist(playlist);
                     navigation.setOptions({ title: playlist.title });
+                    navigation.setParams({ list: playlist.playlistId});
                 });
         });
         
