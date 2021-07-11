@@ -78,6 +78,8 @@ export default PlayView = ({route, navigation}) => {
         const _unsubscribe = navigation.addListener('focus', () => {
             if (route.params) {
                 TrackPlayer.reset();
+                playback = TrackPlayer.STATE_BUFFERING;
+                forceUpdate();
     
                 if (route.params.list == "LOCAL_DOWNLOADS" && !route.params.v) {
                     let loader = new Promise(async(resolve, reject) => {
@@ -232,7 +234,7 @@ export default PlayView = ({route, navigation}) => {
 
                 <View style={{justifyContent: "space-between", flexDirection: "row", paddingTop: 30}}>
                     <Pressable android_ripple={rippleConfig} style={stylesTop.topFirst}
-                               onPress={() => navigation.navigate("App")}>
+                               onPress={() => navigation.goBack()}>
                         <MaterialIcons selectable={false} name="keyboard-arrow-down" color={colors.text} size={30}/>
                     </Pressable>
 
