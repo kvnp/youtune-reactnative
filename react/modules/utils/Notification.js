@@ -2,6 +2,9 @@ import { Platform } from "react-native";
 
 export const displayNotification = Platform.OS == 'web'
     ? ({title, text, icon}) => {
+        if (!window.Notification)
+            return
+            
         if (Notification.permission == 'granted') {
             navigator.serviceWorker.getRegistration().then(function(reg) {
                 var options = {
