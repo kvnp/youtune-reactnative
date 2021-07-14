@@ -4,7 +4,6 @@ import {
     Text,
     StyleSheet,
     Image,
-    Pressable,
     ActivityIndicator,
     Platform,
     Dimensions
@@ -19,7 +18,6 @@ import Playlist from "../../modules/models/music/playlist"
 import SeekBar from "../../components/player/SeekBar";
 import SwipePlaylist from "../../components/player/SwipePlaylist";
 
-import { rippleConfig } from "../../styles/Ripple";
 import {
     skip,
     setRepeat,
@@ -32,8 +30,16 @@ import { getSongLike, likeSong } from "../../modules/storage/MediaStorage";
 import { showModal } from "../../components/modals/MoreModal";
 import { fetchNext } from "../../modules/remote/API";
 import { loadSongLocal, localIDs } from "../../modules/storage/SongStorage";
+import { Button } from "react-native-paper";
 
-var track = null; 
+var track = {
+    id: null,
+    title: null,
+    artist: null,
+    artwork: null,
+    duration: 0
+}; 
+
 var playlist = null;
 
 var playback = TrackPlayer.STATE_BUFFERING;
@@ -76,7 +82,7 @@ export default PlayView = ({route, navigation}) => {
 
     useEffect(() => {
         const _unsubscribe = navigation.addListener('focus', () => {
-            if (route.params) {
+            if (route.params && route.params.v != track.id) {
                 TrackPlayer.reset();
                 playback = TrackPlayer.STATE_BUFFERING;
                 forceUpdate();
@@ -114,6 +120,7 @@ export default PlayView = ({route, navigation}) => {
                         .then(loadedList => startPlaylist(loadedList))
     
                         .catch(async(reason) => {
+                            console.log(reason);
                             if (localIDs.includes(route.params.v)) {
                                 let localPlaylist = new Playlist();
                                 localPlaylist.list.push(await loadSongLocal(route.params.v));
@@ -132,20 +139,13 @@ export default PlayView = ({route, navigation}) => {
             changeCallback = null;
             _unsubscribe();
         };
-    }, []);
+    }, [track, playlist]);
 
     const refreshLike = async() => {
         setLiked(await getSongLike(id));
     }
 
-    if (track != null)
-        var { title, artist, artwork, id } = track;
-    else {
-        id = null;
-        title = null;
-        artist = null;
-        artwork = null;
-    }
+    var { title, artist, artwork, id } = track;
 
     return <>
         <View style={stylesTop.vertContainer}>
@@ -155,8 +155,13 @@ export default PlayView = ({route, navigation}) => {
 
             <View style={[stylesBottom.container, {width: Dimensions.get("window").width - 50, height: Dimensions.get("window").height / 2.6}]}>
                 <View style={controlStyles.container}>
-                    <Pressable onPress={async() => { await likeSong(id, false); await refreshLike(); }} style={{paddingTop: 5}} android_ripple={rippleConfig}>
-                        <MaterialIcons selectable={false}
+                    <Button
+                        onPress={async() => { await likeSong(id, false); await refreshLike(); }}
+                        style={{paddingTop: 5}} labelStyle={{marginHorizontal: 0}} style={{borderRadius: 25, alignItems: "center", padding: 0, margin: 0}} contentStyle={{alignItems: "center", width: 50, height: 50}}
+                    >
+                        <MaterialIcons
+                            style={{alignSelf: "center"}}
+                            selectable={false}
                             name="thumb-down"
                             color={
                                 isLiked == null
@@ -168,7 +173,7 @@ export default PlayView = ({route, navigation}) => {
 
                             size={30}
                         />
-                    </Pressable>
+                    </Button>
                     
                     <View style={[
                         {flexGrow: 1, width: 1, paddingHorizontal: 5, alignItems: "center"},
@@ -180,8 +185,13 @@ export default PlayView = ({route, navigation}) => {
                         <Text adjustsFontSizeToFit={true} ellipsizeMode="tail" numberOfLines={1} style={[stylesBottom.subtitleText, {color: colors.text}]}>{artist}</Text>
                     </View>
 
-                    <Pressable onPress={async() => { await likeSong(id, true); await refreshLike(); }} style={{paddingTop: 5}} android_ripple={rippleConfig}>
-                        <MaterialIcons selectable={false}
+                    <Button
+                        onPress={async() => { await likeSong(id, true); await refreshLike(); }}
+                        labelStyle={{marginHorizontal: 0}} style={{borderRadius: 25, alignItems: "center", padding: 0, margin: 0}} contentStyle={{alignItems: "center", width: 50, height: 50}}
+                    >
+                        <MaterialIcons
+                            style={{alignSelf: "center"}}
+                            selectable={false}
                             name="thumb-up"
                             color={
                                 isLiked == null
@@ -193,52 +203,73 @@ export default PlayView = ({route, navigation}) => {
 
                             size={30}
                         />
-                    </Pressable>
+                    </Button>
                 </View>
 
-                <SeekBar duration={track != null ? track.duration : 0}/>
+                <SeekBar duration={track.duration}/>
                 
                 <View style={stylesBottom.buttonContainer}>
-                    <Pressable onPress={() => {}} android_ripple={rippleConfig}>
-                        <MaterialIcons selectable={false} name="cast" color={colors.text} size={30}/>
-                    </Pressable>
+                    <Button
+                        onPress={() => {}}
+                        labelStyle={{marginHorizontal: 0}} style={{borderRadius: 25, alignItems: "center", padding: 0, margin: 0}} contentStyle={{alignItems: "center", width: 50, height: 50}}
+                    >
+                        <MaterialIcons style={{alignSelf: "center"}} selectable={false} name="cast" color={colors.text} size={30}/>
+                    </Button>
 
-                    <Pressable onPress={() => skip(false)} android_ripple={rippleConfig}>
-                        <MaterialIcons selectable={false} name="skip-previous" color={colors.text} size={40}/>
-                    </Pressable>
+                    <Button
+                        onPress={() => skip(false)}
+                        labelStyle={{marginHorizontal: 0}} style={{borderRadius: 25, alignItems: "center", padding: 0, margin: 0}} contentStyle={{alignItems: "center", width: 50, height: 50}}
+                    >
+                        <MaterialIcons style={{alignSelf: "center"}} selectable={false} name="skip-previous" color={colors.text} size={40}/>
+                    </Button>
 
                     <View style={{alignSelf: "center", alignItems: "center", justifyContent: "center", backgroundColor: dark ? colors.card : colors.primary, width: 60, height: 60, borderRadius: 30}}>
                         {playback == TrackPlayer.STATE_BUFFERING
                             ?   <ActivityIndicator style={{alignSelf: "center"}} color={colors.text} size="large"/>
 
-                            :   <Pressable
-                                    android_ripple={rippleConfig}
+                            :   <Button
+                                    labelStyle={{marginHorizontal: 0}} style={{borderRadius: 25, alignItems: "center", padding: 0, margin: 0}} contentStyle={{alignItems: "center", width: 60, height: 60}}
                                     onPress={() => {
                                         playback == TrackPlayer.STATE_PLAYING
                                             ? TrackPlayer.pause()
                                             : TrackPlayer.play();
-                                    }}>
-                                    <MaterialIcons selectable={false} name={playback == TrackPlayer.STATE_PLAYING ? "pause" : "play-arrow"} color={colors.text} size={40}/>
-                                </Pressable>
+                                    }}
+                                >
+                                    <MaterialIcons style={{alignSelf: "center"}} selectable={false} name={playback == TrackPlayer.STATE_PLAYING ? "pause" : "play-arrow"} color={colors.text} size={40}/>
+                                </Button>
                         }
                     </View>
 
-                    <Pressable onPress={() => skip(true)} android_ripple={rippleConfig}>
-                        <MaterialIcons selectable={false} name="skip-next" color={colors.text} size={40}/>
-                    </Pressable>
+                    <Button
+                        labelStyle={{marginHorizontal: 0}} style={{borderRadius: 25, alignItems: "center", padding: 0, margin: 0}} contentStyle={{alignItems: "center", width: 50, height: 50}}
+                        onPress={() => skip(true)}
+                    >
+                        <MaterialIcons style={{alignSelf: "center"}} selectable={false} name="skip-next" color={colors.text} size={40}/>
+                    </Button>
 
-                    <Pressable onPress={() => setRepeating()} android_ripple={rippleConfig}>
-                        <MaterialIcons selectable={false} name={isRepeating ? "repeat-one" : "repeat"} color={colors.text} size={30}/>
-                    </Pressable>
+                    <Button
+                        labelStyle={{marginHorizontal: 0}} style={{borderRadius: 25, alignItems: "center", padding: 0, margin: 0}} contentStyle={{alignItems: "center", width: 50, height: 50}}
+                        onPress={() => setRepeating()}
+                    >
+                        <MaterialIcons style={{alignSelf: "center"}} selectable={false} name={isRepeating ? "repeat-one" : "repeat"} color={colors.text} size={30}/>
+                    </Button>
                 </View>
 
                 <View style={{justifyContent: "space-between", flexDirection: "row", paddingTop: 30}}>
-                    <Pressable android_ripple={rippleConfig} style={stylesTop.topFirst}
-                               onPress={() => navigation.goBack()}>
-                        <MaterialIcons selectable={false} name="keyboard-arrow-down" color={colors.text} size={30}/>
-                    </Pressable>
+                    <Button
+                        labelStyle={{marginHorizontal: 0}} style={{borderRadius: 25, alignItems: "center", padding: 0, margin: 0}} contentStyle={{alignItems: "center", width: 50, height: 50}}
+                        onPress={() => navigation.goBack()}
+                    >
+                        <MaterialIcons
+                            style={{alignSelf: "center"}}
+                            selectable={false}
+                            name="keyboard-arrow-down"
+                            color={colors.text} size={30}
+                        />
+                    </Button>
 
-                    <Pressable
+                    <Button
+                        labelStyle={{marginHorizontal: 0}} style={{...stylesTop.topThird, borderRadius: 25, alignItems: "center", padding: 0, margin: 0}} contentStyle={{alignItems: "center", width: 50, height: 50}}
                         onPress={() => {
                             let view = {
                                 title: track.title,
@@ -249,16 +280,21 @@ export default PlayView = ({route, navigation}) => {
 
                             showModal(view);
                         }}
-                        android_ripple={rippleConfig}
-                        style={stylesTop.topThird}
                     >
-                        <MaterialIcons selectable={false} name="more-vert" color={colors.text} size={30}/>
-                    </Pressable>
+                        <MaterialIcons
+                            style={{alignSelf: "center"}}
+                            selectable={false}
+                            name="more-vert"
+                            color={colors.text}
+                            size={30}
+                        />
+                    </Button>
                 </View>
             </View>
         </View>
 
-        <SwipePlaylist minimumHeight={50}
+        <SwipePlaylist
+            minimumHeight={50}
             backgroundColor={dark ? colors.card : colors.primary}
             textColor={colors.text}
             playlist={playlist}
@@ -301,6 +337,7 @@ const stylesBottom = StyleSheet.create({
     buttonContainer: {
         flexDirection: "row",
         alignItems: "center",
+        alignSelf: "center",
         justifyContent: "space-between",
         paddingTop: 20
     }
