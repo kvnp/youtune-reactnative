@@ -98,7 +98,7 @@ module.exports = () => ({
         app: './web/index.web.js'
     },
 
-    /*optimization: {
+    optimization: {
         nodeEnv: process.env.NODE_ENV,
         minimize: process.env.NODE_ENV == "production" && !process.env.PORT,
         minimizer: [ new TerserPlugin() ],
@@ -127,7 +127,7 @@ module.exports = () => ({
 
         runtimeChunk: 'multiple',
         moduleIds: 'deterministic',
-    },*/
+    },
 
     output: {
         path: __dirname + '/dist',
@@ -146,11 +146,23 @@ module.exports = () => ({
                     options: {
                         cacheDirectory: true,
                         presets: [
+                            "@babel/preset-react",
+                            "@babel/preset-env",
                             'module:metro-react-native-babel-preset'
                         ],
                         
                         plugins: [
-                            ["react-native-web", { commonjs: true }]
+                            ["react-native-web", { commonjs: true }],
+                            [
+                                "transform-react-remove-prop-types",
+                                {
+                                "removeImport": true,
+                                "additionalLibraries": ["react-style-proptype"]
+                                }
+                            ],
+                            'react-native-paper/babel',
+                            'react-native-reanimated/plugin',
+                            ["@babel/plugin-proposal-private-methods", { "loose": true }]
                         ],
                     },
                 }
