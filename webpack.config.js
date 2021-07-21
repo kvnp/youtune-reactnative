@@ -21,7 +21,7 @@ module.exports = () => ({
         host: "0.0.0.0",
         port: process.env.PORT || 8080,
         public: process.env.PORT
-            ? "utune.herokuapp.com"
+            ? process.env.HOSTNAME
             : undefined,
 
         proxy: {
