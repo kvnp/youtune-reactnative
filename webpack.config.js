@@ -20,9 +20,6 @@ module.exports = () => ({
     devServer: {
         host: "0.0.0.0",
         port: process.env.PORT || 8080,
-        public: process.env.PORT
-            ? process.env.HOSTNAME
-            : undefined,
 
         proxy: {
             '/proxy/videoplayback': {
