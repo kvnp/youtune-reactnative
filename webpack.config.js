@@ -1,3 +1,4 @@
+const path = require('path');
 const webpack = require('webpack');
 const TerserPlugin = require("terser-webpack-plugin");
 const HtmlWebpackPlugin = require('html-webpack-plugin');
@@ -79,15 +80,18 @@ module.exports = () => ({
         historyApiFallback: true,
         compress: true,
 
-        /*watchOptions: {
-            ignored: [
-                "./.git",
-                "./node_modules",
-                "./.github",
-                "./android",
-                "./ios"
-            ]
-        }*/
+        watchFiles: {
+            options: {
+                ignored: [
+                    "./.git",
+                    "./node_modules",
+                    "./.github",
+                    "./android",
+                    "./ios",
+                    "./windows"
+                ]
+            }
+        }
     },
     
     mode: process.env.NODE_ENV,
@@ -132,34 +136,44 @@ module.exports = () => ({
         publicPath: '/'
     },
 
-    devtool: 'source-map',
+    devtool: 'cheap-module-source-map',
 
     module: {
         rules: [
             {
                 test: /\.(ts|tsx|jsx|js|mjs)$/,
                 use: {
-                    loader: "babel-loader",
+                    loader: 'babel-loader?cacheDirectory',
                     options: {
                         cacheDirectory: true,
                         presets: [
+                            "@babel/env",
                             "@babel/preset-react",
-                            "@babel/preset-env",
                             'module:metro-react-native-babel-preset'
                         ],
                         
                         plugins: [
-                            ["react-native-web", { commonjs: true }],
+                            [
+                                "react-native-web",
+                                {
+                                    commonjs: true
+                                }
+                            ],
                             [
                                 "transform-react-remove-prop-types",
                                 {
-                                "removeImport": true,
-                                "additionalLibraries": ["react-style-proptype"]
+                                    "removeImport": true,
+                                    "additionalLibraries": ["react-style-proptype"]
                                 }
                             ],
                             'react-native-paper/babel',
                             'react-native-reanimated/plugin',
-                            ["@babel/plugin-proposal-private-methods", { "loose": true }]
+                            [
+                                "@babel/plugin-proposal-private-methods",
+                                {
+                                    "loose": true
+                                }
+                            ]
                         ],
                     },
                 }
@@ -168,7 +182,7 @@ module.exports = () => ({
             {
                 test: /\.(png|jpe?g|gif|ico|ttf|css)$/i,
                 loader: 'file-loader',
-            },
+            }
         ]
     },    
 
@@ -189,7 +203,7 @@ module.exports = () => ({
 
         process.env.NODE_ENV != "production"
             ? new webpack.HotModuleReplacementPlugin()
-            : () => {},
+            : {},
 
         new WebpackPwaManifest({
             name: 'YouTune',
@@ -221,7 +235,7 @@ module.exports = () => ({
             }
         }),
 
-        new GenerateSW(
+        /*new GenerateSW(
             {
                 mode: process.env.NODE_ENV,
                 navigateFallback: "/index.html",
@@ -263,7 +277,7 @@ module.exports = () => ({
                     }
                 ],
             }
-        )
+        )*/
     ],
     
     resolve: {
