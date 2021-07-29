@@ -85,13 +85,12 @@ export const resultStyle = StyleSheet.create({
     },
 
     resultView: {
+        justifyContent: "stretch",
         flexGrow: 1,
-        paddingHorizontal: 15,
-        marginHorizontal: 5,
-        marginTop: 10,
         borderRadius: 5,
         height: 70,
         flexDirection: 'row',
+        alignSelf: "stretch",
         alignItems: 'center'
     },
 
@@ -104,7 +103,8 @@ export const resultStyle = StyleSheet.create({
         paddingLeft: 10,
         flex: 1,
         flexDirection: 'column',
-        alignItems: 'flex-start'
+        alignItems: 'flex-start',
+        justifyContent: "center"
     },
 
     resultColumnTwo: {
