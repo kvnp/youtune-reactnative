@@ -11,9 +11,11 @@ import {
     Platform
 } from "react-native";
 
+import { Button } from "react-native-paper";
 import TrackPlayer from 'react-native-track-player';
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import { useTheme } from "@react-navigation/native";
+import Toast from "react-native-toast-message";
 
 import { appColor } from "../../styles/App";
 import { handleMedia } from "../../modules/event/mediaNavigator";
@@ -29,7 +31,6 @@ import {
 
 import { storeSong, deleteSong, localIDs, downloadQueue } from "../../modules/storage/SongStorage";
 import { displayNotification } from "../../modules/utils/Notification";
-import Toast from "react-native-toast-message";
 import { abortSongDownload } from "../../modules/storage/SongStorage";
 
 export var showModal = null;
@@ -278,21 +279,23 @@ export default MoreModal = ({navigation}) => {
                 alignSelf: "center",
                 width: "100%"
             }}>
-                <Pressable style={[modalStyles.header, {backgroundColor: colors.border}, Platform.OS == "web" ? {cursor: "default"} : undefined]}>
+                <View style={[modalStyles.header, {backgroundColor: colors.border}, Platform.OS == "web" ? {cursor: "default"} : undefined]}>
                     <Image source={{uri: content.thumbnail}} style={modalStyles.thumbnail}/>
                     <View style={modalStyles.headerText}>
-                        <Text style={{color: colors.text}} numberOfLines={1}>{content.title}</Text>
-                        <Text style={{color: colors.text}} numberOfLines={1}>{content.subtitle}</Text>
+                        <Text style={{color: colors.text, verticalAlign: "middle"}} numberOfLines={1}>{content.title}</Text>
+                        <Text style={{color: colors.text, verticalAlign: "middle"}} numberOfLines={1}>{content.subtitle}</Text>
                     </View>
                     <View style={{width: 120, height: 50, alignItems: "center", justifyContent: "center", flexDirection: "row"}}>
                         <View style={{width: 50, height: 50, alignItems: "center", justifyContent: "center"}}>
-                            <Pressable
+                            <Button
                                 onPress={() => likeFunction(false)}
-                                android_ripple={{color: "darkgray", borderless: true}}
+                                labelStyle={{marginHorizontal: 0}}
+                                style={{borderRadius: 25, alignItems: "center", padding: 0, margin: 0, minWidth: 0}}
+                                contentStyle={{alignItems: "center", width: 50, height: 50, minWidth: 0}}
                             >
                                 <MaterialIcons
                                     name="thumb-down"
-
+                                    style={{verticalAlign: "middle"}}
                                     color={
                                         liked == null
                                             ? "darkgray"
@@ -303,16 +306,18 @@ export default MoreModal = ({navigation}) => {
 
                                     size={25}
                                 />
-                            </Pressable>
+                            </Button>
                         </View>
                         <View style={{width: 50, height: 50, alignItems: "center", justifyContent: "center"}}>
-                            <Pressable
+                            <Button
                                 onPress={() => likeFunction(true)}
-                                android_ripple={{color: "darkgray", borderless: true}}
+                                labelStyle={{marginHorizontal: 0}}
+                                style={{borderRadius: 25, alignItems: "center", padding: 0, margin: 0, minWidth: 0}}
+                                contentStyle={{alignItems: "center", width: 50, height: 50, minWidth: 0}}
                             >
                                 <MaterialIcons
                                     name="thumb-up"
-
+                                    style={{verticalAlign: "middle"}}
                                     color={
                                         liked == null
                                             ? "darkgray"
@@ -323,140 +328,145 @@ export default MoreModal = ({navigation}) => {
 
                                     size={25}
                                 />
-                            </Pressable>
+                            </Button>
                         </View>
                     </View>
-                </Pressable>
+                </View>
 
                 {
                     type == "Song"
-                        ? <View style={modalStyles.entryView}>
-                            <Pressable onPress={() => {navigation.push("Music", {v: videoId});}}
-                                style={[modalStyles.entry, {backgroundColor: colors.card}]}
-                                android_ripple={{color: "gray"}}
-                            >
-                                <MaterialIcons name="radio" color={colors.text} size={25}/>
-                                <Text style={{paddingLeft: 20, color: colors.text}}>Start radio</Text>
-                            </Pressable>
-                        </View>
+                        ? <Button 
+                            onPress={() => {navigation.navigate("Music", {v: videoId});}}
+                            labelStyle={[modalStyles.entry, {margin: 0, padding: 0, borderRadius: 0, letterSpacing: "normal", textTransform: "none", fontSize: 14, textAlignVertical: "center"}]}
+                            style={{backgroundColor: colors.card, margin: 0, padding: 0, borderRadius: 0}}
+                            contentStyle={{margin: 0, padding: 0, borderRadius: 0}}
+                        >
+                            <MaterialIcons name="radio" style={{verticalAlign: "middle"}} color={colors.text} size={25}/>
+                            <Text style={{paddingLeft: 20, color: colors.text, verticalAlign: "middle"}}>Start radio</Text>
+                        </Button>
 
                     : undefined
                 }
 
-                <View style={modalStyles.entryView}>
-                    <Pressable
-                        onPress={
-                            async() => {
-                                if (playing) {
-                                    TrackPlayer.pause();
-                                    setContent(content => ({
-                                        ...content,
-                                        playing: false,
-                                        visible: false
-                                    }));
-                                } else {
-                                    if (await TrackPlayer.getCurrentTrack() == videoId) {
-                                        setContent(content => ({...content, visible: false}));
-                                        handleMedia(content, navigation);
-                                        TrackPlayer.play();
-                                    }
+                <Button
+                    onPress={
+                        async() => {
+                            if (playing) {
+                                TrackPlayer.pause();
+                                setContent(content => ({
+                                    ...content,
+                                    playing: false,
+                                    visible: false
+                                }));
+                            } else {
+                                if (await TrackPlayer.getCurrentTrack() == videoId) {
+                                    setContent(content => ({...content, visible: false}));
+                                    handleMedia(content, navigation);
+                                    TrackPlayer.play();
                                 }
-
                             }
-                        }
-                        style={[modalStyles.entry, {backgroundColor: colors.card}]}
-                        android_ripple={{color: "gray"}}
-                    >
-                        {type == "Song"
-                            ? playing
-                                ? <>
-                                    <MaterialIcons name="pause" color={colors.text} size={25}/>
-                                    <Text style={{paddingLeft: 20, color: colors.text}}>Pause</Text>
-                                </>
 
-                                : <>
-                                    <MaterialIcons name="play-arrow" color={colors.text} size={25}/>
-                                    <Text style={{paddingLeft: 20, color: colors.text}}>Play</Text>
-                                </>
-                            
-                            : <>
-                                <MaterialIcons name="launch" color={colors.text} size={25}/>
-                                <Text style={{paddingLeft: 20, color: colors.text}}>Open</Text>
-                            </>
                         }
-                    </Pressable>
-                </View>
+                    }
+                    labelStyle={[modalStyles.entry, {margin: 0, padding: 0, borderRadius: 0, letterSpacing: "normal", textTransform: "none", fontSize: 14, textAlignVertical: "center"}]}
+                    style={{backgroundColor: colors.card, margin: 0, padding: 0, borderRadius: 0}}
+                    contentStyle={{margin: 0, padding: 0, borderRadius: 0}}
+                >
+                    {type == "Song"
+                        ? playing
+                            ? <>
+                                <MaterialIcons style={{verticalAlign: "middle"}} name="pause" color={colors.text} size={25}/>
+                                <Text style={{paddingLeft: 20, color: colors.text, verticalAlign: "middle"}}>Pause</Text>
+                            </>
+
+                            : <>
+                                <MaterialIcons style={{verticalAlign: "middle"}} name="play-arrow" color={colors.text} size={25}/>
+                                <Text style={{paddingLeft: 20, color: colors.text, verticalAlign: "middle"}}>Play</Text>
+                            </>
+                        
+                        : <>
+                            <MaterialIcons style={{verticalAlign: "middle"}} name="launch" color={colors.text} size={25}/>
+                            <Text style={{paddingLeft: 20, color: colors.text, verticalAlign: "middle"}}>Open</Text>
+                        </>
+                    }
+                </Button>
                 {
                     videoId
-                        ? <View style={modalStyles.entryView}>
-                            <Pressable
-                                onPress={
-                                    () => downloading
-                                        ? abort()
-                                        : downloaded
-                                            ? remove()
-                                            : download()
-                                }
-                                style={[modalStyles.entry, {backgroundColor: colors.card}]}
-                                android_ripple={{color: "gray"}}
-                            >
+                        ? <Button
+                            onPress={
+                                () => downloading
+                                    ? abort()
+                                    : downloaded
+                                        ? remove()
+                                        : download()
+                            }
+                            labelStyle={[modalStyles.entry, {margin: 0, padding: 0, borderRadius: 0, letterSpacing: "normal", textTransform: "none", fontSize: 14, textAlignVertical: "center"}]}
+                            style={{backgroundColor: colors.card, margin: 0, padding: 0, borderRadius: 0}}
+                            contentStyle={{margin: 0, padding: 0, borderRadius: 0}}
+                        >
+                            {
+                                downloading
+                                    ? <ActivityIndicator
+                                        color={colors.text}
+                                        style={{verticalAlign: "middle"}}
+                                    />
+                                    : <MaterialIcons
+                                        style={{verticalAlign: "middle"}}
+                                        name={
+                                            downloaded
+                                                ? "delete"
+                                                : "get-app"
+                                        }
+                                        color={colors.text}
+                                        size={25}
+                                    />
+                            }
+    
+                            <Text style={{paddingLeft: 20, color: colors.text, verticalAlign: "middle"}}>
                                 {
                                     downloading
-                                        ? <ActivityIndicator color={colors.text}/>
-                                        : <MaterialIcons
-                                            name={
-                                                downloaded
-                                                    ? "delete"
-                                                    : "get-app"
-                                            }
-                                            color={colors.text}
-                                            size={25}
-                                        />
-                                }
-        
-                                <Text style={{paddingLeft: 20, color: colors.text}}>
-                                    {
-                                        downloading
-                                            ? "Downloading" + (downloadQueue.length > 0
+                                        ? "Downloading" + (downloadQueue.length > 0
+                                            ? " (" + downloadQueue.length + " in queue)"
+                                            : "")
+    
+                                        : downloaded
+                                            ? "Delete" + (downloadQueue.length > 0
                                                 ? " (" + downloadQueue.length + " in queue)"
                                                 : "")
-        
-                                            : downloaded
-                                                ? "Delete" + (downloadQueue.length > 0
-                                                    ? " (" + downloadQueue.length + " in queue)"
-                                                    : "")
-        
-                                                : "Download" + (downloadQueue.length > 0
-                                                    ? " (" + downloadQueue.length + " in queue)"
-                                                    : "")
-                                    }
-                                </Text>
-                            </Pressable>
-                        </View>
+    
+                                            : "Download" + (downloadQueue.length > 0
+                                                ? " (" + downloadQueue.length + " in queue)"
+                                                : "")
+                                }
+                            </Text>
+                        </Button>
 
 
                         : undefined
                 }
 
-                <View style={modalStyles.entryView}>
-                <Pressable onPress={() => {}} style={[modalStyles.entry, {backgroundColor: colors.card}]} android_ripple={{color: "gray"}}>
+                <Button
+                    uppercase={false}
+                    onPress={() => {}}
+                    labelStyle={[modalStyles.entry, {margin: 0, padding: 0, borderRadius: 0, letterSpacing: "normal", textTransform: "none", fontSize: 14, textAlignVertical: "center"}]}
+                    style={{backgroundColor: colors.card, margin: 0, padding: 0, borderRadius: 0}}
+                    contentStyle={{margin: 0, padding: 0, borderRadius: 0}}
+                >
                     {
                         type == "Song"
                             ? <>
-                                <MaterialIcons name="playlist-add" color={colors.text} size={25}/>
-                                <Text style={{paddingLeft: 20, color: colors.text}}>Add to playlist</Text>
+                                <MaterialIcons name="playlist-add" style={{verticalAlign: "middle"}} color={colors.text} size={25}/>
+                                <Text style={{paddingLeft: 20, color: colors.text, verticalAlign: "middle"}}>Add to playlist</Text>
                             </>
 
                             : <>
-                                <MaterialIcons name="library-add" color={colors.text} size={25}/>
-                                <Text style={{paddingLeft: 20, color: colors.text}}>Add to library</Text>
+                                <MaterialIcons name="library-add" style={{verticalAlign: "middle"}} color={colors.text} size={25}/>
+                                <Text style={{paddingLeft: 20, color: colors.text, verticalAlign: "middle"}}>Add to library</Text>
                             </>
                     }
-                </Pressable>
-                </View>
+                </Button>
 
-                <View style={modalStyles.entryView}>
-                <Pressable
+                <Button
                     onPress={() => {
                         let file;
                         let message;
@@ -473,13 +483,13 @@ export default MoreModal = ({navigation}) => {
 
                         onShare(type, "https://music.youtube.com/" + file, message);
                     }}
-
-                    style={[modalStyles.entry, {backgroundColor: colors.card}]} android_ripple={{color: "gray"}}
+                    labelStyle={[modalStyles.entry, {margin: 0, padding: 0, borderRadius: 0, letterSpacing: "normal", textTransform: "none", fontSize: 14, textAlignVertical: "center"}]}
+                    style={{backgroundColor: colors.card, margin: 0, padding: 0, borderRadius: 0}}
+                    contentStyle={{margin: 0, padding: 0, borderRadius: 0}}
                 >
-                    <MaterialIcons name="share" color={colors.text} size={25}/>
-                    <Text style={{paddingLeft: 20, color: colors.text}}>Share</Text>
-                </Pressable>
-                </View>
+                    <MaterialIcons name="share" style={{verticalAlign: "middle"}} color={colors.text} size={25}/>
+                    <Text style={{paddingLeft: 20, color: colors.text, verticalAlign: "middle"}}>Share</Text>
+                </Button>
             </View>
         </Pressable>
     </Modal>
@@ -514,12 +524,12 @@ const modalStyles = StyleSheet.create({
         flexDirection: "row",
         alignItems: "center",
         alignContent: "center",
-        paddingVertical: 10,
+        textAlign: "flex-start",
+        paddingVertical: 5,
         paddingHorizontal: 50,
-        height: 50,
+        height: 30,
+        maxWidth: 800,
+        alignSelf: "center",
+        width: "100%"
     },
-
-    entryView: {
-        height: 50,
-    }
 });
