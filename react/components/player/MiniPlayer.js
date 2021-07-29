@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { StyleSheet, View, Pressable, Image, Text } from "react-native";
+import { StyleSheet, View, Image, Text } from "react-native";
+import { Button} from "react-native-paper";
 import { useTheme } from "@react-navigation/native";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import TrackPlayer, { useTrackPlayerProgress } from 'react-native-track-player';
 
 import { skip } from "../../service";
-import { rippleConfig } from "../../styles/Ripple";
 
 export default MiniPlayer = ({navigation, style}) => {
     const [state, setState] = useState(TrackPlayer.STATE_STOPPED);
@@ -86,24 +86,40 @@ export default MiniPlayer = ({navigation, style}) => {
             <View style={styles.container}>
                 <Image source={{uri: artwork}} style={styles.image}/>
                 <View style={styles.textContainer}>
-                    <Pressable android_ripple={rippleConfig} onPress={onOpen}>
-                        <Text numberOfLines={1} style={[styles.titleText, {color: colors.text}]}>{title}</Text>
+                    <Button
+                        onPress={onOpen}
+                        labelStyle={{marginHorizontal: 0, margin: 0, padding: 0, borderRadius: 0, letterSpacing: "normal", textTransform: "none", fontSize: 14, textAlignVertical: "center"}}
+                        style={{alignItems: "stretch", padding: 0, margin: 0}}
+                        contentStyle={{alignItems: "center", height: 50}}
+                    >
+                        <Text numberOfLines={1} style={[styles.titleText, {color: colors.text}]}>{title + "\n"}</Text>
                         <Text numberOfLines={1} style={[styles.subtitleText, {color: colors.text}]}>{artist}</Text>
-                    </Pressable>
+                    </Button>
                 </View>
 
                 <View style={[styles.button, {color: colors.card}]}>
-                    <Pressable android_ripple={rippleConfig} onPress={onStop}>
+                    <Button
+                        onPress={onStop}
+                        labelStyle={{marginHorizontal: 0}}
+                        style={{borderRadius: 25, alignItems: "center", padding: 0, margin: 0, minWidth: 0}}
+                        contentStyle={{alignItems: "center", width: 50, height: 50, minWidth: 0}}
+                            
+                    >
                         <MaterialIcons
                             name="clear"
                             color={colors.text}
                             size={29}
                         />
-                    </Pressable>
+                    </Button>
                 </View>
 
                 <View style={[styles.button, {color: colors.card}]}>
-                    <Pressable android_ripple={rippleConfig} onPress={onPlay}>
+                    <Button
+                        onPress={onPlay}
+                        labelStyle={{marginHorizontal: 0}}
+                        style={{borderRadius: 25, alignItems: "center", padding: 0, margin: 0, minWidth: 0}}
+                        contentStyle={{alignItems: "center", width: 50, height: 50, minWidth: 0}}
+                    >
                         <MaterialIcons
                             name={
                                 state == TrackPlayer.STATE_PLAYING
@@ -113,17 +129,22 @@ export default MiniPlayer = ({navigation, style}) => {
                             color={colors.text}
                             size={29}
                         />
-                    </Pressable>
+                    </Button>
                 </View>
 
                 <View style={[styles.button, {color: colors.card}]}>
-                    <Pressable android_ripple={rippleConfig} onPress={onNext}>
+                    <Button
+                        onPress={onNext}
+                        labelStyle={{marginHorizontal: 0}}
+                        style={{borderRadius: 25, alignItems: "center", padding: 0, margin: 0, minWidth: 0}}
+                        contentStyle={{alignItems: "center", width: 50, height: 50, minWidth: 0}}
+                    >
                         <MaterialIcons
                             name="skip-next"
                             color={colors.text}
                             size={29}
                         />
-                    </Pressable>
+                    </Button>
                 </View>
             </View>
         </View>
