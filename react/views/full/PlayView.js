@@ -60,7 +60,7 @@ const stateListener = TrackPlayer.addEventListener("playback-state", e => {
 
 var changeCallback = null;
 
-export default PlayView = ({route, navigation}) => {
+const PlayView = ({route, navigation}) => {
     const [, forceUpdate] = useReducer(x => x + 1, 0);
 
     changeCallback = () => {
@@ -145,19 +145,29 @@ export default PlayView = ({route, navigation}) => {
         setLiked(await getSongLike(id));
     }
 
-    var { title, artist, artwork, id } = track;
+    const { height, width } = Dimensions.get("window");
+    const { title, artist, artwork, id } = track;
 
     return <>
         <View style={stylesTop.vertContainer}>
-            <View style={[imageStyles.view, {height: Dimensions.get("window").height / 2.6, width: Dimensions.get("window").width - 50}]}>
+            <View style={[imageStyles.view, {height: height / 2.6, width: width - 50}]}>
                 <Image resizeMode="contain" style={imageStyles.image} source={{uri: artwork}}/>
             </View>
 
-            <View style={[stylesBottom.container, {width: Dimensions.get("window").width - 50, height: Dimensions.get("window").height / 2.6}]}>
+            <View style={[stylesBottom.container, {width: width - 50, height: height / 2.6}]}>
                 <View style={controlStyles.container}>
+                    
                     <Button
                         onPress={async() => { await likeSong(id, false); await refreshLike(); }}
-                        style={{paddingTop: 5}} labelStyle={{marginHorizontal: 0}} style={{borderRadius: 25, alignItems: "center", padding: 0, margin: 0}} contentStyle={{alignItems: "center", width: 50, height: 50}}
+                        labelStyle={{marginHorizontal: 0}}
+                        style={{borderRadius: 25, alignItems: "center", padding: 0, margin: 0, minWidth: 0,
+                                color: isLiked == null
+                                    ? colors.text
+                                    : !isLiked
+                                        ? colors.primary
+                                        : colors.text
+                        }}
+                        contentStyle={{alignItems: "center", width: 50, height: 50, minWidth: 0}}
                     >
                         <MaterialIcons
                             style={{alignSelf: "center"}}
@@ -180,14 +190,16 @@ export default PlayView = ({route, navigation}) => {
                         Platform.OS === "web"
                             ? {userSelect: "text"}
                             : undefined
-                                ]}>
+                    ]}>
                         <Text adjustsFontSizeToFit={true} ellipsizeMode="tail" numberOfLines={1} style={[stylesBottom.titleText, {color: colors.text}]}>{title}</Text>
                         <Text adjustsFontSizeToFit={true} ellipsizeMode="tail" numberOfLines={1} style={[stylesBottom.subtitleText, {color: colors.text}]}>{artist}</Text>
                     </View>
 
                     <Button
                         onPress={async() => { await likeSong(id, true); await refreshLike(); }}
-                        labelStyle={{marginHorizontal: 0}} style={{borderRadius: 25, alignItems: "center", padding: 0, margin: 0}} contentStyle={{alignItems: "center", width: 50, height: 50}}
+                        labelStyle={{marginHorizontal: 0}}
+                        style={{borderRadius: 25, alignItems: "center", padding: 0, margin: 0, minWidth: 0}}
+                        contentStyle={{alignItems: "center", width: 50, height: 50, minWidth: 0}}
                     >
                         <MaterialIcons
                             style={{alignSelf: "center"}}
@@ -208,17 +220,21 @@ export default PlayView = ({route, navigation}) => {
 
                 <SeekBar duration={track.duration}/>
                 
-                <View style={stylesBottom.buttonContainer}>
+                <View style={[stylesBottom.buttonContainer, {overflow: "visible", alignSelf: "stretch", justifyContent: "space-between"}]}>
                     <Button
                         onPress={() => {}}
-                        labelStyle={{marginHorizontal: 0}} style={{borderRadius: 25, alignItems: "center", padding: 0, margin: 0}} contentStyle={{alignItems: "center", width: 50, height: 50}}
+                        labelStyle={{marginHorizontal: 0}}
+                        style={{borderRadius: 25, alignItems: "center", padding: 0, margin: 0, minWidth: 0}}
+                        contentStyle={{alignItems: "center", width: 50, height: 50, minWidth: 0}}
                     >
                         <MaterialIcons style={{alignSelf: "center"}} selectable={false} name="cast" color={colors.text} size={30}/>
                     </Button>
 
                     <Button
                         onPress={() => skip(false)}
-                        labelStyle={{marginHorizontal: 0}} style={{borderRadius: 25, alignItems: "center", padding: 0, margin: 0}} contentStyle={{alignItems: "center", width: 50, height: 50}}
+                        labelStyle={{marginHorizontal: 0}}
+                        style={{borderRadius: 25, alignItems: "center", padding: 0, margin: 0, minWidth: 0}}
+                        contentStyle={{alignItems: "center", width: 50, height: 50, minWidth: 0}}
                     >
                         <MaterialIcons style={{alignSelf: "center"}} selectable={false} name="skip-previous" color={colors.text} size={40}/>
                     </Button>
@@ -228,7 +244,9 @@ export default PlayView = ({route, navigation}) => {
                             ?   <ActivityIndicator style={{alignSelf: "center"}} color={colors.text} size="large"/>
 
                             :   <Button
-                                    labelStyle={{marginHorizontal: 0}} style={{borderRadius: 25, alignItems: "center", padding: 0, margin: 0}} contentStyle={{alignItems: "center", width: 60, height: 60}}
+                                    labelStyle={{marginHorizontal: 0}}
+                                    style={{borderRadius: 25, alignItems: "center", padding: 0, margin: 0, minWidth: 0}}
+                                    contentStyle={{alignItems: "center", width: 60, height: 60, minWidth: 0}}
                                     onPress={() => {
                                         playback == TrackPlayer.STATE_PLAYING
                                             ? TrackPlayer.pause()
@@ -241,14 +259,18 @@ export default PlayView = ({route, navigation}) => {
                     </View>
 
                     <Button
-                        labelStyle={{marginHorizontal: 0}} style={{borderRadius: 25, alignItems: "center", padding: 0, margin: 0}} contentStyle={{alignItems: "center", width: 50, height: 50}}
+                        labelStyle={{marginHorizontal: 0}}
+                        style={{borderRadius: 25, alignItems: "center", padding: 0, margin: 0, minWidth: 0}}
+                        contentStyle={{alignItems: "center", width: 50, height: 50, minWidth: 0}}
                         onPress={() => skip(true)}
                     >
                         <MaterialIcons style={{alignSelf: "center"}} selectable={false} name="skip-next" color={colors.text} size={40}/>
                     </Button>
 
                     <Button
-                        labelStyle={{marginHorizontal: 0}} style={{borderRadius: 25, alignItems: "center", padding: 0, margin: 0}} contentStyle={{alignItems: "center", width: 50, height: 50}}
+                        labelStyle={{marginHorizontal: 0}}
+                        style={{borderRadius: 25, alignItems: "center", padding: 0, margin: 0, minWidth: 0}}
+                        contentStyle={{alignItems: "center", width: 50, height: 50, minWidth: 0}}
                         onPress={() => setRepeating()}
                     >
                         <MaterialIcons style={{alignSelf: "center"}} selectable={false} name={isRepeating ? "repeat-one" : "repeat"} color={colors.text} size={30}/>
@@ -257,7 +279,9 @@ export default PlayView = ({route, navigation}) => {
 
                 <View style={{justifyContent: "space-between", flexDirection: "row", paddingTop: 30}}>
                     <Button
-                        labelStyle={{marginHorizontal: 0}} style={{borderRadius: 25, alignItems: "center", padding: 0, margin: 0}} contentStyle={{alignItems: "center", width: 50, height: 50}}
+                        labelStyle={{marginHorizontal: 0}}
+                        style={{borderRadius: 25, alignItems: "center", padding: 0, margin: 0, minWidth: 0}}
+                        contentStyle={{alignItems: "center", width: 50, height: 50, minWidth: 0}}
                         onPress={() => navigation.goBack()}
                     >
                         <MaterialIcons
@@ -269,7 +293,9 @@ export default PlayView = ({route, navigation}) => {
                     </Button>
 
                     <Button
-                        labelStyle={{marginHorizontal: 0}} style={{...stylesTop.topThird, borderRadius: 25, alignItems: "center", padding: 0, margin: 0}} contentStyle={{alignItems: "center", width: 50, height: 50}}
+                        labelStyle={{marginHorizontal: 0}}
+                        style={{...stylesTop.topThird, borderRadius: 25, alignItems: "center", padding: 0, margin: 0, minWidth: 0}}
+                        contentStyle={{alignItems: "center", width: 50, height: 50, minWidth: 0}}
                         onPress={() => {
                             let view = {
                                 title: track.title,
@@ -318,12 +344,13 @@ const stylesBottom = StyleSheet.create({
         alignSelf: "center",
         alignItems: "stretch",
         justifyContent: "center",
+        minWidth: "50%",
         maxWidth: 400,
         paddingHorizontal: "5%"
     },
 
     subtitleText: {
-        paddingTop: 5,
+        paddingTop: "1%",
         alignSelf: "center",
         textAlign: "center"
     },
@@ -339,6 +366,7 @@ const stylesBottom = StyleSheet.create({
         alignItems: "center",
         alignSelf: "center",
         justifyContent: "space-between",
+        overflow: "hidden",
         paddingTop: 20
     }
 });
@@ -346,6 +374,7 @@ const stylesBottom = StyleSheet.create({
 const imageStyles = StyleSheet.create({
     view: {
         alignSelf: "stretch",
+        minWidth: "50%",
         maxWidth: 400
     },
 
@@ -382,9 +411,12 @@ const stylesTop = StyleSheet.create({
         width: "100%",
         height: "100%",
         paddingHorizontal: "10%",
+        paddingBottom: "60px",
         flexWrap: "wrap",
         alignSelf: "center",
         alignContent: "space-around",
         justifyContent: "space-around"
     }
 });
+
+export default PlayView;
