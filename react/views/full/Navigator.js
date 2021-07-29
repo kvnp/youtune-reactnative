@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Dimensions, Platform } from "react-native";
+import { Dimensions } from "react-native";
 
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 
@@ -75,12 +75,11 @@ export default Navigator = ({navigation}) => {
             
             screenOptions={{
                 ...tabOptions,
-                ...navigationOptions
+                ...navigationOptions,
             }}
 
             shifting={true}
             sceneAnimationEnabled={true}
-            lazy={false}
             labeled={true}
         >
             <Nav.Screen name="Home" component={HomeTab} options={getTabOptions("home")}/>

@@ -16,7 +16,7 @@ export default MiniPlayer = ({navigation, style}) => {
         artwork: null
     });
 
-    const {dark, colors} = useTheme();
+    const { dark, colors } = useTheme();
     const { position, duration } = useTrackPlayerProgress();
 
     const positionLength = (100 / duration * position);
@@ -66,18 +66,21 @@ export default MiniPlayer = ({navigation, style}) => {
     };
 
     const onStop = () => TrackPlayer.reset();
+    
+    const { title, artist, artwork } = track;
 
-    var title = null;
-    var artist = null;
-    var artwork = null;
-
-    if (track != null) {
-        title = track.title;
-        artist = track.artist;
-        artwork = track.artwork;
-    }
-
-    return  <View style={[style, styles.main, {height: state in [TrackPlayer.STATE_STOPPED, TrackPlayer.STATE_NONE] ?0 :50, backgroundColor: colors.card}]}>
+    return <View
+        style={[
+            style,
+            styles.main,
+            {
+                height: state == TrackPlayer.STATE_STOPPED || state == TrackPlayer.STATE_NONE
+                    ? 0
+                    : 50,
+                backgroundColor: colors.card
+            }
+        ]}
+    >
         <View style={[styles.main, {justifyContent: "space-evenly", width: "100%", maxWidth: 800, alignSelf: "center"}]}>
             <View style={styles.playback}>
                 <View style={{width: positionWidth, backgroundColor: colors.text}}></View>
@@ -160,7 +163,7 @@ const styles = StyleSheet.create({
     },
 
     playback: {
-        height: 1,
+        height: 1.5,
         flexDirection: "row"
     },
 
