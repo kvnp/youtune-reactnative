@@ -80,7 +80,7 @@ export function digestSearchResults(json) {
         reason: null
     };
 
-    let sectionList = json.contents.sectionListRenderer.contents;
+    let sectionList = json.contents.tabbedSearchResultsRenderer.tabs[0].tabRenderer.content.sectionListRenderer.contents;
     if (sectionList[0].hasOwnProperty("itemSectionRenderer")) {
 
         let itemSection = sectionList[0].itemSectionRenderer.contents[0];
