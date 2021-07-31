@@ -5,12 +5,22 @@ const ScrollingText = ({children, style}) => {
     const [containerWidth, setContainerWidth] = useState(-1);
     const [contentWidth, setContentWidth] = useState(-1);
 
-    const valueAnimation = useRef(new Animated.Value(-1)).current;
+    const valueAnimation = useRef(new Animated.Value(0)).current;
     var valueInterpolation = valueAnimation.interpolate({
         inputRange: [-1, 1],
         outputRange: ["-100%", "100%"],
         useNativeDriver: true
     });
+
+    var animation = Animated.timing(
+        valueAnimation,
+        {
+            toValue: containerWidth/contentWidth,
+            duration: 10000,
+            easing: Easing.linear,
+            useNativeDriver: true
+        }
+    );
 
     useEffect(() => {
         valueAnimation.setValue(0);
@@ -24,24 +34,13 @@ const ScrollingText = ({children, style}) => {
         }
     }, [containerWidth, contentWidth]);
 
-    const animation = Animated.timing(
-        valueAnimation,
-        {
-            toValue: 0.5,
-            duration: 15000,
-            easing: Easing.linear,
-            useNativeDriver: true
-        }
-    );
-
     const runAnimation = () => {
-        if (!valueAnimation.hasListeners())
-            animation.start(finished => {
-                if (finished && isOverflowing()) {
-                    valueAnimation.setValue(-1);
-                    runAnimation();
-                }
-            });
+        animation.start(finished => {
+            if (finished && isOverflowing()) {
+                valueAnimation.setValue(-1);
+                runAnimation();
+            }
+        });
     }
 
     const stopAnimation = () => {
