@@ -4,12 +4,12 @@ import {
     StyleSheet,
     Switch,
     Text,
-    Pressable,
     Platform,
     Linking,
-    FlatList
+    FlatList,
+    View
 } from 'react-native';
-
+import { Button } from 'react-native-paper';
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 
 import {
@@ -22,7 +22,6 @@ import {
 
 import { useTheme } from '@react-navigation/native';
 import { setHeader } from '../../components/overlay/Header';
-import { rippleConfig } from '../../styles/Ripple';
 
 const host = Platform.OS == "web"
     ? window.location.hostname.replace("-", "‑") // Unicode NON-BREAKING HYPHEN (U+2011)
@@ -92,22 +91,66 @@ export default SettingsTab = ({navigation}) => {
             ? item.override.web.state
             : item.state;
 
-        return <Pressable key={icon} android_ripple={rippleConfig} onPress={() => disabled ? null : func(!state)} style={[styles.item, {backgroundColor: colors.card}]}>
-            <MaterialIcons name={icon} color={colors.text} size={30}/>
-            <Text style={{flexWrap: "wrap", width: "50%", color: colors.text}}>{desc}</Text>
-            {
-                useSwitch
-                ? <Switch
-                    trackColor={{ false: "gray", true: colors.primary }}
-                    thumbColor="darkgray"
-                    onValueChange={disabled ? null : func}
-                    value={state}
-                    disabled={disabled}
-                />
+        return <Button
+            key={icon}
+            onPress={() => disabled ? null : func(!state)}
+            style={{
+                marginHorizontal: 5,
+                marginBottom: 10,
+                borderRadius: 5
+            }}
 
-                : <MaterialIcons name="launch" color={colors.text} size={30}/>
-            }
-        </Pressable>
+            labelStyle={{
+                display: "flex",
+                flex: 1,
+                letterSpacing: "normal",
+                textTransform: "none",
+                fontSize: 14
+            }}
+            
+            contentStyle={{
+                justifyContent: "stretch",
+                flexGrow: 1,
+                borderRadius: 5,
+                height: 70,
+                flexDirection: 'row',
+                alignSelf: "stretch",
+                alignItems: 'center',
+                backgroundColor: colors.card
+            }}
+        >
+            <View style={{marginHorizontal: "auto"}}>
+                <MaterialIcons name={icon} color={colors.text} size={30}/>
+            </View>
+            <Text
+                style={{
+                    flex: 1,
+                    flexWrap: "wrap",
+                    width: "50%",
+                    alignSelf: "center",
+                    color: colors.text,
+                    marginHorizontal: 10
+                }}
+            >
+                {desc}
+            </Text>
+            
+            <View style={{justifyContent: "center"}}>
+                {
+                    useSwitch
+                    ? <Switch
+                        trackColor={{ false: "gray", true: colors.primary }}
+                        thumbColor="darkgray"
+                        onValueChange={disabled ? null : func}
+                        value={state}
+                        disabled={disabled}
+                    />
+
+                    : <MaterialIcons name="launch" color={colors.text} size={30}/>
+                }
+            </View>
+            
+        </Button>
     }
 
     const items = [
@@ -181,9 +224,6 @@ const styles = StyleSheet.create({
         flexDirection: "row",
         alignItems: "center",
         justifyContent: "space-evenly",
-        height: 70,
-        marginHorizontal: 5,
-        marginBottom: 10,
-        borderRadius: 5
+        height: 70
     },
 });

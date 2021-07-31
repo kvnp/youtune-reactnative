@@ -15,7 +15,6 @@ import { Button } from "react-native-paper";
 import TrackPlayer from 'react-native-track-player';
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import { useTheme } from "@react-navigation/native";
-import Toast from "react-native-toast-message";
 
 import { appColor } from "../../styles/App";
 import { handleMedia } from "../../modules/event/mediaNavigator";
@@ -104,18 +103,6 @@ export default MoreModal = ({navigation}) => {
                 const title = 'Download Finished';
                 const text = 'Download of ' + content.title + ' complete';
                 displayNotification({title: title, text: text, icon: content.thumbnail});
-                Toast.show({
-                    type: 'info',
-                    position: 'top',
-                    text1: title,
-                    text2: text,
-                    visibilityTime: 2000,
-                    autoHide: true,
-                    bottomOffset: 48,
-                    onShow: () => {},
-                    onHide: () => {}, // called when Toast hides (if `autoHide` was set to `true`)
-                    onPress: () => {},
-                });
                 setContent(Content => ({
                     ...Content,
                     downloading: Content.videoId == content.videoId ? false : downloadQueue.findIndex(entry => Content.videoId in entry) > -1 ? true : false,
@@ -126,18 +113,6 @@ export default MoreModal = ({navigation}) => {
                 const title = 'Download Failed';
                 const text = 'Download of ' + content.title + ' did not finish';
                 displayNotification({title: title, text: text, icon: content.thumbnail});
-                Toast.show({
-                    type: 'error',
-                    position: 'top',
-                    text1: title,
-                    text2: text,
-                    visibilityTime: 2000,
-                    autoHide: true,
-                    bottomOffset: 48,
-                    onShow: () => {},
-                    onHide: () => {}, // called when Toast hides (if `autoHide` was set to `true`)
-                    onPress: () => {},
-                });
                 setContent(Content => ({
                     ...Content,
                     downloading: Content.videoId == content.videoId ? false : downloadQueue.findIndex(entry => Content.videoId in entry) > -1 ? true : false,

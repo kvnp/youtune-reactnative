@@ -1,12 +1,11 @@
 import React, { useEffect, useState, useReducer } from "react";
 import {
     View,
-    Text,
     StyleSheet,
     Image,
     ActivityIndicator,
-    Platform,
-    Dimensions
+    Dimensions,
+    Text
 } from "react-native";
 
 import TrackPlayer from 'react-native-track-player';
@@ -22,7 +21,8 @@ import {
     skip,
     setRepeat,
     startPlaylist,
-    isRepeating
+    isRepeating,
+    skipTo
 } from "../../service";
 
 import { getSongLike, likeSong } from "../../modules/storage/MediaStorage";
@@ -31,6 +31,8 @@ import { showModal } from "../../components/modals/MoreModal";
 import { fetchNext } from "../../modules/remote/API";
 import { loadSongLocal, localIDs } from "../../modules/storage/SongStorage";
 import { Button } from "react-native-paper";
+import { dbLoading } from "../../modules/storage/SongStorage.web";
+import ScrollingText from "../../components/shared/ScrollingText";
 
 var track = {
     id: null,
@@ -38,17 +40,26 @@ var track = {
     artist: null,
     artwork: null,
     duration: 0
-}; 
+};
 
-var playlist = null;
+var queue = null;
 
 var playback = TrackPlayer.STATE_BUFFERING;
+
+var textWidth = -1;
 
 const trackListener = TrackPlayer.addEventListener("playback-track-changed", async() => {
     let id = await TrackPlayer.getCurrentTrack();
     if (id != null) {
         track = await TrackPlayer.getTrack(id);
-        playlist = await TrackPlayer.getQueue();
+        let TempQueue = await TrackPlayer.getQueue();
+
+        for (element in TempQueue) {
+            delete element.url;
+        }
+
+        queue = TempQueue;
+        TempQueue = null;
     }
     if (changeCallback) changeCallback();
 });
@@ -64,11 +75,11 @@ const PlayView = ({route, navigation}) => {
     const [, forceUpdate] = useReducer(x => x + 1, 0);
 
     changeCallback = () => {
-        forceUpdate();
         if (track != null) {
             navigation.setOptions({title: track.title});
             navigation.setParams({v: track.id, list: track.playlistId});
         }
+        forceUpdate();
     };
 
     const setRepeating = () => {
@@ -82,39 +93,63 @@ const PlayView = ({route, navigation}) => {
 
     useEffect(() => {
         const _unsubscribe = navigation.addListener('focus', () => {
-            if (route.params && route.params.v != track.id) {
+            if (route.params) {
+                if (route.params.v) {
+                    if (route.params.v == track.id)
+                        return;
+                }
+
+                if (route.params.list && route.params.v) {
+                    if (route.params.list == track.playlistId) {
+                        for (song in queue) {
+                            if (queue[song].id == route.params.v) {
+                                skipTo({id: route.params.v});
+                                return;
+                            }
+                        }
+                    }
+                }
+
                 TrackPlayer.reset();
                 playback = TrackPlayer.STATE_BUFFERING;
                 forceUpdate();
     
-                if (route.params.list == "LOCAL_DOWNLOADS" && !route.params.v) {
-                    let loader = new Promise(async(resolve, reject) => {
-                        let localPlaylist = new Playlist();
-    
-                        for (let i = 0; i < localIDs.length; i++) {
-                            let {title, artist, artwork, duration} = await loadSongLocal(localIDs[i]);
-                            let constructedTrack = {
-                                title,
-                                artist,
-                                artwork,
-                                duration,
-                                id: localIDs[i],
-                                playlistId: route.params.list,
-                                url: null
-                            };
-    
-                            if (localIDs[i] == route.params.v)
-                                localPlaylist.index = i;
-    
-                            localPlaylist.list.push(constructedTrack);
+                if (route.params.list == "LOCAL_DOWNLOADS") {
+                    let intervalId = setInterval(() => {
+                        if (!dbLoading) {
+                            let loader = new Promise(async(resolve, reject) => {
+                                let localPlaylist = new Playlist();
+            
+                                for (let i = 0; i < localIDs.length; i++) {
+                                    let {title, artist, artwork, duration} = await loadSongLocal(localIDs[i]);
+                                    let constructedTrack = {
+                                        title,
+                                        artist,
+                                        artwork,
+                                        duration,
+                                        id: localIDs[i],
+                                        playlistId: route.params.list,
+                                        url: null
+                                    };
+        
+                                    if (route.params.v) {
+                                        if (localIDs[i] == route.params.v)
+                                            localPlaylist.index = i;
+                                    }
+            
+                                    localPlaylist.list.push(constructedTrack);
+                                }
+            
+                                resolve(localPlaylist);
+                            });
+                            
+                            loader.then(loadedPlaylist => {
+                                startPlaylist(loadedPlaylist);
+                            });
+
+                            clearInterval(intervalId);
                         }
-    
-                        resolve(localPlaylist);
-                    });
-                    
-                    loader.then(loadedPlaylist => {
-                        startPlaylist(loadedPlaylist);
-                    });
+                    }, 200);
                 } else if (route.params.v) {
                     fetchNext(route.params.v, route.params.list)
                         .then(loadedList => startPlaylist(loadedList))
@@ -129,6 +164,14 @@ const PlayView = ({route, navigation}) => {
                                 navigation.goBack();
                             }
                         });
+                } else {
+                    fetchNext(null, route.params.list)
+                        .then(loadedList => startPlaylist(loadedList))
+    
+                        .catch(async(reason) => {
+                            console.log(reason);
+                            navigation.goBack();
+                        });
                 }
             } else {
                 changeCallback();
@@ -139,7 +182,7 @@ const PlayView = ({route, navigation}) => {
             changeCallback = null;
             _unsubscribe();
         };
-    }, [track, playlist]);
+    }, [track, queue]);
 
     const refreshLike = async() => {
         setLiked(await getSongLike(id));
@@ -185,14 +228,40 @@ const PlayView = ({route, navigation}) => {
                         />
                     </Button>
                     
-                    <View style={[
-                        {flexGrow: 1, width: 1, paddingHorizontal: 5, alignItems: "center"},
-                        Platform.OS === "web"
-                            ? {userSelect: "text"}
-                            : undefined
-                    ]}>
-                        <Text adjustsFontSizeToFit={true} ellipsizeMode="tail" numberOfLines={1} style={[stylesBottom.titleText, {color: colors.text}]}>{title}</Text>
-                        <Text adjustsFontSizeToFit={true} ellipsizeMode="tail" numberOfLines={1} style={[stylesBottom.subtitleText, {color: colors.text}]}>{artist}</Text>
+                    <View
+                        onLayout={event => {
+                            textWidth = event.nativeEvent.layout.width;
+                            forceUpdate();
+                        }}
+
+                        style={[{
+                            flexGrow: 1,
+                            width: 1,
+                            paddingHorizontal: 5,
+                            alignItems: "center",
+                            userSelect: "text",
+                            overflow: "hidden"
+                        }]}
+                    >
+                        <ScrollingText maxWidth={textWidth}>
+                            <Text
+                                adjustsFontSizeToFit={true}
+                                numberOfLines={1}
+                                style={[stylesBottom.titleText, {color: colors.text}]}
+                            >
+                                {title}
+                            </Text>
+                        </ScrollingText>
+                            
+                        <ScrollingText maxWidth={textWidth}>
+                            <Text
+                                adjustsFontSizeToFit={true}
+                                numberOfLines={1}
+                                style={[stylesBottom.subtitleText, {color: colors.text}]}
+                            >
+                                {artist}
+                            </Text>
+                        </ScrollingText>
                     </View>
 
                     <Button
@@ -294,7 +363,7 @@ const PlayView = ({route, navigation}) => {
 
                     <Button
                         labelStyle={{marginHorizontal: 0}}
-                        style={{...stylesTop.topThird, borderRadius: 25, alignItems: "center", padding: 0, margin: 0, minWidth: 0}}
+                        style={[stylesTop.topThird, { borderRadius: 25, alignItems: "center", padding: 0, margin: 0, minWidth: 0}]}
                         contentStyle={{alignItems: "center", width: 50, height: 50, minWidth: 0}}
                         onPress={() => {
                             let view = {
@@ -323,7 +392,7 @@ const PlayView = ({route, navigation}) => {
             minimumHeight={50}
             backgroundColor={dark ? colors.card : colors.primary}
             textColor={colors.text}
-            playlist={playlist}
+            playlist={queue}
             track={track}
             style={stylesRest.container}
         />

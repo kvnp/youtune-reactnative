@@ -1,15 +1,17 @@
-import { useTheme } from "@react-navigation/native";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import {
     ScrollView,
     Text,
-    View,
-    Pressable
+    View
 } from "react-native";
+
+import { Button } from "react-native-paper";
+import { useTheme } from "@react-navigation/native";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
-import { rippleConfig } from "../../styles/Ripple";
 
 export default Songs = ({ navigation }) => {
+    const [entries, setEntries] = useState([]);
+
     useEffect(() => {
         const unsubscribe = navigation.addListener('focus', () => {
         });
@@ -19,21 +21,21 @@ export default Songs = ({ navigation }) => {
 
     const {dark, colors} = useTheme();
 
-    return (
-        <ScrollView style={{}} contentContainerStyle={{flex: 1, alignItems: "center", justifyContent: "center"}}>
-            <View style={{height: 300, justifyContent: "space-evenly", alignItems: "center"}}>
-                <MaterialIcons name="library-music" color={colors.text} size={50}/>
-                <Text style={{fontSize: 20, color: colors.text}}>Liked songs are displayed here</Text>
-                
-                <View style={{borderRadius: 20, backgroundColor: dark ? colors.card : colors.primary}}>
-                    <Pressable
-                        style={{paddingHorizontal: 20, paddingVertical: 10,}}
-                        onPress={() => navigation.navigate("Search")} android_ripple={rippleConfig}
-                    >
-                        <Text style={{color: colors.text, fontWeight: "bold"}}>Look for music</Text>
-                    </Pressable>
-                </View>
-            </View>
-        </ScrollView>
-    );
+    return entries.length == 0
+        ? <View style={{height: 300, justifyContent: "space-evenly", alignItems: "center", marginTop: "auto"}}>
+            <MaterialIcons name="library-music" color={colors.text} size={50}/>
+            <Text style={{fontSize: 20, color: colors.text}}>Liked songs are displayed here</Text>
+            
+            <Button
+                mode="outlined"
+                onPress={() => navigation.navigate("Search")}
+            >
+                Look for music
+            </Button>
+        </View>
+        : <ScrollView
+            contentContainerStyle={{flex: 1, alignItems: "center", justifyContent: "center"}}
+        >
+        
+    </ScrollView>
 }

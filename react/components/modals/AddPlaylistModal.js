@@ -1,13 +1,14 @@
-import React from "react";
+import React, { useState } from "react";
 import {
     Modal,
     Pressable,
     View,
     StyleSheet,
-    TextInput,
     Platform,
     Text
 } from "react-native";
+
+import { Button, TextInput } from "react-native-paper";
 
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import { useTheme } from "@react-navigation/native";
@@ -16,9 +17,8 @@ import { appColor } from "../../styles/App";
 
 export default AddPlaylistModal = ({navigation, visible, addCallback, cancelCallback}) => {
     const {dark, colors} = useTheme();
-
-    let title = "";
-    let description = "";
+    const [title, setTitle] = useState("");
+    const [description, setDescription] = useState("");
 
     return <Modal
         animationType="slide"
@@ -29,45 +29,54 @@ export default AddPlaylistModal = ({navigation, visible, addCallback, cancelCall
         hardwareAccelerated={true}
     >
         <Pressable onPress={() => cancelCallback()} style={{height: "100%", width: "100%", justifyContent: "flex-end", backgroundColor: "rgba(0, 0, 0, 0.3)"}}>
-            <View style={{
+            <Pressable style={{
                 paddingHorizontal: 10,
                 maxWidth: 800,
                 alignSelf: "center",
                 width: "100%"
             }}>
-                <Pressable style={[modalStyles.header, {backgroundColor: colors.border}, Platform.OS == "web" ? {cursor: "default"} : undefined]}>
+                <View style={[modalStyles.header, {backgroundColor: colors.border}, Platform.OS == "web" ? {cursor: "default"} : undefined]}>
                     <View style={modalStyles.headerText}>
                         <Text style={{color: colors.text}} numberOfLines={1}>Add playlist</Text>
                         <Text style={{color: colors.text}} numberOfLines={1}></Text>
                     </View>
-                </Pressable>
+                </View>
 
-                <Pressable style={{height: 50, alignItems: "center", paddingHorizontal: 50, flexDirection: "row", backgroundColor: colors.card, cursor: Platform.OS == "web" ? "default" : undefined}}>
+                <View style={{height: 80, alignItems: "center", paddingHorizontal: 50, flexDirection: "row", backgroundColor: colors.card, cursor: Platform.OS == "web" ? "default" : undefined}}>
                     <MaterialIcons name="title" color={colors.text} size={25}/>
-                    <TextInput style={[styles.inputText, {color: colors.text, marginLeft: 20}]}
-                        onChangeText={ text => title = text }
+                    <TextInput
+                        placeholderTextColor={colors.text}
+                        underlineColor={colors.border}
+                        style={[styles.inputText, {color: colors.text, backgroundColor: colors.card, marginLeft: 20, flex: 1}]}
+                        value={title}
+                        onChangeText={text => setTitle(text)}
                         placeholder="Title"
+                        mode="flat"
                     />
-                </Pressable>
+                </View>
 
-                <Pressable style={{height: 50, alignItems: "center", paddingHorizontal: 50, flexDirection: "row", backgroundColor: colors.card, cursor: Platform.OS == "web" ? "default" : undefined}}>
+                <View style={{height: 80, alignItems: "center", paddingHorizontal: 50, flexDirection: "row", backgroundColor: colors.card, cursor: Platform.OS == "web" ? "default" : undefined}}>
                     <MaterialIcons name="description" color={colors.text} size={25}/>
-                    <TextInput style={[styles.inputText, {color: colors.text, marginLeft: 20}]}
-                        onChangeText={ text => description = text}
+                    <TextInput
+                        placeholderTextColor={colors.text}
+                        underlineColor={colors.border}
+                        style={[styles.inputText, {color: colors.text, backgroundColor: colors.card, marginLeft: 20, flex: 1}]}
+                        value={description}
+                        onChangeText={text => setDescription(text)}
                         placeholder="Description"
                     />
-                </Pressable>
+                </View>
 
-                <Pressable style={{height: 50, width: "100%", backgroundColor: colors.card, flexDirection: "row", justifyContent: "center", cursor: Platform.OS == "web" ? "default" : undefined}}>
-                    <Pressable style={{marginHorizontal: 20, alignSelf: "center"}} onPress={() => cancelCallback()}>
+                <View style={{height: 80, width: "100%", backgroundColor: colors.card, flexDirection: "row", justifyContent: "center", cursor: Platform.OS == "web" ? "default" : undefined}}>
+                    <Button mode="text" style={{marginHorizontal: 20, alignSelf: "center"}} onPress={() => cancelCallback()}>
                         <Text>CANCEL</Text>
-                    </Pressable>
+                    </Button>
 
-                    <Pressable style={{marginHorizontal: 20, alignSelf: "center"}} onPress={() => addCallback()}>
+                    <Button mode="contained" style={{ marginHorizontal: 20, alignSelf: "center"}} onPress={() => addCallback(title, description)}>
                         <Text>CREATE</Text>
-                    </Pressable>
-                </Pressable>
-            </View>
+                    </Button>
+                </View>
+            </Pressable>
         </Pressable>
     </Modal>
 };

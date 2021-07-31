@@ -1,13 +1,14 @@
-import 'react-native-gesture-handler';
-import React, { useCallback, useState } from "react";
+if (Platform.OS != "windows")
+    require('react-native-gesture-handler');
+
+import React, { useState } from "react";
 import { Platform, StatusBar } from "react-native";
-import { Provider, configureFonts} from 'react-native-paper';
+import { Provider, configureFonts, Snackbar, DefaultTheme as PaperTheme} from 'react-native-paper';
 
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import { DefaultTheme, DarkTheme } from '@react-navigation/native';
 import { enableScreens } from 'react-native-screens';
-import Toast from 'react-native-toast-message'
 
 import { settings } from "./modules/storage/SettingsStorage";
 import PlayView from "./views/full/PlayView";
@@ -157,14 +158,35 @@ const fontConfig = {
     },
 };
 
-const theme = {
-    ...DefaultTheme,
-    fonts: configureFonts(fontConfig)
-}
-
-export default App = () => {
+const App = () => {
     const [dark, setDark] = useState(settings.darkMode);
-    const toastRef = useCallback(ref => Toast.setRef(ref), []);
+    const [visible, setVisible] = useState(true);
+
+    const theme = dark
+        ? {
+            ...PaperTheme,
+            ...DarkTheme,
+            colors: {
+                ...PaperTheme.colors,
+                ...DarkTheme.colors,
+                onSurface: DarkTheme.colors.border
+            },
+            dark: dark,
+            fonts: configureFonts(fontConfig)
+        }
+
+        : {
+            ...PaperTheme,
+            ...DefaultTheme,
+            colors: {
+                ...PaperTheme.colors,
+                ...DefaultTheme.colors,
+                onSurface: DarkTheme.colors.border
+            },
+            dark: dark,
+            fonts: configureFonts(fontConfig)
+        }
+
     if (settings.darkMode)
         StatusBar.setBarStyle("light-content", true);
     else
@@ -178,26 +200,28 @@ export default App = () => {
             StatusBar.setBarStyle("dark-content", true);
     };
 
+    let updateBar = null;
     if (Platform.OS == "web") {
+        updateBar = <Snackbar
+            visible={visible}
+            onDismiss={() => setVisible(false)}
+            style={{bottom: 50, maxWidth: 800, alignSelf: "center", width: "100%"}}
+            action={{
+                label: 'Reload',
+                onPress: () => location.reload(),
+            }}
+        >
+            An update is availabe!
+        </Snackbar>
+
         window['isUpdateAvailable']
             .then(isAvailable => { if (isAvailable) {
-                Toast.show({
-                    type: 'info',
-                    position: 'bottom',
-                    text1: 'New Update available!',
-                    text2: 'Reload the webapp to see the latest juicy changes.',
-                    visibilityTime: 4000,
-                    autoHide: true,
-                    bottomOffset: 48,
-                    onShow: () => {},
-                    onHide: () => {}, // called when Toast hides (if `autoHide` was set to `true`)
-                    onPress: () => location.reload(),
-                });
+                setVisible(true);
             }});
     }
 
     return <Provider theme={theme}>
-        <NavigationContainer linking={linking} theme={dark ? DarkTheme : DefaultTheme}>
+        <NavigationContainer linking={linking} theme={theme}>
             <Stack.Navigator screenOptions={{gestureEnabled: true, swipeEnabled: true, animationEnabled: true}}>
                 <Stack.Screen name="App" component={Navigator} options={navigationOptions}/>
                 <Stack.Screen name="Music" component={PlayView} options={{...navigationOptions, presentation: "modal"}}/>
@@ -211,7 +235,9 @@ export default App = () => {
                             options={{headerBackImage: () => getIcon({title: "arrow-back"})}}
                 />
             </Stack.Navigator>
-            <Toast ref={toastRef}/>
+            {updateBar}
         </NavigationContainer>
     </Provider>
 }
+
+export default App;

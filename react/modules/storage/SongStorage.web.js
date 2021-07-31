@@ -5,6 +5,7 @@ import {
 } from "../remote/API";
 
 export var localIDs = null;
+export var dbLoading = true;
 
 var db = null;
 
@@ -33,6 +34,7 @@ async function loadSongList(db) {
 
         request.onsuccess = event => {
             localIDs = request.result;
+            dbLoading = false;
         };
     };
 }
@@ -57,6 +59,7 @@ export function loadSongLocal(id) {
             request.onsuccess = event => {
                 let track = request.result.track;
                 resolve(track);
+                track = null;
             };
             
         };

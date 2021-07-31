@@ -4,7 +4,6 @@ import {
     StyleSheet,
     Text,
     Pressable,
-    Modal,
     Platform,
     ActivityIndicator,
     View
