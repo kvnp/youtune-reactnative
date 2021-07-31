@@ -160,7 +160,7 @@ const fontConfig = {
 
 const App = () => {
     const [dark, setDark] = useState(settings.darkMode);
-    const [visible, setVisible] = useState(true);
+    const [visible, setVisible] = useState(false);
 
     const theme = dark
         ? {
