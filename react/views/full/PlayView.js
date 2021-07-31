@@ -39,6 +39,7 @@ var track = {
     title: null,
     artist: null,
     artwork: null,
+    playlistId: null,
     duration: 0
 };
 
@@ -71,11 +72,13 @@ var changeCallback = null;
 
 const PlayView = ({route, navigation}) => {
     const [, forceUpdate] = useReducer(x => x + 1, 0);
+    const { height, width } = Dimensions.get("window");
+    const { title, artist, artwork, id, playlistId } = track;
 
     changeCallback = () => {
-        if (track != null) {
-            navigation.setOptions({title: track.title});
-            navigation.setParams({v: track.id, list: track.playlistId});
+        if (title != null && id != null) {
+            navigation.setOptions({title: title});
+            navigation.setParams({v: id, list: playlistId});
         }
         forceUpdate();
     };
@@ -180,14 +183,11 @@ const PlayView = ({route, navigation}) => {
             changeCallback = null;
             _unsubscribe();
         };
-    }, [track, queue]);
+    }, [route.params]);
 
     const refreshLike = async() => {
         setLiked(await getSongLike(id));
     }
-
-    const { height, width } = Dimensions.get("window");
-    const { title, artist, artwork, id } = track;
 
     return <>
         <View style={stylesTop.vertContainer}>
