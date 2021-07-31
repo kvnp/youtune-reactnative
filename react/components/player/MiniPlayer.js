@@ -6,6 +6,7 @@ import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import TrackPlayer, { useTrackPlayerProgress } from 'react-native-track-player';
 
 import { skip } from "../../service";
+import ScrollingText from "../shared/ScrollingText";
 
 export default MiniPlayer = ({navigation, style}) => {
     const [state, setState] = useState(TrackPlayer.STATE_STOPPED);
@@ -91,12 +92,38 @@ export default MiniPlayer = ({navigation, style}) => {
                 <View style={styles.textContainer}>
                     <Button
                         onPress={onOpen}
-                        labelStyle={{marginHorizontal: 0, margin: 0, padding: 0, borderRadius: 0, letterSpacing: "normal", textTransform: "none", fontSize: 14, textAlignVertical: "center"}}
                         style={{alignItems: "stretch", padding: 0, margin: 0}}
                         contentStyle={{alignItems: "center", height: 50}}
+                        labelStyle={{
+                            marginHorizontal: 0,
+                            margin: 0,
+                            padding: 0,
+                            borderRadius: 0,
+                            letterSpacing: "normal",
+                            textTransform: "none",
+                            fontSize: 14,
+                            textAlignVertical: "center",
+                            display: "flex",
+                            flexDirection: "column",
+                            width: "100%"
+                        }}
                     >
-                        <Text numberOfLines={1} style={[styles.titleText, {color: colors.text}]}>{title + "\n"}</Text>
-                        <Text numberOfLines={1} style={[styles.subtitleText, {color: colors.text}]}>{artist}</Text>
+                        <ScrollingText>
+                            <Text
+                                style={[styles.titleText, {color: colors.text, flexWrap: "nowrap"}]}
+                            >
+                                {title}
+                            </Text>
+                        </ScrollingText>
+
+                        <ScrollingText>
+                            <Text
+                                style={[styles.subtitleText, {color: colors.text, flexWrap: "nowrap"}]}
+                            >
+                                {artist}
+                            </Text>
+                        </ScrollingText>
+                        
                     </Button>
                 </View>
 
@@ -106,7 +133,6 @@ export default MiniPlayer = ({navigation, style}) => {
                         labelStyle={{marginHorizontal: 0}}
                         style={{borderRadius: 25, alignItems: "center", padding: 0, margin: 0, minWidth: 0}}
                         contentStyle={{alignItems: "center", width: 50, height: 50, minWidth: 0}}
-                            
                     >
                         <MaterialIcons
                             name="clear"

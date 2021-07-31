@@ -1,63 +1,95 @@
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import { Animated, Easing, View } from "react-native";
 
-const ScrollingText = ({children, style, maxWidth}) => {
-    const [overflown, setOverflown] = useState(false);
+const ScrollingText = ({children, style}) => {
+    const [containerWidth, setContainerWidth] = useState(-1);
+    const [contentWidth, setContentWidth] = useState(-1);
 
-    const valueAnimation = useRef(new Animated.Value(0)).current;
+    const valueAnimation = useRef(new Animated.Value(-1)).current;
     var valueInterpolation = valueAnimation.interpolate({
-        inputRange: [0, 1],
-        outputRange: ["0%", "100%"],
+        inputRange: [-1, 1],
+        outputRange: ["-100%", "100%"],
         useNativeDriver: true
     });
+
+    useEffect(() => {
+        valueAnimation.setValue(0);
+        handleAnimation();
+
+        return () => {
+            valueAnimation.stopAnimation();
+            animation.stop();
+            valueAnimation.removeAllListeners();
+            valueInterpolation.removeAllListeners();
+        }
+    }, [containerWidth, contentWidth]);
 
     const animation = Animated.timing(
         valueAnimation,
         {
-            toValue: 1,
-            duration: 10000,
+            toValue: 0.5,
+            duration: 15000,
             easing: Easing.linear,
             useNativeDriver: true
         }
     );
 
     const runAnimation = () => {
-        if (!overflown) {
-            setOverflown(true);
-            animation.start(() => {
-                valueAnimation.setValue(-1);
-                runAnimation();
+        if (!valueAnimation.hasListeners())
+            animation.start(finished => {
+                if (finished && isOverflowing()) {
+                    valueAnimation.setValue(-1);
+                    runAnimation();
+                }
             });
-        }
     }
 
     const stopAnimation = () => {
-        if (overflown) {
-            animation.stop();
-            animation.reset();
-            valueAnimation.setValue(0);
-            setOverflown(false);
-        }
+        valueAnimation.stopAnimation();
+        animation.stop();
+        valueAnimation.removeAllListeners();
+        valueInterpolation.removeAllListeners();
+        valueAnimation.setValue(-1);
     }
 
-    return <View style={[{overflow: "hidden"}, style]}>
+    const isOverflowing = () => {
+        if (contentWidth == -1 || containerWidth == -1)
+            return false;
+        
+        if (contentWidth > containerWidth)
+            return true;
+        else
+            return false;
+    }
+
+    const handleAnimation = () => {
+        if (isOverflowing())
+            runAnimation();
+        else
+            stopAnimation();
+    }
+
+    return <View
+        style={[{overflow: "hidden", width: "100%"}, style]}
+        onLayout={event => {
+            setContainerWidth(event.nativeEvent.layout.width);
+        }}
+    >
         <Animated.ScrollView
-            /*onLayout={e => {
-                let width = e.nativeEvent.layout.width;
-                
-                if (width > maxWidth)
-                    runAnimation();
-                else
-                    stopAnimation();
-            }}*/
             onContentSizeChange={(width, height) => {
-                if (width > maxWidth)
-                    runAnimation();
-                else
-                    stopAnimation();
+                setContentWidth(width);
             }}
             
-            style={{transform: [{translateX: overflown ? valueInterpolation : 0}]}}
+            style={{
+                alignSelf: isOverflowing()
+                    ? "flex-start"
+                    : "center",
+                transform: [{
+                    translateX: isOverflowing()
+                        ? valueInterpolation
+                        : 0
+                }]
+            }}
         >
             {children}
         </Animated.ScrollView>

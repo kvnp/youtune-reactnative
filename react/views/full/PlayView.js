@@ -46,8 +46,6 @@ var queue = null;
 
 var playback = TrackPlayer.STATE_BUFFERING;
 
-var textWidth = -1;
-
 const trackListener = TrackPlayer.addEventListener("playback-track-changed", async() => {
     let id = await TrackPlayer.getCurrentTrack();
     if (id != null) {
@@ -229,11 +227,6 @@ const PlayView = ({route, navigation}) => {
                     </Button>
                     
                     <View
-                        onLayout={event => {
-                            textWidth = event.nativeEvent.layout.width;
-                            forceUpdate();
-                        }}
-
                         style={[{
                             flexGrow: 1,
                             width: 1,
@@ -243,7 +236,7 @@ const PlayView = ({route, navigation}) => {
                             overflow: "hidden"
                         }]}
                     >
-                        <ScrollingText maxWidth={textWidth}>
+                        <ScrollingText>
                             <Text
                                 adjustsFontSizeToFit={true}
                                 numberOfLines={1}
@@ -253,7 +246,7 @@ const PlayView = ({route, navigation}) => {
                             </Text>
                         </ScrollingText>
                             
-                        <ScrollingText maxWidth={textWidth}>
+                        <ScrollingText>
                             <Text
                                 adjustsFontSizeToFit={true}
                                 numberOfLines={1}
