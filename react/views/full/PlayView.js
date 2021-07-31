@@ -183,7 +183,7 @@ const PlayView = ({route, navigation}) => {
             changeCallback = null;
             _unsubscribe();
         };
-    }, [route.params]);
+    }, []);
 
     const refreshLike = async() => {
         setLiked(await getSongLike(id));
