@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 
 import {
     ScrollView,
@@ -9,7 +9,7 @@ import {
 
 import { Button } from 'react-native-paper';
 
-import { useTheme } from '@react-navigation/native';
+import { useFocusEffect, useTheme } from '@react-navigation/native';
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import Entry from "../../components/shared/Entry";
 import { loadSongLocal, localIDs } from "../../modules/storage/SongStorage";
@@ -22,6 +22,7 @@ export default Downloads = ({ navigation }) => {
     const playlistId = "LOCAL_DOWNLOADS";
 
     const loadEntries = async() => {
+        let entries = [];
         for (let i = 0; i < localIDs.length; i++) {
             let { title, artist, artwork, id } = await loadSongLocal(localIDs[i]);
             entries.push({
@@ -36,23 +37,21 @@ export default Downloads = ({ navigation }) => {
         setEntries(entries);
     }
 
-    useEffect(() => {
-        const unsubscribe = navigation.addListener('focus', () => {
+    useFocusEffect(
+        useCallback(() => {
             if (!dbLoading) {
-                if (entries.length != localIDs.length)
+                if (localIDs.length > 0)
                     loadEntries();
             } else {
                 let intervalId = setInterval(() => {
                     if (!dbLoading) {
                         clearInterval(intervalId);
                         loadEntries();
-                    }
+                    } else console.log("loading");
                 }, 200);
             }
-        });
-
-        return () => unsubscribe();
-    }, []);
+        }, [])
+    )
 
     const {dark, colors} = useTheme();
 
