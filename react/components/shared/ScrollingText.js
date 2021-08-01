@@ -8,15 +8,16 @@ const ScrollingText = ({children, style}) => {
     const valueAnimation = useRef(new Animated.Value(0)).current;
     var valueInterpolation = valueAnimation.interpolate({
         inputRange: [-1, 1],
-        outputRange: ["-100%", "100%"],
+        outputRange: ["100%", "-100%"],
         useNativeDriver: true
     });
 
-    var animation = Animated.timing(
+    const animation = Animated.timing(
         valueAnimation,
         {
-            toValue: containerWidth/contentWidth,
+            toValue: 1,
             duration: 10000,
+            delay: 1000,
             easing: Easing.linear,
             useNativeDriver: true
         }
@@ -26,18 +27,13 @@ const ScrollingText = ({children, style}) => {
         valueAnimation.setValue(0);
         handleAnimation();
 
-        return () => {
-            valueAnimation.stopAnimation();
-            animation.stop();
-            valueAnimation.removeAllListeners();
-            valueInterpolation.removeAllListeners();
-        }
+        return () => stopAnimation();
     }, [containerWidth, contentWidth]);
 
     const runAnimation = () => {
         animation.start(finished => {
             if (finished && isOverflowing()) {
-                valueAnimation.setValue(-1);
+                valueAnimation.setValue(-containerWidth/contentWidth);
                 runAnimation();
             }
         });
@@ -48,7 +44,6 @@ const ScrollingText = ({children, style}) => {
         animation.stop();
         valueAnimation.removeAllListeners();
         valueInterpolation.removeAllListeners();
-        valueAnimation.setValue(-1);
     }
 
     const isOverflowing = () => {
