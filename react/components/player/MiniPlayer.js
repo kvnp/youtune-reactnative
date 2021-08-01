@@ -7,6 +7,7 @@ import TrackPlayer, { useTrackPlayerProgress } from 'react-native-track-player';
 
 import { skip } from "../../service";
 import ScrollingText from "../shared/ScrollingText";
+import { setTransitionTrack } from "../../views/full/PlayView";
 
 export default MiniPlayer = ({navigation, style}) => {
     const [state, setState] = useState(TrackPlayer.STATE_STOPPED);
@@ -43,20 +44,30 @@ export default MiniPlayer = ({navigation, style}) => {
             playback.remove();
             trackChanged.remove();
         }
-    }, []);
+    }, [track, state]);
 
     const refreshTrack = async(e) => {
         if (!e) e = {nextTrack: await TrackPlayer.getCurrentTrack()};
         let track = await TrackPlayer.getTrack(e.nextTrack);
+        delete track.url;
 
-        setTrack({
+        setTrack(track);
+    }
+
+    const onOpen = () => {
+        setTransitionTrack({
+            id: track.id,
+            playlistId: track.playlistId,
             title: track.title,
             artist: track.artist,
             artwork: track.artwork
         });
-    }
 
-    const onOpen = () => navigation.navigate("Music");
+        navigation.navigate("Music", {
+            v: track.id,
+            list: track.playlistId
+        });
+    }
 
     const onNext = () => skip(true);
 

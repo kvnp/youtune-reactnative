@@ -1,15 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useCallback } from 'react';
 
-import {
-    View,
-    Text,
-    StyleSheet,
-    Platform
-} from 'react-native';
-
-import { useNavigation, useTheme } from '@react-navigation/native';
+import { View, Text, StyleSheet, Platform } from 'react-native';
+import { useFocusEffect, useTheme } from '@react-navigation/native';
 import Slider from '@react-native-community/slider';
-
 import TrackPlayer from 'react-native-track-player';
 
 function pad(n, width, z = 0) {
@@ -24,10 +17,10 @@ const minutesAndSeconds = position => ([
     pad( ~~(position % 60), 2),
 ]);
 
-export default SeekBar = ({style, duration}) => {
-    const navigation = useNavigation();
+const SeekBar = ({style}) => {
     const [isSliding, setSliding] = useState(false);
     const [positionCache, setPositionCache] = useState(0);
+    const [duration, setDuration] = useState(0);
     const [state, setState] = useState({
         position: 0,
         bufferedPosition: 0
@@ -46,37 +39,45 @@ export default SeekBar = ({style, duration}) => {
         });
     }
 
-    useEffect(() => {
-        var interval;
+    useFocusEffect(
+        useCallback(() => {
+            var interval;
 
-        const focus = navigation.addListener('focus', async() => {
             updateSeekbar();
-            if (await TrackPlayer.getState() == TrackPlayer.STATE_PLAYING) {
-                clearInterval(interval);
-                interval = setInterval(() => updateSeekbar(), 500);
-            }
-        });
-
-        const trackState = TrackPlayer.addEventListener('playback-state', playback => {
-            clearInterval(interval);
-            switch (playback.state) {
-                case TrackPlayer.STATE_PLAYING:
+            TrackPlayer.getState().then(async(state) => {
+                if (state == TrackPlayer.STATE_PLAYING) {
+                    clearInterval(interval);
+                    setDuration(await TrackPlayer.getDuration());
                     interval = setInterval(() => updateSeekbar(), 500);
-                    break;
-                case TrackPlayer.STATE_NONE:
-                case TrackPlayer.STATE_PAUSED:
-                case TrackPlayer.STATE_STOPPED:
-                case TrackPlayer.STATE_BUFFERING:
-                    updateSeekbar();
-            }
-        });
+                }
+            })
 
-        return () => {
-            clearInterval(interval);
-            focus();
-            trackState.remove();
-        }
-    }, []);
+            const playState = TrackPlayer.addEventListener('playback-state', playback => {
+                clearInterval(interval);
+                switch (playback.state) {
+                    case TrackPlayer.STATE_PLAYING:
+                        interval = setInterval(() => updateSeekbar(), 500);
+                        break;
+                    case TrackPlayer.STATE_NONE:
+                    case TrackPlayer.STATE_PAUSED:
+                    case TrackPlayer.STATE_STOPPED:
+                    case TrackPlayer.STATE_BUFFERING:
+                        updateSeekbar();
+                }
+            });
+    
+            const trackState = TrackPlayer.addEventListener('playback-track-changed', async() => {
+                setDuration(await TrackPlayer.getDuration());
+                updateSeekbar();
+            });
+    
+            return () => {
+                clearInterval(interval);
+                playState.remove();
+                trackState.remove();
+            }
+        }, [])
+    );
 
     return (
         <View style={[styles.container, style]}>
@@ -116,6 +117,8 @@ export default SeekBar = ({style, duration}) => {
         </View>
     );
 };
+
+export default SeekBar;
 
 const styles = StyleSheet.create({
     slider: {

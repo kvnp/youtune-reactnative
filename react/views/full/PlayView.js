@@ -1,16 +1,17 @@
-import React, { useEffect, useState, useReducer } from "react";
+import React, { useEffect, useState, useCallback, useRef } from "react";
 import {
     View,
     StyleSheet,
     Image,
     ActivityIndicator,
     Dimensions,
-    Text
+    Text,
+    InteractionManager
 } from "react-native";
 
 import TrackPlayer from 'react-native-track-player';
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
-import { useTheme } from "@react-navigation/native";
+import { useFocusEffect, useTheme } from "@react-navigation/native";
 
 import Playlist from "../../modules/models/music/playlist"
 
@@ -34,156 +35,203 @@ import { Button } from "react-native-paper";
 import { dbLoading } from "../../modules/storage/SongStorage.web";
 import ScrollingText from "../../components/shared/ScrollingText";
 
-var track = {
+var transitionTrack = {
     id: null,
+    playlistId: null,
     title: null,
     artist: null,
-    artwork: null,
-    playlistId: null,
-    duration: 0
-};
+    artwork: null
+}
 
-var queue = null;
+export const setTransitionTrack = track => {
+    delete track.url;
+    delete track.duration;
+    transitionTrack = track;
+}
 
 var playback = TrackPlayer.STATE_BUFFERING;
-
-const trackListener = TrackPlayer.addEventListener("playback-track-changed", async() => {
-    let id = await TrackPlayer.getCurrentTrack();
-    if (id != null) {
-        track = await TrackPlayer.getTrack(id);
-        let TempQueue = await TrackPlayer.getQueue();
-
-        for (element in TempQueue) {
-            delete element.url;
-        }
-
-        queue = TempQueue;
-        TempQueue = null;
-    }
-    if (changeCallback) changeCallback();
-});
+var stateCallback = null;
 
 const stateListener = TrackPlayer.addEventListener("playback-state", e => {
     playback = e.state;
-    if (changeCallback) changeCallback();
+    if (stateCallback)
+        stateCallback(e.state);
 });
 
-var changeCallback = null;
-
 const PlayView = ({route, navigation}) => {
-    const [, forceUpdate] = useReducer(x => x + 1, 0);
+    const [state, setState] = useState(playback);
+    const [isReplaying, setReplay] = useState(isRepeating);
+    const [queue, setQueue] = useState(null);
+    const [track, setTrack] = useState(
+        route.params
+            ? transitionTrack
+
+            : {
+                id: null,
+                playlistId: null,
+                title: null,
+                artist: null,
+                artwork: null
+            }
+    );
+
     const { height, width } = Dimensions.get("window");
     const { title, artist, artwork, id, playlistId } = track;
 
-    changeCallback = () => {
-        if (title != null && id != null) {
-            navigation.setOptions({title: title});
-            navigation.setParams({v: id, list: playlistId});
-        }
-        forceUpdate();
-    };
-
     const setRepeating = () => {
         setRepeat(!isRepeating);
-        forceUpdate();
+        setReplay(isRepeating);
     };
 
     const [isLiked, setLiked] = useState(null);
 
     const { dark, colors } = useTheme();
 
-    useEffect(() => {
-        const _unsubscribe = navigation.addListener('focus', () => {
-            if (route.params) {
-                if (route.params.v) {
-                    if (route.params.v == track.id)
-                        return;
-                }
-
-                if (route.params.list && route.params.v) {
-                    if (route.params.list == track.playlistId) {
-                        for (song in queue) {
-                            if (queue[song].id == route.params.v) {
-                                skipTo({id: route.params.v});
-                                return;
-                            }
-                        }
-                    }
-                }
-
-                TrackPlayer.reset();
-                playback = TrackPlayer.STATE_BUFFERING;
-                forceUpdate();
-    
-                if (route.params.list == "LOCAL_DOWNLOADS") {
-                    let intervalId = setInterval(() => {
-                        if (!dbLoading) {
-                            let loader = new Promise(async(resolve, reject) => {
-                                let localPlaylist = new Playlist();
-            
-                                for (let i = 0; i < localIDs.length; i++) {
-                                    let {title, artist, artwork, duration} = await loadSongLocal(localIDs[i]);
-                                    let constructedTrack = {
-                                        title,
-                                        artist,
-                                        artwork,
-                                        duration,
-                                        id: localIDs[i],
-                                        playlistId: route.params.list,
-                                        url: null
-                                    };
-        
-                                    if (route.params.v) {
-                                        if (localIDs[i] == route.params.v)
-                                            localPlaylist.index = i;
-                                    }
-            
-                                    localPlaylist.list.push(constructedTrack);
-                                }
-            
-                                resolve(localPlaylist);
-                            });
-                            
-                            loader.then(loadedPlaylist => {
-                                startPlaylist(loadedPlaylist);
-                            });
-
-                            clearInterval(intervalId);
-                        }
-                    }, 200);
-                } else if (route.params.v) {
-                    fetchNext(route.params.v, route.params.list)
-                        .then(loadedList => startPlaylist(loadedList))
-    
-                        .catch(async(reason) => {
-                            console.log(reason);
-                            if (localIDs.includes(route.params.v)) {
-                                let localPlaylist = new Playlist();
-                                localPlaylist.list.push(await loadSongLocal(route.params.v));
-                                startPlaylist(localPlaylist);
-                            } else {
-                                navigation.goBack();
-                            }
-                        });
-                } else {
-                    fetchNext(null, route.params.list)
-                        .then(loadedList => startPlaylist(loadedList))
-    
-                        .catch(async(reason) => {
-                            console.log(reason);
-                            navigation.goBack();
-                        });
-                }
-            } else {
-                changeCallback();
+    useFocusEffect(
+        useCallback(() => {
+            if (title != null && id != null) {
+                navigation.setOptions({title: title});
+                navigation.setParams({v: id, list: playlistId});
             }
-        });
+        }, [track])
+    );
 
-        return () => {
-            changeCallback = null;
-            _unsubscribe();
-        };
-    }, []);
+    useFocusEffect(
+        useCallback(() => {
+            const task = InteractionManager.runAfterInteractions(() => {
+                stateCallback = state => {
+                    setState(state);
+                }
+
+                const trackListener = TrackPlayer.addEventListener("playback-track-changed", async() => {
+                    let id = await TrackPlayer.getCurrentTrack();
+                    if (id != null) {
+                        setTrack(await TrackPlayer.getTrack(id));
+        
+                        let queue = await TrackPlayer.getQueue();
+                        for (element in queue) {
+                            delete element.url;
+                            delete element.duration;
+                        }
+                        
+                        setQueue(queue);
+                    }
+                });
+
+                if (route.params) {
+                    let reloadPromise = new Promise(async(resolve, reject) => {
+                        let reloading = true;
+                        let id = await TrackPlayer.getCurrentTrack();
+                        let track = null;
+                        let playlistId = null;
+                        
+                        if (id != null) {
+                            track = await TrackPlayer.getTrack(id);
+                            delete track.url;
+                            delete track.duration;
+                            playlistId = track.playlistId;
+                        }
+
+                        if (route.params.v) {
+                            if (route.params.v == id) {
+                                reloading = false;
+                            }
+                        }
+
+                        if (route.params.list && route.params.v) {
+                            if (route.params.list == playlistId) {
+                                skipTo({id: route.params.v});
+                                reloading = false;
+                            }
+                        }
+
+                        resolve(reloading);
+                    });
+
+                    reloadPromise.then(reloading => {
+                        if (reloading) {
+                            TrackPlayer.reset();
+                            setState(TrackPlayer.STATE_BUFFERING);
+                
+                            if (route.params.list == "LOCAL_DOWNLOADS") {
+                                let intervalId = setInterval(() => {
+                                    if (!dbLoading) {
+                                        let loader = new Promise(async(resolve, reject) => {
+                                            let localPlaylist = new Playlist();
+                        
+                                            for (let i = 0; i < localIDs.length; i++) {
+                                                let {title, artist, artwork, duration} = await loadSongLocal(localIDs[i]);
+                                                let constructedTrack = {
+                                                    title,
+                                                    artist,
+                                                    artwork,
+                                                    duration,
+                                                    id: localIDs[i],
+                                                    playlistId: route.params.list,
+                                                    url: null
+                                                };
+                    
+                                                if (route.params.v) {
+                                                    if (localIDs[i] == route.params.v)
+                                                        localPlaylist.index = i;
+                                                }
+                        
+                                                localPlaylist.list.push(constructedTrack);
+                                            }
+                        
+                                            resolve(localPlaylist);
+                                        });
+                                        
+                                        loader.then(loadedPlaylist => {
+                                            startPlaylist(loadedPlaylist);
+                                        });
+                
+                                        clearInterval(intervalId);
+                                    }
+                                }, 200);
+                            } else if (route.params.v) {
+                                fetchNext(route.params.v, route.params.list)
+                                    .then(loadedList => startPlaylist(loadedList))
+                
+                                    .catch(async(reason) => {
+                                        console.log(reason);
+                                        if (localIDs.includes(route.params.v)) {
+                                            let localPlaylist = new Playlist();
+                                            localPlaylist.list.push(await loadSongLocal(route.params.v));
+                                            startPlaylist(localPlaylist);
+                                        } else {
+                                            navigation.goBack();
+                                        }
+                                    });
+                            } else {
+                                fetchNext(null, route.params.list)
+                                    .then(loadedList => startPlaylist(loadedList))
+                
+                                    .catch(async(reason) => {
+                                        console.log(reason);
+                                        navigation.goBack();
+                                    });
+                            }
+                        }
+                    })
+                } else {
+                    TrackPlayer.getCurrentTrack(async(id) => {
+                        let track = await TrackPlayer.getTrack(id);
+                        delete track.url;
+                        delete track.duration;
+                        setTrack(track);
+                    })
+                }
+
+                return () => {
+                    trackListener.remove();
+                    stateCallback = null;
+                }
+            });
+
+            return () => task.cancel();
+        }, [])
+    );
 
     const refreshLike = async() => {
         setLiked(await getSongLike(id));
@@ -280,7 +328,7 @@ const PlayView = ({route, navigation}) => {
                     </Button>
                 </View>
 
-                <SeekBar duration={track.duration}/>
+                <SeekBar/>
                 
                 <View style={[stylesBottom.buttonContainer, {overflow: "visible", alignSelf: "stretch", justifyContent: "space-between"}]}>
                     <Button
@@ -302,7 +350,7 @@ const PlayView = ({route, navigation}) => {
                     </Button>
 
                     <View style={{alignSelf: "center", alignItems: "center", justifyContent: "center", backgroundColor: dark ? colors.card : colors.primary, width: 60, height: 60, borderRadius: 30}}>
-                        {playback == TrackPlayer.STATE_BUFFERING
+                        {state == TrackPlayer.STATE_BUFFERING
                             ?   <ActivityIndicator style={{alignSelf: "center"}} color={colors.text} size="large"/>
 
                             :   <Button
@@ -310,12 +358,22 @@ const PlayView = ({route, navigation}) => {
                                     style={{borderRadius: 25, alignItems: "center", padding: 0, margin: 0, minWidth: 0}}
                                     contentStyle={{alignItems: "center", width: 60, height: 60, minWidth: 0}}
                                     onPress={() => {
-                                        playback == TrackPlayer.STATE_PLAYING
+                                        state == TrackPlayer.STATE_PLAYING
                                             ? TrackPlayer.pause()
                                             : TrackPlayer.play();
                                     }}
                                 >
-                                    <MaterialIcons style={{alignSelf: "center"}} selectable={false} name={playback == TrackPlayer.STATE_PLAYING ? "pause" : "play-arrow"} color={colors.text} size={40}/>
+                                    <MaterialIcons
+                                        style={{alignSelf: "center"}}
+                                        color={colors.text}
+                                        size={40}
+                                        selectable={false}
+                                        name={
+                                            state == TrackPlayer.STATE_PLAYING
+                                                ? "pause"
+                                                : "play-arrow"
+                                        }
+                                    />
                                 </Button>
                         }
                     </View>
@@ -335,7 +393,7 @@ const PlayView = ({route, navigation}) => {
                         contentStyle={{alignItems: "center", width: 50, height: 50, minWidth: 0}}
                         onPress={() => setRepeating()}
                     >
-                        <MaterialIcons style={{alignSelf: "center"}} selectable={false} name={isRepeating ? "repeat-one" : "repeat"} color={colors.text} size={30}/>
+                        <MaterialIcons style={{alignSelf: "center"}} selectable={false} name={isReplaying ? "repeat-one" : "repeat"} color={colors.text} size={30}/>
                     </Button>
                 </View>
 
