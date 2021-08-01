@@ -31,6 +31,7 @@ import {
 import { storeSong, deleteSong, localIDs, downloadQueue } from "../../modules/storage/SongStorage";
 import { displayNotification } from "../../modules/utils/Notification";
 import { abortSongDownload } from "../../modules/storage/SongStorage";
+import { setTransitionTrack } from "../../views/full/PlayView";
 
 export var showModal = null;
 
@@ -311,7 +312,17 @@ export default MoreModal = ({navigation}) => {
                 {
                     type == "Song"
                         ? <Button 
-                            onPress={() => {navigation.navigate("Music", {v: videoId});}}
+                            onPress={() => {
+                                setTransitionTrack({
+                                    id: videoId,
+                                    playlistId: playlistId,
+                                    title: content.title,
+                                    artist: content.subtitle,
+                                    artwork: content.thumbnail
+                                })
+
+                                navigation.navigate("Music", {v: videoId, list: playlistId});
+                            }}
                             labelStyle={[modalStyles.entry, {margin: 0, padding: 0, borderRadius: 0, letterSpacing: "normal", textTransform: "none", fontSize: 14, textAlignVertical: "center"}]}
                             style={{backgroundColor: colors.card, margin: 0, padding: 0, borderRadius: 0}}
                             contentStyle={{margin: 0, padding: 0, borderRadius: 0}}

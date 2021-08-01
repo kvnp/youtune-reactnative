@@ -53,8 +53,6 @@ const ScrollingText = ({children, style}) => {
             });
 
             timing.start(finished => {
-                console.log(finished);
-                console.log(animation);
                 if (finished && isOverflowing()) {
                     if (animation.animating)
                         resetAnimation();

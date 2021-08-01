@@ -45,7 +45,6 @@ var transitionTrack = {
 
 export const setTransitionTrack = track => {
     delete track.url;
-    delete track.duration;
     transitionTrack = track;
 }
 
@@ -111,7 +110,6 @@ const PlayView = ({route, navigation}) => {
                         let queue = await TrackPlayer.getQueue();
                         for (element in queue) {
                             delete element.url;
-                            delete element.duration;
                         }
                         
                         setQueue(queue);
@@ -128,7 +126,6 @@ const PlayView = ({route, navigation}) => {
                         if (id != null) {
                             track = await TrackPlayer.getTrack(id);
                             delete track.url;
-                            delete track.duration;
                             playlistId = track.playlistId;
                         }
 
@@ -139,7 +136,7 @@ const PlayView = ({route, navigation}) => {
                         }
 
                         if (route.params.list && route.params.v) {
-                            if (route.params.list == playlistId) {
+                            if (route.params.list == playlistId && reloading) {
                                 skipTo({id: route.params.v});
                                 reloading = false;
                             }
@@ -148,8 +145,8 @@ const PlayView = ({route, navigation}) => {
                         resolve(reloading);
                     });
 
-                    reloadPromise.then(reloading => {
-                        if (reloading) {
+                    reloadPromise.then(willReload => {
+                        if (willReload) {
                             TrackPlayer.reset();
                             setState(TrackPlayer.STATE_BUFFERING);
                 
@@ -218,7 +215,6 @@ const PlayView = ({route, navigation}) => {
                     TrackPlayer.getCurrentTrack(async(id) => {
                         let track = await TrackPlayer.getTrack(id);
                         delete track.url;
-                        delete track.duration;
                         setTrack(track);
                     })
                 }
@@ -357,11 +353,11 @@ const PlayView = ({route, navigation}) => {
                                     labelStyle={{marginHorizontal: 0}}
                                     style={{borderRadius: 25, alignItems: "center", padding: 0, margin: 0, minWidth: 0}}
                                     contentStyle={{alignItems: "center", width: 60, height: 60, minWidth: 0}}
-                                    onPress={() => {
+                                    onPress={
                                         state == TrackPlayer.STATE_PLAYING
-                                            ? TrackPlayer.pause()
-                                            : TrackPlayer.play();
-                                    }}
+                                            ? TrackPlayer.pause
+                                            : TrackPlayer.play
+                                    }
                                 >
                                     <MaterialIcons
                                         style={{alignSelf: "center"}}

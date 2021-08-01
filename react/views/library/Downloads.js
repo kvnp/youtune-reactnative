@@ -47,7 +47,7 @@ export default Downloads = ({ navigation }) => {
                     if (!dbLoading) {
                         clearInterval(intervalId);
                         loadEntries();
-                    } else console.log("loading");
+                    }
                 }, 200);
             }
         }, [])
