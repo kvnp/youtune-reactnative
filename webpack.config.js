@@ -136,51 +136,36 @@ module.exports = () => ({
         publicPath: '/'
     },
 
-    devtool: 'cheap-module-source-map',
+    devtool: 'source-map',
 
     module: {
         rules: [
             {
-                test: /\.(ts|tsx|jsx|js|mjs)$/,
+                test: /\.(ts|tsx|jsx|js|mjs)$/i,
                 use: {
-                    loader: 'babel-loader?cacheDirectory',
+                    loader: 'babel-loader',
                     options: {
                         cacheDirectory: true,
                         presets: [
-                            "@babel/env",
-                            "@babel/preset-react",
-                            'module:metro-react-native-babel-preset'
+                            ["@babel/env", {loose: true}],
+                            "@babel/react"
                         ],
                         
                         plugins: [
-                            [
-                                "react-native-web",
-                                {
-                                    commonjs: true
-                                }
-                            ],
-                            [
-                                "transform-react-remove-prop-types",
-                                {
-                                    "removeImport": true,
-                                    "additionalLibraries": ["react-style-proptype"]
-                                }
-                            ],
+                            ["transform-react-remove-prop-types", {
+                                removeImport: true,
+                                additionalLibraries: ["react-style-proptype"]
+                            }],
                             'react-native-paper/babel',
                             'react-native-reanimated/plugin',
-                            [
-                                "@babel/plugin-proposal-private-methods",
-                                {
-                                    "loose": true
-                                }
-                            ]
+                            ["react-native-web", {commonjs: true}]
                         ],
                     },
                 }
             },
 
             {
-                test: /\.(png|jpe?g|gif|ico|ttf|css)$/i,
+                test: /\.(png|jpe?g|gif|ico|ttf|css)$/,
                 loader: 'file-loader',
             }
         ]
