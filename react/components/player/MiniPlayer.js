@@ -113,7 +113,11 @@ const MiniPlayer = ({style, containerStyle}) => {
                     <>
                     <ScrollingText>
                         <Text
-                            style={[styles.titleText, {color: colors.text, flexWrap: "nowrap"}]}
+                            numberOfLines={1}
+                            style={[
+                                styles.titleText,
+                                {color: colors.text}
+                            ]}
                         >
                             {title}
                         </Text>
@@ -121,7 +125,11 @@ const MiniPlayer = ({style, containerStyle}) => {
 
                     <ScrollingText>
                         <Text
-                            style={[styles.subtitleText, {color: colors.text, flexWrap: "nowrap"}]}
+                            numberOfLines={1}
+                            style={[
+                                styles.subtitleText,
+                                {color: colors.text,}
+                            ]}
                         >
                             {artist}
                         </Text>
