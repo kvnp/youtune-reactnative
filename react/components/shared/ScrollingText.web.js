@@ -1,4 +1,5 @@
-import React, { useState, useEffect, useRef } from "react";
+import { useFocusEffect } from "@react-navigation/native";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { ScrollView, View } from "react-native";
 import { unstable_createElement } from "react-native-web";
 
@@ -48,19 +49,26 @@ const ScrollingText = ({children, style}) => {
     }
 
     return <View
-        style={[{overflow: "hidden", width: "100%"}, style]}
+        style={[
+            {overflow: "hidden", width: "100%"},
+            style
+        ]}
         onLayout={
             e => setContainerWidth(e.nativeEvent.layout.width)
         }
     >
-        <Style>
-            {
-                children.props.children
-                    ? `@keyframes ${children.props.children.replaceAll(" ", "_").replace(/[\W_]+/g,"-")} { from {transform: translateX(0%)} to {transform: translateX(-100%)}}\n` +
-                    `@keyframes ${children.props.children.replaceAll(" ", "_").replace(/[\W_]+/g,"-")}_2 { from {transform: translateX(${containerWidth/contentWidth*100}%)} to {transform: translateX(-100%)}}`
-                    : null
-            }
-        </Style>
+        {
+            isOverflowing()
+                ? <Style>
+                    {
+                        `@keyframes ${children.props.children.replaceAll(" ", "_").replace(/[\W_]+/g,"-")} { from {transform: translateX(0%)} to {transform: translateX(-100%)}}\n` +
+                        `@keyframes ${children.props.children.replaceAll(" ", "_").replace(/[\W_]+/g,"-")}_2 { from {transform: translateX(${containerWidth/contentWidth*100}%)} to {transform: translateX(-100%)}}`
+                    }
+                </Style>
+
+                : null
+        }
+        
         <ScrollView
             ref={viewRef}
             onContentSizeChange={
