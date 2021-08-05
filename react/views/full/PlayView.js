@@ -21,7 +21,6 @@ import {
     skip,
     setRepeat,
     isRepeating,
-    skipTo,
     handlePlayback
 } from "../../service";
 
@@ -436,7 +435,7 @@ const stylesTop = StyleSheet.create({
         width: "100%",
         height: "100%",
         paddingHorizontal: "10%",
-        paddingBottom: "60px",
+        paddingBottom: 60,
         alignSelf: "center",
         alignContent: "space-around",
         justifyContent: "space-around"
