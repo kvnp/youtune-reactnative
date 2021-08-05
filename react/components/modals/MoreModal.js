@@ -11,7 +11,7 @@ import {
     Platform
 } from "react-native";
 
-import { Button } from "react-native-paper";
+import { TouchableRipple } from "react-native-paper";
 import TrackPlayer from 'react-native-track-player';
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import { useTheme } from "@react-navigation/native";
@@ -260,55 +260,75 @@ export default MoreModal = ({navigation}) => {
                         <Text style={{color: colors.text}} numberOfLines={1}>{content.title}</Text>
                         <Text style={{color: colors.text}} numberOfLines={1}>{content.subtitle}</Text>
                     </View>
-                    <View style={{width: 120, height: 50, alignItems: "center", justifyContent: "center", flexDirection: "row"}}>
-                        <View style={{width: 50, height: 50, alignItems: "center", justifyContent: "center"}}>
-                            <Button
-                                onPress={() => likeFunction(false)}
-                                labelStyle={{display: "flex", marginHorizontal: 0}}
-                                style={{borderRadius: 25, alignItems: "center", padding: 0, margin: 0, minWidth: 0}}
-                                contentStyle={{alignItems: "center", width: 50, height: 50, minWidth: 0}}
-                            >
-                                <MaterialIcons
-                                    name="thumb-down"
-                                    color={
-                                        liked == null
-                                            ? "darkgray"
-                                            : !liked
-                                                ? colors.primary
-                                                : "darkgray"
-                                    }
+                    <View style={{width: 120, height: 50, alignItems: "center", alignSelf: "center", justifyContent: "center", flexDirection: "row"}}>
+                        <TouchableRipple
+                            borderless={true}
+                            rippleColor={colors.primary}
+                            onPress={() => likeFunction(false)}
+                            style={{
+                                width: 50,
+                                height: 50,
+                                marginHorizontal: 5,
+                                borderRadius: 25,
+                                alignItems: "center",
+                                justifyContent: "center"
+                            }}
+                        >
+                            <MaterialIcons
+                                name="thumb-down"
+                                color={
+                                    liked == null
+                                        ? "darkgray"
+                                        : !liked
+                                            ? colors.primary
+                                            : "darkgray"
+                                }
 
-                                    size={25}
-                                />
-                            </Button>
-                        </View>
-                        <View style={{width: 50, height: 50, alignItems: "center", justifyContent: "center"}}>
-                            <Button
-                                onPress={() => likeFunction(true)}
-                                labelStyle={{display: "flex", marginHorizontal: 0}}
-                                style={{borderRadius: 25, alignItems: "center", padding: 0, margin: 0, minWidth: 0}}
-                                contentStyle={{alignItems: "center", width: 50, height: 50, minWidth: 0}}
-                            >
-                                <MaterialIcons
-                                    name="thumb-up"
-                                    color={
-                                        liked == null
-                                            ? "darkgray"
-                                            : liked
-                                                ? colors.primary
-                                                : "darkgray"
-                                    }
+                                size={25}
+                            />
+                        </TouchableRipple>
+                        <TouchableRipple
+                            borderless={true}
+                            rippleColor={colors.primary}
+                            onPress={() => likeFunction(true)}
 
-                                    size={25}
-                                />
-                            </Button>
-                        </View>
+                            style={{
+                                width: 50,
+                                height: 50,
+                                marginHorizontal: 5,
+                                borderRadius: 25,
+                                alignItems: "center",
+                                justifyContent: "center"
+                            }}
+                        >
+                            <MaterialIcons
+                                name="thumb-up"
+                                color={
+                                    liked == null
+                                        ? "darkgray"
+                                        : liked
+                                            ? colors.primary
+                                            : "darkgray"
+                                }
+
+                                size={25}
+                            />
+                        </TouchableRipple>
                     </View>
                 </View>
 
                 {
                     type == "Song"
-                        ? <Button 
+                    ? <View style={{backgroundColor: colors.card}}>
+                        <TouchableRipple
+                            borderless={true}
+                            rippleColor={colors.primary}
+                            style={{
+                                borderRadius: 5,
+                                height: 50,
+                                alignItems: "center",
+                                flexDirection: "row"
+                            }}
                             onPress={() => {
                                 setTransitionTrack({
                                     id: videoId,
@@ -317,21 +337,34 @@ export default MoreModal = ({navigation}) => {
                                     artist: content.subtitle,
                                     artwork: content.thumbnail
                                 })
-
+        
                                 navigation.navigate("Music", {v: videoId, list: playlistId});
                             }}
-                            labelStyle={[modalStyles.entry, {display: "flex", margin: 0, padding: 0, borderRadius: 0, letterSpacing: 0, textTransform: "none", fontSize: 14, textAlignVertical: "center"}]}
-                            style={{backgroundColor: colors.card, margin: 0, padding: 0, borderRadius: 0}}
-                            contentStyle={{margin: 0, padding: 0, borderRadius: 0}}
                         >
-                            <MaterialIcons name="radio" style={{display: "flex"}} color={colors.text} size={25}/>
-                            <Text style={{paddingLeft: 20, color: colors.text, display: "flex"}}>Start radio</Text>
-                        </Button>
+                            <>
+                                <MaterialIcons
+                                    name="radio"
+                                    color={colors.text}
+                                    size={25}
+                                    style={{marginLeft: 70}}
+                                />
+                                <Text style={{paddingLeft: 20,color: colors.text}}>Start radio</Text>
+                            </>
+                        </TouchableRipple>
+                    </View>
 
                     : undefined
                 }
-
-                <Button
+                <View style={{backgroundColor: colors.card}}>
+                <TouchableRipple
+                    borderless={true}
+                    rippleColor={colors.primary}
+                    style={{
+                        borderRadius: 5,
+                        height: 50,
+                        alignItems: "center",
+                        flexDirection: "row"
+                    }}
                     onPress={
                         async() => {
                             if (playing) {
@@ -351,31 +384,38 @@ export default MoreModal = ({navigation}) => {
 
                         }
                     }
-                    labelStyle={[modalStyles.entry, {display: "flex", margin: 0, padding: 0, borderRadius: 0, letterSpacing: 0, textTransform: "none", fontSize: 14, textAlignVertical: "center"}]}
-                    style={{backgroundColor: colors.card, margin: 0, padding: 0, borderRadius: 0}}
-                    contentStyle={{margin: 0, padding: 0, borderRadius: 0}}
                 >
                     {type == "Song"
                         ? playing
                             ? <>
-                                <MaterialIcons style={{display: "flex"}} name="pause" color={colors.text} size={25}/>
-                                <Text style={{paddingLeft: 20, color: colors.text, display: "flex"}}>Pause</Text>
+                                <MaterialIcons style={{marginLeft: 70}} name="pause" color={colors.text} size={25}/>
+                                <Text style={{paddingLeft: 20, color: colors.text}}>Pause</Text>
                             </>
 
                             : <>
-                                <MaterialIcons style={{display: "flex"}} name="play-arrow" color={colors.text} size={25}/>
-                                <Text style={{paddingLeft: 20, color: colors.text, display: "flex"}}>Play</Text>
+                                <MaterialIcons style={{marginLeft: 70}} name="play-arrow" color={colors.text} size={25}/>
+                                <Text style={{paddingLeft: 20, color: colors.text}}>Play</Text>
                             </>
                         
                         : <>
-                            <MaterialIcons style={{display: "flex"}} name="launch" color={colors.text} size={25}/>
-                            <Text style={{paddingLeft: 20, color: colors.text, display: "flex"}}>Open</Text>
+                            <MaterialIcons style={{marginLeft: 70}} name="launch" color={colors.text} size={25}/>
+                            <Text style={{paddingLeft: 20, color: colors.text}}>Open</Text>
                         </>
                     }
-                </Button>
+                </TouchableRipple>
+                </View>
                 {
                     videoId
-                        ? <Button
+                        ? <View style={{backgroundColor: colors.card}}>
+                            <TouchableRipple
+                            borderless={true}
+                            rippleColor={colors.primary}
+                            style={{
+                                borderRadius: 5,
+                                height: 50,
+                                alignItems: "center",
+                                flexDirection: "row"
+                            }}
                             onPress={
                                 () => downloading
                                     ? abort()
@@ -383,18 +423,16 @@ export default MoreModal = ({navigation}) => {
                                         ? remove()
                                         : download()
                             }
-                            labelStyle={[modalStyles.entry, {display: "flex", margin: 0, padding: 0, borderRadius: 0, letterSpacing: 0, textTransform: "none", fontSize: 14, textAlignVertical: "center"}]}
-                            style={{backgroundColor: colors.card, margin: 0, padding: 0, borderRadius: 0}}
-                            contentStyle={{margin: 0, padding: 0, borderRadius: 0}}
                         >
+                            <>
                             {
                                 downloading
                                     ? <ActivityIndicator
                                         color={colors.text}
-                                        style={{display: "flex"}}
+                                        style={{marginLeft: 70}}
                                     />
                                     : <MaterialIcons
-                                        style={{display: "flex"}}
+                                        style={{marginLeft: 70}}
                                         name={
                                             downloaded
                                                 ? "delete"
@@ -405,7 +443,7 @@ export default MoreModal = ({navigation}) => {
                                     />
                             }
     
-                            <Text style={{paddingLeft: 20, color: colors.text, display: "flex"}}>
+                            <Text style={{paddingLeft: 20, color: colors.text}}>
                                 {
                                     downloading
                                         ? "Downloading" + (downloadQueue.length > 0
@@ -422,34 +460,50 @@ export default MoreModal = ({navigation}) => {
                                                 : "")
                                 }
                             </Text>
-                        </Button>
+                            </>
+                        </TouchableRipple>
+                        </View>
 
 
                         : undefined
                 }
-
-                <Button
-                    uppercase={false}
+                <View style={{backgroundColor: colors.card}}>
+                <TouchableRipple
+                    borderless={true}
+                    rippleColor={colors.primary}
+                    style={{
+                        borderRadius: 5,
+                        height: 50,
+                        alignItems: "center",
+                        flexDirection: "row"
+                    }}
                     onPress={() => {}}
-                    labelStyle={[modalStyles.entry, {display: "flex", margin: 0, padding: 0, borderRadius: 0, letterSpacing: 0, textTransform: "none", fontSize: 14, textAlignVertical: "center"}]}
-                    style={{backgroundColor: colors.card, margin: 0, padding: 0, borderRadius: 0}}
-                    contentStyle={{margin: 0, padding: 0, borderRadius: 0}}
                 >
                     {
                         type == "Song"
                             ? <>
-                                <MaterialIcons name="playlist-add" style={{display: "flex"}} color={colors.text} size={25}/>
-                                <Text style={{paddingLeft: 20, color: colors.text, display: "flex"}}>Add to playlist</Text>
+                                <MaterialIcons name="playlist-add" style={{marginLeft: 70}} color={colors.text} size={25}/>
+                                <Text style={{paddingLeft: 20, color: colors.text}}>Add to playlist</Text>
                             </>
 
                             : <>
-                                <MaterialIcons name="library-add" style={{display: "flex"}} color={colors.text} size={25}/>
-                                <Text style={{paddingLeft: 20, color: colors.text, display: "flex"}}>Add to library</Text>
+                                <MaterialIcons name="library-add" style={{marginLeft: 70}} color={colors.text} size={25}/>
+                                <Text style={{paddingLeft: 20, color: colors.text}}>Add to library</Text>
                             </>
                     }
-                </Button>
-
-                <Button
+                </TouchableRipple>
+                </View>
+                
+                <View style={{backgroundColor: colors.card}}>
+                <TouchableRipple
+                    borderless={true}
+                    rippleColor={colors.primary}
+                    style={{
+                        borderRadius: 5,
+                        height: 50,
+                        alignItems: "center",
+                        flexDirection: "row"
+                    }}
                     onPress={() => {
                         let file;
                         let message;
@@ -466,13 +520,13 @@ export default MoreModal = ({navigation}) => {
 
                         onShare(type, "https://music.youtube.com/" + file, message);
                     }}
-                    labelStyle={[modalStyles.entry, {display: "flex", margin: 0, padding: 0, borderRadius: 0, letterSpacing: 0, textTransform: "none", fontSize: 14, textAlignVertical: "center"}]}
-                    style={{backgroundColor: colors.card, margin: 0, padding: 0, borderRadius: 0}}
-                    contentStyle={{margin: 0, padding: 0, borderRadius: 0}}
                 >
-                    <MaterialIcons name="share" style={{display: "flex"}} color={colors.text} size={25}/>
-                    <Text style={{paddingLeft: 20, color: colors.text, display: "flex"}}>Share</Text>
-                </Button>
+                    <>
+                    <MaterialIcons name="share" style={{marginLeft: 70}} color={colors.text} size={25}/>
+                    <Text style={{paddingLeft: 20, color: colors.text}}>Share</Text>
+                    </>
+                </TouchableRipple>
+                </View>
             </View>
         </Pressable>
     </Modal>

@@ -13,6 +13,7 @@ import {
 
 import { useTheme } from '@react-navigation/native';
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
+import { Button } from 'react-native-paper';
 
 import Entry from '../../components/shared/Entry';
 import { setHeader } from '../../components/overlay/Header';
@@ -107,20 +108,19 @@ export default SearchTab = ({route, navigation}) => {
             </>}
 
             renderSectionHeader={({ section: { title } }) => (
-                <View style={resultHomeStyle.textView}>
+                <View style={[resultHomeStyle.textView, {paddingBottom: 10}]}>
                     <Text style={[resultHomeStyle.homeText, {color: colors.text}]}>{title}</Text>
                 </View>
             )}
 
             renderSectionFooter={({ section: { bottomEndpoint } }) => (
                 bottomEndpoint != null
-                    ? <Pressable
-                        android_ripple={rippleConfig}
+                    ? <Button
                         onPress={() => search(bottomEndpoint.query, bottomEndpoint.params)}
-                        style={{padding: 10, margin: 20, width: 100, borderRadius: 10, alignItems: "center", backgroundColor: colors.card}}
+                        style={{marginHorizontal: 5, marginTop: 10}}
                     >
                         <Text style={{color: colors.text, fontSize: 15, fontWeight: "700"}}>{bottomEndpoint.text}</Text>
-                    </Pressable>
+                    </Button>
 
                     : null
             )}

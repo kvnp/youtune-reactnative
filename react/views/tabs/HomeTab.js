@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 
 import {
     Text,
@@ -9,16 +9,16 @@ import {
     Platform
 } from 'react-native';
 
+import { useFocusEffect, useTheme } from '@react-navigation/native';
+import { Button } from 'react-native-paper';
+
 import { fetchHome } from "../../modules/remote/API";
-
 import Shelf from '../../components/shared/Shelf';
-
 import { shelvesStyle } from '../../styles/Shelves';
 import { refreshStyle, preResultHomeStyle } from '../../styles/Home';
-import { useTheme } from '@react-navigation/native';
 import { setHeader } from '../../components/overlay/Header';
 
-export default HomeTab = ({navigation, route}) => {
+export default HomeTab = ({navigation}) => {
     const [shelves, setShelves] = useState([]);
     const [continuation, setContinuation] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -29,29 +29,32 @@ export default HomeTab = ({navigation, route}) => {
             : "Pull down to load"
     );
 
-    useEffect(() => {
-        const _unsubscribe = navigation.addListener('focus', () => {
-            setHeader({title: "Home"});
-            if (shelves.length == 0)
-                startRefresh();
-        });
-
-        const _offlineListener = Platform.OS == "web"
-            ? window.addEventListener("online", () => {
-                setLoading(true);
-                startRefresh();
-            })
-            : undefined;
-
-        return () => {
-            _unsubscribe();
-
-            if (_offlineListener)
-                _offlineListener();
-        };
-    }, []);
+    useFocusEffect(
+        useCallback(() => {
+            const _unsubscribe = navigation.addListener('focus', () => {
+                setHeader({title: "Home"});
+                if (shelves.length == 0)
+                    startRefresh();
+            });
+    
+            const _offlineListener = Platform.OS == "web"
+                ? window.addEventListener("online", () => {
+                    setLoading(true);
+                    startRefresh();
+                })
+                : undefined;
+    
+            return () => {
+                _unsubscribe();
+    
+                if (_offlineListener)
+                    _offlineListener();
+            };
+        }, [])
+    );
 
     const startRefresh = async() => {
+        console.log("refresh");
         let temp = continuation;
 
         fetchHome(temp)
@@ -75,7 +78,6 @@ export default HomeTab = ({navigation, route}) => {
             })
 
             .catch(e => {
-                setHomeText("You are offline");
                 setLoading(false);
             })
 
@@ -112,14 +114,11 @@ export default HomeTab = ({navigation, route}) => {
                         <ActivityIndicator color={colors.text} size="large"/>
                     </View>
 
-                    : <Pressable onPress={startRefresh} style={[refreshStyle.button, {backgroundColor: colors.card}]}>
-                        <Text style={[refreshStyle.buttonText, {color: colors.text}]}>Refresh</Text>
-                    </Pressable>
+                    : <Button style={{marginHorizontal: 50}} onPress={startRefresh} mode="outlined">
+                        <Text style={{color: colors.text}}>Refresh</Text>
+                    </Button>
 
-                : <Pressable onPress={startRefresh} style={[refreshStyle.button, {backgroundColor: colors.card}]}>
-                    <Text style={[refreshStyle.buttonText, {color: colors.text}]}>Refresh</Text>
-                </Pressable>
-            
+                : undefined
         }
 
         progressViewOffset={0}

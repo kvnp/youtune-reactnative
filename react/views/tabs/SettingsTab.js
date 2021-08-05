@@ -9,7 +9,7 @@ import {
     FlatList,
     View
 } from 'react-native';
-import { Button } from 'react-native-paper';
+import { TouchableRipple } from 'react-native-paper';
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 
 import {
@@ -91,66 +91,62 @@ export default SettingsTab = ({navigation}) => {
             ? item.override.web.state
             : item.state;
 
-        return <Button
-            key={icon}
-            onPress={() => disabled ? null : func(!state)}
+        return <TouchableRipple
+            borderless={true}
+            disabled={disabled}
             style={{
                 marginHorizontal: 5,
+                borderRadius: 5,
                 marginBottom: 10,
-                borderRadius: 5
+                height: 70,
+                backgroundColor: colors.card,
+                flexDirection: 'row',
             }}
 
-            labelStyle={{
-                display: "flex",
-                flex: 1,
-                letterSpacing: 0,
-                textTransform: "none",
-                fontSize: 14
-            }}
-            
-            contentStyle={{
-                justifyContent: "center",
-                flexGrow: 1,
-                borderRadius: 5,
-                height: 70,
-                flexDirection: 'row',
-                alignSelf: "stretch",
-                alignItems: 'center',
-                backgroundColor: colors.card
-            }}
+            key={icon}
+            onPress={() => disabled ? null : func(!state)}
+            rippleColor={colors.primary}
         >
-            <View style={{marginHorizontal: "auto"}}>
-                <MaterialIcons name={icon} color={colors.text} size={30}/>
-            </View>
-            <Text
-                style={{
+            <View style={{
+                flex: 1,
+                flexDirection: "row",
+                alignSelf: "center",
+                alignItems: "center",
+                paddingHorizontal: 20
+            }}>
+                <MaterialIcons
+                    name={icon}
+                    color={colors.text}
+                    size={30}
+                />
+
+                <Text style={{
                     flex: 1,
                     flexWrap: "wrap",
-                    width: "50%",
-                    alignSelf: "center",
                     color: colors.text,
                     marginHorizontal: 10
-                }}
-            >
-                {desc}
-            </Text>
-            
-            <View style={{justifyContent: "center"}}>
+                }}>
+                    {desc}
+                </Text>
+                
                 {
                     useSwitch
-                    ? <Switch
-                        trackColor={{ false: "gray", true: colors.primary }}
-                        thumbColor="darkgray"
-                        onValueChange={disabled ? null : func}
-                        value={state}
-                        disabled={disabled}
-                    />
+                        ? <Switch
+                            trackColor={{ false: "gray", true: colors.primary }}
+                            thumbColor="darkgray"
+                            onValueChange={disabled ? null : func}
+                            value={state}
+                            disabled={disabled}
+                        />
 
-                    : <MaterialIcons name="launch" color={colors.text} size={30}/>
+                        : <MaterialIcons
+                            name="launch"
+                            color={colors.text}
+                            size={30}
+                        />
                 }
             </View>
-            
-        </Button>
+        </TouchableRipple>;
     }
 
     const items = [

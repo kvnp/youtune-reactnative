@@ -32,7 +32,7 @@ export default ArtistView = ({ route, navigation }) => {
                     navigation.setOptions({ title: artist.header.title });
                 }
             });
-    }, []);
+    }, [artist]);
 
     var shelves;
     if (artist != null)

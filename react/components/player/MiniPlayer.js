@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { StyleSheet, View, Image, Text } from "react-native";
-import { Button} from "react-native-paper";
+
+import { TouchableRipple} from "react-native-paper";
 import { useNavigation, useTheme } from "@react-navigation/native";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import TrackPlayer, { useTrackPlayerProgress } from 'react-native-track-player';
@@ -37,7 +38,6 @@ const MiniPlayer = ({style, containerStyle}) => {
         const trackChanged = TrackPlayer.addEventListener("playback-track-changed", refreshTrack);
 
         return () => {
-            _unsubscribe();
             playback.remove();
             trackChanged.remove();
         }
@@ -50,7 +50,6 @@ const MiniPlayer = ({style, containerStyle}) => {
             delete track.url;
             setTrack(track);
         }
-
     }
 
     const onOpen = () => {
@@ -84,10 +83,13 @@ const MiniPlayer = ({style, containerStyle}) => {
     
     const { title, artist, artwork } = track;
 
-    return <View style={[styles.main, {
-        height: isInactive() ? 0 : 50,
-        backgroundColor: colors.card
-    }, containerStyle]}>
+    return <View
+        style={[
+            styles.main, {
+            height: isInactive() ? 0 : 50,
+            backgroundColor: colors.card
+        }, containerStyle]}
+    >
         <View style={[styles.main, {
             justifyContent: "space-evenly",
             width: "100%",
@@ -99,92 +101,85 @@ const MiniPlayer = ({style, containerStyle}) => {
             </View>
             <View style={styles.container}>
                 <Image source={{uri: artwork}} style={styles.image}/>
-                <View style={styles.textContainer}>
-                    <Button
-                        onPress={onOpen}
-                        style={{alignItems: "stretch", padding: 0, margin: 0}}
-                        contentStyle={{alignItems: "center", height: 50}}
-                        labelStyle={{
-                            marginHorizontal: 0,
-                            margin: 0,
-                            padding: 0,
-                            borderRadius: 0,
-                            letterSpacing: 0,
-                            textTransform: "none",
-                            fontSize: 14,
-                            textAlignVertical: "center",
-                            display: "flex",
-                            flexDirection: "column",
-                            width: "100%"
-                        }}
-                    >
-                        <ScrollingText>
-                            <Text
-                                style={[styles.titleText, {color: colors.text, flexWrap: "nowrap"}]}
-                            >
-                                {title}
-                            </Text>
-                        </ScrollingText>
+                <TouchableRipple
+                    borderless={true}
+                    rippleColor={colors.primary}
+                    onPress={onOpen}
+                    style={[
+                        styles.textContainer,
+                        {alignItems: "stretch", padding: 0, margin: 0}
+                    ]}
+                >
+                    <>
+                    <ScrollingText>
+                        <Text
+                            style={[styles.titleText, {color: colors.text, flexWrap: "nowrap"}]}
+                        >
+                            {title}
+                        </Text>
+                    </ScrollingText>
 
-                        <ScrollingText>
-                            <Text
-                                style={[styles.subtitleText, {color: colors.text, flexWrap: "nowrap"}]}
-                            >
-                                {artist}
-                            </Text>
-                        </ScrollingText>
-                        
-                    </Button>
-                </View>
+                    <ScrollingText>
+                        <Text
+                            style={[styles.subtitleText, {color: colors.text, flexWrap: "nowrap"}]}
+                        >
+                            {artist}
+                        </Text>
+                    </ScrollingText>
+                    </>
+                </TouchableRipple>
 
-                <View style={[styles.button, {color: colors.card}]}>
-                    <Button
-                        onPress={onStop}
-                        labelStyle={{marginHorizontal: 0}}
-                        style={{borderRadius: 25, alignItems: "center", padding: 0, margin: 0, minWidth: 0}}
-                        contentStyle={{alignItems: "center", width: 50, height: 50, minWidth: 0}}
-                    >
-                        <MaterialIcons
-                            name="clear"
-                            color={colors.text}
-                            size={29}
-                        />
-                    </Button>
-                </View>
+                <TouchableRipple
+                    borderless={true}
+                    rippleColor={colors.primary}
+                    style={[
+                        styles.button,
+                        {color: colors.card, borderRadius: 25}
+                    ]}
+                    onPress={onStop}
+                >
+                    <MaterialIcons
+                        name="clear"
+                        color={colors.text}
+                        size={29}
+                    />
+                </TouchableRipple>
 
-                <View style={[styles.button, {color: colors.card}]}>
-                    <Button
-                        onPress={onPlay}
-                        labelStyle={{marginHorizontal: 0}}
-                        style={{borderRadius: 25, alignItems: "center", padding: 0, margin: 0, minWidth: 0}}
-                        contentStyle={{alignItems: "center", width: 50, height: 50, minWidth: 0}}
-                    >
-                        <MaterialIcons
-                            name={
-                                state == TrackPlayer.STATE_PLAYING
-                                    ? "pause"
-                                    : "play-arrow"
-                            }
-                            color={colors.text}
-                            size={29}
-                        />
-                    </Button>
-                </View>
+                <TouchableRipple
+                    borderless={true}
+                    rippleColor={colors.primary}
+                    style={[
+                        styles.button,
+                        {color: colors.card, borderRadius: 25}
+                    ]}
+                    onPress={onPlay}
+                >
+                    <MaterialIcons
+                        name={
+                            state == TrackPlayer.STATE_PLAYING
+                                ? "pause"
+                                : "play-arrow"
+                        }
+                        color={colors.text}
+                        size={29}
+                    />
+                </TouchableRipple>
 
-                <View style={[styles.button, {color: colors.card}]}>
-                    <Button
-                        onPress={onNext}
-                        labelStyle={{marginHorizontal: 0}}
-                        style={{borderRadius: 25, alignItems: "center", padding: 0, margin: 0, minWidth: 0}}
-                        contentStyle={{alignItems: "center", width: 50, height: 50, minWidth: 0}}
-                    >
+                <TouchableRipple
+                    borderless={true}
+                    rippleColor={colors.primary}
+                    style={[
+                        styles.button,
+                        {color: colors.card, borderRadius: 25}
+                    ]}
+                    onPress={onNext}
+                >
                         <MaterialIcons
                             name="skip-next"
                             color={colors.text}
                             size={29}
                         />
-                    </Button>
-                </View>
+                </TouchableRipple>
             </View>
         </View>
     </View>
@@ -221,8 +216,7 @@ const styles = StyleSheet.create({
     textContainer: {
         flex: 1,
         overflow: "hidden",
-        paddingLeft: 10,
-        paddingRight: 10,
+        marginHorizontal: 10,
     },
 
     titleText: {

@@ -2,13 +2,12 @@ import React from 'react';
 
 import {
     Text,
-    Image,
-    Pressable
+    Image
 } from "react-native";
+import { TouchableRipple } from 'react-native-paper';
 
 import { playlistStyle } from '../../styles/Playlist';
 import { handleMedia } from '../../modules/event/mediaNavigator';
-import { rippleConfig } from '../../styles/Ripple';
 import { useTheme } from '@react-navigation/native';
 import { showModal } from '../modals/MoreModal';
 
@@ -28,12 +27,13 @@ export default Playlist = ({ playlist, navigation, style }) => {
     const { colors } = useTheme();
 
     return (
-        <Pressable
-            android_ripple={rippleConfig}
+        <TouchableRipple
+            rippleColor={colors.primary}
             onLongPress={() => showModal(view)}
             onPress={() => handleMedia(view, navigation)}
             style={[style, playlistStyle.container]}
         >
+            <>
             <Image style={playlistStyle.cover} source={{uri: thumbnail}}/>
 
             <Text style={[playlistStyle.title, {color: colors.text}]} numberOfLines={2}>
@@ -43,6 +43,7 @@ export default Playlist = ({ playlist, navigation, style }) => {
             <Text style={[playlistStyle.description, {color: colors.text}]} numberOfLines={2}>
                 {subtitle}
             </Text>
-        </Pressable>
+            </>
+        </TouchableRipple>
     );
 }

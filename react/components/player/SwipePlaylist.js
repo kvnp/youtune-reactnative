@@ -1,33 +1,36 @@
+import { useTheme } from "@react-navigation/native";
 import React from "react";
 import {
     Image,
     Text,
     StyleSheet,
-    Pressable,
     Dimensions,
     FlatList,
     View
 } from "react-native";
+import { TouchableRipple } from "react-native-paper";
 
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import BottomSheet from 'reanimated-bottom-sheet';
 
 import { localIDs } from "../../modules/storage/SongStorage";
 import { skipTo } from "../../service";
-import { rippleConfig } from "../../styles/Ripple";
 
 export default SwipePlaylist = ({playlist, track, backgroundColor, textColor, minimumHeight}) => {
     const { height } = Dimensions.get("window");
+    const colors = useTheme();
     const sheetRef = React.useRef(null);
 
-    const renderHeader = () => <Pressable 
-        android_ripple={rippleConfig}
+    const renderHeader = () => <TouchableRipple
+        rippleColor={colors.primary}
         style={[styles.panelHeader, {backgroundColor: backgroundColor}]}
         onPress={() => sheetRef.current.snapTo(1)}
     >
+        <>
         <View style={[stylesRest.smallBar, {backgroundColor: textColor}]}/>
         <Text style={{color: textColor}}>PLAYLIST</Text>
-    </Pressable>
+        </>
+    </TouchableRipple>
 
     const renderContent = () => <View style={{height: height - 200, backgroundColor: backgroundColor}}>
         <FlatList
@@ -37,16 +40,18 @@ export default SwipePlaylist = ({playlist, track, backgroundColor, textColor, mi
 
             keyExtractor={item => item.id}
             renderItem={({item, index}) =>
-                <Pressable android_ripple={rippleConfig}
-                            style={{
-                                height: minimumHeight,
-                                flexDirection: "row",
-                                alignItems: "center",
-                                marginVertical: 5
-                            }}
+                <TouchableRipple
+                    rippleColor={colors.primary}
+                    style={{
+                        height: minimumHeight,
+                        flexDirection: "row",
+                        alignItems: "center",
+                        marginVertical: 5
+                    }}
 
-                            onPress={() => skipTo({id: item.id})}
+                    onPress={() => skipTo({id: item.id})}
                 >
+                    <>
                     {
                         track != null
                             ? track.id == item.id
@@ -70,8 +75,8 @@ export default SwipePlaylist = ({playlist, track, backgroundColor, textColor, mi
                             : undefined
                         : undefined
                     }
-
-                </Pressable>
+                    </>
+                </TouchableRipple>
             }
         />
     </View>;
