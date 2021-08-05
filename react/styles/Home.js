@@ -39,7 +39,7 @@ export const resultHomeStyle = StyleSheet.create({
 
     textView: {
         paddingLeft: 20,
-        paddingTop: 20,
+        paddingTop: 20
     }
 });
 
