@@ -69,28 +69,28 @@ const fontConfig = {
             fontFamily: 'Segoe UI',
             fontWeight: 'normal',
             textTransform: "none",
-            letterSpacing: "normal",
+            letterSpacing: 0,
             fontSize: 14
         },
         medium: {
             fontFamily: 'Segoe UI',
             fontWeight: 'normal',
             textTransform: "none",
-            letterSpacing: "normal",
+            letterSpacing: 0,
             fontSize: 14
         },
         light: {
             fontFamily: 'Segoe UI',
             fontWeight: 'normal',
             textTransform: "none",
-            letterSpacing: "normal",
+            letterSpacing: 0,
             fontSize: 14
         },
         thin: {
             fontFamily: 'Segoe UI',
             fontWeight: 'normal',
             textTransform: "none",
-            letterSpacing: "normal",
+            letterSpacing: 0,
             fontSize: 14
         },
     },

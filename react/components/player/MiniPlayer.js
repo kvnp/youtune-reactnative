@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { StyleSheet, View, Image, Text } from "react-native";
 import { Button} from "react-native-paper";
-import { useTheme } from "@react-navigation/native";
+import { useNavigation, useTheme } from "@react-navigation/native";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import TrackPlayer, { useTrackPlayerProgress } from 'react-native-track-player';
 
@@ -9,9 +9,9 @@ import { skip } from "../../service";
 import ScrollingText from "../shared/ScrollingText";
 import { setTransitionTrack } from "../../views/full/PlayView";
 
-export default MiniPlayer = ({navigation, style}) => {
+const MiniPlayer = ({style, containerStyle}) => {
     const [state, setState] = useState(TrackPlayer.STATE_STOPPED);
-
+    const navigation = useNavigation();
     const [track, setTrack] = useState({
         title: null,
         artist: null,
@@ -27,13 +27,10 @@ export default MiniPlayer = ({navigation, style}) => {
     const remainingWidth = (100 - positionLength) + "%";
 
     useEffect(() => {
-        const _unsubscribe = navigation.addListener('focus', () => {
-            TrackPlayer.getState().then(state => setState(state));
-
-            TrackPlayer.getCurrentTrack().then(id => {
-                if (id != null)
-                    refreshTrack({nextTrack: id});
-            });
+        TrackPlayer.getState().then(state => setState(state));
+        TrackPlayer.getCurrentTrack().then(id => {
+            if (id != null)
+                refreshTrack({nextTrack: id});
         });
 
         const playback = TrackPlayer.addEventListener("playback-state", e => setState(e.state));
@@ -44,14 +41,16 @@ export default MiniPlayer = ({navigation, style}) => {
             playback.remove();
             trackChanged.remove();
         }
-    }, [track, state]);
+    }, []);
 
     const refreshTrack = async(e) => {
         if (!e) e = {nextTrack: await TrackPlayer.getCurrentTrack()};
         let track = await TrackPlayer.getTrack(e.nextTrack);
-        delete track.url;
+        if (track != null) {
+            delete track.url;
+            setTrack(track);
+        }
 
-        setTrack(track);
     }
 
     const onOpen = () => {
@@ -78,22 +77,22 @@ export default MiniPlayer = ({navigation, style}) => {
     };
 
     const onStop = () => TrackPlayer.reset();
+
+    const isInactive = () => {
+        return state == TrackPlayer.STATE_STOPPED || state == TrackPlayer.STATE_NONE;
+    }
     
     const { title, artist, artwork } = track;
 
-    return <View
-        style={[
-            style,
-            styles.main,
-            {
-                height: state == TrackPlayer.STATE_STOPPED || state == TrackPlayer.STATE_NONE
-                    ? 0
-                    : 50,
-                backgroundColor: colors.card
-            }
-        ]}
-    >
-        <View style={[styles.main, {justifyContent: "space-evenly", width: "100%", maxWidth: 800, alignSelf: "center"}]}>
+    return <View style={[styles.main, {
+        height: isInactive() ? 0 : 50,
+        backgroundColor: colors.card
+    }, containerStyle]}>
+        <View style={[styles.main, {
+            justifyContent: "space-evenly",
+            width: "100%",
+            alignSelf: "center"
+        }, style]}>
             <View style={styles.playback}>
                 <View style={{width: positionWidth, backgroundColor: colors.text}}></View>
                 <View style={{width: remainingWidth, backgroundColor: colors.card}}></View>
@@ -110,7 +109,7 @@ export default MiniPlayer = ({navigation, style}) => {
                             margin: 0,
                             padding: 0,
                             borderRadius: 0,
-                            letterSpacing: "normal",
+                            letterSpacing: 0,
                             textTransform: "none",
                             fontSize: 14,
                             textAlignVertical: "center",
@@ -243,3 +242,5 @@ const styles = StyleSheet.create({
         paddingRight: 2
     }
 });
+
+export default MiniPlayer;

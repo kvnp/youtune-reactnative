@@ -12,10 +12,9 @@ import { Button } from 'react-native-paper';
 import { useFocusEffect, useTheme } from '@react-navigation/native';
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import Entry from "../../components/shared/Entry";
-import { loadSongLocal, localIDs } from "../../modules/storage/SongStorage";
+import { loadSongLocal, localIDs, dbLoading } from "../../modules/storage/SongStorage";
 import { shelvesStyle } from '../../styles/Shelves';
 import { playLocal } from '../../modules/event/mediaNavigator';
-import { dbLoading } from '../../modules/storage/SongStorage.web';
 
 export default Downloads = ({ navigation }) => {
     const [entries, setEntries] = useState([]);

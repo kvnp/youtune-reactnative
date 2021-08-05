@@ -28,9 +28,8 @@ import {
     getArtistLike
 } from "../../modules/storage/MediaStorage";
 
-import { storeSong, deleteSong, localIDs, downloadQueue } from "../../modules/storage/SongStorage";
+import { storeSong, deleteSong, localIDs, downloadQueue, abortSongDownload } from "../../modules/storage/SongStorage";
 import { displayNotification } from "../../modules/utils/Notification";
-import { abortSongDownload } from "../../modules/storage/SongStorage";
 import { setTransitionTrack } from "../../views/full/PlayView";
 
 export var showModal = null;
@@ -258,20 +257,19 @@ export default MoreModal = ({navigation}) => {
                 <View style={[modalStyles.header, {backgroundColor: colors.border}, Platform.OS == "web" ? {cursor: "default"} : undefined]}>
                     <Image source={{uri: content.thumbnail}} style={modalStyles.thumbnail}/>
                     <View style={modalStyles.headerText}>
-                        <Text style={{color: colors.text, verticalAlign: "middle"}} numberOfLines={1}>{content.title}</Text>
-                        <Text style={{color: colors.text, verticalAlign: "middle"}} numberOfLines={1}>{content.subtitle}</Text>
+                        <Text style={{color: colors.text}} numberOfLines={1}>{content.title}</Text>
+                        <Text style={{color: colors.text}} numberOfLines={1}>{content.subtitle}</Text>
                     </View>
                     <View style={{width: 120, height: 50, alignItems: "center", justifyContent: "center", flexDirection: "row"}}>
                         <View style={{width: 50, height: 50, alignItems: "center", justifyContent: "center"}}>
                             <Button
                                 onPress={() => likeFunction(false)}
-                                labelStyle={{marginHorizontal: 0}}
+                                labelStyle={{display: "flex", marginHorizontal: 0}}
                                 style={{borderRadius: 25, alignItems: "center", padding: 0, margin: 0, minWidth: 0}}
                                 contentStyle={{alignItems: "center", width: 50, height: 50, minWidth: 0}}
                             >
                                 <MaterialIcons
                                     name="thumb-down"
-                                    style={{verticalAlign: "middle"}}
                                     color={
                                         liked == null
                                             ? "darkgray"
@@ -287,13 +285,12 @@ export default MoreModal = ({navigation}) => {
                         <View style={{width: 50, height: 50, alignItems: "center", justifyContent: "center"}}>
                             <Button
                                 onPress={() => likeFunction(true)}
-                                labelStyle={{marginHorizontal: 0}}
+                                labelStyle={{display: "flex", marginHorizontal: 0}}
                                 style={{borderRadius: 25, alignItems: "center", padding: 0, margin: 0, minWidth: 0}}
                                 contentStyle={{alignItems: "center", width: 50, height: 50, minWidth: 0}}
                             >
                                 <MaterialIcons
                                     name="thumb-up"
-                                    style={{verticalAlign: "middle"}}
                                     color={
                                         liked == null
                                             ? "darkgray"
@@ -323,12 +320,12 @@ export default MoreModal = ({navigation}) => {
 
                                 navigation.navigate("Music", {v: videoId, list: playlistId});
                             }}
-                            labelStyle={[modalStyles.entry, {margin: 0, padding: 0, borderRadius: 0, letterSpacing: "normal", textTransform: "none", fontSize: 14, textAlignVertical: "center"}]}
+                            labelStyle={[modalStyles.entry, {display: "flex", margin: 0, padding: 0, borderRadius: 0, letterSpacing: 0, textTransform: "none", fontSize: 14, textAlignVertical: "center"}]}
                             style={{backgroundColor: colors.card, margin: 0, padding: 0, borderRadius: 0}}
                             contentStyle={{margin: 0, padding: 0, borderRadius: 0}}
                         >
-                            <MaterialIcons name="radio" style={{verticalAlign: "middle"}} color={colors.text} size={25}/>
-                            <Text style={{paddingLeft: 20, color: colors.text, verticalAlign: "middle"}}>Start radio</Text>
+                            <MaterialIcons name="radio" style={{display: "flex"}} color={colors.text} size={25}/>
+                            <Text style={{paddingLeft: 20, color: colors.text, display: "flex"}}>Start radio</Text>
                         </Button>
 
                     : undefined
@@ -354,25 +351,25 @@ export default MoreModal = ({navigation}) => {
 
                         }
                     }
-                    labelStyle={[modalStyles.entry, {margin: 0, padding: 0, borderRadius: 0, letterSpacing: "normal", textTransform: "none", fontSize: 14, textAlignVertical: "center"}]}
+                    labelStyle={[modalStyles.entry, {display: "flex", margin: 0, padding: 0, borderRadius: 0, letterSpacing: 0, textTransform: "none", fontSize: 14, textAlignVertical: "center"}]}
                     style={{backgroundColor: colors.card, margin: 0, padding: 0, borderRadius: 0}}
                     contentStyle={{margin: 0, padding: 0, borderRadius: 0}}
                 >
                     {type == "Song"
                         ? playing
                             ? <>
-                                <MaterialIcons style={{verticalAlign: "middle"}} name="pause" color={colors.text} size={25}/>
-                                <Text style={{paddingLeft: 20, color: colors.text, verticalAlign: "middle"}}>Pause</Text>
+                                <MaterialIcons style={{display: "flex"}} name="pause" color={colors.text} size={25}/>
+                                <Text style={{paddingLeft: 20, color: colors.text, display: "flex"}}>Pause</Text>
                             </>
 
                             : <>
-                                <MaterialIcons style={{verticalAlign: "middle"}} name="play-arrow" color={colors.text} size={25}/>
-                                <Text style={{paddingLeft: 20, color: colors.text, verticalAlign: "middle"}}>Play</Text>
+                                <MaterialIcons style={{display: "flex"}} name="play-arrow" color={colors.text} size={25}/>
+                                <Text style={{paddingLeft: 20, color: colors.text, display: "flex"}}>Play</Text>
                             </>
                         
                         : <>
-                            <MaterialIcons style={{verticalAlign: "middle"}} name="launch" color={colors.text} size={25}/>
-                            <Text style={{paddingLeft: 20, color: colors.text, verticalAlign: "middle"}}>Open</Text>
+                            <MaterialIcons style={{display: "flex"}} name="launch" color={colors.text} size={25}/>
+                            <Text style={{paddingLeft: 20, color: colors.text, display: "flex"}}>Open</Text>
                         </>
                     }
                 </Button>
@@ -386,7 +383,7 @@ export default MoreModal = ({navigation}) => {
                                         ? remove()
                                         : download()
                             }
-                            labelStyle={[modalStyles.entry, {margin: 0, padding: 0, borderRadius: 0, letterSpacing: "normal", textTransform: "none", fontSize: 14, textAlignVertical: "center"}]}
+                            labelStyle={[modalStyles.entry, {display: "flex", margin: 0, padding: 0, borderRadius: 0, letterSpacing: 0, textTransform: "none", fontSize: 14, textAlignVertical: "center"}]}
                             style={{backgroundColor: colors.card, margin: 0, padding: 0, borderRadius: 0}}
                             contentStyle={{margin: 0, padding: 0, borderRadius: 0}}
                         >
@@ -394,10 +391,10 @@ export default MoreModal = ({navigation}) => {
                                 downloading
                                     ? <ActivityIndicator
                                         color={colors.text}
-                                        style={{verticalAlign: "middle"}}
+                                        style={{display: "flex"}}
                                     />
                                     : <MaterialIcons
-                                        style={{verticalAlign: "middle"}}
+                                        style={{display: "flex"}}
                                         name={
                                             downloaded
                                                 ? "delete"
@@ -408,7 +405,7 @@ export default MoreModal = ({navigation}) => {
                                     />
                             }
     
-                            <Text style={{paddingLeft: 20, color: colors.text, verticalAlign: "middle"}}>
+                            <Text style={{paddingLeft: 20, color: colors.text, display: "flex"}}>
                                 {
                                     downloading
                                         ? "Downloading" + (downloadQueue.length > 0
@@ -434,20 +431,20 @@ export default MoreModal = ({navigation}) => {
                 <Button
                     uppercase={false}
                     onPress={() => {}}
-                    labelStyle={[modalStyles.entry, {margin: 0, padding: 0, borderRadius: 0, letterSpacing: "normal", textTransform: "none", fontSize: 14, textAlignVertical: "center"}]}
+                    labelStyle={[modalStyles.entry, {display: "flex", margin: 0, padding: 0, borderRadius: 0, letterSpacing: 0, textTransform: "none", fontSize: 14, textAlignVertical: "center"}]}
                     style={{backgroundColor: colors.card, margin: 0, padding: 0, borderRadius: 0}}
                     contentStyle={{margin: 0, padding: 0, borderRadius: 0}}
                 >
                     {
                         type == "Song"
                             ? <>
-                                <MaterialIcons name="playlist-add" style={{verticalAlign: "middle"}} color={colors.text} size={25}/>
-                                <Text style={{paddingLeft: 20, color: colors.text, verticalAlign: "middle"}}>Add to playlist</Text>
+                                <MaterialIcons name="playlist-add" style={{display: "flex"}} color={colors.text} size={25}/>
+                                <Text style={{paddingLeft: 20, color: colors.text, display: "flex"}}>Add to playlist</Text>
                             </>
 
                             : <>
-                                <MaterialIcons name="library-add" style={{verticalAlign: "middle"}} color={colors.text} size={25}/>
-                                <Text style={{paddingLeft: 20, color: colors.text, verticalAlign: "middle"}}>Add to library</Text>
+                                <MaterialIcons name="library-add" style={{display: "flex"}} color={colors.text} size={25}/>
+                                <Text style={{paddingLeft: 20, color: colors.text, display: "flex"}}>Add to library</Text>
                             </>
                     }
                 </Button>
@@ -469,12 +466,12 @@ export default MoreModal = ({navigation}) => {
 
                         onShare(type, "https://music.youtube.com/" + file, message);
                     }}
-                    labelStyle={[modalStyles.entry, {margin: 0, padding: 0, borderRadius: 0, letterSpacing: "normal", textTransform: "none", fontSize: 14, textAlignVertical: "center"}]}
+                    labelStyle={[modalStyles.entry, {display: "flex", margin: 0, padding: 0, borderRadius: 0, letterSpacing: 0, textTransform: "none", fontSize: 14, textAlignVertical: "center"}]}
                     style={{backgroundColor: colors.card, margin: 0, padding: 0, borderRadius: 0}}
                     contentStyle={{margin: 0, padding: 0, borderRadius: 0}}
                 >
-                    <MaterialIcons name="share" style={{verticalAlign: "middle"}} color={colors.text} size={25}/>
-                    <Text style={{paddingLeft: 20, color: colors.text, verticalAlign: "middle"}}>Share</Text>
+                    <MaterialIcons name="share" style={{display: "flex"}} color={colors.text} size={25}/>
+                    <Text style={{paddingLeft: 20, color: colors.text, display: "flex"}}>Share</Text>
                 </Button>
             </View>
         </Pressable>
@@ -510,7 +507,7 @@ const modalStyles = StyleSheet.create({
         flexDirection: "row",
         alignItems: "center",
         alignContent: "center",
-        textAlign: "flex-start",
+        textAlign: "left",
         paddingVertical: 5,
         paddingHorizontal: 50,
         height: 30,

@@ -85,7 +85,7 @@ export const resultStyle = StyleSheet.create({
     },
 
     resultView: {
-        justifyContent: "stretch",
+        justifyContent: "center",
         flexGrow: 1,
         borderRadius: 5,
         height: 70,

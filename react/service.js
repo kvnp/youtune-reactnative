@@ -1,43 +1,42 @@
 import TrackPlayer from 'react-native-track-player';
-import { fetchAudioStream } from "./modules/remote/API";
+import { fetchAudioStream, fetchNext } from "./modules/remote/API";
 import { StatusBar } from 'react-native';
 import { initSettings } from './modules/storage/SettingsStorage';
 import { loadSongLocal, localIDs } from './modules/storage/SongStorage';
+import Playlist from "./modules/models/music/playlist";
 
 export const register = () => {
     StatusBar.setBarStyle("dark-content", true);
     StatusBar.setTranslucent(true);
     StatusBar.setBackgroundColor("transparent", true);
     
-    TrackPlayer.setupPlayer({}).then(() => {
-        TrackPlayer.registerPlaybackService(() => require("./handler"));
-        TrackPlayer.updateOptions({
-            stopWithApp: true,
-            alwaysPauseOnInterruption: true,
+    TrackPlayer.registerPlaybackService(() => require("./handler"));
+    TrackPlayer.updateOptions({
+        stopWithApp: true,
+        alwaysPauseOnInterruption: true,
 
-            capabilities: [
-                TrackPlayer.CAPABILITY_PLAY,
-                TrackPlayer.CAPABILITY_PAUSE,
-                TrackPlayer.CAPABILITY_SKIP_TO_NEXT,
-                TrackPlayer.CAPABILITY_SKIP_TO_PREVIOUS,
-                TrackPlayer.CAPABILITY_STOP,
-                TrackPlayer.CAPABILITY_SEEK_TO
-            ],
+        capabilities: [
+            TrackPlayer.CAPABILITY_PLAY,
+            TrackPlayer.CAPABILITY_PAUSE,
+            TrackPlayer.CAPABILITY_SKIP_TO_NEXT,
+            TrackPlayer.CAPABILITY_SKIP_TO_PREVIOUS,
+            TrackPlayer.CAPABILITY_STOP,
+            TrackPlayer.CAPABILITY_SEEK_TO
+        ],
 
-            notificationCapabilities: [
-                TrackPlayer.CAPABILITY_PLAY,
-                TrackPlayer.CAPABILITY_PAUSE,
-                TrackPlayer.CAPABILITY_SKIP_TO_NEXT,
-                TrackPlayer.CAPABILITY_SKIP_TO_PREVIOUS,
-                TrackPlayer.CAPABILITY_STOP
-            ],
+        notificationCapabilities: [
+            TrackPlayer.CAPABILITY_PLAY,
+            TrackPlayer.CAPABILITY_PAUSE,
+            TrackPlayer.CAPABILITY_SKIP_TO_NEXT,
+            TrackPlayer.CAPABILITY_SKIP_TO_PREVIOUS,
+            TrackPlayer.CAPABILITY_STOP
+        ],
 
-            compactCapabilities: [
-                TrackPlayer.CAPABILITY_PLAY,
-                TrackPlayer.CAPABILITY_PAUSE,
-                TrackPlayer.CAPABILITY_SKIP_TO_NEXT
-            ],
-        });
+        compactCapabilities: [
+            TrackPlayer.CAPABILITY_PLAY,
+            TrackPlayer.CAPABILITY_PAUSE,
+            TrackPlayer.CAPABILITY_SKIP_TO_NEXT
+        ],
     });
 
     initSettings();
@@ -62,8 +61,13 @@ export const skipAuto = async() => {
 }
 
 export const skipTo = async({id, array}) => {
-    if (!array)
+    if (!array) {
         array = await TrackPlayer.getQueue();
+        
+        for (element in array)
+            element.url = null;
+    }
+
 
     let index;
     let track;
@@ -103,6 +107,9 @@ export const skipTo = async({id, array}) => {
 export const skip = async(forward) => {
     let id = await TrackPlayer.getCurrentTrack();
     let array = await TrackPlayer.getQueue();
+    for (element in array)
+        element.url = null;
+
     let playing = (await TrackPlayer.getState()) == TrackPlayer.STATE_PLAYING;
     let position = await TrackPlayer.getPosition();
     let index;
@@ -147,5 +154,65 @@ export const startPlaylist = async(playlist) => {
             await TrackPlayer.skip(focusedId);
             TrackPlayer.play();
         }
+    }
+}
+
+export const handlePlayback = async({videoId, playlistId}) => {
+    let id = await TrackPlayer.getCurrentTrack();
+    let track = await TrackPlayer.getTrack(id);
+    let queue = await TrackPlayer.getQueue();
+
+    if (id == videoId)
+        return;
+
+    if (track) {
+        if (playlistId == track.playlistId) {
+            for (element in queue) {
+                if (element.id == videoId) {
+                    skipTo({id: videoId});
+                    return;
+                }
+            }
+        }
+    }
+    
+
+    TrackPlayer.reset();
+    if (playlistId == "LOCAL_DOWNLOADS") {
+        let localPlaylist = new Playlist();
+
+        for (let i = 0; i < localIDs.length; i++) {
+            let {title, artist, artwork, duration} = await loadSongLocal(localIDs[i]);
+            let constructedTrack = {
+                title,
+                artist,
+                artwork,
+                duration,
+                id: localIDs[i],
+                playlistId: playlistId,
+                url: null
+            };
+
+            if (videoId) {
+                if (localIDs[i] == videoId)
+                    localPlaylist.index = i;
+            }
+
+            localPlaylist.list.push(constructedTrack);
+        }
+
+        startPlaylist(localPlaylist);
+    } else {
+        fetchNext(videoId, playlistId)
+            .then(resultPlaylist => startPlaylist(resultPlaylist))
+
+            .catch(async(reason) => {
+                console.log(reason);
+                if (localIDs.includes(videoId)) {
+                    let localPlaylist = new Playlist();
+                    localPlaylist.list.push(await loadSongLocal(videoId));
+                    startPlaylist(localPlaylist);
+                }
+            });
     }
 }

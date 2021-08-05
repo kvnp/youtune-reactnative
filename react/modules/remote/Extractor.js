@@ -21,7 +21,6 @@ export function extractConfiguration(html) {
     }};
 
     let setMessage = msgs => ytData.MESSAGES = msgs;
-
     let initialData = [];
 
     while (html.includes("<script")) {
@@ -30,10 +29,10 @@ export function extractConfiguration(html) {
         let part = html.slice(html.indexOf(">"), html.indexOf("</"));
 
         while (part.includes("initialData.push(")) {
-            let dataOne = part.indexOf("initialData.push(");
-            let dataTwo = part.indexOf(");") + 2;
-            eval(part.slice(dataOne, dataTwo))
-            part = part.slice(dataTwo);
+            let dataOne = part.indexOf("initialData.push(") + 17;
+            let dataTwo = part.indexOf(");");
+            initialData.push(part.slice(dataOne, dataTwo));
+            part = part.slice(dataTwo + 2);
         }
 
         if (part.includes("ytcfg.set(")) {
@@ -55,7 +54,7 @@ export function extractConfiguration(html) {
                 
                 ytcfg.set(JSON.parse(slice));
             } catch (e) {
-                console.error(e);
+                console.log(e);
             }
         }
         
@@ -67,7 +66,7 @@ export function extractConfiguration(html) {
 
         html = html.slice(html.indexOf("</"));
     }
-
+    
     return ytData;
 }
 

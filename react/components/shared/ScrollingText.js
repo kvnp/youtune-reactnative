@@ -8,8 +8,7 @@ const ScrollingText = ({children, style}) => {
     const scrollAnim = useRef(new Animated.Value(0)).current;
     const scrollInterpolation = scrollAnim.interpolate({
         inputRange: [-1, 1],
-        outputRange: ["100%", "-100%"],
-        useNativeDriver: true
+        outputRange: [100, -100]
     });
 
     useEffect(() => {

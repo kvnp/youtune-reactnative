@@ -82,12 +82,34 @@ export default Navigator = ({navigation}) => {
             sceneAnimationEnabled={true}
             labeled={true}
         >
-            <Nav.Screen name="Home" component={HomeTab} options={getTabOptions("home")}/>
-            <Nav.Screen name="Search" component={SearchTab} options={getTabOptions("search")}/>
-            <Nav.Screen name="Library" component={LibraryTab} options={getTabOptions("folder")}/>
-            <Nav.Screen name="Settings" component={SettingsTab} options={getTabOptions("settings")}/>
+            <Nav.Screen
+                name="Home"
+                component={HomeTab}
+                options={getTabOptions("home")}
+            />
+
+            <Nav.Screen
+                name="Search"
+                component={SearchTab}
+                options={getTabOptions("search")}
+            />
+
+            <Nav.Screen
+                name="Library"
+                component={LibraryTab}
+                options={getTabOptions("folder")}
+            />
+
+            <Nav.Screen
+                name="Settings"
+                component={SettingsTab}
+                options={getTabOptions("settings")}
+            />
         </Nav.Navigator>
-        <MiniPlayer style={{position: "absolute", bottom: 48, width: "100%"}} navigation={navigation}/>
+        <MiniPlayer
+            containerStyle={{position: "absolute", bottom: 48, width: "100%"}}
+            style={{maxWidth: 800}}
+        />
         <MoreModal navigation={navigation}/>
     </>
 }

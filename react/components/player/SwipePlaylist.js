@@ -1,17 +1,18 @@
 import React from "react";
 import {
     Image,
-    View,
     Text,
     StyleSheet,
     Pressable,
+    Dimensions,
     FlatList,
-    Dimensions
+    View
 } from "react-native";
+
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import BottomSheet from 'reanimated-bottom-sheet';
-import { localIDs } from "../../modules/storage/SongStorage";
 
+import { localIDs } from "../../modules/storage/SongStorage";
 import { skipTo } from "../../service";
 import { rippleConfig } from "../../styles/Ripple";
 

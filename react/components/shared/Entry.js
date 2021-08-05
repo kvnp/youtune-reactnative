@@ -46,7 +46,7 @@ export default Entry = ({ entry, navigation, index, forcedPlaylistId }) => {
             labelStyle={{
                 display: "flex",
                 flex: 1,
-                letterSpacing: "normal",
+                letterSpacing: 0,
                 textTransform: "none",
                 fontSize: 14
             }}
