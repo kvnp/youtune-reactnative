@@ -103,13 +103,13 @@ export default SettingsTab = ({navigation}) => {
             labelStyle={{
                 display: "flex",
                 flex: 1,
-                letterSpacing: "normal",
+                letterSpacing: 0,
                 textTransform: "none",
                 fontSize: 14
             }}
             
             contentStyle={{
-                justifyContent: "stretch",
+                justifyContent: "center",
                 flexGrow: 1,
                 borderRadius: 5,
                 height: 70,
