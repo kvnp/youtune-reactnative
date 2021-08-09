@@ -22,17 +22,18 @@ export function extractConfiguration(html) {
 
     let setMessage = msgs => ytData.MESSAGES = msgs;
     let initialData = [];
+    this.initialData = initialData;
 
     while (html.includes("<script")) {
         html = html.slice(html.indexOf("<script"));
 
         let part = html.slice(html.indexOf(">"), html.indexOf("</"));
-
         while (part.includes("initialData.push(")) {
-            let dataOne = part.indexOf("initialData.push(") + 17;
-            let dataTwo = part.indexOf(");");
-            initialData.push(part.slice(dataOne, dataTwo));
-            part = part.slice(dataTwo + 2);
+            let dataOne = part.indexOf("initialData.push(");
+            let dataTwo = part.indexOf(");") + 2;
+            let slice = part.slice(dataOne, dataTwo);
+            eval(slice);
+            part = part.slice(dataTwo);
         }
 
         if (part.includes("ytcfg.set(")) {
