@@ -686,10 +686,39 @@ export function digestBrowseResults(json, browseId) {
 }
 
 export async function digestStreams(parse) {
+    let current = {
+        audioQuality: null,
+        url: null
+    };
+
     for (let i = 0; i < parse.streamingData.adaptiveFormats.length; i++) {
-        if (parse.streamingData.adaptiveFormats[i].mimeType.split("/")[0] == "audio")
-            return parse.streamingData.adaptiveFormats[i].url;
+        let mimeType = parse.streamingData.adaptiveFormats[i].mimeType;
+        if (mimeType.split("/")[0] == "audio") {
+
+            let audioQuality;
+            switch (parse.streamingData.adaptiveFormats[i].audioQuality) {
+                case "AUDIO_QUALITY_LOW":
+                    audioQuality = 1;
+                case "AUDIO_QUALITY_MEDIUM":
+                    audioQuality = 2;
+                case "AUDIO_QUALITY_HIGH":
+                    audioQuality = 3;
+            }
+            
+            if (audioQuality > current.audioQuality) {
+                let url = parse.streamingData.adaptiveFormats[i].url;
+                current = {
+                    audioQuality: audioQuality,
+                    url: url
+                };
+            }
+
+            if (audioQuality == 3)
+                break;
+        }
     }
+
+    return current.url;
 }
 
 export function digestNextResults(json) {
