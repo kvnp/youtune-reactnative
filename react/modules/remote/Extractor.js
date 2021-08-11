@@ -1,8 +1,6 @@
 import { msToMin, msToMMSS, textToSec } from "../utils/Time";
 import Track from "../models/music/track";
 import Playlist from "../models/music/playlist";
-import { decodeNestedURI } from "../utils/Decoder";
-import { getSignature } from "./Decrypt";
 import { hackTracks } from "../../components/collections/FlatEntries";
 
 export function extractConfiguration(html) {
@@ -688,26 +686,9 @@ export function digestBrowseResults(json, browseId) {
 }
 
 export async function digestStreams(parse) {
-    let videoId = parse.videoDetails.videoId;
-
     for (let i = 0; i < parse.streamingData.adaptiveFormats.length; i++) {
-        if (parse.streamingData.adaptiveFormats[i].mimeType.split("/")[0] == "audio") {
-            if (parse.streamingData.adaptiveFormats[i].signatureCipher) {
-                let signatureCipher = parse.streamingData.adaptiveFormats[i].signatureCipher;
-
-                let sigArray = decodeNestedURI(signatureCipher).split("&");
-                let stream = sigArray[2].slice(4);
-                let s = await getSignature(videoId, sigArray[0].substring(2));
-
-                for (let j = 0; j < sigArray.length; j++)
-                    if (j != 0 & j != 2)
-                        stream += "&" + sigArray[j];
-
-                stream += "&sig=" + s;
-                return stream;
-            } else
-                return parse.streamingData.adaptiveFormats[i].url;
-        }
+        if (parse.streamingData.adaptiveFormats[i].mimeType.split("/")[0] == "audio")
+            return parse.streamingData.adaptiveFormats[i].url;
     }
 }
 

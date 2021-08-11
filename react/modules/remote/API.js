@@ -11,7 +11,6 @@ import {
 
 import { settings } from "../../modules/storage/SettingsStorage";
 import { getHttpResponse, getUrl } from "./HTTP";
-import { enableDecryption, signatureTimestamp, isDecryptionWorking } from "./Decrypt";
 
 export const headers_simple = {"User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:79.0) Gecko/20100101 Firefox/79.0"};
 const headers_ytm = {
@@ -37,13 +36,6 @@ async function getConfig(path) {
 
     configuration = extractConfiguration(response);
     
-    let baseUrl = configuration
-        .WEB_PLAYER_CONTEXT_CONFIGS
-        .WEB_PLAYER_CONTEXT_CONFIG_ID_MUSIC_WATCH
-        .jsUrl
-    
-    enableDecryption({baseUrl});
-    
     apiKey = configuration
         .WEB_PLAYER_CONTEXT_CONFIGS
         .WEB_PLAYER_CONTEXT_CONFIG_ID_MUSIC_WATCH
@@ -55,7 +47,25 @@ function getRequestBody() {
         context: {
             client: {
                 clientName: "WEB_REMIX",
-                clientVersion: "0.1",
+                clientVersion: "1.20210630.00.00"
+            }
+        }
+    };
+
+    if (settings.transmitLanguage) {
+        body.context.client["gl"] = getGL();
+        body.context.client["hl"] = getHL();
+    }
+
+    return body;
+}
+
+function getRequestBodyStream() {
+    let body = {
+        context: {
+            client: {
+                clientName: "ANDROID",
+                clientVersion: "16.02"
             }
         }
     };
@@ -205,11 +215,6 @@ export async function fetchAudioInfo({videoId, playlistId, controllerCallback}) 
     let body = getRequestBody();
     body.context["user"] = { lockedSafetyMode: settings.safetyMode }
     body["videoId"] = videoId;
-    
-    if (!isDecryptionWorking())
-        await enableDecryption({videoId});
-
-    body["playbackContext"] = {contentPlaybackContext: {signatureTimestamp: signatureTimestamp}};
 
     if (playlistId)
         body["playlistId"] = playlistId;
@@ -226,16 +231,11 @@ export async function fetchAudioInfo({videoId, playlistId, controllerCallback}) 
 }
 
 export async function fetchAudioStream({videoId, controllerCallback}) {
-    let url = "https://music.youtube.com/youtubei/v1/player?key=" + apiKey;
+    let url = "https://youtubei.googleapis.com/youtubei/v1/player?key=" + apiKey;
 
-    let body = getRequestBody();
+    let body = getRequestBodyStream();
     body.context["user"] = { lockedSafetyMode: settings.safetyMode }
     body["videoId"] = videoId;
-
-    if (!isDecryptionWorking())
-        await enableDecryption({videoId});
-
-    body["playbackContext"] = {contentPlaybackContext: {signatureTimestamp: signatureTimestamp}};
 
     let response = await getHttpResponse(url, {
         method: "POST",
