@@ -697,12 +697,14 @@ export async function digestStreams(parse) {
 
             let audioQuality;
             switch (parse.streamingData.adaptiveFormats[i].audioQuality) {
-                case "AUDIO_QUALITY_LOW":
-                    audioQuality = 1;
                 case "AUDIO_QUALITY_MEDIUM":
                     audioQuality = 2;
+                    break;
                 case "AUDIO_QUALITY_HIGH":
                     audioQuality = 3;
+                    break;
+                default:
+                    audioQuality = 1;
             }
             
             if (audioQuality > current.audioQuality) {
