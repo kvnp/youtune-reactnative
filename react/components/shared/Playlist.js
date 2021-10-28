@@ -7,9 +7,9 @@ import {
 import { TouchableRipple } from 'react-native-paper';
 
 import { playlistStyle } from '../../styles/Playlist';
-import { handleMedia } from '../../modules/event/mediaNavigator';
 import { useTheme } from '@react-navigation/native';
 import { showModal } from '../modals/MoreModal';
+import Navigation from '../../services/ui/Navigation';
 
 export default Playlist = ({ playlist, navigation, style }) => {
     let { title, subtitle, thumbnail } = playlist;
@@ -30,7 +30,7 @@ export default Playlist = ({ playlist, navigation, style }) => {
         <TouchableRipple
             rippleColor={colors.primary}
             onLongPress={() => showModal(view)}
-            onPress={() => handleMedia(view, navigation)}
+            onPress={() => Navigation.handleMedia(view, navigation)}
             style={[style, playlistStyle.container]}
         >
             <>

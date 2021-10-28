@@ -1,5 +1,5 @@
 import { Platform } from "react-native";
-import { settings } from "../storage/SettingsStorage";
+import Settings from "../../services/device/Settings";
 
 const url = "https://music.youtube.com/"
 const partialEndpoint = "youtubei/v1/"
@@ -10,7 +10,7 @@ export function getUrl(endpoint, apiKey) {
 }
 
 export const getHttpResponse = (url, input, type, controllerCallback) => {
-    if (Platform.OS == "web" || settings.proxyYTM) {
+    if (Platform.OS == "web" || Settings.Values.proxyYTM) {
         if (url.split("/")[2] == "lh3.googleusercontent.com")
             url = window.location.protocol + "//" +
                   window.location.host + "/proxy/lh3/" +

@@ -1,183 +1,131 @@
-import TrackPlayer from 'react-native-track-player';
+import TrackPlayer, { RepeatMode, State } from 'react-native-track-player';
+
 import { fetchAudioStream, fetchNext } from "./modules/remote/API";
-import { StatusBar } from 'react-native';
-import { initSettings } from './modules/storage/SettingsStorage';
 import { loadSongLocal, localIDs } from './modules/storage/SongStorage';
 import Playlist from "./modules/models/music/playlist";
+import { metadataCallback } from './views/full/PlayView';
 
-export const register = () => {
-    StatusBar.setBarStyle("dark-content", true);
-    StatusBar.setTranslucent(true);
-    StatusBar.setBackgroundColor("transparent", true);
-    
-    TrackPlayer.registerPlaybackService(() => require("./handler"));
-    TrackPlayer.updateOptions({
-        stopWithApp: true,
-        alwaysPauseOnInterruption: true,
+/*import Queue from "queue-promise";
 
-        capabilities: [
-            TrackPlayer.CAPABILITY_PLAY,
-            TrackPlayer.CAPABILITY_PAUSE,
-            TrackPlayer.CAPABILITY_SKIP_TO_NEXT,
-            TrackPlayer.CAPABILITY_SKIP_TO_PREVIOUS,
-            TrackPlayer.CAPABILITY_STOP,
-            TrackPlayer.CAPABILITY_SEEK_TO
-        ],
+const queue = new Queue({
+  concurrent: 1,
+  interval: 1
+});
 
-        notificationCapabilities: [
-            TrackPlayer.CAPABILITY_PLAY,
-            TrackPlayer.CAPABILITY_PAUSE,
-            TrackPlayer.CAPABILITY_SKIP_TO_NEXT,
-            TrackPlayer.CAPABILITY_SKIP_TO_PREVIOUS,
-            TrackPlayer.CAPABILITY_STOP
-        ],
+queue.on("start", () => {});
+queue.on("stop", () => {});
+queue.on("end", () => {});
 
-        compactCapabilities: [
-            TrackPlayer.CAPABILITY_PLAY,
-            TrackPlayer.CAPABILITY_PAUSE,
-            TrackPlayer.CAPABILITY_SKIP_TO_NEXT
-        ],
-    });
+queue.on("resolve", data => {});
+queue.on("reject", error => {});*/
 
-    initSettings();
-}
-
-export const YOUTUBE_WATCH = "https://www.youtube.com/watch?v=";
-
-export var isRepeating = false;
-export var focusedId = null;
-
-export const setRepeat = async(boolean) => {
-    isRepeating = boolean;
-    if (isRepeating)
-        focusedId = await TrackPlayer.getCurrentTrack();
-}
-
-export const skipAuto = async() => {
-    if (isRepeating)
-        TrackPlayer.seekTo(0);
+const getUrl = async(id) => {
+    if (localIDs.includes(id))
+        return (await loadSongLocal(id)).url;
     else
-        skip(true);
+        return await fetchAudioStream({videoId: id});
 }
 
-export const skipTo = async({id, array}) => {
-    if (!array) {
-        array = await TrackPlayer.getQueue();
-        
-        for (element in array)
-            element.url = null;
-    }
-
-
-    let index;
-    let track;
-
-    for (let i = 0; i < array.length; i++) {
-        if (array[i].id == id) {
-            index = i;
-            track = array[i];
-            break;
-        }
-    }
-
-    focusedId = id;
-    if (!track.url) {
-        TrackPlayer.pause();
-
-        if (localIDs.includes(id))
-            track.url = (await loadSongLocal(id)).url;
-        else
-            track.url = await fetchAudioStream({videoId: id});
-    } else {
-        return TrackPlayer.skip(id);
-    }
-
-    let next;
-    if (index == array.length - 1)
-        next = null;
-    else
-        next = array[index + 1].id;
-
-    await TrackPlayer.remove(id);
-    await TrackPlayer.add(track, next);
-    await TrackPlayer.skip(id);
-    TrackPlayer.play();
-}
-
-export const skip = async(forward) => {
-    let id = await TrackPlayer.getCurrentTrack();
-    let array = await TrackPlayer.getQueue();
-    for (element in array)
-        element.url = null;
-
-    let playing = (await TrackPlayer.getState()) == TrackPlayer.STATE_PLAYING;
-    let position = await TrackPlayer.getPosition();
-    let index;
-
-    for (let i = 0; i < array.length; i++) {
-        if (array[i].id == id) {
-            index = i;
-            break;
-        }
-    }
-
-    let next;
-    if (forward) {
-        if (index == array.length - 1)
-            return TrackPlayer.seekTo(0);
-        
-        next = array[index + 1].id;
-    } else {
-        if (playing && position > 10 || index == 0)
-            return TrackPlayer.seekTo(0);
-
-        next = array[index - 1].id;
-    }
-
-    skipTo({id: next, array});
-}
+var urlLoaded = null;
+export var metadata = [];
 
 export const startPlaylist = async(playlist) => {
+    metadata = playlist.list;
+    if (metadataCallback)
+        metadataCallback(metadata, playlist.index);
+
+    urlLoaded = Array(playlist.list.length).fill(false);
+
     for (let i = 0; i < playlist.list.length; i++) {
         let track = playlist.list[i];
-        if (i == playlist.index) {
-            if (localIDs.includes(track.id))
-                track.url = (await loadSongLocal(track.id)).url;
-            else
-                track.url = await fetchAudioStream({videoId: track.id});
-        }
+        /*if (i == playlist.index) {
+            track.url = await getUrl(track.id);
+            urlLoaded[i] = true;
+        }*/
+
+        track.url = await getUrl(track.id);
+        urlLoaded[i] = true;
 
         await TrackPlayer.add(track);
         
         if (i == playlist.index) {
-            focusedId = track.id;
-            await TrackPlayer.skip(focusedId);
+            await TrackPlayer.skip(i);
             TrackPlayer.play();
         }
     }
+    return;
+
+    /*let nextTrack;
+    let currentTrack;
+    let startingIndex = 0;
+    if (playlist.index == playlist.list.length - 1) {
+        nextTrack = playlist.list[0];
+        nextTrack.url = await getUrl(nextTrack.id);
+        urlLoaded[0] = true;
+
+        startingIndex = 1;
+        console.log(nextTrack);
+        await TrackPlayer.add(nextTrack);
+        console.log(await TrackPlayer.getQueue());
+    }
+    
+    console.log(playlist.list.slice(startingIndex, playlist.index));
+    await TrackPlayer.add(
+        playlist.list.slice(startingIndex, playlist.index)
+    );
+    console.log(await TrackPlayer.getQueue());
+
+    currentTrack = playlist.list[playlist.index];
+    currentTrack.url = await getUrl(currentTrack.id);
+    urlLoaded[playlist.index] = true;
+    console.log(currentTrack);
+    await TrackPlayer.add(currentTrack);
+    console.log(await TrackPlayer.getQueue());
+
+    await TrackPlayer.skip(playlist.index);
+    setMetadataIndex(playlist.index);
+
+    await TrackPlayer.play();
+
+    if (startingIndex == 0) {
+        nextTrack = playlist.list[playlist.index + 1];
+        nextTrack.url = await getUrl(nextTrack.id);
+        urlLoaded[playlist.index + 1] = true;
+        await TrackPlayer.add(nextTrack);
+    }
+    
+    await TrackPlayer.add(
+        playlist.list.slice(
+            playlist.index + 2,
+            playlist.list.length
+        )
+    );
+    
+    console.log(await TrackPlayer.getQueue());*/
 }
 
 export const handlePlayback = async({videoId, playlistId}) => {
-    let id = await TrackPlayer.getCurrentTrack();
-    let track = await TrackPlayer.getTrack(id);
     let queue = await TrackPlayer.getQueue();
+    if (queue.length > 0) {
+        let index = await TrackPlayer.getCurrentTrack();
+        let track = await TrackPlayer.getTrack(index);
 
-    if (id == videoId)
-        return;
+        if (track.id == videoId)
+            return;
 
-    if (track) {
-        if (playlistId == track.playlistId) {
-            for (element in queue) {
-                if (element.id == videoId) {
-                    skipTo({id: videoId});
-                    return;
+        if (track) {
+            if (playlistId == track.playlistId) {
+                for (let i = 0; i < queue.length; i++) {
+                    if (queue[i].id == videoId)
+                        return TrackPlayer.skip(i);
                 }
             }
         }
-    }
-    
 
-    TrackPlayer.reset();
+        metadata = [];
+        TrackPlayer.reset();
+    }
+
     if (playlistId == "LOCAL_DOWNLOADS") {
         let localPlaylist = new Playlist();
 
@@ -207,7 +155,6 @@ export const handlePlayback = async({videoId, playlistId}) => {
             .then(resultPlaylist => startPlaylist(resultPlaylist))
 
             .catch(async(reason) => {
-                console.log(reason);
                 if (localIDs.includes(videoId)) {
                     let localPlaylist = new Playlist();
                     localPlaylist.list.push(await loadSongLocal(videoId));
@@ -216,3 +163,77 @@ export const handlePlayback = async({videoId, playlistId}) => {
             });
     }
 }
+
+export const skip = async(nextIndex) => {
+    console.log(await TrackPlayer.getCurrentTrack() + " " + metadataIndex);
+    console.log("0 " + nextIndex + " " + metadata.length);
+
+    if (metadata.length == 0)
+        return;
+
+    let forward = nextIndex > metadataIndex;
+    let playing = playback == State.Playing;
+    let position = await TrackPlayer.getPosition();
+
+    /*if (
+        nextIndex > metadata.length - 1 ||
+        playing && !forward && position > 10 ||
+        nextIndex < 0
+    )
+        return TrackPlayer.seekTo(0);*/
+
+    let track = metadata[nextIndex];
+    await TrackPlayer.skip(nextIndex);
+    return TrackPlayer.play();
+
+    let hasUrl = urlLoaded[nextIndex];
+
+    if (hasUrl) {
+        console.log("hasUrl");
+        await TrackPlayer.skip(nextIndex);
+        if (playing)
+            TrackPlayer.play();
+        
+        return;
+    }
+
+    TrackPlayer.pause();
+
+    track.url = await getUrl(track.id);
+    urlLoaded[nextIndex] = true;
+
+    let afterNext;
+    if (nextIndex == metadata.length - 1)
+        afterNext = null;
+    else
+        afterNext = nextIndex;
+
+    await TrackPlayer.remove(nextIndex);
+    await TrackPlayer.add(track, afterNext);
+    await TrackPlayer.skip(nextIndex);
+    return TrackPlayer.play();
+}
+
+export var currentRepeatMode = RepeatMode.Off;
+export var currentRepeatString = "repeat";
+
+export const switchRepeatMode = () => {
+    switch(currentRepeatMode) {
+        case RepeatMode.Off:
+            TrackPlayer.setRepeatMode(RepeatMode.Queue);
+            currentRepeatMode = RepeatMode.Queue;
+            currentRepeatString = "repeat-on";
+            break;
+        case RepeatMode.Queue:
+            TrackPlayer.setRepeatMode(RepeatMode.Track);
+            currentRepeatMode = RepeatMode.Track;
+            currentRepeatString = "repeat-one-on";
+            break;
+        case RepeatMode.Track:
+            TrackPlayer.setRepeatMode(RepeatMode.Off);
+            currentRepeatMode = RepeatMode.Off;
+            currentRepeatString = "repeat";
+    }
+
+    return currentRepeatString;
+};

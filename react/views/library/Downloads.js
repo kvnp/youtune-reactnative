@@ -11,10 +11,11 @@ import { Button } from 'react-native-paper';
 
 import { useFocusEffect, useTheme } from '@react-navigation/native';
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
+
 import Entry from "../../components/shared/Entry";
+import Navigation from '../../services/ui/Navigation';
 import { loadSongLocal, localIDs, dbLoading } from "../../modules/storage/SongStorage";
 import { shelvesStyle } from '../../styles/Shelves';
-import { playLocal } from '../../modules/event/mediaNavigator';
 
 export default Downloads = ({ navigation }) => {
     const [entries, setEntries] = useState([]);
@@ -106,7 +107,7 @@ export default Downloads = ({ navigation }) => {
                     mode="contained"
                     style={{margin: 20, alignItems: "stretch"}}
                     labelStyle={{alignItems: "stretch"}}
-                    onPress={() => playLocal("LOCAL_DOWNLOADS", navigation)}
+                    onPress={() => Navigation.playLocal("LOCAL_DOWNLOADS", navigation)}
                 >
                     Play all
                 </Button>

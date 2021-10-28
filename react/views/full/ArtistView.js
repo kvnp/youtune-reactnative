@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useCallback } from "react";
 import {
     View,
     Text,
@@ -7,6 +7,7 @@ import {
 } from "react-native";
 
 import { useTheme } from "@react-navigation/native";
+import { useFocusEffect } from "@react-navigation/core";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import LinearGradient from "react-native-linear-gradient";
 
@@ -19,26 +20,24 @@ import FlatShelves from "../../components/collections/FlatShelves";
 export default ArtistView = ({ route, navigation }) => {
     const {dark, colors}  = useTheme();
     const [artist, setArtist] = useState(null);
-    navigation.setOptions({ title: "Loading" });
 
     const gradientColors = ["rgba(242, 242, 242, 1)", "rgba(242, 242, 242, 0.8)", "rgba(242, 242, 242, 0.5)", "rgba(242, 242, 242, 0.2)"];
     const gradientColorsDark = ["rgba(0, 0, 0, 1)", "rgba(0, 0, 0, 0.8)", "rgba(0, 0, 0, 0.5)", "rgba(0, 0, 0, 0.2)"];
 
-    useEffect(() => {
-        fetchBrowse(route.params.channelId)
-            .then(artist => {
-                if (navigation.isFocused()) {
+    useFocusEffect(
+        useCallback(() => {
+            navigation.setOptions({ title: "Loading" });
+            fetchBrowse(route.params.channelId)
+                .then(artist => {
                     setArtist(artist);
                     navigation.setOptions({ title: artist.header.title });
-                }
-            });
-    }, [artist]);
+                });
+        }, [])
+    )
 
-    var shelves;
-    if (artist != null)
-        shelves = artist.shelves;
-    else
-        shelves = null;
+    const shelves = artist != null
+        ? artist.shelves
+        : null;
     
     return <>
         <FlatShelves shelves={shelves} navigation={navigation}/>

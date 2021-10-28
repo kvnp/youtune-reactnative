@@ -1,4 +1,3 @@
-import { useTheme } from "@react-navigation/native";
 import React from "react";
 import {
     Image,
@@ -8,13 +7,14 @@ import {
     FlatList,
     View
 } from "react-native";
-import { TouchableRipple } from "react-native-paper";
 
+import TrackPlayer from 'react-native-track-player';
+import { TouchableRipple } from "react-native-paper";
+import { useTheme } from "@react-navigation/native";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
-import BottomSheet from 'reanimated-bottom-sheet';
+import BottomSheet from 'rn-sliding-up-panel';
 
 import { localIDs } from "../../modules/storage/SongStorage";
-import { skipTo } from "../../service";
 
 export default SwipePlaylist = ({playlist, track, backgroundColor, textColor, minimumHeight}) => {
     const { height } = Dimensions.get("window");
@@ -49,7 +49,7 @@ export default SwipePlaylist = ({playlist, track, backgroundColor, textColor, mi
                         marginVertical: 5
                     }}
 
-                    onPress={() => skipTo({id: item.id})}
+                    onPress={() => TrackPlayer.skip(index)}
                 >
                     <>
                     {

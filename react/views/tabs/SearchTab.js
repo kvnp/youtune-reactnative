@@ -11,19 +11,18 @@ import {
     Platform
 } from 'react-native';
 
-import { useTheme } from '@react-navigation/native';
+import { useTheme, useNavigation, useRoute } from '@react-navigation/native';
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import { Button } from 'react-native-paper';
 
+import Media from '../../services/api/Media';
 import Entry from '../../components/shared/Entry';
-import { setHeader } from '../../components/overlay/Header';
-import { fetchResults } from '../../modules/remote/API';
 import { shelvesStyle } from '../../styles/Shelves';
 import { rippleConfig } from '../../styles/Ripple';
 import { searchBarStyle } from '../../styles/Search';
 import { resultHomeStyle, preResultHomeStyle } from '../../styles/Home';
 
-export default SearchTab = ({route, navigation}) => {
+export default SearchTab = () => {
     const [searchText, setSearchText] = useState("Look for music using the search bar");
     const [shelves, setShelves] = useState([]);
     const [loading, setLoading] = useState(false);
@@ -33,26 +32,15 @@ export default SearchTab = ({route, navigation}) => {
     const [query, setQuery] = useState("");
     const {dark, colors} = useTheme();
 
+    const route = useRoute();
+    const navigation = useNavigation();
+
     useEffect(() => {
         if (route.params)
             if (route.params.q) {
                 setQuery(route.params.q);
                 search(route.params.q)
             }
-
-        const unsubscribe = navigation.addListener('tabPress', () => {
-            setHeader({title: "Search"});
-        });
-
-        const unsubscribe2 = navigation.addListener('focus', () => {
-            setHeader({title: "Search"});
-        });
-
-        return () => {
-            unsubscribe();
-            unsubscribe2();
-        }
-
     }, []);
 
     const search = (query, params) => {
@@ -61,7 +49,7 @@ export default SearchTab = ({route, navigation}) => {
         if (query.length > 0) {
             setLoading(true);
 
-            fetchResults(query, params)
+            Media.getSearchResults(query, params)
                 .then(data => {
                     if (data.suggestionOption == suggestion)
                         data.suggestionOption = null;

@@ -1,9 +1,9 @@
 import React, { useState, useCallback } from 'react';
-
 import { View, Text, StyleSheet, Platform } from 'react-native';
+
 import { useFocusEffect, useTheme } from '@react-navigation/native';
 import Slider from '@react-native-community/slider';
-import TrackPlayer from 'react-native-track-player';
+import TrackPlayer, { Event, State, useProgress } from 'react-native-track-player';
 
 function pad(n, width, z = 0) {
     n = n + '';
@@ -17,108 +17,48 @@ const minutesAndSeconds = position => ([
     pad( ~~(position % 60), 2),
 ]);
 
-const SeekBar = ({style}) => {
+export default SeekBar = ({style, duration}) => {
     const [isSliding, setSliding] = useState(false);
+    const { colors } = useTheme();
     const [positionCache, setPositionCache] = useState(0);
-    const [duration, setDuration] = useState(0);
-    const [state, setState] = useState({
-        position: 0,
-        bufferedPosition: 0
-    });
 
-    const { position, bufferedPosition } = state;
+    const { position, bufferedPosition } = useProgress(500);
 
     const elapsed = minutesAndSeconds(position);
     const remaining = minutesAndSeconds(duration - position);
-    const { colors } = useTheme();
 
-    const updateSeekbar = async() => {
-        setState({
-            position: await TrackPlayer.getPosition(),
-            bufferedPosition: await TrackPlayer.getBufferedPosition()
-        });
-    }
+    return <View style={[styles.container, style]}>
+        <Slider
+            maximumValue={Math.max(duration, 1, position)}
+            onSlidingComplete={newPosition => {
+                TrackPlayer.seekTo(newPosition)
+                    .then(() => setSliding(false));
+            }}
+            onSlidingStart={currentPosition => {
+                setSliding(true);
+                setPositionCache(currentPosition);
+            }}
 
-    useFocusEffect(
-        useCallback(() => {
-            var interval;
+            value={isSliding != true ? position : positionCache}
+            bufferedPosition={bufferedPosition}
+            minimumTrackTintColor={colors.text}
+            maximumTrackTintColor={colors.card}
+            thumbTintColor={colors.primary}
+            thumbStyle={{color: colors.primary}}
+            trackStyle={styles.track}
+        />
 
-            updateSeekbar();
-            TrackPlayer.getState().then(async(state) => {
-                if (state == TrackPlayer.STATE_PLAYING) {
-                    clearInterval(interval);
-                    setDuration(await TrackPlayer.getDuration());
-                    interval = setInterval(() => updateSeekbar(), 500);
-                }
-            })
-
-            const playState = TrackPlayer.addEventListener('playback-state', playback => {
-                clearInterval(interval);
-                switch (playback.state) {
-                    case TrackPlayer.STATE_PLAYING:
-                        interval = setInterval(() => updateSeekbar(), 500);
-                        break;
-                    case TrackPlayer.STATE_NONE:
-                    case TrackPlayer.STATE_PAUSED:
-                    case TrackPlayer.STATE_STOPPED:
-                    case TrackPlayer.STATE_BUFFERING:
-                        updateSeekbar();
-                }
-            });
-    
-            const trackState = TrackPlayer.addEventListener('playback-track-changed', async() => {
-                setDuration(await TrackPlayer.getDuration());
-                updateSeekbar();
-            });
-    
-            return () => {
-                clearInterval(interval);
-                playState.remove();
-                trackState.remove();
-            }
-        }, [])
-    );
-
-    return (
-        <View style={[styles.container, style]}>
-            <Slider
-                maximumValue={Math.max(duration, 1, position)}
-                onSlidingComplete={async(newPosition) => {
-                    await TrackPlayer.seekTo(newPosition);
-                    setState(oldState => ({
-                        ...oldState,
-                        position: newPosition
-                    }));
-                    setSliding(false);
-                }}
-                onSlidingStart={currentPosition => {
-                    setSliding(true);
-                    setPositionCache(currentPosition);
-                }}
-
-                value={isSliding != true ? position : positionCache}
-                bufferedPosition={bufferedPosition}
-                minimumTrackTintColor={colors.text}
-                maximumTrackTintColor={colors.card}
-                thumbTintColor={colors.primary}
-                thumbStyle={{color: colors.primary}}
-                trackStyle={styles.track}
-            />
-
-            <View style={{ flexDirection: 'row', paddingRight: 15, paddingLeft: 15 }}>
-                <Text style={[styles.text, {color: colors.text}]}>
-                    {elapsed[0] + ':' + elapsed[1]}
-                </Text>
-                <View style={{ flex: 1 }} />
-                <Text style={[styles.text, {textAlign: 'right', color: colors.text}]}>
-                    {'-' + remaining[0] + ':' + remaining[1]}
-                </Text>
-            </View>
+        <View style={{ flexDirection: 'row', paddingRight: 15, paddingLeft: 15 }}>
+            <Text style={[styles.text, {color: colors.text}]}>
+                {elapsed[0] + ':' + elapsed[1]}
+            </Text>
+            <View style={{ flex: 1 }} />
+            <Text style={[styles.text, {textAlign: 'right', color: colors.text}]}>
+                {'-' + remaining[0] + ':' + remaining[1]}
+            </Text>
         </View>
-    );
+    </View>
 };
-
-export default SeekBar;
 
 const styles = StyleSheet.create({
     slider: {

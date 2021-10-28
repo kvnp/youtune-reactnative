@@ -22,11 +22,7 @@
 
         <script>
             window.setImmediate = window.setTimeout;
-            var process = {
-                env: {
-                    NODE_DEV: "false"
-                }
-            };
+            var process = undefined;
 
             if (window.Notification)
                 Notification.requestPermission();

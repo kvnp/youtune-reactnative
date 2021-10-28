@@ -1,3 +1,6 @@
+This project is currently being rewritten and migrated to track-player v2.
+Music playback is not working as of yet and navigating through the UI is a bit buggy.
+
 Youtube Music client for Android, iOS and Web built with React Native
 
 ![alt text](youtune.jpg)

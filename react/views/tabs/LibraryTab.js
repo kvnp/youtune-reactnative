@@ -1,5 +1,5 @@
-import React, { useEffect } from 'react';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import React from 'react';
+import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 
 import { navigationOptions } from '../../App';
 import Playlists from '../library/Playlists';
@@ -7,28 +7,12 @@ import Albums from '../library/Albums';
 import Songs from '../library/Songs';
 import Artists from '../library/Artists';
 import Downloads from '../library/Downloads';
-import { setHeader } from '../../components/overlay/Header';
 import { getIcon } from '../../modules/utils/Icon';
 
-const Tab = createBottomTabNavigator();
+const Tab = createMaterialTopTabNavigator();
 const tabOptions = {};
 
-export default LibraryTab = ({navigation}) => {
-    useEffect(() => {
-        const unsubscribe = navigation.addListener('tabPress', () => {
-            setHeader({title: "Library"});
-        });
-
-        const unsubscribe2 = navigation.addListener('focus', () => {
-            setHeader({title: "Library"});
-        });
-
-        return () => {
-            unsubscribe();
-            unsubscribe2();
-        }
-    }, []);
-
+export default LibraryTab = () => {
     return <Tab.Navigator initialRouteName="Playlists" tabBarPosition="bottom" screenOptions={{...navigationOptions, ...tabOptions}}>
         <Tab.Screen name="Playlists" component={Playlists} options={{ tabBarIcon: ({ color }) => getIcon({title: "playlist-play", color}) }}/>
         <Tab.Screen name="Albums" component={Albums} options={{ tabBarIcon: ({ color }) => getIcon({title: "album", color}) }}/>

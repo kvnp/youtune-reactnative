@@ -1,16 +1,10 @@
 import React from 'react';
 
 import { FlatList } from "react-native";
-import { textToSec } from '../../modules/utils/Time';
+//import { textToSec } from '../../modules/utils/Time';
 import Entry from '../shared/Entry';
 
-export var hackTracks = null;
-
-export const setHackTracks = playlist => {
-    hackTracks = playlist;
-}
-
-const entriesToPlaylist = (entries, playlistId) => {
+/*const entriesToPlaylist = (entries, playlistId) => {
     let tracks = {
         list: [],
         index: 0
@@ -28,13 +22,13 @@ const entriesToPlaylist = (entries, playlistId) => {
     }
 
     return tracks;
-}
+}*/
 
 export default FlatEntries = ({entries, playlistId, navigation}) => {
-    if (playlistId)
+    /*if (playlistId)
         hackTracks = entriesToPlaylist(entries, playlistId);
     else
-        hackTracks = null;
+        hackTracks = null;*/
 
     return <FlatList
         contentContainerStyle={{

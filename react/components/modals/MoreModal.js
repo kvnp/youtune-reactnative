@@ -17,7 +17,6 @@ import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import { useTheme } from "@react-navigation/native";
 
 import { appColor } from "../../styles/App";
-import { handleMedia } from "../../modules/event/mediaNavigator";
 
 import {
     likeSong,
@@ -30,7 +29,7 @@ import {
 
 import { storeSong, deleteSong, localIDs, downloadQueue, abortSongDownload } from "../../modules/storage/SongStorage";
 import { displayNotification } from "../../modules/utils/Notification";
-import { setTransitionTrack } from "../../views/full/PlayView";
+import Music from "../../services/music/Music";
 
 export var showModal = null;
 
@@ -330,7 +329,7 @@ export default MoreModal = ({navigation}) => {
                                 flexDirection: "row"
                             }}
                             onPress={() => {
-                                setTransitionTrack({
+                                Music.setTransitionTrack({
                                     id: videoId,
                                     playlistId: playlistId,
                                     title: content.title,
@@ -365,25 +364,16 @@ export default MoreModal = ({navigation}) => {
                         alignItems: "center",
                         flexDirection: "row"
                     }}
-                    onPress={
-                        async() => {
-                            if (playing) {
-                                TrackPlayer.pause();
-                                setContent(content => ({
-                                    ...content,
-                                    playing: false,
-                                    visible: false
-                                }));
-                            } else {
-                                if (await TrackPlayer.getCurrentTrack() == videoId) {
-                                    setContent(content => ({...content, visible: false}));
-                                    handleMedia(content, navigation);
-                                    TrackPlayer.play();
-                                }
-                            }
-
+                    onPress={() => {
+                        if (playing) {
+                            TrackPlayer.pause();
+                            setContent(content => ({
+                                ...content,
+                                playing: false,
+                                visible: false
+                            }));
                         }
-                    }
+                    }}
                 >
                     {type == "Song"
                         ? playing

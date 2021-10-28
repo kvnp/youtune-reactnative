@@ -1,16 +1,9 @@
 import { getHL, getGL } from "../utils/Native";
-import {
-    digestHomeResults,
-    digestSearchResults,
-    digestBrowseResults,
-    digestNextResults,
-    digestStreams,
-    extractConfiguration,
-    digestAudioInfo
-} from "./Extractor";
+import {extractConfiguration,} from "./Extractor";
 
-import { settings } from "../../modules/storage/SettingsStorage";
 import { getHttpResponse, getUrl } from "./HTTP";
+import Settings from "../../services/device/Settings";
+import Extractor from "../../services/api/Extractor";
 
 export const headers_simple = {"User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:79.0) Gecko/20100101 Firefox/79.0"};
 const headers_ytm = {
@@ -52,7 +45,7 @@ function getRequestBody() {
         }
     };
 
-    if (settings.transmitLanguage) {
+    if (Settings.Values.transmitLanguage) {
         body.context.client["gl"] = getGL();
         body.context.client["hl"] = getHL();
     }
@@ -70,7 +63,7 @@ function getRequestBodyStream() {
         }
     };
 
-    if (settings.transmitLanguage) {
+    if (Settings.Values.transmitLanguage) {
         body.context.client["gl"] = getGL();
         body.context.client["hl"] = getHL();
     }
@@ -85,7 +78,10 @@ export async function fetchResults(query, params) {
     const url = getUrl("search", apiKey);
 
     let body = getRequestBody();
-    body.context["user"] = {enableSafetyMode: settings.safetyMode};
+    body.context["user"] = {
+        enableSafetyMode: Settings.Values.safetyMode
+    };
+
     body["query"] = query;
     
     if (params)
@@ -97,7 +93,7 @@ export async function fetchResults(query, params) {
         body: JSON.stringify(body)
     }, "json");
     
-    return digestSearchResults(response);
+    return Extractor.digestSearchResponse(response);
 }
 
 export async function fetchSpecificResults(kind) {
@@ -107,7 +103,7 @@ export async function fetchSpecificResults(kind) {
     const url = getUrl("browse", apiKey);
 
     let body = getRequestBody();
-    body.context["user"] = { enableSafetyMode: settings.safetyMode }
+    body.context["user"] = { enableSafetyMode: Settings.Values.safetyMode }
     body["input"] = input;
 
     let response = await getHttpResponse(url, {
@@ -116,7 +112,7 @@ export async function fetchSpecificResults(kind) {
         body: JSON.stringify(body)
     }, "json");
 
-    return digestSearchResults(response);
+    return Extractor.digestSearchResponse(response);
 }
 
 export async function fetchHome(continuation) {
@@ -125,17 +121,18 @@ export async function fetchHome(continuation) {
 
     for (let element of configuration.YTMUSIC_INITIAL_DATA)
         if (element.path == "/browse" && element.params.browseId == "FEmusic_home")
-            return digestHomeResults(element.data);
+            return Extractor.digestHomeResponse(element.data);
 
     let url = getUrl("browse", apiKey);
 
     let body = getRequestBody();
-    body.context["user"] = { enableSafetyMode: settings.safetyMode }
+    body.context["user"] = { enableSafetyMode: Settings.Values.safetyMode }
 
     if (continuation)
         url = url + "&ctoken=" + continuation.continuation + 
                     "&continuation=" + continuation.continuation +
-                    "&itct=" + continuation.itct
+                    "&itct=" + continuation.itct +
+                    "&type=next"
     else
         body["browseId"] = "FEmusic_home";
 
@@ -145,7 +142,7 @@ export async function fetchHome(continuation) {
         body: JSON.stringify(body)
     }, "json");
 
-    return digestHomeResults(response);
+    return Extractor.digestHomeResponse(response);
 }
 
 export async function fetchSuggestions(input) {
@@ -155,7 +152,7 @@ export async function fetchSuggestions(input) {
     const url = getUrl("get_search_suggestions", apiKey);
 
     let body = getRequestBody();
-    body.context["user"] = { enableSafetyMode: settings.safetyMode }
+    body.context["user"] = { enableSafetyMode: Settings.Values.safetyMode }
     body["input"] = input;
 
     let response = await getHttpResponse(url, {
@@ -180,7 +177,7 @@ export async function fetchBrowse(browseId) {
                 if (configuration.YTMUSIC_INITIAL_DATA[i].params.browseId == "FEmusic_home")
                     await getConfig("/playlist?list=" + browseId);
                 
-                return digestBrowseResults(
+                return Extractor.digestBrowseResponse(
                     configuration.YTMUSIC_INITIAL_DATA[i].data,
                     configuration.YTMUSIC_INITIAL_DATA[i].params.browseId
                 );
@@ -193,7 +190,7 @@ export async function fetchBrowse(browseId) {
     const url = getUrl("browse", apiKey);
 
     let body = getRequestBody();
-    body.context["user"] = { enableSafetyMode: settings.safetyMode }
+    body.context["user"] = { enableSafetyMode: Settings.Values.safetyMode }
 
     if (slice == "RD")
         browseId = "VL" + browseId;
@@ -206,14 +203,14 @@ export async function fetchBrowse(browseId) {
         body: JSON.stringify(body)
     }, "json");
 
-    return digestBrowseResults(response, browseId);
+    return Extractor.digestBrowseResponse(response, browseId);
 }
 
 export async function fetchAudioInfo({videoId, playlistId, controllerCallback}) {
     let url = "https://music.youtube.com/youtubei/v1/player?key=" + apiKey;
 
     let body = getRequestBody();
-    body.context["user"] = { lockedSafetyMode: settings.safetyMode }
+    body.context["user"] = { lockedSafetyMode: Settings.Values.safetyMode }
     body["videoId"] = videoId;
 
     if (playlistId)
@@ -225,7 +222,7 @@ export async function fetchAudioInfo({videoId, playlistId, controllerCallback}) 
         body: JSON.stringify(body)
     }, "json", controllerCallback);
 
-    let audioInfo = digestAudioInfo(response);
+    let audioInfo = Extractor.digestAudioInfo(response);
 
     return audioInfo;
 }
@@ -234,7 +231,7 @@ export async function fetchAudioStream({videoId, controllerCallback}) {
     let url = "https://youtubei.googleapis.com/youtubei/v1/player?key=" + apiKey;
 
     let body = getRequestBodyStream();
-    body.context["user"] = { lockedSafetyMode: settings.safetyMode }
+    body.context["user"] = { lockedSafetyMode: Settings.Values.safetyMode }
     body["videoId"] = videoId;
 
     let response = await getHttpResponse(url, {
@@ -243,7 +240,7 @@ export async function fetchAudioStream({videoId, controllerCallback}) {
         body: JSON.stringify(body)
     }, "json", controllerCallback);
 
-    let stream = digestStreams(response);
+    let stream = Extractor.digestStreams(response);
     return stream;
 }
 
@@ -264,7 +261,7 @@ export async function fetchNext(videoId, playlistId) {
         body: JSON.stringify(body)
     }, "json");
 
-    return digestNextResults(response);
+    return Extractor.digestNextResponse(response);
 }
 
 export async function downloadMedia({url, controllerCallback}) {

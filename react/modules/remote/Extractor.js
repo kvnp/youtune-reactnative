@@ -1,7 +1,7 @@
 import { msToMin, msToMMSS, textToSec } from "../utils/Time";
 import Track from "../models/music/track";
 import Playlist from "../models/music/playlist";
-import { hackTracks } from "../../components/collections/FlatEntries";
+//import { hackTracks } from "../../components/collections/FlatEntries";
 
 export function extractConfiguration(html) {
     let ytData = {};
@@ -685,7 +685,7 @@ export function digestBrowseResults(json, browseId) {
         return getAlbum(json);
 }
 
-export async function digestStreams(parse) {
+export function digestStreams(parse) {
     let current = {
         audioQuality: null,
         url: null
@@ -732,7 +732,7 @@ export function digestNextResults(json) {
                                 .playlist.playlistPanelRenderer;
     else {
         let musicQueueRenderer = json.contents.singleColumnMusicWatchNextResultsRenderer.tabbedRenderer.watchNextTabbedResultsRenderer.tabs[0].tabRenderer.content.musicQueueRenderer;
-        if (musicQueueRenderer.hasOwnProperty("hack") && hackTracks != null) {
+        /*if (musicQueueRenderer.hasOwnProperty("hack") && hackTracks != null) {
             playlist = hackTracks;
             let currentVideoId = json.currentVideoEndpoint.watchEndpoint.videoId;
             
@@ -744,7 +744,8 @@ export function digestNextResults(json) {
             }
         } else {
             playlistRenderer = musicQueueRenderer.content.playlistPanelRenderer;
-        }
+        }*/
+        playlistRenderer = musicQueueRenderer.content.playlistPanelRenderer;
     }
 
     playlist.index = json.currentVideoEndpoint.watchEndpoint.index;

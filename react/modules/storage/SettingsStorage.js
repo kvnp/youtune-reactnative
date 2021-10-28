@@ -1,5 +1,4 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { darkCallback } from '../../App';
+import AsyncStorage from '@react-native-async-storage/async-storage';;
 
 export var settings = {
     transmitLanguage: false,
@@ -12,7 +11,6 @@ export const initSettings = () => {
     getSettings().then(storage => {
         if (storage != null) {
             settings = storage;
-            darkCallback(settings.darkMode);
         }
     });
 }
