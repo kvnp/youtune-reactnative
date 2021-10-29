@@ -5,8 +5,8 @@
     "repository": "github:kvnp/youtune-reactnative",
     "license": "GPL-3.0",
     "engines": {
-        "node": "15.x",
-        "npm": "7.x"
+        "node": "16.x",
+        "npm": "8.x"
     },
     "funding": {
         "type": "patreon",
@@ -40,11 +40,11 @@
         "react-native-linear-gradient": "github:react-native-linear-gradient/react-native-linear-gradient",
         "react-native-pager-view": "^5.4.7",
         "react-native-paper": "^4.9.2",
-        "react-native-reanimated": "^2.3.0-alpha.2",
+        "react-native-reanimated": "^2.3.0-beta.1",
         "react-native-safe-area-context": "^3.3.2",
         "react-native-screens": "^3.8.0",
         "react-native-tab-view": "^3.1.1",
-        "react-native-track-player": "github:react-native-linear-gradient/react-native-linear-gradient",
+        "react-native-track-player": "https://github.com/kvnp/react-native-track-player/tarball/main",
         "react-native-vector-icons": "^9.0.0",
         "react-native-web": "^0.17.5",
         "react-native-web-linear-gradient": "^1.1.2",
@@ -52,10 +52,10 @@
         "rn-sliding-up-panel": "^2.4.5"
     },
     "devDependencies": {
-        "@babel/core": "^7.15.0",
-        "@babel/preset-env": "^7.15.0",
+        "@babel/core": "^7.15.8",
+        "@babel/preset-env": "^7.15.8",
         "@babel/preset-react": "^7.14.5",
-        "@babel/runtime": "^7.15.3",
+        "@babel/runtime": "^7.15.4",
         "@react-native-community/eslint-config": "^3.0.1",
         "babel-jest": "^27.3.1",
         "babel-loader": "^8.2.3",
