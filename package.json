@@ -21,7 +21,8 @@
         "bundle": "react-native start",
         "test": "jest",
         "lint": "eslint .",
-        "dist": "webpack"
+        "dist": "webpack",
+        "postinstall": "cd ./node_modules/react-native-track-player/ && npm install && npm run prepare && rm -rf ./node_modules && rm -rf ./src"
     },
     "dependencies": {
         "@react-native-async-storage/async-storage": "^1.15.9",
@@ -38,11 +39,11 @@
         "react-native": "^0.66.1",
         "react-native-gesture-handler": "^1.10.3",
         "react-native-linear-gradient": "github:react-native-linear-gradient/react-native-linear-gradient",
-        "react-native-pager-view": "^5.4.7",
+        "react-native-pager-view": "^5.4.8",
         "react-native-paper": "^4.9.2",
         "react-native-reanimated": "^2.3.0-beta.1",
         "react-native-safe-area-context": "^3.3.2",
-        "react-native-screens": "^3.8.0",
+        "react-native-screens": "^3.9.0",
         "react-native-tab-view": "^3.1.1",
         "react-native-track-player": "https://github.com/kvnp/react-native-track-player/tarball/main",
         "react-native-vector-icons": "^9.0.0",
@@ -52,10 +53,10 @@
         "rn-sliding-up-panel": "^2.4.5"
     },
     "devDependencies": {
-        "@babel/core": "^7.15.8",
-        "@babel/preset-env": "^7.15.8",
-        "@babel/preset-react": "^7.14.5",
-        "@babel/runtime": "^7.15.4",
+        "@babel/core": "^7.16.0",
+        "@babel/preset-env": "^7.16.0",
+        "@babel/preset-react": "^7.16.0",
+        "@babel/runtime": "^7.16.0",
         "@react-native-community/eslint-config": "^3.0.1",
         "babel-jest": "^27.3.1",
         "babel-loader": "^8.2.3",
@@ -70,7 +71,7 @@
         "react-native-codegen": "^0.0.9",
         "react-style-proptype": "^3.2.2",
         "react-test-renderer": "^17.0.2",
-        "webpack": "^5.60.0",
+        "webpack": "^5.61.0",
         "webpack-cli": "^4.9.1",
         "webpack-dev-server": "4.4.0",
         "webpack-pwa-manifest": "^4.3.0",
