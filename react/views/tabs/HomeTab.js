@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import {
     Text,
@@ -9,13 +9,13 @@ import {
     Platform
 } from 'react-native';
 
-import { useFocusEffect, useTheme } from '@react-navigation/native';
+import { useTheme } from '@react-navigation/native';
 import { Button } from 'react-native-paper';
 
 import { fetchHome } from "../../modules/remote/API";
 import Shelf from '../../components/shared/Shelf';
 import { shelvesStyle } from '../../styles/Shelves';
-import { refreshStyle, preResultHomeStyle } from '../../styles/Home';
+import { preResultHomeStyle } from '../../styles/Home';
 import { setHeader } from '../../components/overlay/Header';
 
 export default HomeTab = ({navigation}) => {
@@ -29,32 +29,29 @@ export default HomeTab = ({navigation}) => {
             : "Pull down to load"
     );
 
-    useFocusEffect(
-        useCallback(() => {
-            const _unsubscribe = navigation.addListener('focus', () => {
-                setHeader({title: "Home"});
-                if (shelves.length == 0)
-                    startRefresh();
-            });
-    
-            const _offlineListener = Platform.OS == "web"
-                ? window.addEventListener("online", () => {
-                    setLoading(true);
-                    startRefresh();
-                })
-                : undefined;
-    
-            return () => {
-                _unsubscribe();
-    
-                if (_offlineListener)
-                    _offlineListener();
-            };
-        }, [])
-    );
+    useEffect(() => {
+        const _unsubscribe = navigation.addListener('focus', () => {
+            setHeader({title: "Home"});
+            if (shelves.length == 0)
+                startRefresh();
+        });
+
+        const _offlineListener = Platform.OS == "web"
+            ? window.addEventListener("online", () => {
+                setLoading(true);
+                startRefresh();
+            })
+            : undefined;
+
+        return () => {
+            _unsubscribe();
+
+            if (_offlineListener)
+                _offlineListener();
+        };
+    }, [])
 
     const startRefresh = async() => {
-        console.log("refresh");
         let temp = continuation;
 
         fetchHome(temp)
