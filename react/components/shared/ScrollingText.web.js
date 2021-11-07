@@ -1,5 +1,4 @@
-import { useFocusEffect } from "@react-navigation/native";
-import React, { useState, useEffect, useRef, useCallback } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { ScrollView, View } from "react-native";
 import { unstable_createElement } from "react-native-web";
 
@@ -14,6 +13,8 @@ const ScrollingText = ({children, style}) => {
         viewRef.current.style.animationTimingFunction = "linear";
         viewRef.current.style.animationDuration = "10s";
         viewRef.current.style.transformOrigin = "0%";
+        viewRef.current.children[0].children[0].children[0]
+            .style.whiteSpace = "nowrap";
     }, []);
 
     useEffect(() => {
