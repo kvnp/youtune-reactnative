@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Platform } from "react-native";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { Provider, configureFonts, Snackbar, DefaultTheme as PaperTheme} from 'react-native-paper';
 
 import { NavigationContainer } from "@react-navigation/native";
@@ -83,24 +84,26 @@ const App = () => {
             }});
     }
 
-    return <Provider theme={theme}>
-        <NavigationContainer linking={linking} theme={theme}>
-            <Stack.Navigator screenOptions={{gestureEnabled: true, swipeEnabled: true, animationEnabled: true}}>
-                <Stack.Screen name="App" component={Navigator} options={navigationOptions}/>
-                <Stack.Screen name="Music" component={PlayView} options={{...navigationOptions, presentation: "modal"}}/>
-                <Stack.Screen name="Captcha" component={CaptchaView}/>
-                
-                <Stack.Screen name="Playlist" component={PlaylistView}
-                            options={{headerBackImage: () => getIcon({title: "arrow-back"})}}
-                />
-                
-                <Stack.Screen name="Artist" component={ArtistView}
-                            options={{headerBackImage: () => getIcon({title: "arrow-back"})}}
-                />
-            </Stack.Navigator>
-            {updateBar}
-        </NavigationContainer>
-    </Provider>
+    return <GestureHandlerRootView>
+        <Provider theme={theme}>
+            <NavigationContainer linking={linking} theme={theme}>
+                <Stack.Navigator screenOptions={{gestureEnabled: true, swipeEnabled: true, animationEnabled: true}}>
+                    <Stack.Screen name="App" component={Navigator} options={navigationOptions}/>
+                    <Stack.Screen name="Music" component={PlayView} options={{...navigationOptions, presentation: "modal"}}/>
+                    <Stack.Screen name="Captcha" component={CaptchaView}/>
+                    
+                    <Stack.Screen name="Playlist" component={PlaylistView}
+                                options={{headerBackImage: () => getIcon({title: "arrow-back"})}}
+                    />
+                    
+                    <Stack.Screen name="Artist" component={ArtistView}
+                                options={{headerBackImage: () => getIcon({title: "arrow-back"})}}
+                    />
+                </Stack.Navigator>
+                {updateBar}
+            </NavigationContainer>
+        </Provider>
+    </GestureHandlerRootView>;
 }
 
 const linking = {
