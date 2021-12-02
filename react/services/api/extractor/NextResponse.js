@@ -1,3 +1,7 @@
+import Playlist from "../../../modules/models/music/playlist";
+import Track from "../../../modules/models/music/track";
+import { textToSec } from "../../../modules/utils/Time";
+
 export default function digestNextResults(json) {
     let playlist = new Playlist();
 
