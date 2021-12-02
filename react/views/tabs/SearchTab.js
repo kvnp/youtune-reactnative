@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import {
     SectionList,
     Text,
@@ -30,10 +30,11 @@ export default SearchTab = () => {
     const [suggestion, setSuggestion] = useState(null);
     const [instead, setInstead] = useState(null);
     const [query, setQuery] = useState("");
+    
     const {dark, colors} = useTheme();
-
     const route = useRoute();
     const navigation = useNavigation();
+    const searchInput = useRef(null);
 
     useEffect(() => {
         if (route.params)
@@ -41,6 +42,12 @@ export default SearchTab = () => {
                 setQuery(route.params.q);
                 search(route.params.q)
             }
+
+        const unsubFocus = navigation.addListener('focus', () => {
+            searchInput.current.focus();
+        });
+        
+        return unsubFocus;
     }, []);
 
     const search = (query, params) => {
@@ -163,6 +170,7 @@ export default SearchTab = () => {
             <View style={[searchBarStyle.container, {backgroundColor: colors.card}]}>
                 <View style={searchBarStyle.inputBox}>
                     <TextInput style={[searchBarStyle.input, {color: colors.text}]}
+                            ref={searchInput}
                             placeholder="Search"
                             value={query}
                             onChangeText={newQuery => setQuery(newQuery)}
