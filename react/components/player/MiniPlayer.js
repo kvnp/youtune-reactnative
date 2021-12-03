@@ -51,10 +51,8 @@ export default MiniPlayer = ({style, containerStyle}) => {
     const refreshTrack = async(e) => {
         if (!e) e = {nextTrack: await TrackPlayer.getCurrentTrack()};
         let track = await TrackPlayer.getTrack(e.nextTrack);
-        if (track != null) {
-            //delete track.url;
+        if (track != null)
             setTrack(track);
-        }
     }
 
     const onOpen = () => {
