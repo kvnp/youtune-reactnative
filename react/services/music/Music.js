@@ -68,29 +68,24 @@ export default class Music {
     }
 
     static cycleRepeatMode = () => {
-        return new Promise(async(resolve, reject) => {
-            if (!Music.#initialized)
-                reject("Music needs to be initialized by calling initialize()");
+        if (!Music.#initialized)
+            reject("Music needs to be initialized by calling initialize()");
 
-            switch(Music.repeatMode) {
-                case RepeatMode.Off:
-                    await TrackPlayer.setRepeatMode(RepeatMode.Queue);
-                    Music.repeatMode = RepeatMode.Queue;
-                    Music.repeatModeString = "repeat-on";
-                    break;
-                case RepeatMode.Queue:
-                    await TrackPlayer.setRepeatMode(RepeatMode.Track);
-                    Music.repeatMode = RepeatMode.Track;
-                    Music.repeatModeString = "repeat-one-on";
-                    break;
-                case RepeatMode.Track:
-                    await TrackPlayer.setRepeatMode(RepeatMode.Off);
-                    Music.repeatMode = RepeatMode.Off;
-                    Music.repeatModeString = "repeat";
-            }
-            await TrackPlayer.setRepeatMode(Music.repeatMode);
-            resolve();
-        });
+        switch (Music.repeatMode) {
+            case RepeatMode.Off:
+                Music.repeatMode = RepeatMode.Queue;
+                Music.repeatModeString = "repeat-on";
+                break;
+            case RepeatMode.Queue:
+                Music.repeatMode = RepeatMode.Track;
+                Music.repeatModeString = "repeat-one-on";
+                break;
+            case RepeatMode.Track:
+                Music.repeatMode = RepeatMode.Off;
+                Music.repeatModeString = "repeat";
+        }
+        
+        TrackPlayer.setRepeatMode(Music.repeatMode);
     }
 
     static get index() {
