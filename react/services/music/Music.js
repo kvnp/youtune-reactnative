@@ -1,4 +1,6 @@
+import { DeviceEventEmitter } from 'react-native';
 import TrackPlayer, { Capability, RepeatMode } from 'react-native-track-player';
+import Queue from 'queue-promise';
 import Media from '../api/Media';
 
 export default class Music {
@@ -11,11 +13,54 @@ export default class Music {
 
     static transitionTrack;
 
+    static #emitter = DeviceEventEmitter;
+    static EVENT_METADATA_UPDATE = "event-metadata-update";
+
+    static #queue = new Queue({
+        concurrent: 5,
+        interval: 1
+    });
+
+    static addListener(event, listener) {
+        return Music.#emitter.addListener(event, listener);
+    }
+
     static initialize = () => {
         return new Promise(async(resolve, reject) => {
             TrackPlayer.registerPlaybackService(TrackPlayerTaskProvider);
             await TrackPlayer.setupPlayer({});
             await TrackPlayer.updateOptions(TrackPlayerOptions);
+            Music.#queue.on("start", () => {});
+            Music.#queue.on("stop", () => {});
+            Music.#queue.on("end", () => {});
+
+            Music.#queue.on("reject", error => {});
+            Music.#queue.on("resolve", async(track) => {
+                if (Music.metadataList == null)
+                    return;
+
+                let trackIndex = -1;
+                for (let i = 0; i < Music.metadataList.length; i++) {
+                    if (Music.metadataList[i].id == track.id) {
+                        trackIndex = i;
+                        break;
+                    }
+                }
+
+                if (trackIndex == -1)
+                    return;
+
+                await TrackPlayer.remove(trackIndex);
+                await TrackPlayer.add(track, trackIndex);
+                Music.trackUrlLoaded[trackIndex] = true;
+
+                if (Music.metadata.id != track.id)
+                    return;
+
+                await TrackPlayer.skip(trackIndex);
+                TrackPlayer.play();
+            });
+
             Music.#initialized = true;
             TrackPlayer.setRepeatMode(Music.repeatMode);
             resolve();
@@ -63,23 +108,46 @@ export default class Music {
     }
 
     static skipTo(index) {
+        if (index == null)
+            return;
+        
+        if (index + 1 >= Music.metadataList.length || index < 0)
+            return;
+
+        if (Music.metadataList == null)
+            return;
+
         if (Music.metadataList != null) {
             Music.metadataIndex = index;
-            TrackPlayer.skip(index);
+            Music.#emitter.emit(Music.EVENT_METADATA_UPDATE, null);
+            
+            if (Music.trackUrlLoaded[Music.metadataIndex]) {
+                TrackPlayer.skip(index).then(() => {
+                    TrackPlayer.play();
+                });
+            } else {
+                Music.#queue.enqueue(() => {
+                    return new Promise(async(resolve, reject) => {
+                        let track = Music.metadataList[Music.metadataIndex];
+                        track.url = await Media.getAudioStream({videoId: track.id});
+                        resolve(track);
+                    });
+                });
+            }
         }
     }
     
     static skipNext() {
-        if (Music.metadataIndex > 0) {
+        if (Music.metadataIndex < Music.metadataList.length - 1) {
             Music.metadataIndex++;
-            TrackPlayer.skipToNext();
+            Music.skipTo(Music.metadataIndex);
         }
     }
 
     static skipPrevious() {
-        if (Music.metadataIndex < Music.metadataList.length - 1) {
+        if (Music.metadataIndex > 0) {
             Music.metadataIndex--;
-            TrackPlayer.skipToPrevious();
+            Music.skipTo(Music.metadataIndex);
         }
     }
 
@@ -140,27 +208,29 @@ export default class Music {
     }
 
     static async startPlaylist(playlist) {
-        console.log(playlist);
-        Music.metadataList = playlist.list;
-        Music.trackUrlLoaded = Array(playlist.list.length).fill(false);
-    
-        for (let i = 0; i < playlist.list.length; i++) {
-            let track = playlist.list[i];
-            /*if (i == playlist.index) {
-                track.url = await getUrl(track.id);
-                urlLoaded[i] = true;
-            }*/
-    
-            track.url = await getUrl(track.id);
-            Music.trackUrlLoaded[i] = true;
-    
-            await TrackPlayer.add(track);
-            
-            if (i == playlist.index) {
-                await TrackPlayer.skip(i);
-                TrackPlayer.play();
+        try {
+            Music.metadataList = playlist.list.slice();
+            Music.trackUrlLoaded = Array(playlist.list.length).fill(false);
+            Music.metadataIndex = 0;
+
+            for (let i = 0; i < playlist.list.length; i++) {
+                if (i == playlist.index) {
+                    playlist.list[i].url = await Media.getAudioStream({videoId: playlist.list[i].id});
+                    Music.trackUrlLoaded[i] = true;
+                    Music.metadataIndex = i;
+                    break;
+                }
             }
+
+            await TrackPlayer.add(playlist.list);
+            await TrackPlayer.skip(Music.metadataIndex);
+            TrackPlayer.play();
+            
+            Music.#emitter.emit(Music.EVENT_METADATA_UPDATE, null);
+        } catch(e) {
+            console.log(e);
         }
+        
     }
 }
 

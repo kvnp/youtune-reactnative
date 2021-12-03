@@ -166,8 +166,8 @@ export default class Media {
         };
         
         let response = await HTTP.getResponse(url, input, type);
-        console.log(response);
         let playlist = Extractor.digestNextResponse(response);
+        
         return playlist;
     }
 

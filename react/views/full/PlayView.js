@@ -22,11 +22,11 @@ import { getSongLike, likeSong } from "../../modules/storage/MediaStorage";
 import Music from "../../services/music/Music";
 
 const PlayView = ({route, navigation}) => {
+    const forceUpdate = React.useReducer(() => ({}))[1]
     const { height, width } = useWindowDimensions();
     const { dark, colors } = useTheme();
-    const forceUpdate = React.useReducer(() => ({}))[1]
-    const [state, setState] = useState(State.Buffering);
 
+    const [state, setState] = useState(State.Buffering);
     const [isLiked, setLiked] = useState(null);
     
     const refreshLike = async() => setLiked(
@@ -36,11 +36,12 @@ const PlayView = ({route, navigation}) => {
     const {id, playlistId, title, artist, artwork, duration} = Music.metadata;
 
     useEffect(() => {
-        if (title != null && id != null) {
-            navigation.setOptions({title: title});
-            navigation.setParams({v: id, list: playlistId});
-        }
-    });
+        if (id == null)
+            return;
+            
+        navigation.setOptions({title: title});
+        navigation.setParams({v: id, list: playlistId});
+    }, [id]);
 
     useEffect(() => {
         Music.handlePlayback({
@@ -53,7 +54,15 @@ const PlayView = ({route, navigation}) => {
             e => setState(e.state)
         );
 
-        return () => stateListener.remove();
+        const updateListener = Music.addListener(
+            Music.EVENT_METADATA_UPDATE,
+            () => forceUpdate()
+        );
+
+        return () => {
+            stateListener.remove();
+            updateListener.remove();
+        }
     }, []);
 
     return <View style={{flex: 1}}>
@@ -66,7 +75,11 @@ const PlayView = ({route, navigation}) => {
                 <View style={controlStyles.container}>
                     
                     <Button
-                        onPress={async() => { await likeSong(id, false); await refreshLike(); forceUpdate()}}
+                        onPress={async() => {
+                            await likeSong(id, false);
+                            await refreshLike();
+                            forceUpdate()
+                        }}
                         labelStyle={{marginHorizontal: 0}}
                         style={{borderRadius: 25, alignItems: "center", padding: 0, margin: 0, minWidth: 0,
                                 color: isLiked == null
@@ -125,7 +138,11 @@ const PlayView = ({route, navigation}) => {
                     </View>
 
                     <Button
-                        onPress={async() => { await likeSong(id, true); await refreshLike(); forceUpdate();}}
+                        onPress={async() => {
+                            await likeSong(id, true);
+                            await refreshLike();
+                            forceUpdate();
+                        }}
                         labelStyle={{marginHorizontal: 0}}
                         style={{borderRadius: 25, alignItems: "center", padding: 0, margin: 0, minWidth: 0}}
                         contentStyle={{alignItems: "center", width: 50, height: 50, minWidth: 0}}
@@ -163,7 +180,7 @@ const PlayView = ({route, navigation}) => {
                         labelStyle={{marginHorizontal: 0}}
                         style={{borderRadius: 25, alignItems: "center", padding: 0, margin: 0, minWidth: 0}}
                         contentStyle={{alignItems: "center", width: 50, height: 50, minWidth: 0}}
-                        onPress={() => {Music.skipPrevious(); forceUpdate();}}
+                        onPress={() => Music.skipPrevious()}
                     >
                         <MaterialIcons style={{alignSelf: "center"}} selectable={false} name="skip-previous" color={colors.text} size={40}/>
                     </Button>
@@ -205,7 +222,7 @@ const PlayView = ({route, navigation}) => {
                         labelStyle={{marginHorizontal: 0}}
                         style={{borderRadius: 25, alignItems: "center", padding: 0, margin: 0, minWidth: 0}}
                         contentStyle={{alignItems: "center", width: 50, height: 50, minWidth: 0}}
-                        onPress={() => {Music.skipNext(); forceUpdate();}}
+                        onPress={() => Music.skipNext()}
                     >
                         <MaterialIcons style={{alignSelf: "center"}} selectable={false} name="skip-next" color={colors.text} size={40}/>
                     </Button>
@@ -214,7 +231,10 @@ const PlayView = ({route, navigation}) => {
                         labelStyle={{marginHorizontal: 0}}
                         style={{borderRadius: 25, alignItems: "center", padding: 0, margin: 0, minWidth: 0}}
                         contentStyle={{alignItems: "center", width: 50, height: 50, minWidth: 0}}
-                        onPress={() => {Music.cycleRepeatMode(); forceUpdate();}}
+                        onPress={() => {
+                            Music.cycleRepeatMode();
+                            forceUpdate();
+                        }}
                     >
                         <MaterialIcons
                             style={{alignSelf: "center"}}
@@ -245,10 +265,10 @@ const PlayView = ({route, navigation}) => {
                         style={[stylesTop.topThird, { borderRadius: 25, alignItems: "center", padding: 0, margin: 0, minWidth: 0}]}
                         contentStyle={{alignItems: "center", width: 50, height: 50, minWidth: 0}}
                         onPress={() => showModal({
-                            title: track.title,
-                            subtitle: track.artist,
-                            thumbnail: track.artwork,
-                            videoId: track.id
+                            title: title,
+                            subtitle: artist,
+                            thumbnail: artwork,
+                            videoId: id
                         })}
                     >
                         <MaterialIcons

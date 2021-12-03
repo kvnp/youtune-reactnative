@@ -52,7 +52,7 @@ export default MiniPlayer = ({style, containerStyle}) => {
         if (!e) e = {nextTrack: await TrackPlayer.getCurrentTrack()};
         let track = await TrackPlayer.getTrack(e.nextTrack);
         if (track != null) {
-            delete track.url;
+            //delete track.url;
             setTrack(track);
         }
     }
