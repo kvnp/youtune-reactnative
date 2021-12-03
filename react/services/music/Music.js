@@ -1,10 +1,12 @@
 import { DeviceEventEmitter } from 'react-native';
-import TrackPlayer, { Capability, RepeatMode } from 'react-native-track-player';
+import TrackPlayer, { Capability, RepeatMode, Event, State } from 'react-native-track-player';
 import Queue from 'queue-promise';
 import Media from '../api/Media';
 
 export default class Music {
     static #initialized;
+    static state = State.None;
+    static position = 0;
     static repeatMode = RepeatMode.Off;
     static repeatModeString = "repeat";
     static metadataList = [];
@@ -16,6 +18,84 @@ export default class Music {
     static #emitter = DeviceEventEmitter;
     static EVENT_METADATA_UPDATE = "event-metadata-update";
 
+    static TrackPlayerTaskProvider = () => {
+        return async function() {
+            TrackPlayer.addEventListener(Event.PlaybackState, params => {
+                Music.state = params.state;
+            });
+    
+            TrackPlayer.addEventListener(Event.PlaybackTrackChanged, params => {
+                console.log(Event.PlaybackTrackChanged);
+                console.log(params);
+                
+                if (Music.metadataIndex != params.nextTrack) {
+                    Music.metadataIndex = params.nextTrack;
+                    Music.#emitter.emit(Music.EVENT_METADATA_UPDATE, null);
+                }
+
+                if (params.nextTrack < Music.metadataList.length - 1 && params.nextTrack >= 0) {
+                    if (!Music.trackUrlLoaded[params.nextTrack]) {
+                        Music.#queue.enqueue(() => {
+                            return new Promise(async(resolve, reject) => {
+                                let track = Music.metadataList[params.nextTrack];
+                                track.url = await Media.getAudioStream({videoId: track.id});
+                                resolve(track);
+                            });
+                        });
+                    }
+                }
+            });
+    
+            TrackPlayer.addEventListener(Event.PlaybackQueueEnded, params => {
+                //console.log(Event.PlaybackQueueEnded);
+                //console.log(params);
+            });
+    
+            TrackPlayer.addEventListener(Event.PlaybackError, params => {
+                //console.log(Event.PlaybackError);
+                //console.log(params);
+                /*TrackPlayer.seekTo(0).then(() => {
+                    TrackPlayer.play();
+                });*/
+            });
+    
+            TrackPlayer.addEventListener(Event.RemoteNext, params => {
+                Music.skipNext();
+            });
+    
+            TrackPlayer.addEventListener(Event.RemotePrevious, params => {
+                Music.skipPrevious();
+            });
+    
+            TrackPlayer.addEventListener(Event.RemotePlay, params => TrackPlayer.play());
+    
+            TrackPlayer.addEventListener(Event.RemotePause, params => TrackPlayer.pause());
+    
+            TrackPlayer.addEventListener(Event.RemoteStop, params => TrackPlayer.stop());
+    
+            TrackPlayer.addEventListener(Event.RemoteSeek, params => {
+                TrackPlayer.seekTo( ~~(params.position) );
+            });
+    
+            TrackPlayer.addEventListener(Event.RemoteJumpForward, async() => {
+                let position = await TrackPlayer.getPosition();
+                let duration = await TrackPlayer.getDuration();
+                position += 10;
+                if (position > duration) position = duration;
+    
+                TrackPlayer.seekTo(position);
+            });
+    
+            TrackPlayer.addEventListener(Event.RemoteJumpBackward, async() => {
+                let position = await TrackPlayer.getPosition();
+                position -= 10;
+                if (newPosition < 0) position = 0;
+    
+                TrackPlayer.seekTo(position);
+            });
+        }
+    };
+
     static #queue = new Queue({
         concurrent: 5,
         interval: 1
@@ -26,10 +106,11 @@ export default class Music {
     }
 
     static initialize = () => {
-        return new Promise(async(resolve, reject) => {
-            TrackPlayer.registerPlaybackService(TrackPlayerTaskProvider);
+        return new Promise(async(resolve, reject) => {   
+            TrackPlayer.registerPlaybackService(Music.TrackPlayerTaskProvider);
             await TrackPlayer.setupPlayer({});
             await TrackPlayer.updateOptions(TrackPlayerOptions);
+
             Music.#queue.on("start", () => {});
             Music.#queue.on("stop", () => {});
             Music.#queue.on("end", () => {});
@@ -103,47 +184,57 @@ export default class Music {
     }
 
     static skipTo(index) {
-        if (index == null)
+        if (index == null || Music.metadataList == null)
             return;
         
-        if (index + 1 >= Music.metadataList.length || index < 0)
-            return;
+        if (index < 0)
+            index = 0;
 
-        if (Music.metadataList == null)
-            return;
-
-        if (Music.metadataList != null) {
-            Music.metadataIndex = index;
-            Music.#emitter.emit(Music.EVENT_METADATA_UPDATE, null);
-            
-            if (Music.trackUrlLoaded[Music.metadataIndex]) {
-                TrackPlayer.skip(index).then(() => {
-                    TrackPlayer.play();
-                });
+        if (index + 1 >= Music.metadataList.length) {
+            if (Music.repeatMode == RepeatMode.Queue) {
+                index = 0;
             } else {
-                Music.#queue.enqueue(() => {
-                    return new Promise(async(resolve, reject) => {
-                        let track = Music.metadataList[Music.metadataIndex];
-                        track.url = await Media.getAudioStream({videoId: track.id});
-                        resolve(track);
-                    });
-                });
+                index = Music.metadataList.length - 1;
             }
+        }
+        
+        let forward = index > Music.metadataIndex;
+        let playing = Music.state == State.Playing;
+        let seek = !forward && Music.position >= 10;
+
+        if (seek)
+            TrackPlayer.seekTo(0);
+        else
+            Music.metadataIndex = index;
+
+        Music.#emitter.emit(Music.EVENT_METADATA_UPDATE, null);
+        
+        if (Music.trackUrlLoaded[Music.metadataIndex]) {
+            if (!seek)
+                TrackPlayer.skip(index);
+        } else {
+            Music.#queue.enqueue(() => {
+                return new Promise(async(resolve, reject) => {
+                    let track = Music.metadataList[Music.metadataIndex];
+                    track.url = await Media.getAudioStream({videoId: track.id});
+                    resolve(track);
+                });
+            });
         }
     }
     
     static skipNext() {
-        if (Music.metadataIndex < Music.metadataList.length - 1) {
-            Music.metadataIndex++;
-            Music.skipTo(Music.metadataIndex);
-        }
+        TrackPlayer.getPosition().then(position => {
+            Music.position = position;
+            Music.skipTo(Music.metadataIndex + 1);
+        })
     }
 
     static skipPrevious() {
-        if (Music.metadataIndex > 0) {
-            Music.metadataIndex--;
-            Music.skipTo(Music.metadataIndex);
-        }
+        TrackPlayer.getPosition().then(position => {
+            Music.position = position;
+            Music.skipTo(Music.metadataIndex - 1);
+        })
     }
 
     static setTransitionTrack(track) {
@@ -203,98 +294,30 @@ export default class Music {
     }
 
     static async startPlaylist(playlist) {
-        try {
-            Music.metadataList = playlist.list.slice();
-            Music.trackUrlLoaded = Array(playlist.list.length).fill(false);
-            Music.metadataIndex = 0;
+        Music.metadataList = playlist.list.slice();
+        Music.trackUrlLoaded = Array(playlist.list.length).fill(false);
+        Music.metadataIndex = 0;
 
-            for (let i = 0; i < playlist.list.length; i++) {
-                if (i == playlist.index) {
-                    playlist.list[i].url = await Media.getAudioStream({videoId: playlist.list[i].id});
-                    Music.trackUrlLoaded[i] = true;
-                    Music.metadataIndex = i;
-                    break;
-                }
+        for (let i = 0; i < playlist.list.length; i++) {
+            if (i == playlist.index) {
+                Music.metadataIndex = i;
             }
 
-            await TrackPlayer.add(playlist.list);
-            await TrackPlayer.skip(Music.metadataIndex);
-            TrackPlayer.play();
-            
-            Music.#emitter.emit(Music.EVENT_METADATA_UPDATE, null);
-        } catch(e) {
-            console.log(e);
+            if (i == playlist.index || i == playlist.index + 1) {
+                playlist.list[i].url = await Media.getAudioStream({videoId: playlist.list[i].id});
+                Music.trackUrlLoaded[i] = true;
+            }
+
+            if (i == playlist.index + 1) {
+                break;
+            }
         }
+
+        await TrackPlayer.add(playlist.list);
+        await TrackPlayer.skip(Music.metadataIndex);
+        TrackPlayer.play();
         
-    }
-}
-
-const TrackPlayerTaskProvider = () => {
-    return async function() {
-        TrackPlayer.addEventListener(Event.PlaybackState, params => {
-            //console.log(Event.PlaybackState);
-            //console.log(params);
-
-            playback = params.state;
-            //if (stateCallback)
-            //    stateCallback(params.state);
-        });
-
-        TrackPlayer.addEventListener(Event.PlaybackTrackChanged, params => {
-            console.log(Event.PlaybackTrackChanged);
-            console.log(params);
-            
-            metadataIndex = params.nextTrack;
-            //if (trackCallback)
-            //    trackCallback(metadataIndex);
-
-            //TrackPlayer.getQueue()
-            //    .then(queue => console.log(queue));
-        });
-
-        TrackPlayer.addEventListener(Event.PlaybackQueueEnded, params => {
-            //console.log(Event.PlaybackQueueEnded);
-            //console.log(params);
-        });
-
-        TrackPlayer.addEventListener(Event.PlaybackError, params => {
-            //console.log(Event.PlaybackError);
-            //console.log(params);
-            /*TrackPlayer.seekTo(0).then(() => {
-                TrackPlayer.play();
-            });*/
-        });
-
-        TrackPlayer.addEventListener(Event.RemoteNext, params => TrackPlayer.skipToNext);
-
-        TrackPlayer.addEventListener(Event.RemotePrevious, params => TrackPlayer.skipToPrevious);
-
-        TrackPlayer.addEventListener(Event.RemotePlay, params => TrackPlayer.play());
-
-        TrackPlayer.addEventListener(Event.RemotePause, params => TrackPlayer.pause());
-
-        TrackPlayer.addEventListener(Event.RemoteStop, params => TrackPlayer.stop());
-
-        TrackPlayer.addEventListener(Event.RemoteSeek, params => {
-            TrackPlayer.seekTo( ~~(params.position) );
-        });
-
-        TrackPlayer.addEventListener(Event.RemoteJumpForward, async() => {
-            let position = await TrackPlayer.getPosition();
-            let duration = await TrackPlayer.getDuration();
-            position += 10;
-            if (newPosition > duration) position = duration;
-
-            TrackPlayer.seekTo(position);
-        });
-
-        TrackPlayer.addEventListener(Event.RemoteJumpBackward, async() => {
-            let position = await TrackPlayer.getPosition();
-            position -= 10;
-            if (newPosition < 0) position = 0;
-
-            TrackPlayer.seekTo(position);
-        });
+        Music.#emitter.emit(Music.EVENT_METADATA_UPDATE, null);
     }
 }
 
