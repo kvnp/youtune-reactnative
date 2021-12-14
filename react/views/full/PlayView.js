@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useReducer } from "react";
 import {
     View,
     StyleSheet,
@@ -17,28 +17,28 @@ import SeekBar from "../../components/player/SeekBar";
 import SwipePlaylist from "../../components/player/SwipePlaylist";
 import { showModal } from "../../components/modals/MoreModal";
 import ScrollingText from "../../components/shared/ScrollingText";
-import { getSongLike, likeSong } from "../../modules/storage/MediaStorage";
 
 import Music from "../../services/music/Music";
 
 const PlayView = ({route, navigation}) => {
-    const forceUpdate = React.useReducer(() => ({}))[1]
+    const forceUpdate = useReducer(() => ({}))[1];
     const { height, width } = useWindowDimensions();
     const { dark, colors } = useTheme();
 
-    const [state, setState] = useState(State.Buffering);
+    const [state, setState] = useState(Music.state);
     const [isLiked, setLiked] = useState(null);
-    
-    const refreshLike = async() => setLiked(
-        await getSongLike(id)
-    );
-    
+
     const {id, playlistId, title, artist, artwork, duration} = Music.metadata;
+    
+    const likeSong = like => {
+
+    }
+    
 
     useEffect(() => {
         if (id == null)
             return;
-            
+
         navigation.setOptions({title: title});
         navigation.setParams({v: id, list: playlistId});
     }, [id]);
@@ -56,8 +56,15 @@ const PlayView = ({route, navigation}) => {
 
         const updateListener = Music.addListener(
             Music.EVENT_METADATA_UPDATE,
-            () => forceUpdate()
+            () => {
+                setState(State.Buffering);
+                forceUpdate();
+            }
         );
+
+        TrackPlayer.getState().then(state => {
+            setState(Music.state);
+        });
 
         return () => {
             stateListener.remove();
@@ -75,11 +82,7 @@ const PlayView = ({route, navigation}) => {
                 <View style={controlStyles.container}>
                     
                     <Button
-                        onPress={async() => {
-                            await likeSong(id, false);
-                            await refreshLike();
-                            forceUpdate()
-                        }}
+                        onPress={async() => likeSong(false)}
                         labelStyle={{marginHorizontal: 0}}
                         style={{borderRadius: 25, alignItems: "center", padding: 0, margin: 0, minWidth: 0,
                                 color: isLiked == null
@@ -138,11 +141,7 @@ const PlayView = ({route, navigation}) => {
                     </View>
 
                     <Button
-                        onPress={async() => {
-                            await likeSong(id, true);
-                            await refreshLike();
-                            forceUpdate();
-                        }}
+                        onPress={() => likeSong(true)}
                         labelStyle={{marginHorizontal: 0}}
                         style={{borderRadius: 25, alignItems: "center", padding: 0, margin: 0, minWidth: 0}}
                         contentStyle={{alignItems: "center", width: 50, height: 50, minWidth: 0}}
