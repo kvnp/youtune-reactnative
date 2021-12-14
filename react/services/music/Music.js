@@ -2,6 +2,7 @@ import { DeviceEventEmitter } from 'react-native';
 import TrackPlayer, { Capability, RepeatMode, Event, State } from 'react-native-track-player';
 import Queue from 'queue-promise';
 import Media from '../api/Media';
+import Playlist from '../../modules/models/music/playlist';
 
 export default class Music {
     static #initialized;
@@ -148,6 +149,12 @@ export default class Music {
         });
     }
 
+    static reset = () => {
+        Music.metadataIndex = 0;
+        Music.metadataList = [];
+        TrackPlayer.reset();
+    }
+
     static cycleRepeatMode = () => {
         if (!Music.#initialized)
             reject("Music needs to be initialized by calling initialize()");
@@ -199,15 +206,15 @@ export default class Music {
         }
         
         let forward = index > Music.metadataIndex;
-        let playing = Music.state == State.Playing;
+        //let playing = Music.state == State.Playing;
         let seek = !forward && Music.position >= 10;
 
         if (seek)
             TrackPlayer.seekTo(0);
-        else
+        else {
             Music.metadataIndex = index;
-
-        Music.#emitter.emit(Music.EVENT_METADATA_UPDATE, null);
+            Music.#emitter.emit(Music.EVENT_METADATA_UPDATE, null);
+        }
         
         if (Music.trackUrlLoaded[Music.metadataIndex]) {
             if (!seek)
@@ -242,25 +249,24 @@ export default class Music {
     }
 
     static handlePlayback = async({videoId, playlistId}) => {
-        //let queue = await TrackPlayer.getQueue();
         let queue = Music.metadataList;
         if (queue.length > 0) {
-            //let index = await TrackPlayer.getCurrentTrack();
-            let index = Music.metadataIndex;
+            let track = Music.metadata;
 
-            //let track = await TrackPlayer.getTrack(index);
-            let track = Music.metadataList[Music.metadataIndex];
-    
-            if (track.id == videoId)
-                return;
-    
-            if (track)
-                return TrackPlayer.skip(index);
-    
-            Music.metadataList = [];
-            TrackPlayer.reset();
+            if (playlistId == track.playlistId) {
+                if (track.id == videoId)
+                    return;
+
+                for (let i = 0; i < queue.length; i++) {
+                    if (queue[i].id == videoId)
+                        return TrackPlayer.skip(i);
+                }
+            }
+
+            Music.reset();
         }
-    
+
+        Music.state = State.Buffering;
         if (playlistId == "LOCAL_DOWNLOADS") {
             let localPlaylist = new Playlist();
     
@@ -288,7 +294,6 @@ export default class Music {
         } else {
             Media.getNextSongs({videoId, playlistId})
                 .then(resultPlaylist => Music.startPlaylist(resultPlaylist))
-    
                 .catch(async(reason) => {});
         }
     }
