@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { Dimensions } from "react-native";
 
-import { useNavigation } from "@react-navigation/core";
+import { useFocusEffect, useNavigation } from "@react-navigation/core";
 import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
 import TrackPlayer, { State } from 'react-native-track-player';
 
@@ -37,6 +37,12 @@ export default Navigator = () => {
     const [bottomMargin, setBottomMargin] = useState(0);
     const [headerTitle, setHeaderTitle] = useState(null);
     const navigation = useNavigation();
+
+    useFocusEffect(
+        useCallback(() => {
+            resizeContainer();
+        }, [])
+    );
     
     useEffect(() => {
         refreshHeader();
