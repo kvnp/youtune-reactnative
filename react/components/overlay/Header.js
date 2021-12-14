@@ -1,28 +1,23 @@
-import React, { useCallback, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { ImageBackground, Text } from "react-native";
-import { useTheme, useFocusEffect } from '@react-navigation/native';
+import { useTheme } from '@react-navigation/native';
 import LinearGradient from 'react-native-linear-gradient';
 
-import { headerStyle } from '../../styles/App';
 import UI from '../../services/ui/UI';
+import { headerStyle } from '../../styles/App';
 
 export default Header = ({style, title}) => {
-    const [header, setState] = useState({
-        source: null
-    });
-
+    const [header, setState] = useState({source: null});
     const { dark, colors } = useTheme();
 
-    useFocusEffect (
-        useCallback(() => {
-            const headerListener = UI.addListener(
-                UI.EVENT_HEADER,
-                state => setState(state)
-            );
+    useEffect(() => {
+        const headerListener = UI.addListener(
+            UI.EVENT_HEADER,
+            state => setState(state)
+        );
 
-            return () => headerListener.remove();
-        }, [])
-    );
+        return () => headerListener.remove();
+    }, []);
 
     return (
         <ImageBackground style={[headerStyle.container, style]}
