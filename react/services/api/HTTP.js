@@ -1,4 +1,5 @@
 import Device from "../device/Device";
+import IO from "../device/IO";
 
 export default class HTTP {
     static Headers = class Headers {
@@ -42,6 +43,12 @@ export default class HTTP {
     }
 
     static #getProxyUrl(url) {
+        if (!url.startsWith("http"))
+            return url;
+
+        if (url.includes(window.location.hostname))
+            return url;
+
         if (url.split("/")[2] == "lh3.googleusercontent.com")
             return window.location.protocol + "//" +
                   window.location.host + "/proxy/lh3/" +
