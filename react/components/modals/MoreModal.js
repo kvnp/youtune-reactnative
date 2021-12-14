@@ -16,20 +16,9 @@ import TrackPlayer from 'react-native-track-player';
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import { useTheme } from "@react-navigation/native";
 
+import ScrollingText from "../shared/ScrollingText";
 import { appColor } from "../../styles/App";
-
-import {
-    likeSong,
-    likeArtist,
-    likePlaylist,
-    getSongLike,
-    getPlaylistLike,
-    getArtistLike
-} from "../../modules/storage/MediaStorage";
-
-import { storeSong, deleteSong, localIDs, downloadQueue, abortSongDownload } from "../../modules/storage/SongStorage";
-import { displayNotification } from "../../modules/utils/Notification";
-import Music from "../../services/music/Music";
+import Navigation from "../../services/ui/Navigation";
 
 export var showModal = null;
 
@@ -81,7 +70,7 @@ export default MoreModal = ({navigation}) => {
     const refresh = (type, id) => {
         return new Promise(async(resolve) => {
             let liked = null;
-            switch(type) {
+            /*switch(type) {
                 case "Song":
                     liked = await getSongLike(id);
                     break;
@@ -90,14 +79,14 @@ export default MoreModal = ({navigation}) => {
                     break;
                 case "Artist":
                     liked = await getArtistLike(id);
-            }
+            }*/
             resolve(liked);
         })
     };
 
     const download = () => {
         setContent(content => ({...content, downloading: true}));
-        storeSong(videoId)
+        /*storeSong(videoId)
             .then(id => {
                 const title = 'Download Finished';
                 const text = 'Download of ' + content.title + ' complete';
@@ -117,18 +106,18 @@ export default MoreModal = ({navigation}) => {
                     downloading: Content.videoId == content.videoId ? false : downloadQueue.findIndex(entry => Content.videoId in entry) > -1 ? true : false,
                     downloaded: Content.videoId == content.videoId ? false : localIDs.includes(Content.videoId) ? true : false
                 }));
-            });
+            });*/
     }
 
     const abort = () => {
-        abortSongDownload(videoId).then(() => {
+        /*abortSongDownload(videoId).then(() => {
             setContent(content => ({...content, downloading: false, downloaded: false}));
-        });
+        });*/
     }
 
     const remove = () => {
         setContent(content => ({...content, downloading: true}));
-        deleteSong(videoId)
+        /*deleteSong(videoId)
             .then(id => {
                 setContent(Content => ({
                     ...Content,
@@ -142,8 +131,7 @@ export default MoreModal = ({navigation}) => {
                     downloading: Content.videoId == content.videoId ? false : downloadQueue.findIndex(entry => Content.videoId in entry) > -1 ? true : false,
                     downloaded: Content.videoId == content.videoId ? true : localIDs.includes(Content.videoId) ? true : false
                 }));
-            });
-        ;
+            });*/
     }
 
     showModal = async(info) => {
@@ -158,7 +146,7 @@ export default MoreModal = ({navigation}) => {
             liked = await refresh(type, info.videoId);
     
             likeFunction = boolean => {
-                likeSong(info.videoId, boolean);
+                //likeSong(info.videoId, boolean);
                 refresh(type, info.videoId)
                     .then(liked => {
                         setContent(content => ({...content, liked: liked}));
@@ -170,7 +158,7 @@ export default MoreModal = ({navigation}) => {
                     type = "Artist";
                     liked = await refresh(type, info.browseId);
                     likeFunction = (boolean) => {
-                        likeArtist(info.browseId, boolean);
+                        //likeArtist(info.browseId, boolean);
                         refresh(type, info.videoId)
                             .then(liked => {
                                 setContent(content => ({...content, liked: liked}));
@@ -181,7 +169,7 @@ export default MoreModal = ({navigation}) => {
                     type = "Playlist";
                     liked = await refresh(type, info.playlistId);
                     likeFunction = boolean => {
-                        likePlaylist(info.playlistId, boolean);
+                        //likePlaylist(info.playlistId, boolean);
                         refresh(type, info.videoId)
                             .then(liked => {
                                 setContent(content => ({...content, liked: liked}));
@@ -192,7 +180,7 @@ export default MoreModal = ({navigation}) => {
                 type = "Playlist";
                 liked = await refresh(type, info.playlistId);
                 likeFunction = boolean => {
-                    likePlaylist(info.playlistId, boolean);
+                    //likePlaylist(info.playlistId, boolean);
                     refresh(type, info.videoId)
                         .then(liked => {
                             setContent(content => ({...content, liked: liked}));
@@ -208,11 +196,11 @@ export default MoreModal = ({navigation}) => {
             }
         }
         
-        if (downloadQueue.findIndex(entry => info.videoId in entry) > -1)
+        /*if (downloadQueue.findIndex(entry => info.videoId in entry) > -1)
             downloading = true;
 
         if (localIDs.includes(info.videoId))
-            downloaded = true;
+            downloaded = true;*/
 
         setContent({
             ...info,
@@ -256,8 +244,13 @@ export default MoreModal = ({navigation}) => {
                 <View style={[modalStyles.header, {backgroundColor: colors.border}, Platform.OS == "web" ? {cursor: "default"} : undefined]}>
                     <Image source={{uri: content.thumbnail}} style={modalStyles.thumbnail}/>
                     <View style={modalStyles.headerText}>
-                        <Text style={{color: colors.text}} numberOfLines={1}>{content.title}</Text>
-                        <Text style={{color: colors.text}} numberOfLines={1}>{content.subtitle}</Text>
+                        <ScrollingText>
+                            <Text style={{color: colors.text}} numberOfLines={1}>{content.title}</Text>
+                        </ScrollingText>
+                        
+                        <ScrollingText>
+                            <Text style={{color: colors.text}} numberOfLines={1}>{content.subtitle}</Text>
+                        </ScrollingText>
                     </View>
                     <View style={{width: 120, height: 50, alignItems: "center", alignSelf: "center", justifyContent: "center", flexDirection: "row"}}>
                         <TouchableRipple
@@ -328,16 +321,16 @@ export default MoreModal = ({navigation}) => {
                                 alignItems: "center",
                                 flexDirection: "row"
                             }}
+                            
                             onPress={() => {
-                                Music.setTransitionTrack({
-                                    id: videoId,
-                                    playlistId: playlistId,
+                                Navigation.handleMedia({
                                     title: content.title,
-                                    artist: content.subtitle,
-                                    artwork: content.thumbnail
-                                })
-        
-                                navigation.navigate("Music", {v: videoId, list: playlistId});
+                                    subtitle: content.subtitle,
+                                    thumbnail: content.thumbnail,
+                                    videoId: videoId,
+                                    browseId: browseId,
+                                    playlistId: playlistId,
+                                }, navigation);
                             }}
                         >
                             <>
@@ -435,7 +428,8 @@ export default MoreModal = ({navigation}) => {
     
                             <Text style={{paddingLeft: 20, color: colors.text}}>
                                 {
-                                    downloading
+                                    "Download"
+                                    /*downloading
                                         ? "Downloading" + (downloadQueue.length > 0
                                             ? " (" + downloadQueue.length + " in queue)"
                                             : "")
@@ -447,7 +441,7 @@ export default MoreModal = ({navigation}) => {
     
                                             : "Download" + (downloadQueue.length > 0
                                                 ? " (" + downloadQueue.length + " in queue)"
-                                                : "")
+                                                : "")*/
                                 }
                             </Text>
                             </>
