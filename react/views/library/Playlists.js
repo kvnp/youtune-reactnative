@@ -9,11 +9,11 @@ import {
     View
 } from "react-native";
 
-import { storePlaylists, getPlaylists } from "../../modules/storage/PlaylistStorage";
-import Playlist from '../../components/shared/Playlist';
-import { rippleConfig } from "../../styles/Ripple";
 import { useTheme } from "@react-navigation/native";
+
+import Playlist from '../../components/shared/Playlist';
 import AddPlaylistModal from "../../components/modals/AddPlaylistModal";
+import { rippleConfig } from "../../styles/Ripple";
 
 export default Playlists = ({navigation}) => {
     const [modalVisible, setModalVisible] = useState(false);
@@ -25,11 +25,7 @@ export default Playlists = ({navigation}) => {
         const unsubscribe = navigation.addListener('focus', () => {
             setModalVisible(false);
             if (loading) {
-                getPlaylists()
-                    .then(playlists => {
-                        setPlaylists(playlists);
-                        setLoading(false);
-                    });
+                setLoading(false);
             }
         });
 
@@ -47,7 +43,6 @@ export default Playlists = ({navigation}) => {
             }
         }
 
-        storePlaylists([...playlists, {title: title, subtitle: description}]);
         setPlaylists([...playlists, {title: title, subtitle: description}]);
         setModalVisible(false);
     }

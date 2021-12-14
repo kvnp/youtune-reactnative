@@ -14,7 +14,6 @@ import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 
 import Entry from "../../components/shared/Entry";
 import Navigation from '../../services/ui/Navigation';
-import { loadSongLocal, localIDs, dbLoading } from "../../modules/storage/SongStorage";
 import { shelvesStyle } from '../../styles/Shelves';
 
 export default Downloads = ({ navigation }) => {
@@ -23,7 +22,7 @@ export default Downloads = ({ navigation }) => {
 
     const loadEntries = async() => {
         let entries = [];
-        for (let i = 0; i < localIDs.length; i++) {
+        /*for (let i = 0; i < localIDs.length; i++) {
             let { title, artist, artwork, id } = await loadSongLocal(localIDs[i]);
             entries.push({
                 title,
@@ -32,14 +31,14 @@ export default Downloads = ({ navigation }) => {
                 id,
                 playlistId
             });
-        }
+        }*/
 
         setEntries(entries);
     }
 
     useFocusEffect(
         useCallback(() => {
-            if (!dbLoading) {
+            /*if (!dbLoading) {
                 if (localIDs.length > 0)
                     loadEntries();
             } else {
@@ -49,7 +48,7 @@ export default Downloads = ({ navigation }) => {
                         loadEntries();
                     }
                 }, 200);
-            }
+            }*/
         }, [])
     )
 
@@ -67,7 +66,16 @@ export default Downloads = ({ navigation }) => {
         </Button>
     </View>
 
-    return dbLoading
+    return <View style={{
+        flex: 1,
+        width: "100%",
+        alignItems: "center",
+        justifyContent: "center"
+    }}>
+        <ActivityIndicator size="large"/>
+    </View>
+
+    /*return dbLoading
         ? <View style={{
                 flex: 1,
                 width: "100%",
@@ -114,5 +122,5 @@ export default Downloads = ({ navigation }) => {
             }
         </ScrollView>
 
-        : emptyFiller;
+        : emptyFiller;*/
 }
