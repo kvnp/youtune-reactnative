@@ -1,3 +1,4 @@
+import UI from "../ui/UI";
 import API from "./API";
 import Extractor from "./Extractor";
 import HTTP from "./HTTP";
@@ -45,13 +46,6 @@ export default class Media {
 
     static getBrowseData(browseId, continuation) {
         return new Promise(async(resolve, reject) => {
-            function returnData(browseId, data) {
-                if (browseId == "FEmusic_home")
-                    return Extractor.digestHomeResponse(data);
-                else
-                    return Extractor.digestBrowseResponse(data, browseId);
-            }
-
             if (browseId == undefined)
                 resolve(null);
             
@@ -74,9 +68,16 @@ export default class Media {
             }
 
             let initialData = await API.getInitialData(browseId);
-            if (initialData != null)
-                resolve(returnData(browseId, initialData));
-            else {
+            if (initialData != null) {
+                let extraction = browseId == "FEmusic_home"
+                    ? Extractor.digestHomeResponse(initialData)
+                    : Extractor.digestBrowseResponse(initialData, browseId)
+                
+                if (extraction.picture != null)
+                    UI.setHeader({url: extraction.picture});
+
+                resolve(extraction);
+            } else {
                 //TODO implement continuation properly
                 let requestBody = API.RequestBody.WEB;
                 if (continuation && browseId == "FEmusic_home")
@@ -96,7 +97,11 @@ export default class Media {
                 };
 
                 HTTP.getResponse(url, input, type)
-                    .then(response => resolve(returnData(browseId, response)))
+                    .then(response => resolve(
+                        browseId == "FEmusic_home"
+                            ? Extractor.digestHomeResponse(response)
+                            : Extractor.digestBrowseResponse(response, browseId)
+                    ))
                     .catch(reason => reject(reason));
             }
             

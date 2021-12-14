@@ -1,5 +1,3 @@
-import UI from "../../ui/UI";
-
 export default function digestHomeResponse(json) {
     console.log(json);
     let tabRenderer = json.contents.singleColumnBrowseResultsRenderer.tabs[0].tabRenderer;
@@ -10,7 +8,7 @@ export default function digestHomeResponse(json) {
     else
         sectionList = json.continuationContents.sectionListContinuation;
 
-    let final = {shelves: [], continuation: null};
+    let final = {shelves: [], continuation: null, picture: null};
     if (sectionList.hasOwnProperty("continuations")) {
         let continuations = sectionList.continuations[0].nextContinuationData;
         final.continuation = {
@@ -29,7 +27,7 @@ export default function digestHomeResponse(json) {
 
             let index = shelfRenderer.backgroundImage.simpleVideoThumbnailRenderer.thumbnail.thumbnails.length - 1;
             let picture = shelfRenderer.backgroundImage.simpleVideoThumbnailRenderer.thumbnail.thumbnails[index].url;
-            UI.setHeader({url: picture});
+            final.picture = picture;
 
         } else if (contentList[y].hasOwnProperty("musicCarouselShelfRenderer"))
             shelfRenderer = contentList[y].musicCarouselShelfRenderer;

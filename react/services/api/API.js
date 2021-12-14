@@ -93,7 +93,7 @@ export default class API {
                 resolve(false);
 
             if (!initialPath)
-                initialPath = null;
+                initialPath = "";
 
             let url = API.URL.Main + initialPath;
             let input = {
