@@ -5,10 +5,9 @@ import { TouchableRipple} from "react-native-paper";
 import { useNavigation, useTheme } from "@react-navigation/native";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import TrackPlayer, { useProgress, State, Event } from 'react-native-track-player';
-
-import { skipToNext } from "../../service";
-import ScrollingText from "../shared/ScrollingText";
 import Music from "../../services/music/Music";
+
+import ScrollingText from "../shared/ScrollingText";
 
 export default MiniPlayer = ({style, containerStyle}) => {
     const [state, setState] = useState(State.Stopped);
@@ -70,7 +69,7 @@ export default MiniPlayer = ({style, containerStyle}) => {
         });
     }
 
-    const onNext = () => skipToNext();
+    const onNext = () => Music.skipNext();
 
     const onPlay = () => {
         state == State.Playing
@@ -78,7 +77,7 @@ export default MiniPlayer = ({style, containerStyle}) => {
             : TrackPlayer.play();
     };
 
-    const onStop = () => TrackPlayer.reset();
+    const onStop = () => Music.reset();
 
     const isInactive = () => {
         return state == State.Stopped || state == State.None;
