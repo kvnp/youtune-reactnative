@@ -5,14 +5,10 @@ import {
     Image,
     Pressable
 } from "react-native";
-
 import { useTheme, useFocusEffect } from "@react-navigation/native";
-
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 
-import FlatEntries from "../../components/collections/FlatEntries";
-import { fetchBrowse } from "../../modules/remote/API";
-
+import Media from "../../services/api/Media";
 import {
     bottomBarStyle,
     bottomBarAlbumStyle
@@ -25,23 +21,13 @@ export default PlaylistView = ({ route, navigation }) => {
 
     useFocusEffect(
         useCallback(() => {
-            if (playlist == null) {
-                fetchBrowse(route.params.list)
+            if (playlist == null || playlist.playlistId != route.params.list)
+                Media.getBrowseData(route.params.list)
                     .then(playlist => {
                         navigation.setOptions({ title: playlist.title });
                         navigation.setParams({ list: playlist.playlistId});
                         setPlaylist(playlist);
                     });
-            } else {
-                if (playlist.playlistId != route.params.list) {
-                    fetchBrowse(route.params.list)
-                        .then(playlist => {
-                            navigation.setOptions({ title: playlist.title });
-                            navigation.setParams({ list: playlist.playlistId});
-                            setPlaylist(playlist);
-                        });
-                }
-            }
         }, [])
     )
 

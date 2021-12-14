@@ -11,11 +11,11 @@ import { useFocusEffect } from "@react-navigation/core";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import LinearGradient from "react-native-linear-gradient";
 
+import Media from "../../services/api/Media";
+import FlatShelves from "../../components/collections/FlatShelves";
+
 import { bottomBarStyle } from "../../styles/BottomBar";
 import { rippleConfig } from "../../styles/Ripple";
-
-import { fetchBrowse } from "../../modules/remote/API";
-import FlatShelves from "../../components/collections/FlatShelves";
 
 export default ArtistView = ({ route, navigation }) => {
     const {dark, colors}  = useTheme();
@@ -27,7 +27,7 @@ export default ArtistView = ({ route, navigation }) => {
     useFocusEffect(
         useCallback(() => {
             navigation.setOptions({ title: "Loading" });
-            fetchBrowse(route.params.channelId)
+            Media.getBrowseData(route.params.channelId)
                 .then(artist => {
                     setArtist(artist);
                     navigation.setOptions({ title: artist.header.title });
