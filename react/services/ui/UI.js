@@ -1,5 +1,6 @@
 import { DeviceEventEmitter, StatusBar } from "react-native";
 import { enableScreens } from "react-native-screens";
+import IO from "../device/IO";
 
 import Settings from "../device/Settings";
 import Music from "../music/Music";
@@ -14,7 +15,8 @@ export default class UI {
         Music.initialize();
         Settings.initialize().then(() => {
             UI.setDarkMode(Settings.Values.darkMode);
-            UI.setHeader({url: Settings.Values.headerState.source.uri});
+            if (Settings.Values.headerState != null)
+                UI.setHeader({url: Settings.Values.headerState.source.uri});
         });
         
         StatusBar.setTranslucent(true);
@@ -34,10 +36,18 @@ export default class UI {
         source: null
     };
 
-    static setHeader = ({url}) => {
+    static setHeader = async({url}) => {
         let state = {};
-        if (url != undefined)               state.source = {uri: url};
-        else if (UI.Header.source != null)  state.source = UI.Header.source;
+        if (url != undefined) {
+            if (IO.isBlob(url))
+                url = await IO.getBlobAsBase64({url});
+
+            state.source = {uri: url};
+
+        } else if (UI.Header.source != null) {
+            state.source = UI.Header.source;
+
+        }
 
         UI.Header = state;
         UI.#emitter.emit(UI.EVENT_HEADER, state);
