@@ -3,18 +3,26 @@ import Device from "../Device";
 export default class Storage {
     static #Provider = (() => {
         if (Device.Platform == "web")
-            return require("./IndexedDBProvider").default;
+            return require("./provider/IndexedDBProvider").default;
         else if (Device.Platform == "node")
-            return require("./FSProvider").default;
+            return require("./provider/FSProvider").default;
         else
-            return require("./AsyncStorageProvider").default;
+            return require("./provider/AsyncStorageProvider").default;
     })();
 
-    static setItem(key, value) {
-        return this.#Provider.setItem(key, value);
+    static setItem(storeName, data) {
+        return this.#Provider.setItem(storeName, data);
     }
 
-    static getItem(key) {
-        return this.#Provider.getItem(key);
+    static getItem(storeName, key) {
+        return this.#Provider.getItem(storeName, key);
+    }
+
+    static deleteItem(storeName, key) {
+        return this.#Provider.deleteItem(storeName, key);
+    }
+
+    static getAllKeys(storeName) {
+        return this.#Provider.getAllKeys(storeName);
     }
 }

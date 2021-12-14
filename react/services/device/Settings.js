@@ -1,5 +1,7 @@
 import { DeviceEventEmitter } from "react-native";
+import Media from "../api/Media";
 import UI from "../ui/UI";
+import IO from "./IO";
 import Storage from "./storage/Storage";
 
 export default class Settings {
@@ -8,18 +10,16 @@ export default class Settings {
         return new Promise(async(resolve, reject) => {
             if (this.initialized)
                 resolve(true);
-            
-            const value = await Storage.getItem("@storage_Settings");
 
-            if (value !== null) {
-                console.log(value);
-                this.Values = JSON.parse(value);
-                this.#emitter.emit(this.EVENT_SETTINGS, this.Values);
-                this.initialized = true;
-                resolve(true);
-            } else {
-                reject("loading failed");
+            let keys = Object.keys(this.Values);
+            for (let i = 0; i < keys.length; i++) {
+                let result = await Storage.getItem("Settings", keys[i]);
+                if (result !== undefined && result !== null) {
+                    this.Values[keys[i]] = result.value;
+                }
             }
+
+            resolve(true);
         });
     }
 
@@ -30,10 +30,12 @@ export default class Settings {
         return this.#emitter.addListener(event, listener);
     }
 
-    static #storeSettings() {
-        console.log("storing")
-        const string = JSON.stringify(this.Values);
-        return Storage.setItem("@storage_Settings", string); 
+    static #storeSetting(key) {
+        let data = {
+            setting: key,
+            value: this.Values[key]
+        };
+        return Storage.setItem("Settings", data);
     }
 
     static Values = {
@@ -47,21 +49,21 @@ export default class Settings {
     static enableLanguageTransmission(boolean) {
         if (boolean != this.Values.transmitLanguage) {
             this.Values.transmitLanguage = boolean;
-            this.#storeSettings();
+            this.#storeSetting("transmitLanguage");
         }
     }
     
     static enableProxy(boolean) {
         if (boolean != this.Values.proxyYTM) {
             this.Values.proxyYTM = boolean;
-            this.#storeSettings();
+            this.#storeSetting("proxyYTM");
         }
     }
     
     static enableSafetyMode(boolean) {
         if (boolean != this.Values.safetyMode) {
             this.Values.safetyMode = boolean;
-            this.#storeSettings();
+            this.#storeSetting("safetyMode");
         }
     }
     
@@ -69,15 +71,23 @@ export default class Settings {
         if (boolean != this.Values.darkMode) {
             UI.setDarkMode(boolean);
             this.Values.darkMode = boolean;
-            this.#storeSettings();
+            this.#storeSetting("darkMode");
         }
     }
 
     static setHeaderState(state) {
-        if (state != this.Values.headerState) {
-            console.log(state);
-            this.Values.headerState = state;
-            this.#storeSettings();
-        }
+        if (this.Values.headerState != state) {
+            if (IO.isBlob(state.source.uri)) {
+                this.#storeSetting("headerState");
+
+            } else {
+                Media.getBlob({url: state.source.uri})
+                    .then(result => {
+                        state.source.uri = result;
+                        this.Values.headerState = state;
+                        this.#storeSetting("headerState");
+                    });
+            }
+        }   
     }
 }
