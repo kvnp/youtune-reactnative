@@ -50,17 +50,18 @@ export default MoreModal = ({navigation}) => {
                 message: message + ":\n" + url
             }, {
                 dialogTitle: title
+            }).then(event => {
+                console.log(event);
+                setContent({...content, visible: false});
+                /*if (result.action === Share.sharedAction) {
+                    if (result.activityType)
+                        console.log("shared with activity type of " + result.activityType);
+                    else
+                        console.log("shared");
+                    
+                } else if (result.action === Share.dismissedAction)
+                    console.log("dismissed")*/
             });
-            setContent({...content, visible: false});
-            
-            if (result.action === Share.sharedAction) {
-                if (result.activityType)
-                    console.log("shared with activity type of " + result.activityType);
-                else
-                    console.log("shared");
-                
-            } else if (result.action === Share.dismissedAction)
-                console.log("dismissed")
 
         } catch (error) {
             alert(error.message);
@@ -502,7 +503,7 @@ export default MoreModal = ({navigation}) => {
                             file = "channel/" + browseId;
                         }
 
-                        onShare(type, "https://music.youtube.com/" + file, message);
+                        onShare(type, window.location.origin + "/" + file, message);
                     }}
                 >
                     <>
