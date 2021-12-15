@@ -2,7 +2,7 @@ import { DeviceEventEmitter } from 'react-native';
 import TrackPlayer, { Capability, RepeatMode, Event, State } from 'react-native-track-player';
 import Queue from 'queue-promise';
 import Media from '../api/Media';
-import Playlist from '../../modules/models/music/playlist';
+import Playlist from '../../models/music/playlist';
 
 export default class Music {
     static #initialized;
@@ -193,19 +193,27 @@ export default class Music {
     static skipTo(index) {
         if (index == null || Music.metadataList == null)
             return;
-        
-        if (index < 0)
-            index = 0;
 
-        if (index + 1 >= Music.metadataList.length) {
+        let forward;
+        if (index < 0) {
+            if (Music.repeatMode == RepeatMode.Queue) {
+                index = Music.metadataList.length - 1;
+                forward = false;
+            } else {
+                index = 0;
+            }
+        } else if (index + 1 >= Music.metadataList.length) {
             if (Music.repeatMode == RepeatMode.Queue) {
                 index = 0;
+                forward = true;
             } else {
                 index = Music.metadataList.length - 1;
             }
         }
         
-        let forward = index > Music.metadataIndex;
+        forward = forward != undefined
+            ? forward
+            : index > Music.metadataIndex;
         //let playing = Music.state == State.Playing;
         let seek = !forward && Music.position >= 10;
 
