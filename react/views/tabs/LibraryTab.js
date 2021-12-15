@@ -7,7 +7,7 @@ import Albums from '../library/Albums';
 import Songs from '../library/Songs';
 import Artists from '../library/Artists';
 import Downloads from '../library/Downloads';
-import { getIcon } from '../../modules/utils/Icon';
+import { getIcon } from '../../utils/Icon';
 
 const Tab = createMaterialTopTabNavigator();
 const tabOptions = {};

@@ -15,7 +15,7 @@ import Header from "../../components/overlay/Header";
 import { headerStyle } from "../../styles/App";
 import MoreModal from "../../components/modals/MoreModal";
 import MiniPlayer from "../../components/player/MiniPlayer";
-import { getIcon } from "../../modules/utils/Icon";
+import { getIcon } from "../../utils/Icon";
 
 const getTabOptions = title => {
     return { tabBarIcon: ({ color }) => getIcon({title, color}) };

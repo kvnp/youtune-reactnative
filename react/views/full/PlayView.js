@@ -33,7 +33,6 @@ const PlayView = ({route, navigation}) => {
     const likeSong = like => {
 
     }
-    
 
     useEffect(() => {
         if (id == null)

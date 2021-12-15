@@ -13,7 +13,7 @@ import ArtistView from "./views/full/ArtistView";
 import Navigator from "./views/full/Navigator";
 import CaptchaView from "./views/full/CaptchaView";
 
-import { getIcon } from "./modules/utils/Icon";
+import { getIcon } from "./utils/Icon";
 import UI from "./services/ui/UI";
 import Settings from "./services/device/Settings";
 

@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import {
     Text,
@@ -9,11 +9,10 @@ import {
     Platform
 } from 'react-native';
 
-import { useFocusEffect, useTheme } from '@react-navigation/native';
+import { useTheme } from '@react-navigation/native';
 import { Button } from 'react-native-paper';
 
 import Media from '../../services/api/Media';
-import UI from '../../services/ui/UI';
 import Shelf from '../../components/shared/Shelf';
 import { shelvesStyle } from '../../styles/Shelves';
 import { preResultHomeStyle } from '../../styles/Home';
@@ -21,7 +20,7 @@ import { preResultHomeStyle } from '../../styles/Home';
 export default HomeTab = ({navigation}) => {
     const [shelves, setShelves] = useState([]);
     const [continuation, setContinuation] = useState(null);
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState(false);
     const { colors } = useTheme();
     const [homeText, setHomeText] = useState(
         Platform.OS == "web"
@@ -29,12 +28,11 @@ export default HomeTab = ({navigation}) => {
             : "Pull down to load"
     );
 
-    useFocusEffect(
-        useCallback(() => {
-            if (shelves.length == 0)
-                startRefresh();
-        }, [])
-    );
+    useEffect(() => {
+        console.log("home loading")
+        if (shelves.length == 0)
+            startRefresh();
+    }, []);
 
     const startRefresh = () => {
         Media.getBrowseData("FEmusic_home", continuation)
@@ -66,8 +64,7 @@ export default HomeTab = ({navigation}) => {
         }
 
         onEndReached={() => {
-            if (continuation)
-                startRefresh();
+            //startRefresh();
         }}
 
         ListFooterComponent={
@@ -77,7 +74,7 @@ export default HomeTab = ({navigation}) => {
                         <ActivityIndicator color={colors.text} size="large"/>
                     </View>
 
-                    : <Button style={{marginHorizontal: 50}} onPress={startRefresh} mode="outlined">
+                    : <Button style={{marginHorizontal: 50}} onPress={() => startRefresh()} mode="outlined">
                         <Text style={{color: colors.text}}>Refresh</Text>
                     </Button>
 
@@ -89,7 +86,11 @@ export default HomeTab = ({navigation}) => {
         renderItem={({item}) => <Shelf shelf={item} navigation={navigation}/>}
 
         refreshing={loading}
-        onRefresh={startRefresh}
+        onRefresh={
+            Platform.OS != "web"
+                ? () => startRefresh()
+                : undefined
+        }
 
         ListFooterComponentStyle={
             shelves.length == 0 
