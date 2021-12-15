@@ -1,9 +1,9 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState } from 'react';
 import { View, Text, StyleSheet, Platform } from 'react-native';
 
-import { useFocusEffect, useTheme } from '@react-navigation/native';
+import { useTheme } from '@react-navigation/native';
 import Slider from '@react-native-community/slider';
-import TrackPlayer, { Event, State, useProgress } from 'react-native-track-player';
+import TrackPlayer, { State, useProgress } from 'react-native-track-player';
 
 function pad(n, width, z = 0) {
     n = n + '';
@@ -17,29 +17,52 @@ const minutesAndSeconds = position => ([
     pad( ~~(position % 60), 2),
 ]);
 
-export default SeekBar = ({style, duration}) => {
-    const [isSliding, setSliding] = useState(false);
+export default SeekBar = ({style, duration, buffering}) => {
     const { colors } = useTheme();
-    const [positionCache, setPositionCache] = useState(0);
-
     const { position, bufferedPosition } = useProgress(500);
 
-    const elapsed = minutesAndSeconds(position);
-    const remaining = minutesAndSeconds(duration - position);
+    const [state, setState] = useState({
+        isSliding: false,
+        cache: 0
+    });
+
+    const realPosition = buffering == State.Buffering
+        ? 0
+        : state.isSliding != true
+            ? position
+            : state.cache
+
+    const elapsed = minutesAndSeconds(realPosition);
+    const remaining = minutesAndSeconds(duration - realPosition);
 
     return <View style={[styles.container, style]}>
         <Slider
-            maximumValue={Math.max(duration, 1, position)}
             onSlidingComplete={newPosition => {
                 TrackPlayer.seekTo(newPosition)
-                    .then(() => setSliding(false));
-            }}
-            onSlidingStart={currentPosition => {
-                setSliding(true);
-                setPositionCache(currentPosition);
+                    .then(() => setState({
+                        isSliding: false,
+                        cache: 0
+                    }));
             }}
 
-            value={isSliding != true ? position : positionCache}
+            onValueChange={value => {
+                if (state.isSliding)
+                    setState({
+                        isSliding: true,
+                        cache: value
+                    });
+            }}
+            
+            onSlidingStart={currentPosition => {
+                setState({
+                    isSliding: true,
+                    cache: currentPosition
+                });
+            }}
+
+            
+            value={realPosition}
+            maximumValue={Math.max(duration, 1, realPosition)}
             bufferedPosition={bufferedPosition}
             minimumTrackTintColor={colors.text}
             maximumTrackTintColor={colors.card}

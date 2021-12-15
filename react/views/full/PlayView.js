@@ -163,7 +163,7 @@ const PlayView = ({route, navigation}) => {
                     </Button>
                 </View>
 
-                <SeekBar duration={duration}/>
+                <SeekBar duration={duration} buffering={state}/>
                 
                 <View style={[stylesBottom.buttonContainer, {overflow: "visible", alignSelf: "stretch", justifyContent: "space-between"}]}>
                     <Button
