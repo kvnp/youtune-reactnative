@@ -12,13 +12,14 @@ import {
 } from "react-native";
 
 import { TouchableRipple } from "react-native-paper";
-import TrackPlayer from 'react-native-track-player';
+import TrackPlayer, { State } from 'react-native-track-player';
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import { useTheme } from "@react-navigation/native";
 
+import Navigation from "../../services/ui/Navigation";
+import Music from "../../services/music/Music";
 import ScrollingText from "../shared/ScrollingText";
 import { appColor } from "../../styles/App";
-import Navigation from "../../services/ui/Navigation";
 
 export var showModal = null;
 
@@ -44,7 +45,7 @@ export default MoreModal = ({navigation}) => {
     const onShare = async(type, url, message) => {
         try {
             const title = "YouTune - " + type;
-            const result = await Share.share({
+            Share.share({
                 title: title,
                 url: url,
                 message: message + ":\n" + url
@@ -53,14 +54,6 @@ export default MoreModal = ({navigation}) => {
             }).then(event => {
                 console.log(event);
                 setContent({...content, visible: false});
-                /*if (result.action === Share.sharedAction) {
-                    if (result.activityType)
-                        console.log("shared with activity type of " + result.activityType);
-                    else
-                        console.log("shared");
-                    
-                } else if (result.action === Share.dismissedAction)
-                    console.log("dismissed")*/
             });
 
         } catch (error) {
@@ -191,8 +184,8 @@ export default MoreModal = ({navigation}) => {
         }
 
         let isPlaying = false;
-        if (await TrackPlayer.getCurrentTrack() == info.videoId) {
-            if (await TrackPlayer.getState() == TrackPlayer.STATE_PLAYING) {
+        if (Music.metadata.id == info.videoId) {
+            if (await TrackPlayer.getState() == State.Playing) {
                 isPlaying = true;
             }
         }
@@ -359,14 +352,21 @@ export default MoreModal = ({navigation}) => {
                         flexDirection: "row"
                     }}
                     onPress={() => {
-                        if (playing) {
+                        if (playing)
                             TrackPlayer.pause();
-                            setContent(content => ({
-                                ...content,
-                                playing: false,
-                                visible: false
-                            }));
+                        else {
+                            if (Music.metadata.id == content.videoId) {
+                                TrackPlayer.play();
+                            } else {
+                                Navigation.handleMedia(content, navigation);
+                            }
                         }
+
+                        setContent(content => ({
+                            ...content,
+                            playing: !playing,
+                            visible: false
+                        }));
                     }}
                 >
                     {type == "Song"
