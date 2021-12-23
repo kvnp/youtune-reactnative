@@ -202,7 +202,7 @@ export default class Music {
             } else {
                 index = 0;
             }
-        } else if (index + 1 >= Music.metadataList.length) {
+        } else if (index + 1 > Music.metadataList.length) {
             if (Music.repeatMode == RepeatMode.Queue) {
                 index = 0;
                 forward = true;
@@ -232,7 +232,6 @@ export default class Music {
             Music.#queue.enqueue(() => {
                 return new Promise(async(resolve, reject) => {
                     let track = Music.metadataList[Music.metadataIndex];
-                    //track.url = await Media.getAudioStream({videoId: track.id});
                     track.url = await Music.getStream({videoId: track.id});
                     resolve(track);
                 });
@@ -273,10 +272,11 @@ export default class Music {
             if (playlistId == track.playlistId) {
                 if (track.id == videoId)
                     return;
-
+                
                 for (let i = 0; i < queue.length; i++) {
-                    if (queue[i].id == videoId)
-                        return TrackPlayer.skip(i);
+                    if (queue[i].id == videoId) {
+                        return Music.skipTo(i);
+                    }
                 }
             }
 
@@ -328,7 +328,6 @@ export default class Music {
             }
 
             if (i == playlist.index || i == playlist.index + 1) {
-                //playlist.list[i].url = await Media.getAudioStream({videoId: playlist.list[i].id});
                 playlist.list[i].url = await Music.getStream({videoId: playlist.list[i].id});
                 Music.trackUrlLoaded[i] = true;
             }
