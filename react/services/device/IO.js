@@ -1,5 +1,3 @@
-import Media from "../api/Media";
-
 export default class IO {
     static isBlob(data) {
         return data instanceof Blob;
@@ -23,21 +21,13 @@ export default class IO {
         }
     }
 
-    static getBlobAsBase64({blob, url, controllerCallback}) {
+    static getBlobAsBase64({blob}) {
         return new Promise(async(resolve, reject) => {
-            if (url) {
-                if (this.isBlob(url))
-                    blob = url;
-                else
-                    blob = await Media.getBlob({url, controllerCallback});
-            }
-
             let fileReader = new FileReader();
             fileReader.readAsDataURL(blob);
-
             fileReader.onloadend = () => {
                 resolve(fileReader.result);
-            }
+            };
         })
     }
 
