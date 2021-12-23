@@ -71,7 +71,7 @@ const PlayView = ({route, navigation}) => {
         }
     }, []);
 
-    return <View style={{flex: 1}}>
+    return <View style={{flex: 1, backgroundColor: dark ? "black" : "white"}}>
         <View style={[stylesTop.vertContainer, {flexDirection: "column"}]}>
             <View style={[imageStyles.view, {height: height / 2.6}]}>
                 <Image resizeMode="contain" style={imageStyles.image} source={{uri: artwork}}/>
