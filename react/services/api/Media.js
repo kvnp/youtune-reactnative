@@ -1,3 +1,4 @@
+import IO from "../device/IO";
 import UI from "../ui/UI";
 import API from "./API";
 import Extractor from "./Extractor";
@@ -47,7 +48,7 @@ export default class Media {
     static getBrowseData(browseId, continuation) {
         return new Promise(async(resolve, reject) => {
             if (browseId == undefined)
-                resolve(null);
+                return resolve(null);
             
             if (!API.initialized) {
                 let initialPath;
@@ -71,40 +72,37 @@ export default class Media {
             if (initialData != null) {
                 let extraction = browseId == "FEmusic_home"
                     ? Extractor.digestHomeResponse(initialData)
-                    : Extractor.digestBrowseResponse(initialData, browseId)
-                
-                if (extraction.picture != null)
-                    UI.setHeader({url: extraction.picture});
+                    : Extractor.digestBrowseResponse(initialData, browseId);
 
-                resolve(extraction);
-            } else {
-                //TODO implement continuation properly
-                let requestBody = API.RequestBody.WEB;
-                if (continuation && browseId == "FEmusic_home")
-                    url = url + "&ctoken=" + continuation.continuation + 
-                                "&continuation=" + continuation.continuation +
-                                "&itct=" + continuation.itct +
-                                "&type=next"
-                else
-                    requestBody.browseId = browseId;
-
-                let url = API.URL.Browse;
-                let type = HTTP.Type.Json;
-                let input = {
-                    method: HTTP.Method.POST,
-                    headers: HTTP.Headers.Referer,
-                    body: JSON.stringify(requestBody)
-                };
-
-                HTTP.getResponse(url, input, type)
-                    .then(response => resolve(
-                        browseId == "FEmusic_home"
-                            ? Extractor.digestHomeResponse(response)
-                            : Extractor.digestBrowseResponse(response, browseId)
-                    ))
-                    .catch(reason => reject(reason));
+                UI.setHeader({url: extraction?.picture});
+                return resolve(extraction);
             }
-            
+
+            //TODO implement continuation properly
+            let requestBody = API.RequestBody.WEB;
+            if (continuation && browseId == "FEmusic_home")
+                url = url + "&ctoken=" + continuation.continuation + 
+                            "&continuation=" + continuation.continuation +
+                            "&itct=" + continuation.itct +
+                            "&type=next"
+            else
+                requestBody.browseId = browseId;
+
+            let url = API.URL.Browse;
+            let type = HTTP.Type.Json;
+            let input = {
+                method: HTTP.Method.POST,
+                headers: HTTP.Headers.Referer,
+                body: JSON.stringify(requestBody)
+            };
+
+            HTTP.getResponse(url, input, type)
+                .then(response => resolve(
+                    browseId == "FEmusic_home"
+                        ? Extractor.digestHomeResponse(response)
+                        : Extractor.digestBrowseResponse(response, browseId)
+                ))
+                .catch(reason => reject(reason));
         });
     }
 
@@ -177,6 +175,9 @@ export default class Media {
     }
 
     static async getBlob({url, controllerCallback}) {
+        if (IO.isBlob(url))
+            return url;
+
         let type = HTTP.Type.Blob;
         let input = {
             method: HTTP.Method.GET,

@@ -13,7 +13,7 @@ export default Header = ({style, title}) => {
     useEffect(() => {
         const headerListener = UI.addListener(
             UI.EVENT_HEADER,
-            state => setState(state)
+            state => setState({source: {uri: state?.source.uri}})
         );
 
         return () => headerListener.remove();

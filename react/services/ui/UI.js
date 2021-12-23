@@ -1,7 +1,7 @@
 import { DeviceEventEmitter, StatusBar } from "react-native";
 import { enableScreens } from "react-native-screens";
-import IO from "../device/IO";
 
+import Downloads from "../device/Downloads";
 import Settings from "../device/Settings";
 import Music from "../music/Music";
 
@@ -12,11 +12,11 @@ export default class UI {
 
     static initialize = () => {
         enableScreens(true);
+        Downloads.initialize();
         Music.initialize();
         Settings.initialize().then(() => {
             UI.setDarkMode(Settings.Values.darkMode);
-            if (Settings.Values.headerState != null)
-                UI.setHeader({url: Settings.Values.headerState.source.uri});
+            UI.setHeader({url: Settings.Values.headerState?.source.uri});
         });
         
         StatusBar.setTranslucent(true);
@@ -36,22 +36,13 @@ export default class UI {
         source: null
     };
 
-    static setHeader = async({url}) => {
-        let state = {};
-        if (url != undefined) {
-            if (IO.isBlob(url))
-                url = await IO.getBlobAsBase64({url});
-
-            state.source = {uri: url};
-
-        } else if (UI.Header.source != null) {
-            state.source = UI.Header.source;
-
-        }
-
-        UI.Header = state;
-        UI.#emitter.emit(UI.EVENT_HEADER, state);
-        Settings.setHeaderState(state);
+    static setHeader = ({url}) => {
+        if (url == undefined || UI.Header.source?.uri == url)
+            return;
+        
+        UI.Header.source = {uri: url};
+        UI.#emitter.emit(UI.EVENT_HEADER, UI.Header);
+        Settings.setHeaderState(UI.Header);
     }
 
     static addListener(event, listener) {
