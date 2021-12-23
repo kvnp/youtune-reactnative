@@ -89,7 +89,7 @@ const App = () => {
             <NavigationContainer linking={linking} theme={theme}>
                 <Stack.Navigator screenOptions={{gestureEnabled: true, swipeEnabled: true, animationEnabled: true}}>
                     <Stack.Screen name="App" component={Navigator} options={navigationOptions}/>
-                    <Stack.Screen name="Music" component={PlayView} options={{...navigationOptions, presentation: "modal"}}/>
+                    <Stack.Screen name="Music" component={PlayView} options={{...navigationOptions, presentation: "transparentModal"}}/>
                     <Stack.Screen name="Captcha" component={CaptchaView}/>
                     
                     <Stack.Screen name="Playlist" component={PlaylistView}
