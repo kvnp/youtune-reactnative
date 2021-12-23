@@ -90,7 +90,7 @@ export default class API {
     static initialize(initialPath) {
         return new Promise((resolve, reject) => {
             if (this.initialized)
-                resolve(false);
+                return resolve(false);
 
             if (!initialPath)
                 initialPath = "";
@@ -182,17 +182,14 @@ export default class API {
             if (!API.initialized)
                 await API.initialize();
 
-            console.log(API.YTMUSIC_INITIAL_DATA);
             for (let i = 0; i < API.YTMUSIC_INITIAL_DATA.length; i++) {
                 if ("/browse" == API.YTMUSIC_INITIAL_DATA[i].path) {
                     if (browseId == API.YTMUSIC_INITIAL_DATA[i].params.browseId)
-                        resolve(API.YTMUSIC_INITIAL_DATA[i].data);
+                        return resolve(API.YTMUSIC_INITIAL_DATA[i].data);
                     else
-                        break;
+                        return resolve(null);
                 }
             }
-
-            resolve(null);
         })
     }
 }

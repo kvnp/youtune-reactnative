@@ -9,7 +9,7 @@ export default class Settings {
     static initialize() {
         return new Promise(async(resolve, reject) => {
             if (this.initialized)
-                resolve(true);
+                return resolve(true);
 
             let keys = Object.keys(this.Values);
             for (let i = 0; i < keys.length; i++) {
@@ -18,7 +18,7 @@ export default class Settings {
                     this.Values[keys[i]] = result.value;
                 }
             }
-
+            
             resolve(true);
         });
     }
