@@ -3,6 +3,8 @@ import TrackPlayer, { Capability, RepeatMode, Event, State } from 'react-native-
 import Queue from 'queue-promise';
 import Media from '../api/Media';
 import Playlist from '../../models/music/playlist';
+import Downloads from '../device/Downloads';
+import IO from '../device/IO';
 
 export default class Music {
     static #initialized;
@@ -15,6 +17,7 @@ export default class Music {
     static trackUrlLoaded = [];
 
     static transitionTrack;
+    static wasPlayingBeforeSkip = false;
 
     static #emitter = DeviceEventEmitter;
     static EVENT_METADATA_UPDATE = "event-metadata-update";
@@ -26,9 +29,6 @@ export default class Music {
             });
     
             TrackPlayer.addEventListener(Event.PlaybackTrackChanged, params => {
-                console.log(Event.PlaybackTrackChanged);
-                console.log(params);
-                
                 if (Music.metadataIndex != params.nextTrack) {
                     Music.metadataIndex = params.nextTrack;
                     Music.#emitter.emit(Music.EVENT_METADATA_UPDATE, null);
@@ -39,7 +39,7 @@ export default class Music {
                         Music.#queue.enqueue(() => {
                             return new Promise(async(resolve, reject) => {
                                 let track = Music.metadataList[params.nextTrack];
-                                track.url = await Media.getAudioStream({videoId: track.id});
+                                track.url = await Music.getStream({videoId: track.id});
                                 resolve(track);
                             });
                         });
@@ -107,7 +107,7 @@ export default class Music {
     }
 
     static initialize = () => {
-        return new Promise(async(resolve, reject) => {   
+        return new Promise(async(resolve, reject) => {
             TrackPlayer.registerPlaybackService(Music.TrackPlayerTaskProvider);
             await TrackPlayer.setupPlayer({});
             await TrackPlayer.updateOptions(TrackPlayerOptions);
@@ -215,6 +215,7 @@ export default class Music {
             ? forward
             : index > Music.metadataIndex;
         //let playing = Music.state == State.Playing;
+        //TrackPlayer.pause();
         let seek = !forward && Music.position >= 10;
 
         if (seek)
@@ -231,7 +232,8 @@ export default class Music {
             Music.#queue.enqueue(() => {
                 return new Promise(async(resolve, reject) => {
                     let track = Music.metadataList[Music.metadataIndex];
-                    track.url = await Media.getAudioStream({videoId: track.id});
+                    //track.url = await Media.getAudioStream({videoId: track.id});
+                    track.url = await Music.getStream({videoId: track.id});
                     resolve(track);
                 });
             });
@@ -256,6 +258,13 @@ export default class Music {
         Music.transitionTrack = track;
     }
 
+    static getStream({videoId}) {
+        if (Downloads.isTrackDownloaded(videoId))
+            return Downloads.getStream(videoId);
+        else
+            return Media.getAudioStream({videoId});
+    }
+
     static handlePlayback = async({videoId, playlistId}) => {
         let queue = Music.metadataList;
         if (queue.length > 0) {
@@ -275,27 +284,29 @@ export default class Music {
         }
 
         Music.state = State.Buffering;
-        if (playlistId == "LOCAL_DOWNLOADS") {
+        if (playlistId?.includes("LOCAL")) {
             let localPlaylist = new Playlist();
+
+            if (!Downloads.initialized) {
+                await Downloads.waitForInitialization();
+            }
     
-            for (let i = 0; i < localIDs.length; i++) {
-                let {title, artist, artwork, duration} = await loadSongLocal(localIDs[i]);
-                let constructedTrack = {
-                    title,
-                    artist,
-                    artwork,
-                    duration,
-                    id: localIDs[i],
-                    playlistId: playlistId,
-                    url: null
-                };
-    
-                if (videoId) {
-                    if (localIDs[i] == videoId)
-                        localPlaylist.index = i;
+            for (let i = 0; i < Downloads.downloadedTracks.length; i++) {
+                let id = Downloads.downloadedTracks[i];
+                let local = await Downloads.getTrack(id);
+                local.id = local.videoId;
+                local.playlistId = playlistId;
+                delete local.videoId;
+                
+                if (local != undefined) {
+                    local.artwork = IO.getBlobAsURL(local.artwork);
+                    if (videoId) {
+                        if (id == videoId)
+                            localPlaylist.index = i;
+                    }
+        
+                    localPlaylist.list.push(local);
                 }
-    
-                localPlaylist.list.push(constructedTrack);
             }
     
             Music.startPlaylist(localPlaylist);
@@ -317,7 +328,8 @@ export default class Music {
             }
 
             if (i == playlist.index || i == playlist.index + 1) {
-                playlist.list[i].url = await Media.getAudioStream({videoId: playlist.list[i].id});
+                //playlist.list[i].url = await Media.getAudioStream({videoId: playlist.list[i].id});
+                playlist.list[i].url = await Music.getStream({videoId: playlist.list[i].id});
                 Music.trackUrlLoaded[i] = true;
             }
 
