@@ -37,7 +37,7 @@ export default Navigator = () => {
     const [bottomMargin, setBottomMargin] = useState(0);
     const [headerTitle, setHeaderTitle] = useState(null);
     const navigation = useNavigation();
-
+    
     useFocusEffect(
         useCallback(() => {
             resizeContainer();
@@ -45,24 +45,13 @@ export default Navigator = () => {
     );
     
     useEffect(() => {
-        refreshHeader();
-        const _unsubscribe = navigation.addListener(
-            'focus', resizeContainer
-        );
-
+        resizeContainer();
         let playbackState = TrackPlayer.addEventListener(
             "playback-state", resizeContainer
         );
 
-        return () => {
-            _unsubscribe();
-            playbackState.remove();
-        };
+        return () => playbackState.remove();
     }, []);
-
-    const refreshHeader = title => {
-        setHeaderTitle(title);
-    }
 
     const resizeContainer = async(e) => {
         if (!e) 
@@ -88,7 +77,7 @@ export default Navigator = () => {
             }}
 
             screenListeners={({route}) => {
-                refreshHeader(route.name);
+                setHeaderTitle(route.name);
             }}
 
             shifting={true}
