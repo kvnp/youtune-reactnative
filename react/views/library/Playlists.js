@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useState } from "react";
 import {
     ScrollView,
     StyleSheet,
@@ -9,7 +9,7 @@ import {
     View
 } from "react-native";
 
-import { useTheme } from "@react-navigation/native";
+import { useFocusEffect, useTheme } from "@react-navigation/native";
 
 import Playlist from '../../components/shared/Playlist';
 import AddPlaylistModal from "../../components/modals/AddPlaylistModal";
@@ -21,16 +21,14 @@ export default Playlists = ({navigation}) => {
     const [playlists, setPlaylists] = useState([]);
     const { colors } = useTheme();
 
-    useEffect(() => {
-        const unsubscribe = navigation.addListener('focus', () => {
+    useFocusEffect(
+        useCallback(() => {
             setModalVisible(false);
             if (loading) {
                 setLoading(false);
             }
-        });
-
-        return () => unsubscribe();
-    }, []);
+        }, [])
+    );
 
     const addPlaylist = ({title, description}) => {
         let sum = title + description;
@@ -59,10 +57,16 @@ export default Playlists = ({navigation}) => {
         ? <>
             <ScrollView contentContainerStyle={styles.playlistCollectionContainer}>
             <>
-                <Pressable android_ripple={rippleConfig} style={styles.playlist} onPress={() => setModalVisible(true)}>
-                    <Text style={[styles.newPlaylist, {color: colors.text}]}>+</Text>
-                    <Text style={[styles.playlistTitle, {color: colors.text}]}>Add Playlist</Text>
-                </Pressable>
+                <Playlist
+                    playlist={{title: "Add Playlist", placeholder: "+"}}
+                    onPress={() => setModalVisible(true)}
+                    style={styles.playlist}/>
+
+                <Playlist
+                    playlist={{title: "Liked Songs", playlistId: "LOCAL_LIKES", placeholder:"👍" }}
+                    navigation={navigation}
+                    style={styles.playlist}
+                />
 
                 {playlists.map(playlist => {
                     return <Playlist
@@ -70,7 +74,6 @@ export default Playlists = ({navigation}) => {
                         playlist={playlist}
                         navigation={navigation}
                         style={styles.playlist}
-                        local={true}
                     />;
                 })}
             </>

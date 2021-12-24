@@ -1,5 +1,6 @@
-function getPlaylist(json, playlistId) {
+function getPlaylist(json) {
     let browse = {playlistId: "", title: "", subtitle: "", secondSubtitle: "", description: "", thumbnail: null, entries: []};
+
     let musicHeader = json.header.musicDetailHeaderRenderer;
 
     let titlelist = musicHeader.title.runs;
@@ -27,24 +28,31 @@ function getPlaylist(json, playlistId) {
     let thumbnaillist = musicHeader.thumbnail.croppedSquareThumbnailRenderer.thumbnail.thumbnails;
     browse.thumbnail = thumbnaillist.slice(-1)[0].url;
 
-
     let songTabs = json.contents.singleColumnBrowseResultsRenderer.tabs;
 
     for (let st = 0; st < songTabs.length; st++) {
         let songList = songTabs[st].tabRenderer.content.sectionListRenderer.contents;
         
         for (let sl = 0; sl < songList.length; sl++) {
-            let songs = songList[sl].musicPlaylistShelfRenderer.contents;
-            browse.playlistId = songList[sl].musicPlaylistShelfRenderer.playlistId;
+            let songs
+            if (songList[sl].hasOwnProperty("musicPlaylistShelfRenderer")) {
+                songs = songList[sl].musicPlaylistShelfRenderer.contents;
+                browse.playlistId = songList[sl].musicPlaylistShelfRenderer.playlistId;
+            } else if (songList[sl].hasOwnProperty("musicShelfRenderer")) {
+                songs = songList[sl].musicShelfRenderer.contents;
+                browse.playlistId = json.microformat.microformatDataRenderer.urlCanonical.split("=").slice(-1)[0]
+            } else {
+                break;
+            }
             
             for (let songIndex = 0; songIndex < songs.length; songIndex++) {
                 let responsiveMusicItem = songs[songIndex].musicResponsiveListItemRenderer;
 
                 let songTitlelist = responsiveMusicItem.flexColumns[0].musicResponsiveListItemFlexColumnRenderer.text.runs;
                 let songSubtitlelist = responsiveMusicItem.flexColumns[1].musicResponsiveListItemFlexColumnRenderer.text.runs;
-                let songSecondsubtitlelist = responsiveMusicItem.flexColumns[2].musicResponsiveListItemFlexColumnRenderer.text.runs;
+                let songSecondsubtitlelist = responsiveMusicItem.flexColumns[2]?.musicResponsiveListItemFlexColumnRenderer.text.runs;
                 let songLengthlist = responsiveMusicItem.fixedColumns[0].musicResponsiveListItemFixedColumnRenderer.text.runs;
-                let songThumbnaillist = responsiveMusicItem.thumbnail.musicThumbnailRenderer.thumbnail.thumbnails;
+                let songThumbnaillist = responsiveMusicItem.thumbnail?.musicThumbnailRenderer.thumbnail.thumbnails;
 
                 let entry = {title: "", subtitle: "", secondTitle: "", secondSubtitle: "",  videoId: null, playlistId: null, thumbnail: null};
 
@@ -65,8 +73,11 @@ function getPlaylist(json, playlistId) {
                     entry.secondTitle += songLengthlist[sll].text;
                 }
 
-                //entry.thumbnail = songThumbnaillist[songThumbnaillist.length - 1].url;
-                entry.thumbnail = songThumbnaillist.slice(-1)[0].url;
+                if (songThumbnaillist != null) {
+                    entry.thumbnail = songThumbnaillist.slice(-1)[0].url;
+                } else {
+                    entry.thumbnail = browse.thumbnail;
+                }
 
                 if (responsiveMusicItem.menu == undefined) continue; // ??
 
@@ -84,10 +95,12 @@ function getPlaylist(json, playlistId) {
                             if (navigation.hasOwnProperty("watchEndpoint")) {
                                 entry.videoId = navigation.watchEndpoint.videoId;
 
-                                if (playlistId != undefined)
-                                    entry.playlistId = playlistId;
+                                if (browse.playlistId != null)
+                                    entry.playlistId = browse.playlistId;
                                 else
                                     entry.playlistId = navigation.watchEndpoint.playlistId;
+
+                                break;
                             }
                         }
                     }
@@ -102,6 +115,7 @@ function getPlaylist(json, playlistId) {
 }
 
 function getAlbum(json) {
+    console.log(json);
     let updatelist = json.frameworkUpdates.entityBatchUpdate.mutations
 
     let browse = {playlistId: "", title: "", subtitle: "", secondSubtitle: "", description: "", thumbnail: null, entries: []};
@@ -330,9 +344,8 @@ function getArtist(json) {
 }
 
 export default function digestBrowseResponse(json, browseId) {
-    if (browseId.slice(0, 2) === "VL") {
-        let playlistId = browseId.slice(2);
-        return getPlaylist(json, playlistId);
+    if (browseId.slice(0, 2) === "VL" || browseId.slice(0, 2) === "MP") {
+        return getPlaylist(json);
     } else if (browseId.slice(0, 2) === "UC")
         return getArtist(json);
     else
