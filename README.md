@@ -1,30 +1,6 @@
-This project is currently being rewritten and migrated to track-player v2.
-Music playback is not working as of yet and navigating through the UI is a bit buggy.
-
-Youtube Music client for Android, iOS and Web built with React Native
+Youtube Music client for Android, iOS and Web built with React Native that allows you to listen to music from Youtube. You can download songs and listen to them while being offline.
 
 ![alt text](youtune.jpg)
-
-What works:
-- Displaying home screen
-- Using search
-- Opening Playlists and Artists
-- Playing music from artist and playlist pages
-- Playing music from search results
-- Include song recommendations
-- Retain playlist after selecting a song from artist or playlist pages
-- Links to music streams are deobfuscated (thanks to [NewPipeExtractor](https://github.com/TeamNewPipe/NewPipeExtractor))
-- Youtube Music API requests are proxied over webpack-dev-server or Nginx using provided config
-- Control playback through notifications
-- Dark mode
-- PWA support with asset caching for offline use
-- Deep linking based on Youtube's URL structure
-- Downloading songs on web and storing them via Indexed DB
-
-Features that are being worked on:
-- Create custom playlists that are kept locally
-- Keep track of songs that have been liked
-- Download songs on Android/iOS for offline playback
 
 How to run:
 
