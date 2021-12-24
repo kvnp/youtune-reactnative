@@ -284,36 +284,16 @@ export default class Music {
         }
 
         Music.state = State.Buffering;
-        if (playlistId?.includes("LOCAL")) {
-            let localPlaylist = new Playlist();
-
-            if (!Downloads.initialized) {
-                await Downloads.waitForInitialization();
-            }
-    
-            for (let i = 0; i < Downloads.downloadedTracks.length; i++) {
-                let id = Downloads.downloadedTracks[i];
-                let local = await Downloads.getTrack(id);
-                local.id = local.videoId;
-                local.playlistId = playlistId;
-                delete local.videoId;
-                
-                if (local != undefined) {
-                    local.artwork = IO.getBlobAsURL(local.artwork);
-                    if (videoId) {
-                        if (id == videoId)
-                            localPlaylist.index = i;
-                    }
-        
-                    localPlaylist.list.push(local);
-                }
-            }
-    
-            Music.startPlaylist(localPlaylist);
+        if (playlistId?.startsWith("LOCAL")) {
+            Downloads.loadLocalPlaylist(playlistId, videoId)
+                .then(localPlaylist => {
+                    Music.startPlaylist(localPlaylist);
+                })
+                .catch(_ => console.log(_));
         } else {
             Media.getNextSongs({videoId, playlistId})
                 .then(resultPlaylist => Music.startPlaylist(resultPlaylist))
-                .catch(async(reason) => {});
+                .catch(_ => console.log(_));
         }
     }
 

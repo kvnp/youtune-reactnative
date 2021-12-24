@@ -44,8 +44,8 @@ export default class Navigation {
                     id: videoId,
                     playlistId: browseId.slice(2),
                     title: media.title,
-                    artist: media.subtitle.includes("•")
-                        ? media.subtitle.split("•")[1].trim()
+                    artist: media.subtitle?.includes("•")
+                        ? media.subtitle?.split("•")[1].trim()
                         : media.subtitle,
                     artwork: media.thumbnail
                 });

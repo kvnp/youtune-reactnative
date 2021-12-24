@@ -15,14 +15,14 @@ import { showModal } from '../modals/MoreModal';
 import Navigation from '../../services/ui/Navigation';
 
 export default Entry = ({ entry, navigation, index, forcedPlaylistId }) => {
-    const { title, subtitle, thumbnail } = entry;
-    const { videoId, browseId, playlistId } = entry;
+    const { title, subtitle, artist, thumbnail, artwork,
+            videoId, id, browseId, playlistId } = entry;
 
     const view = {
         title: title,
-        subtitle: subtitle,
-        thumbnail: thumbnail,
-        videoId: videoId,
+        subtitle: subtitle || artist,
+        thumbnail: thumbnail || artwork,
+        videoId: videoId || id,
         browseId: browseId,
         playlistId: forcedPlaylistId
             ? forcedPlaylistId
@@ -64,12 +64,12 @@ export default Entry = ({ entry, navigation, index, forcedPlaylistId }) => {
         <Image 
             style={resultStyle.resultCover}
             progressiveRenderingEnabled={true}
-            source={{uri: thumbnail}}
+            source={{uri: thumbnail || artwork}}
         />
 
         <View style={resultStyle.resultColumnOne}>
             <Text numberOfLines={1} style={[resultStyle.resultText, {color: colors.text}]}>{title}</Text>
-            <Text numberOfLines={1} style={[resultStyle.resultText, {color: colors.text}]}>{subtitle}</Text>
+            <Text numberOfLines={1} style={[resultStyle.resultText, {color: colors.text}]}>{view.subtitle}</Text>
         </View>
 
         <TouchableRipple

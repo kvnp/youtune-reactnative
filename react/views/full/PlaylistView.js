@@ -17,26 +17,50 @@ import { rippleConfig } from "../../styles/Ripple";
 import Navigation from "../../services/ui/Navigation";
 import FlatEntries from "../../components/collections/FlatEntries";
 import { ActivityIndicator } from "react-native-paper";
+import Downloads from "../../services/device/Downloads";
 
 export default PlaylistView = ({ route, navigation }) => {
     const {dark, colors} = useTheme();
     const [playlist, setPlaylist] = useState(null);
-    const idFits = route.params.list == Navigation.transitionPlaylist?.playlistId ||
-                   route.params.list == Navigation.transitionPlaylist?.browseId;
+    const idFits = route.params?.list == Navigation.transitionPlaylist?.playlistId ||
+                   route.params?.list == Navigation.transitionPlaylist?.browseId;
 
     useFocusEffect(
         useCallback(() => {
+            if (!route.params.hasOwnProperty("list"))
+                navigation.pop();
+
             if (idFits)
                 navigation.setOptions({ title: Navigation.transitionPlaylist.title });
 
-            if (playlist == null || !idFits)
-                Media.getBrowseData(route.params.list)
-                    .then(playlist => {
-                        Navigation.transitionPlaylist = null;
-                        navigation.setOptions({ title: playlist.title });
-                        navigation.setParams({ list: playlist.playlistId});
-                        setPlaylist(playlist);
-                    });
+            if (playlist == null || !idFits) {
+                if (!route.params.list.startsWith("LOCAL")) {
+                    Media.getBrowseData(route.params.list)
+                        .then(playlist => {
+                            Navigation.transitionPlaylist = null;
+                            navigation.setOptions({ title: playlist.title });
+                            navigation.setParams({ list: playlist.playlistId});
+                            setPlaylist(playlist);
+                        });
+                } else {
+                    Downloads.loadLocalPlaylist(route.params.list)
+                        .then(localPlaylist => {
+                            let playlist = {
+                                playlistId: localPlaylist.playlistId,
+                                title: localPlaylist.title,
+                                subtitle: localPlaylist.subtitle,
+                                secondSubtitle: localPlaylist.secondSubtitle,
+                                entries: localPlaylist.list
+                            };
+                            console.log(entries);
+                            Navigation.transitionPlaylist = null;
+                            navigation.setOptions({ title: playlist.title });
+                            navigation.setParams({ list: playlist.playlistId});
+                            setPlaylist(playlist);
+                        });
+                }
+            }
+                
         }, [])
     )
 
@@ -52,8 +76,8 @@ export default PlaylistView = ({ route, navigation }) => {
             ? <View style={{flex: 1, justifyContent: "center"}}>
                 <ActivityIndicator/>
             </View>
-            
-            : <FlatEntries 
+
+            : <FlatEntries
                 entries={entries}
                 isPlaylist={true}
                 playlistId={route.params.list}
@@ -80,7 +104,7 @@ export default PlaylistView = ({ route, navigation }) => {
                         playlist == null
                         ? <>
                             {
-                                idFits
+                                idFits && playlist != null
                                     ? <Text numberOfLines={1} style={[bottomBarAlbumStyle.albumTitle, bottomBarAlbumStyle.albumText, {color: colors.text}]}>
                                         {Navigation.transitionPlaylist.title}
                                     </Text>

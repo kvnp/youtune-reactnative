@@ -1,4 +1,5 @@
 import { DeviceEventEmitter } from "react-native";
+import Playlist from "../../models/music/playlist";
 import Media from "../api/Media";
 import IO from "./IO";
 import Storage from "./storage/Storage";
@@ -278,6 +279,47 @@ export default class Downloads {
             
             let url = await Storage.getItem("Downloads", videoId);
             resolve(url);
+        });
+    }
+
+
+    static loadLocalPlaylist(playlistId, videoId) {
+        return new Promise(async(resolve, reject) => {
+            if (!this.initialized)
+                await Downloads.waitForInitialization();
+
+            let localPlaylist = new Playlist();
+            localPlaylist.playlistId = playlistId;
+            localPlaylist.subtitle = "Playlist • Local";
+            let list;
+            
+            if (playlistId == "LOCAL_DOWNLOADS") {
+                list = this.downloadedTracks;
+                localPlaylist.title = "Downloads";
+            } else if (playlistId == "LOCAL_LIKES") {
+                list = this.#likedTracks;
+                localPlaylist.title = "Liked Songs";
+            } else {
+                // list = await Downloads.getPlaylist(playlistId)
+            }
+
+            for (let i = 0; i < list.length; i++) {
+                let id = list[i];
+                let local = await this.getTrack(id);
+                local.artwork = IO.getBlobAsURL(local.artwork);
+                local.id = local.videoId;
+                local.playlistId = playlistId;
+                delete local.videoId;
+                localPlaylist.list.push(local);
+                console.log(local);
+
+                if (id == videoId)
+                    localPlaylist.index = i;
+            }
+
+            localPlaylist.secondSubtitle = localPlaylist.list.length
+                + (localPlaylist.list.length > 1 ? "titles" : "title");
+            resolve(localPlaylist);
         });
     }
 }
