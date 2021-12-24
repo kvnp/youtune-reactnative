@@ -2,9 +2,8 @@ import { DeviceEventEmitter } from 'react-native';
 import TrackPlayer, { Capability, RepeatMode, Event, State } from 'react-native-track-player';
 import Queue from 'queue-promise';
 import Media from '../api/Media';
-import Playlist from '../../models/music/playlist';
 import Downloads from '../device/Downloads';
-import IO from '../device/IO';
+import Cast from './Cast';
 
 export default class Music {
     static #initialized;
@@ -108,6 +107,7 @@ export default class Music {
 
     static initialize = () => {
         return new Promise(async(resolve, reject) => {
+            Cast.initialize();
             TrackPlayer.registerPlaybackService(Music.TrackPlayerTaskProvider);
             await TrackPlayer.setupPlayer({});
             await TrackPlayer.updateOptions(TrackPlayerOptions);
@@ -157,7 +157,7 @@ export default class Music {
 
     static cycleRepeatMode = () => {
         if (!Music.#initialized)
-            reject("Music needs to be initialized by calling initialize()");
+            return reject("Music needs to be initialized by calling initialize()");
 
         switch (Music.repeatMode) {
             case RepeatMode.Off:
