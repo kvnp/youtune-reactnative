@@ -1,5 +1,4 @@
 function getPlaylist(json) {
-    console.log(json);
     let browse = {playlistId: "", title: "", subtitle: "", secondSubtitle: "", description: "", thumbnail: null, entries: []};
 
     let musicHeader = json.header.musicDetailHeaderRenderer;
@@ -13,7 +12,6 @@ function getPlaylist(json) {
     for (let s = 0; s < subtitlelist.length; s++) {
         browse.subtitle += subtitlelist[s].text;
     }
-    console.log(browse.subtitle);
 
     if (musicHeader.hasOwnProperty("description")) {
         let descriptionlist = musicHeader.description.runs;
@@ -121,7 +119,6 @@ function getPlaylist(json) {
 }
 
 function getAlbum(json) {
-    console.log(json);
     let updatelist = json.frameworkUpdates.entityBatchUpdate.mutations
 
     let browse = {playlistId: "", title: "", subtitle: "", secondSubtitle: "", description: "", thumbnail: null, entries: []};
