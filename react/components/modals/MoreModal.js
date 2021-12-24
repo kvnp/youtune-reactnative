@@ -39,8 +39,7 @@ export default MoreModal = ({navigation}) => {
         playing: false,
         downloading: false,
         downloaded: false,
-        queue: 0,
-        likeFunction: () => {}
+        queue: 0
     });
 
     const {dark, colors} = useTheme();
@@ -49,13 +48,10 @@ export default MoreModal = ({navigation}) => {
         title, subtitle, thumbnail,
         videoId, browseId, playlistId,
         type, liked, visible, playing,
-        downloading, downloaded, queue,
-        likeFunction
+        downloading, downloaded, queue
     } = content;
 
     useEffect(() => {
-        console.log("moremodal");
-        console.log(visible);
         if (visible) {
             dlListener = Downloads.addListener(
                 Downloads.EVENT_REFRESH,
@@ -93,73 +89,44 @@ export default MoreModal = ({navigation}) => {
         }
     };
 
+    const like = bool => {
+        if (liked == bool)
+            bool = null;
+
+        Downloads.likeTrack(id, bool);
+        setContent({...content, liked: bool});
+    }
+
     const refresh = (type, id) => {
         return new Promise(async(resolve) => {
             let liked = null;
-            /*switch(type) {
-                case "Song":
-                    liked = await getSongLike(id);
-                    break;
-                case "Playlist":
-                    liked = await getPlaylistLike(id);
-                    break;
-                case "Artist":
-                    liked = await getArtistLike(id);
-            }*/
+            if (type == "Song")
+                liked = await Downloads.isTrackLiked(id);
+
             resolve(liked);
-        })
+        });
     };
 
     showModal = async(info) => {
         let type;
-        let likeFunction;
         let liked;
 
         if (info.videoId != null) {
             type = "Song";
             liked = await refresh(type, info.videoId);
-    
-            likeFunction = boolean => {
-                //likeSong(info.videoId, boolean);
-                refresh(type, info.videoId)
-                    .then(liked => {
-                        setContent(content => ({...content, liked: liked}));
-                    })
-            }
         } else if (info.playlistId != null || info.browseId != null) {
             if (info.browseId != null) {
                 if (info.browseId.slice(0, 2) == "UC") {
                     type = "Artist";
                     liked = await refresh(type, info.browseId);
-                    likeFunction = (boolean) => {
-                        //likeArtist(info.browseId, boolean);
-                        refresh(type, info.videoId)
-                            .then(liked => {
-                                setContent(content => ({...content, liked: liked}));
-                            })
-                    }
     
                 } else {
                     type = "Playlist";
                     liked = await refresh(type, info.playlistId);
-                    likeFunction = boolean => {
-                        //likePlaylist(info.playlistId, boolean);
-                        refresh(type, info.videoId)
-                            .then(liked => {
-                                setContent(content => ({...content, liked: liked}));
-                            })
-                    }
                 }
             } else {
                 type = "Playlist";
                 liked = await refresh(type, info.playlistId);
-                likeFunction = boolean => {
-                    //likePlaylist(info.playlistId, boolean);
-                    refresh(type, info.videoId)
-                        .then(liked => {
-                            setContent(content => ({...content, liked: liked}));
-                        })
-                }
             }
         }
 
@@ -169,25 +136,16 @@ export default MoreModal = ({navigation}) => {
                 isPlaying = true;
             }
         }
-        
-        /*if (downloadQueue.findIndex(entry => info.videoId in entry) > -1)
-            downloading = true;
-
-        if (localIDs.includes(info.videoId))
-            downloaded = true;*/
 
         setContent({
             ...info,
             type: type,
             playing: isPlaying,
-            //downloading: downloading,
-            //downloaded: downloaded,
+            liked: liked,
             downloading: Downloads.isTrackDownloading(info.videoId),
             downloaded: Downloads.isTrackDownloaded(info.videoId),
             queue: Downloads.getDownloadingLength(),
-            visible: true,
-            liked,
-            likeFunction: likeFunction
+            visible: true
         });
     };
 
@@ -216,61 +174,68 @@ export default MoreModal = ({navigation}) => {
                             <Text style={{color: colors.text}} numberOfLines={1}>{subtitle}</Text>
                         </ScrollingText>
                     </View>
-                    <View style={{width: 120, height: 50, alignItems: "center", alignSelf: "center", justifyContent: "center", flexDirection: "row"}}>
-                        <TouchableRipple
-                            borderless={true}
-                            rippleColor={colors.primary}
-                            onPress={() => likeFunction(false)}
-                            style={{
-                                width: 50,
-                                height: 50,
-                                marginHorizontal: 5,
-                                borderRadius: 25,
-                                alignItems: "center",
-                                justifyContent: "center"
-                            }}
-                        >
-                            <MaterialIcons
-                                name="thumb-down"
-                                color={
-                                    liked == null
-                                        ? "darkgray"
-                                        : !liked
-                                            ? colors.primary
-                                            : "darkgray"
-                                }
-
-                                size={25}
-                            />
-                        </TouchableRipple>
-                        <TouchableRipple
-                            borderless={true}
-                            rippleColor={colors.primary}
-                            onPress={() => likeFunction(true)}
-
-                            style={{
-                                width: 50,
-                                height: 50,
-                                marginHorizontal: 5,
-                                borderRadius: 25,
-                                alignItems: "center",
-                                justifyContent: "center"
-                            }}
-                        >
-                            <MaterialIcons
-                                name="thumb-up"
-                                color={
-                                    liked == null
-                                        ? "darkgray"
-                                        : liked
-                                            ? colors.primary
-                                            : "darkgray"
-                                }
-
-                                size={25}
-                            />
-                        </TouchableRipple>
-                    </View>
+                        <View style={{width: 120, height: 50, alignItems: "center", alignSelf: "center", justifyContent: "center", flexDirection: "row"}}>
+                        {
+                        type != "Song"
+                            ? undefined
+                            : <>
+                            <TouchableRipple
+                                borderless={true}
+                                rippleColor={colors.primary}
+                                onPress={() => like(false)}
+                                style={{
+                                    width: 50,
+                                    height: 50,
+                                    marginHorizontal: 5,
+                                    borderRadius: 25,
+                                    alignItems: "center",
+                                    justifyContent: "center"
+                                }}
+                            >
+                                <MaterialIcons
+                                    name="thumb-down"
+                                    color={
+                                        liked == null
+                                            ? "darkgray"
+                                            : !liked
+                                                ? colors.primary
+                                                : "darkgray"
+                                    }
+    
+                                    size={25}
+                                />
+                            </TouchableRipple>
+                            <TouchableRipple
+                                borderless={true}
+                                rippleColor={colors.primary}
+                                onPress={() => like(true)}
+    
+                                style={{
+                                    width: 50,
+                                    height: 50,
+                                    marginHorizontal: 5,
+                                    borderRadius: 25,
+                                    alignItems: "center",
+                                    justifyContent: "center"
+                                }}
+                            >
+                                <MaterialIcons
+                                    name="thumb-up"
+                                    color={
+                                        liked == null
+                                            ? "darkgray"
+                                            : liked
+                                                ? colors.primary
+                                                : "darkgray"
+                                    }
+    
+                                    size={25}
+                                />
+                            </TouchableRipple>
+                            </>
+                        }
+                        </View>
+                    
                 </View>
 
                 {
@@ -374,7 +339,7 @@ export default MoreModal = ({navigation}) => {
                                 () => downloading
                                     ? Downloads.cancelDownload(videoId)
                                     : downloaded
-                                        ? Downloads.deleteTrack(videoId)
+                                        ? Downloads.deleteDownload(videoId)
                                         : Downloads.downloadTrack(videoId)
                             }
                         >

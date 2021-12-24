@@ -44,8 +44,8 @@ export default class IndexedDBProvider {
                 var downloads = result.createObjectStore("Downloads", { keyPath: "videoId" });
                 downloads.createIndex("videoId", "videoId", { unique: true });
 
-                var likes = result.createObjectStore("Likes", {keyPath: "id"});
-                likes.createIndex("id", "id", { unique: true });
+                var likes = result.createObjectStore("Likes", {keyPath: "videoId"});
+                likes.createIndex("videoId", "videoId", { unique: true });
             };
 
             req.onsuccess = function(evt) {
@@ -76,13 +76,17 @@ export default class IndexedDBProvider {
             if (!this.#initialized)
                 this.#db = await this.initialize();
 
-            this.#db
-                .transaction(storeName, this.#read_only)
-                .objectStore(storeName)
-                .get(key)
-                .onsuccess = function(event) {
-                    resolve(event.target.result);
-                };
+            try {
+                this.#db
+                    .transaction(storeName, this.#read_only)
+                    .objectStore(storeName)
+                    .get(key)
+                    .onsuccess = function(event) {
+                        resolve(event.target.result);
+                    };
+            } catch (_) {
+                this.#db = await this.initialize();
+            }
         });
     }
 
@@ -91,13 +95,18 @@ export default class IndexedDBProvider {
             if (!this.#initialized)
                 this.#db = await this.initialize();
 
-            this.#db
-                .transaction(storeName, this.#read_write)
-                .objectStore(storeName)
-                .put(data)
-                .onsuccess = function(event) {
-                    resolve(true);
-                };
+            try {
+                this.#db
+                    .transaction(storeName, this.#read_write)
+                    .objectStore(storeName)
+                    .put(data)
+                    .onsuccess = function(event) {
+                        resolve(true);
+                    };
+            } catch (_) {
+                this.#db = await this.initialize();
+            }
+            
         });
     }
 
@@ -106,13 +115,18 @@ export default class IndexedDBProvider {
             if (!this.#initialized)
                 this.#db = await this.initialize();
 
-            this.#db
-                .transaction(storeName, this.#read_write)
-                .objectStore(storeName)
-                .delete(key)
-                .onsuccess = function(event) {
-                    resolve(true);
-                };
+            try {
+                this.#db
+                    .transaction(storeName, this.#read_write)
+                    .objectStore(storeName)
+                    .delete(key)
+                    .onsuccess = function(event) {
+                        resolve(true);
+                    };
+            } catch (_) {
+                this.#db = await this.initialize();
+            }
+            
         });
     }
 
@@ -121,13 +135,17 @@ export default class IndexedDBProvider {
             if (!this.#initialized)
                 this.#db = await this.initialize();
             
-            this.#db
-                .transaction(storeName, this.#read_only)
-                .objectStore(storeName)
-                .getAllKeys()
-                .onsuccess = function(event) {
-                    resolve(event.target.result);
-                }
+            try {
+                this.#db
+                    .transaction(storeName, this.#read_only)
+                    .objectStore(storeName)
+                    .getAllKeys()
+                    .onsuccess = function(event) {
+                        resolve(event.target.result);
+                    }
+            } catch (_) {
+                this.#db = await this.initialize();
+            }
         });
     }
 }

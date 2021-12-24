@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useReducer } from "react";
+import React, { useState, useEffect, useReducer, useCallback } from "react";
 import {
     View,
     StyleSheet,
@@ -10,15 +10,16 @@ import {
 
 import TrackPlayer, { Event, State } from 'react-native-track-player';
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
-import { useTheme } from "@react-navigation/native";
+import { useFocusEffect, useTheme } from "@react-navigation/native";
 import { Button } from "react-native-paper";
+
+import Music from "../../services/music/Music";
+import Downloads from "../../services/device/Downloads";
 
 import SeekBar from "../../components/player/SeekBar";
 import SwipePlaylist from "../../components/player/SwipePlaylist";
 import { showModal } from "../../components/modals/MoreModal";
 import ScrollingText from "../../components/shared/ScrollingText";
-
-import Music from "../../services/music/Music";
 
 const PlayView = ({route, navigation}) => {
     const forceUpdate = useReducer(() => ({}))[1];
@@ -31,18 +32,36 @@ const PlayView = ({route, navigation}) => {
     const {id, playlistId, title, artist, artwork, duration} = Music.metadata;
     
     const likeSong = like => {
+        if (isLiked == like)
+            like = null;
 
+        Downloads.likeTrack(id, like);
+        setLiked(like);
     }
 
     useEffect(() => {
-        if (id == null)
-            return;
+        Downloads.isTrackLiked(id).then(lk => {
+            if (isLiked != lk)
+                setLiked(lk);
+        });
+    });
 
-        navigation.setOptions({title: title});
-        navigation.setParams({v: id, list: playlistId});
-    }, [id]);
+    useFocusEffect(
+        useCallback(() => {
+            if (id == null)
+                return;
+
+            navigation.setOptions({title: title});
+            navigation.setParams({v: id, list: playlistId});
+        }, [id])
+    );
 
     useEffect(() => {
+        if (id != null) {
+            navigation.setOptions({title: title});
+            navigation.setParams({v: id, list: playlistId});
+        }
+
         Music.handlePlayback({
             videoId: route.params.v,
             playlistId: route.params.list
@@ -81,15 +100,9 @@ const PlayView = ({route, navigation}) => {
                 <View style={controlStyles.container}>
                     
                     <Button
-                        onPress={async() => likeSong(false)}
+                        onPress={() => likeSong(false)}
                         labelStyle={{marginHorizontal: 0}}
-                        style={{borderRadius: 25, alignItems: "center", padding: 0, margin: 0, minWidth: 0,
-                                color: isLiked == null
-                                    ? colors.text
-                                    : !isLiked
-                                        ? colors.primary
-                                        : colors.text
-                        }}
+                        style={{borderRadius: 25, alignItems: "center", padding: 0, margin: 0, minWidth: 0}}
                         contentStyle={{alignItems: "center", width: 50, height: 50, minWidth: 0}}
                     >
                         <MaterialIcons
@@ -98,10 +111,10 @@ const PlayView = ({route, navigation}) => {
                             name="thumb-down"
                             color={
                                 isLiked == null
-                                    ? colors.text
+                                    ? "dimgray"
                                     : !isLiked
-                                        ? colors.primary
-                                        : colors.text
+                                        ? colors.text
+                                        : "dimgray"
                             }
 
                             size={30}
@@ -151,10 +164,10 @@ const PlayView = ({route, navigation}) => {
                             name="thumb-up"
                             color={
                                 isLiked == null
-                                    ? colors.text
+                                    ? "dimgray"
                                     : isLiked
-                                        ? colors.primary
-                                        : colors.text
+                                        ? colors.text
+                                        : "dimgray"
                             }
 
                             size={30}
