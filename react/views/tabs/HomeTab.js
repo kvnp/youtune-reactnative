@@ -12,16 +12,15 @@ import {
 import { useTheme } from '@react-navigation/native';
 import { Button } from 'react-native-paper';
 
-import { fetchHome } from "../../modules/remote/API";
+import Media from '../../services/api/Media';
 import Shelf from '../../components/shared/Shelf';
 import { shelvesStyle } from '../../styles/Shelves';
 import { preResultHomeStyle } from '../../styles/Home';
-import { setHeader } from '../../components/overlay/Header';
 
 export default HomeTab = ({navigation}) => {
     const [shelves, setShelves] = useState([]);
     const [continuation, setContinuation] = useState(null);
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState(false);
     const { colors } = useTheme();
     const [homeText, setHomeText] = useState(
         Platform.OS == "web"
@@ -30,55 +29,19 @@ export default HomeTab = ({navigation}) => {
     );
 
     useEffect(() => {
-        const _unsubscribe = navigation.addListener('focus', () => {
-            setHeader({title: "Home"});
-            if (shelves.length == 0)
-                startRefresh();
-        });
+        if (shelves.length == 0)
+            startRefresh();
+    }, []);
 
-        const _offlineListener = Platform.OS == "web"
-            ? window.addEventListener("online", () => {
-                setLoading(true);
-                startRefresh();
-            })
-            : undefined;
-
-        return () => {
-            _unsubscribe();
-
-            if (_offlineListener)
-                _offlineListener();
-        };
-    }, [])
-
-    const startRefresh = async() => {
-        let temp = continuation;
-
-        fetchHome(temp)
+    const startRefresh = () => {
+        Media.getBrowseData("FEmusic_home", continuation)
             .then(result => {
-                setHomeText(
-                    Platform.OS == "web"
-                        ? "Press the home icon to load"
-                        : "Pull down to load"
-                );
-
-                if (result.background)
-                    setHeader({image: result.background});
-
                 setShelves(result.shelves);
-
-                if (result.continuation)
-                    setContinuation(result.continuation);
-
-                if (loading)
-                    setLoading(false);
-            })
-
-            .catch(e => {
                 setLoading(false);
             })
-
-        
+            .catch(() => {
+                setLoading(false);
+            })
     }
 
     return <FlatList
@@ -100,8 +63,7 @@ export default HomeTab = ({navigation}) => {
         }
 
         onEndReached={() => {
-            if (continuation)
-                startRefresh();
+            //startRefresh();
         }}
 
         ListFooterComponent={
@@ -111,7 +73,7 @@ export default HomeTab = ({navigation}) => {
                         <ActivityIndicator color={colors.text} size="large"/>
                     </View>
 
-                    : <Button style={{marginHorizontal: 50}} onPress={startRefresh} mode="outlined">
+                    : <Button style={{marginHorizontal: 50}} onPress={() => startRefresh()} mode="outlined">
                         <Text style={{color: colors.text}}>Refresh</Text>
                     </Button>
 
@@ -123,7 +85,11 @@ export default HomeTab = ({navigation}) => {
         renderItem={({item}) => <Shelf shelf={item} navigation={navigation}/>}
 
         refreshing={loading}
-        onRefresh={startRefresh}
+        onRefresh={
+            Platform.OS != "web"
+                ? () => startRefresh()
+                : undefined
+        }
 
         ListFooterComponentStyle={
             shelves.length == 0 

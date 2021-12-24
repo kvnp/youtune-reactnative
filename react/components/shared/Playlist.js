@@ -4,16 +4,16 @@ import {
     Text,
     Image
 } from "react-native";
+import { useTheme } from '@react-navigation/native';
 import { TouchableRipple } from 'react-native-paper';
 
-import { playlistStyle } from '../../styles/Playlist';
-import { handleMedia } from '../../modules/event/mediaNavigator';
-import { useTheme } from '@react-navigation/native';
+import Navigation from '../../services/ui/Navigation';
 import { showModal } from '../modals/MoreModal';
+import { playlistStyle } from '../../styles/Playlist';
 
-export default Playlist = ({ playlist, navigation, style }) => {
-    let { title, subtitle, thumbnail } = playlist;
-    let { videoId, browseId, playlistId } = playlist;
+export default Playlist = ({ playlist, navigation, style, onPress }) => {
+    let { title, subtitle, thumbnail, placeholder,
+          videoId, browseId, playlistId } = playlist;
 
     let view = {
         title: title,
@@ -30,11 +30,28 @@ export default Playlist = ({ playlist, navigation, style }) => {
         <TouchableRipple
             rippleColor={colors.primary}
             onLongPress={() => showModal(view)}
-            onPress={() => handleMedia(view, navigation)}
+            onPress={
+                onPress
+                    ? () => onPress()
+                    : () => {
+                        Navigation.transitionPlaylist = {
+                            playlistId: playlistId,
+                            browseId: browseId,
+                            title: title,
+                            thumbnail: thumbnail
+                        }
+                        Navigation.handleMedia(view, navigation);
+                    }
+            }
             style={[style, playlistStyle.container]}
         >
             <>
-            <Image style={playlistStyle.cover} source={{uri: thumbnail}}/>
+            {
+                placeholder
+                    ? <Text style={[playlistStyle.cover, {color: colors.text, textAlign: "center", fontSize: 100}]}>{placeholder}</Text>
+                    : <Image style={playlistStyle.cover} source={{uri: thumbnail}}/>
+            }
+            
 
             <Text style={[playlistStyle.title, {color: colors.text}]} numberOfLines={2}>
                 {title}

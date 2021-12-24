@@ -1,18 +1,15 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useState } from "react";
 import {
     ScrollView,
     StyleSheet,
-    Text,
-    Pressable,
     Platform,
     ActivityIndicator,
     View
 } from "react-native";
 
-import { storePlaylists, getPlaylists } from "../../modules/storage/PlaylistStorage";
+import { useFocusEffect, useTheme } from "@react-navigation/native";
+
 import Playlist from '../../components/shared/Playlist';
-import { rippleConfig } from "../../styles/Ripple";
-import { useTheme } from "@react-navigation/native";
 import AddPlaylistModal from "../../components/modals/AddPlaylistModal";
 
 export default Playlists = ({navigation}) => {
@@ -21,20 +18,14 @@ export default Playlists = ({navigation}) => {
     const [playlists, setPlaylists] = useState([]);
     const { colors } = useTheme();
 
-    useEffect(() => {
-        const unsubscribe = navigation.addListener('focus', () => {
+    useFocusEffect(
+        useCallback(() => {
             setModalVisible(false);
             if (loading) {
-                getPlaylists()
-                    .then(playlists => {
-                        setPlaylists(playlists);
-                        setLoading(false);
-                    });
+                setLoading(false);
             }
-        });
-
-        return () => unsubscribe();
-    }, []);
+        }, [])
+    );
 
     const addPlaylist = ({title, description}) => {
         let sum = title + description;
@@ -47,7 +38,6 @@ export default Playlists = ({navigation}) => {
             }
         }
 
-        storePlaylists([...playlists, {title: title, subtitle: description}]);
         setPlaylists([...playlists, {title: title, subtitle: description}]);
         setModalVisible(false);
     }
@@ -64,10 +54,19 @@ export default Playlists = ({navigation}) => {
         ? <>
             <ScrollView contentContainerStyle={styles.playlistCollectionContainer}>
             <>
-                <Pressable android_ripple={rippleConfig} style={styles.playlist} onPress={() => setModalVisible(true)}>
-                    <Text style={[styles.newPlaylist, {color: colors.text}]}>+</Text>
-                    <Text style={[styles.playlistTitle, {color: colors.text}]}>Add Playlist</Text>
-                </Pressable>
+                <Playlist
+                    key="Add Playlist"
+                    playlist={{title: "Add Playlist", placeholder: "+"}}
+                    onPress={() => setModalVisible(true)}
+                    style={styles.playlist}
+                />
+
+                <Playlist
+                    key="LOCAL_LIKES"
+                    playlist={{title: "Liked Songs", playlistId: "LOCAL_LIKES", placeholder:"👍"}}
+                    navigation={navigation}
+                    style={styles.playlist}
+                />
 
                 {playlists.map(playlist => {
                     return <Playlist
@@ -75,7 +74,6 @@ export default Playlists = ({navigation}) => {
                         playlist={playlist}
                         navigation={navigation}
                         style={styles.playlist}
-                        local={true}
                     />;
                 })}
             </>

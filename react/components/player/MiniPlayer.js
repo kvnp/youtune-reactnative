@@ -4,14 +4,13 @@ import { StyleSheet, View, Image, Text } from "react-native";
 import { TouchableRipple} from "react-native-paper";
 import { useNavigation, useTheme } from "@react-navigation/native";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
-import TrackPlayer, { useTrackPlayerProgress } from 'react-native-track-player';
+import TrackPlayer, { useProgress, State, Event } from 'react-native-track-player';
+import Music from "../../services/music/Music";
 
-import { skip } from "../../service";
 import ScrollingText from "../shared/ScrollingText";
-import { setTransitionTrack } from "../../views/full/PlayView";
 
-const MiniPlayer = ({style, containerStyle}) => {
-    const [state, setState] = useState(TrackPlayer.STATE_STOPPED);
+export default MiniPlayer = ({style, containerStyle}) => {
+    const [state, setState] = useState(State.Stopped);
     const navigation = useNavigation();
     const [track, setTrack] = useState({
         title: null,
@@ -20,7 +19,7 @@ const MiniPlayer = ({style, containerStyle}) => {
     });
 
     const { dark, colors } = useTheme();
-    const { position, duration } = useTrackPlayerProgress();
+    const { position, duration } = useProgress();
 
     const positionLength = (100 / duration * position);
 
@@ -34,8 +33,13 @@ const MiniPlayer = ({style, containerStyle}) => {
                 refreshTrack({nextTrack: id});
         });
 
-        const playback = TrackPlayer.addEventListener("playback-state", e => setState(e.state));
-        const trackChanged = TrackPlayer.addEventListener("playback-track-changed", refreshTrack);
+        const playback = TrackPlayer.addEventListener(
+            Event.PlaybackState, e => setState(e.state)
+        );
+
+        const trackChanged = TrackPlayer.addEventListener(
+            Event.PlaybackTrackChanged, refreshTrack
+        );
 
         return () => {
             playback.remove();
@@ -46,14 +50,12 @@ const MiniPlayer = ({style, containerStyle}) => {
     const refreshTrack = async(e) => {
         if (!e) e = {nextTrack: await TrackPlayer.getCurrentTrack()};
         let track = await TrackPlayer.getTrack(e.nextTrack);
-        if (track != null) {
-            delete track.url;
+        if (track != null)
             setTrack(track);
-        }
     }
 
     const onOpen = () => {
-        setTransitionTrack({
+        Music.setTransitionTrack({
             id: track.id,
             playlistId: track.playlistId,
             title: track.title,
@@ -67,18 +69,18 @@ const MiniPlayer = ({style, containerStyle}) => {
         });
     }
 
-    const onNext = () => skip(true);
+    const onNext = () => Music.skipNext();
 
     const onPlay = () => {
-        state == TrackPlayer.STATE_PLAYING
+        state == State.Playing
             ? TrackPlayer.pause()
             : TrackPlayer.play();
     };
 
-    const onStop = () => TrackPlayer.reset();
+    const onStop = () => Music.reset();
 
     const isInactive = () => {
-        return state == TrackPlayer.STATE_STOPPED || state == TrackPlayer.STATE_NONE;
+        return state == State.Stopped || state == State.None;
     }
     
     const { title, artist, artwork } = track;
@@ -164,7 +166,7 @@ const MiniPlayer = ({style, containerStyle}) => {
                 >
                     <MaterialIcons
                         name={
-                            state == TrackPlayer.STATE_PLAYING
+                            state == State.Playing
                                 ? "pause"
                                 : "play-arrow"
                         }
@@ -244,5 +246,3 @@ const styles = StyleSheet.create({
         paddingRight: 2
     }
 });
-
-export default MiniPlayer;

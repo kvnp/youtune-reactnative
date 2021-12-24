@@ -1,4 +1,3 @@
-const path = require('path');
 const webpack = require('webpack');
 const TerserPlugin = require("terser-webpack-plugin");
 const HtmlWebpackPlugin = require('html-webpack-plugin');
@@ -220,7 +219,7 @@ module.exports = () => ({
             }
         }),
 
-        new GenerateSW(
+        /*new GenerateSW(
             {
                 mode: process.env.NODE_ENV,
                 navigateFallback: "/index.html",
@@ -262,7 +261,7 @@ module.exports = () => ({
                     }
                 ],
             }
-        )
+        )*/
     ],
     
     resolve: {

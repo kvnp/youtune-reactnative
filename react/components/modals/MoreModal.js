@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
     Modal,
     Pressable,
@@ -12,27 +12,18 @@ import {
 } from "react-native";
 
 import { TouchableRipple } from "react-native-paper";
-import TrackPlayer from 'react-native-track-player';
+import TrackPlayer, { State } from 'react-native-track-player';
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import { useTheme } from "@react-navigation/native";
 
+import Navigation from "../../services/ui/Navigation";
+import Music from "../../services/music/Music";
+import Downloads from "../../services/device/Downloads";
+import ScrollingText from "../shared/ScrollingText";
 import { appColor } from "../../styles/App";
-import { handleMedia } from "../../modules/event/mediaNavigator";
-
-import {
-    likeSong,
-    likeArtist,
-    likePlaylist,
-    getSongLike,
-    getPlaylistLike,
-    getArtistLike
-} from "../../modules/storage/MediaStorage";
-
-import { storeSong, deleteSong, localIDs, downloadQueue, abortSongDownload } from "../../modules/storage/SongStorage";
-import { displayNotification } from "../../modules/utils/Notification";
-import { setTransitionTrack } from "../../views/full/PlayView";
 
 export var showModal = null;
+var dlListener = null;
 
 export default MoreModal = ({navigation}) => {
     const [content, setContent] = useState({
@@ -48,197 +39,115 @@ export default MoreModal = ({navigation}) => {
         playing: false,
         downloading: false,
         downloaded: false,
-        likeFunction: () => {}
+        queue: 0
     });
 
     const {dark, colors} = useTheme();
 
+    const {
+        title, subtitle, thumbnail,
+        videoId, browseId, playlistId,
+        type, liked, visible, playing,
+        downloading, downloaded, queue
+    } = content;
+
+    useEffect(() => {
+        if (visible) {
+            dlListener = Downloads.addListener(
+                Downloads.EVENT_REFRESH,
+                () => {
+                    if (visible)
+                        setContent({
+                            ...content,
+                            downloading: Downloads.isTrackDownloading(videoId),
+                            downloaded: Downloads.isTrackDownloaded(videoId),
+                            queue: Downloads.getDownloadingLength()
+                        })
+                }
+            );
+        } else if (dlListener != null) {
+            dlListener.remove();
+        }
+    }, [visible]);
+
     const onShare = async(type, url, message) => {
         try {
             const title = "YouTune - " + type;
-            const result = await Share.share({
+            Share.share({
                 title: title,
                 url: url,
                 message: message + ":\n" + url
             }, {
                 dialogTitle: title
+            }).then(event => {
+                console.log(event);
+                setContent({...content, visible: false});
             });
-            setContent({...content, visible: false});
-            
-            if (result.action === Share.sharedAction) {
-                if (result.activityType)
-                    console.log("shared with activity type of " + result.activityType);
-                else
-                    console.log("shared");
-                
-            } else if (result.action === Share.dismissedAction)
-                console.log("dismissed")
 
         } catch (error) {
             alert(error.message);
         }
     };
 
+    const like = bool => {
+        if (liked == bool)
+            bool = null;
+
+        Downloads.likeTrack(id, bool);
+        setContent({...content, liked: bool});
+    }
+
     const refresh = (type, id) => {
         return new Promise(async(resolve) => {
             let liked = null;
-            switch(type) {
-                case "Song":
-                    liked = await getSongLike(id);
-                    break;
-                case "Playlist":
-                    liked = await getPlaylistLike(id);
-                    break;
-                case "Artist":
-                    liked = await getArtistLike(id);
-            }
+            if (type == "Song")
+                liked = await Downloads.isTrackLiked(id);
+
             resolve(liked);
-        })
-    };
-
-    const download = () => {
-        setContent(content => ({...content, downloading: true}));
-        storeSong(videoId)
-            .then(id => {
-                const title = 'Download Finished';
-                const text = 'Download of ' + content.title + ' complete';
-                displayNotification({title: title, text: text, icon: content.thumbnail});
-                setContent(Content => ({
-                    ...Content,
-                    downloading: Content.videoId == content.videoId ? false : downloadQueue.findIndex(entry => Content.videoId in entry) > -1 ? true : false,
-                    downloaded: Content.videoId == content.videoId ? true : downloadQueue.findIndex(entry => Content.videoId in entry) > -1 ? true : false
-                }));
-            })
-            .catch(id => {
-                const title = 'Download Failed';
-                const text = 'Download of ' + content.title + ' did not finish';
-                displayNotification({title: title, text: text, icon: content.thumbnail});
-                setContent(Content => ({
-                    ...Content,
-                    downloading: Content.videoId == content.videoId ? false : downloadQueue.findIndex(entry => Content.videoId in entry) > -1 ? true : false,
-                    downloaded: Content.videoId == content.videoId ? false : localIDs.includes(Content.videoId) ? true : false
-                }));
-            });
-    }
-
-    const abort = () => {
-        abortSongDownload(videoId).then(() => {
-            setContent(content => ({...content, downloading: false, downloaded: false}));
         });
-    }
-
-    const remove = () => {
-        setContent(content => ({...content, downloading: true}));
-        deleteSong(videoId)
-            .then(id => {
-                setContent(Content => ({
-                    ...Content,
-                    downloading: Content.videoId == content.videoId ? false : downloadQueue.findIndex(entry => Content.videoId in entry) > -1 ? true : false,
-                    downloaded: Content.videoId == content.videoId ? false : localIDs.includes(Content.videoId) ? true : false
-                }));
-            })
-            .catch(id => {
-                setContent(Content => ({
-                    ...Content,
-                    downloading: Content.videoId == content.videoId ? false : downloadQueue.findIndex(entry => Content.videoId in entry) > -1 ? true : false,
-                    downloaded: Content.videoId == content.videoId ? true : localIDs.includes(Content.videoId) ? true : false
-                }));
-            });
-        ;
-    }
+    };
 
     showModal = async(info) => {
         let type;
-        let likeFunction;
         let liked;
-        let downloading = false;
-        let downloaded = false;
 
         if (info.videoId != null) {
             type = "Song";
             liked = await refresh(type, info.videoId);
-    
-            likeFunction = boolean => {
-                likeSong(info.videoId, boolean);
-                refresh(type, info.videoId)
-                    .then(liked => {
-                        setContent(content => ({...content, liked: liked}));
-                    })
-            }
         } else if (info.playlistId != null || info.browseId != null) {
             if (info.browseId != null) {
                 if (info.browseId.slice(0, 2) == "UC") {
                     type = "Artist";
                     liked = await refresh(type, info.browseId);
-                    likeFunction = (boolean) => {
-                        likeArtist(info.browseId, boolean);
-                        refresh(type, info.videoId)
-                            .then(liked => {
-                                setContent(content => ({...content, liked: liked}));
-                            })
-                    }
     
                 } else {
                     type = "Playlist";
                     liked = await refresh(type, info.playlistId);
-                    likeFunction = boolean => {
-                        likePlaylist(info.playlistId, boolean);
-                        refresh(type, info.videoId)
-                            .then(liked => {
-                                setContent(content => ({...content, liked: liked}));
-                            })
-                    }
                 }
             } else {
                 type = "Playlist";
                 liked = await refresh(type, info.playlistId);
-                likeFunction = boolean => {
-                    likePlaylist(info.playlistId, boolean);
-                    refresh(type, info.videoId)
-                        .then(liked => {
-                            setContent(content => ({...content, liked: liked}));
-                        })
-                }
             }
         }
 
         let isPlaying = false;
-        if (await TrackPlayer.getCurrentTrack() == info.videoId) {
-            if (await TrackPlayer.getState() == TrackPlayer.STATE_PLAYING) {
+        if (Music.metadata.id == info.videoId) {
+            if (await TrackPlayer.getState() == State.Playing) {
                 isPlaying = true;
             }
         }
-        
-        if (downloadQueue.findIndex(entry => info.videoId in entry) > -1)
-            downloading = true;
-
-        if (localIDs.includes(info.videoId))
-            downloaded = true;
 
         setContent({
             ...info,
             type: type,
             playing: isPlaying,
-            downloading: downloading,
-            downloaded: downloaded,
-            visible: true,
-            liked,
-            likeFunction: likeFunction
+            liked: liked,
+            downloading: Downloads.isTrackDownloading(info.videoId),
+            downloaded: Downloads.isTrackDownloaded(info.videoId),
+            queue: Downloads.getDownloadingLength(),
+            visible: true
         });
     };
-
-    const {
-        browseId,
-        playlistId,
-        videoId,
-        type,
-        downloading,
-        downloaded,
-        visible,
-        playing,
-        liked,
-        likeFunction
-    } = content;
 
     return <Modal
         animationType="slide"
@@ -255,66 +164,78 @@ export default MoreModal = ({navigation}) => {
                 width: "100%"
             }}>
                 <View style={[modalStyles.header, {backgroundColor: colors.border}, Platform.OS == "web" ? {cursor: "default"} : undefined]}>
-                    <Image source={{uri: content.thumbnail}} style={modalStyles.thumbnail}/>
+                    <Image source={{uri: thumbnail}} style={modalStyles.thumbnail}/>
                     <View style={modalStyles.headerText}>
-                        <Text style={{color: colors.text}} numberOfLines={1}>{content.title}</Text>
-                        <Text style={{color: colors.text}} numberOfLines={1}>{content.subtitle}</Text>
+                        <ScrollingText>
+                            <Text style={{color: colors.text}} numberOfLines={1}>{title}</Text>
+                        </ScrollingText>
+                        
+                        <ScrollingText>
+                            <Text style={{color: colors.text}} numberOfLines={1}>{subtitle}</Text>
+                        </ScrollingText>
                     </View>
-                    <View style={{width: 120, height: 50, alignItems: "center", alignSelf: "center", justifyContent: "center", flexDirection: "row"}}>
-                        <TouchableRipple
-                            borderless={true}
-                            rippleColor={colors.primary}
-                            onPress={() => likeFunction(false)}
-                            style={{
-                                width: 50,
-                                height: 50,
-                                marginHorizontal: 5,
-                                borderRadius: 25,
-                                alignItems: "center",
-                                justifyContent: "center"
-                            }}
-                        >
-                            <MaterialIcons
-                                name="thumb-down"
-                                color={
-                                    liked == null
-                                        ? "darkgray"
-                                        : !liked
-                                            ? colors.primary
-                                            : "darkgray"
-                                }
-
-                                size={25}
-                            />
-                        </TouchableRipple>
-                        <TouchableRipple
-                            borderless={true}
-                            rippleColor={colors.primary}
-                            onPress={() => likeFunction(true)}
-
-                            style={{
-                                width: 50,
-                                height: 50,
-                                marginHorizontal: 5,
-                                borderRadius: 25,
-                                alignItems: "center",
-                                justifyContent: "center"
-                            }}
-                        >
-                            <MaterialIcons
-                                name="thumb-up"
-                                color={
-                                    liked == null
-                                        ? "darkgray"
-                                        : liked
-                                            ? colors.primary
-                                            : "darkgray"
-                                }
-
-                                size={25}
-                            />
-                        </TouchableRipple>
-                    </View>
+                        <View style={{width: 120, height: 50, alignItems: "center", alignSelf: "center", justifyContent: "center", flexDirection: "row"}}>
+                        {
+                        type != "Song"
+                            ? undefined
+                            : <>
+                            <TouchableRipple
+                                borderless={true}
+                                rippleColor={colors.primary}
+                                onPress={() => like(false)}
+                                style={{
+                                    width: 50,
+                                    height: 50,
+                                    marginHorizontal: 5,
+                                    borderRadius: 25,
+                                    alignItems: "center",
+                                    justifyContent: "center"
+                                }}
+                            >
+                                <MaterialIcons
+                                    name="thumb-down"
+                                    color={
+                                        liked == null
+                                            ? "darkgray"
+                                            : !liked
+                                                ? colors.primary
+                                                : "darkgray"
+                                    }
+    
+                                    size={25}
+                                />
+                            </TouchableRipple>
+                            <TouchableRipple
+                                borderless={true}
+                                rippleColor={colors.primary}
+                                onPress={() => like(true)}
+    
+                                style={{
+                                    width: 50,
+                                    height: 50,
+                                    marginHorizontal: 5,
+                                    borderRadius: 25,
+                                    alignItems: "center",
+                                    justifyContent: "center"
+                                }}
+                            >
+                                <MaterialIcons
+                                    name="thumb-up"
+                                    color={
+                                        liked == null
+                                            ? "darkgray"
+                                            : liked
+                                                ? colors.primary
+                                                : "darkgray"
+                                    }
+    
+                                    size={25}
+                                />
+                            </TouchableRipple>
+                            </>
+                        }
+                        </View>
+                    
                 </View>
 
                 {
@@ -329,16 +250,16 @@ export default MoreModal = ({navigation}) => {
                                 alignItems: "center",
                                 flexDirection: "row"
                             }}
+                            
                             onPress={() => {
-                                setTransitionTrack({
-                                    id: videoId,
+                                Navigation.handleMedia({
+                                    title: title,
+                                    subtitle: subtitle,
+                                    thumbnail: thumbnail,
+                                    videoId: videoId,
+                                    browseId: browseId,
                                     playlistId: playlistId,
-                                    title: content.title,
-                                    artist: content.subtitle,
-                                    artwork: content.thumbnail
-                                })
-        
-                                navigation.navigate("Music", {v: videoId, list: playlistId});
+                                }, navigation);
                             }}
                         >
                             <>
@@ -365,25 +286,23 @@ export default MoreModal = ({navigation}) => {
                         alignItems: "center",
                         flexDirection: "row"
                     }}
-                    onPress={
-                        async() => {
-                            if (playing) {
-                                TrackPlayer.pause();
-                                setContent(content => ({
-                                    ...content,
-                                    playing: false,
-                                    visible: false
-                                }));
+                    onPress={() => {
+                        if (playing)
+                            TrackPlayer.pause();
+                        else {
+                            if (Music.metadata.id == videoId) {
+                                TrackPlayer.play();
                             } else {
-                                if (await TrackPlayer.getCurrentTrack() == videoId) {
-                                    setContent(content => ({...content, visible: false}));
-                                    handleMedia(content, navigation);
-                                    TrackPlayer.play();
-                                }
+                                Navigation.handleMedia(content, navigation);
                             }
-
                         }
-                    }
+
+                        setContent(content => ({
+                            ...content,
+                            playing: !playing,
+                            visible: false
+                        }));
+                    }}
                 >
                     {type == "Song"
                         ? playing
@@ -418,10 +337,10 @@ export default MoreModal = ({navigation}) => {
                             }}
                             onPress={
                                 () => downloading
-                                    ? abort()
+                                    ? Downloads.cancelDownload(videoId)
                                     : downloaded
-                                        ? remove()
-                                        : download()
+                                        ? Downloads.deleteDownload(videoId)
+                                        : Downloads.downloadTrack(videoId)
                             }
                         >
                             <>
@@ -446,17 +365,17 @@ export default MoreModal = ({navigation}) => {
                             <Text style={{paddingLeft: 20, color: colors.text}}>
                                 {
                                     downloading
-                                        ? "Downloading" + (downloadQueue.length > 0
-                                            ? " (" + downloadQueue.length + " in queue)"
+                                        ? "Downloading" + (queue > 0
+                                            ? " (" + queue + " in queue)"
                                             : "")
     
                                         : downloaded
-                                            ? "Delete" + (downloadQueue.length > 0
-                                                ? " (" + downloadQueue.length + " in queue)"
+                                            ? "Delete" + (queue > 0
+                                                ? " (" + queue + " in queue)"
                                                 : "")
     
-                                            : "Download" + (downloadQueue.length > 0
-                                                ? " (" + downloadQueue.length + " in queue)"
+                                            : "Download" + (queue > 0
+                                                ? " (" + queue + " in queue)"
                                                 : "")
                                 }
                             </Text>
@@ -508,17 +427,17 @@ export default MoreModal = ({navigation}) => {
                         let file;
                         let message;
                         if (type == "Song") {
-                            message = content.title + " - " + content.subtitle;
+                            message = title + " - " + subtitle;
                             file = "watch?v=" + videoId;
                         } else if (type == "Playlist") {
-                            message = content.title + " - " + content.subtitle;
+                            message = title + " - " + subtitle;
                             file = "playlist?list=" + playlistId;
                         } else {
-                            message = content.title + " - " + type;
+                            message = title + " - " + type;
                             file = "channel/" + browseId;
                         }
 
-                        onShare(type, "https://music.youtube.com/" + file, message);
+                        onShare(type, window.location.origin + "/" + file, message);
                     }}
                 >
                     <>

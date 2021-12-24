@@ -11,41 +11,25 @@ import {
 } from 'react-native';
 import { TouchableRipple } from 'react-native-paper';
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
-
-import {
-    setTransmitLanguage,
-    setProxyYTM,
-    setSafetyMode,
-    setDarkMode,
-    settings
-} from '../../modules/storage/SettingsStorage';
-
 import { useTheme } from '@react-navigation/native';
-import { setHeader } from '../../components/overlay/Header';
+
+import Settings from '../../services/device/Settings';
 
 const host = Platform.OS == "web"
     ? window.location.hostname.replace("-", "‑") // Unicode NON-BREAKING HYPHEN (U+2011)
     : "youtune.kvnp.eu";
 
-export default SettingsTab = ({navigation}) => {
-    const [language, setLanguage] = useState(settings.transmitLanguage);
-    const [proxy, setProxy] = useState(settings.proxyYTM);
-    const [safety, setSafety] = useState(settings.safetyMode);
-    const { colors, dark } = useTheme();
+export default SettingsTab = () => {
+    const [settings, setSettings] = useState(Settings.Values);
+    const { colors } = useTheme();
 
     useEffect(() => {
-        const unsubscribe = navigation.addListener('tabPress', () => {
-            setHeader({title: "Settings"});
-        });
-
-        const unsubscribe2 = navigation.addListener('focus', () => {
-            setHeader({title: "Settings"});
-        });
-
-        return () => {
-            unsubscribe();
-            unsubscribe2();
-        }
+        const settingsListener = Settings.addListener(
+            Settings.EVENT_SETTINGS,
+            settings => setSettings(settings)
+        );
+                
+        return () => settingsListener.remove();
     }, []);
 
     const openRepo = () => {
@@ -53,28 +37,27 @@ export default SettingsTab = ({navigation}) => {
         if (Platform.OS == "web")
             window.open(url, "_blank");
         else
-            Linking.openURL(url).catch(
-                err => console.error("Couldn't load page", err)
-            );
+            Linking.openURL(url);
     };
 
     const toggleLanguage = boolean => {
-        setTransmitLanguage(boolean);
-        setLanguage(boolean);
+        setSettings({...settings, transmitLanguage: boolean});
+        Settings.enableLanguageTransmission(boolean);
     };
     
     const toggleProxy = boolean => {
-        setProxyYTM(boolean);
-        setProxy(boolean);
+        setSettings({...settings, proxyYTM: boolean});
+        Settings.enableProxy(boolean);
     };
 
     const toggleSafetyMode = boolean => {
-        setSafetyMode(boolean);
-        setSafety(boolean);
+        setSettings({...settings, safetyMode: boolean});
+        Settings.enableSafetyMode(boolean);
     };
 
     const toggleDarkMode = boolean => {
-        setDarkMode(boolean);
+        setSettings({...settings, darkMode: boolean});
+        Settings.enableDarkMode(boolean);
     };
 
     const drawItem = ({item}) => {
@@ -161,7 +144,7 @@ export default SettingsTab = ({navigation}) => {
         {
             icon: "language",
             description: "Transmit device language",
-            state: language,
+            state: settings.transmitLanguage,
             function: toggleLanguage,
             switch: true
         },
@@ -169,7 +152,7 @@ export default SettingsTab = ({navigation}) => {
         {
             icon: "public",
             description: "Proxy search and browse requests over " + host,
-            state: proxy,
+            state: settings.proxyYTM,
             function: toggleProxy,
             switch: true,
             override: {
@@ -183,7 +166,7 @@ export default SettingsTab = ({navigation}) => {
         {
             icon: "child-friendly",
             description: "Enable safety mode",
-            state: safety,
+            state: settings.safetyMode,
             function: toggleSafetyMode,
             switch: true
         },
@@ -191,7 +174,7 @@ export default SettingsTab = ({navigation}) => {
         {
             icon: "brightness-low",
             description: "Enable dark mode",
-            state: dark,
+            state: settings.darkMode,
             function: toggleDarkMode,
             switch: true
         },

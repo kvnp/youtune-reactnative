@@ -1,28 +1,27 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { Dimensions } from "react-native";
 
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-
-import TrackPlayer from 'react-native-track-player';
+import { useFocusEffect, useNavigation } from "@react-navigation/core";
+import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
+import TrackPlayer, { State } from 'react-native-track-player';
 
 import SearchTab from "../tabs/SearchTab";
 import HomeTab from "../tabs/HomeTab";
 import LibraryTab from "../tabs/LibraryTab";
 import SettingsTab from "../tabs/SettingsTab";
 
+import { navigationOptions } from "../../App";
 import Header from "../../components/overlay/Header";
 import { headerStyle } from "../../styles/App";
 import MoreModal from "../../components/modals/MoreModal";
 import MiniPlayer from "../../components/player/MiniPlayer";
-import { getIcon } from "../../modules/utils/Icon";
-import { navigationOptions } from "../../App";
-import { useTheme } from "@react-navigation/native";
+import { getIcon } from "../../utils/Icon";
 
 const getTabOptions = title => {
     return { tabBarIcon: ({ color }) => getIcon({title, color}) };
 }
 
-const Nav = createBottomTabNavigator();
+const Nav = createMaterialTopTabNavigator();
 
 const tabOptions = {
     lazy: false,
@@ -34,39 +33,38 @@ const tabOptions = {
     animationEnabled: true
 };
 
-export default Navigator = ({navigation}) => {
+export default Navigator = () => {
     const [bottomMargin, setBottomMargin] = useState(0);
-    const { colors } = useTheme();
+    const [headerTitle, setHeaderTitle] = useState(null);
+    const navigation = useNavigation();
+    
+    useFocusEffect(
+        useCallback(() => {
+            resizeContainer();
+        }, [])
+    );
     
     useEffect(() => {
-        const _unsubscribe = navigation.addListener('focus', () => {
-            resizeContainer();
-        });
+        resizeContainer();
+        let playbackState = TrackPlayer.addEventListener(
+            "playback-state", resizeContainer
+        );
 
-        let playbackState = TrackPlayer.addEventListener("playback-state", resizeContainer);
-        return () => {
-            _unsubscribe();
-            playbackState.remove();
-        };
+        return () => playbackState.remove();
     }, []);
 
     const resizeContainer = async(e) => {
-        if (!e) e = {state: await TrackPlayer.getState()}
-
-        switch (e.state) {
-            case TrackPlayer.STATE_NONE:
-            case TrackPlayer.STATE_STOPPED:
-                setBottomMargin(0);
-                break;
-            case TrackPlayer.STATE_PLAYING:
-            case TrackPlayer.STATE_PAUSED:
-            case TrackPlayer.STATE_BUFFERING:
-                setBottomMargin(50);
-        }
+        if (!e) 
+            e = {state: await TrackPlayer.getState()};
+        
+        setBottomMargin(
+            e.state == State.Playing || e.state == State.Paused
+                ? 50 : 0
+        );
     }
 
     return <>
-        <Header style={headerStyle.headerPicture}/>
+        <Header style={headerStyle.headerPicture} title={headerTitle}/>
         <Nav.Navigator
             initialRouteName="Home"
             tabBarPosition="bottom"
@@ -76,6 +74,10 @@ export default Navigator = ({navigation}) => {
             screenOptions={{
                 ...tabOptions,
                 ...navigationOptions,
+            }}
+
+            screenListeners={({route}) => {
+                setHeaderTitle(route.name);
             }}
 
             shifting={true}

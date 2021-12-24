@@ -1,12 +1,9 @@
 import React, { useState, useEffect, useRef } from "react";
 import { ScrollView, View } from "react-native";
-import { unstable_createElement } from "react-native-web";
 
 const ScrollingText = ({children, style}) => {
     const [containerWidth, setContainerWidth] = useState(-1);
     const [contentWidth, setContentWidth] = useState(-1);
-
-    const Style = props => unstable_createElement("style", props);
     const viewRef = useRef(null);
 
     useEffect(() => {
@@ -57,15 +54,15 @@ const ScrollingText = ({children, style}) => {
         onLayout={
             e => setContainerWidth(e.nativeEvent.layout.width)
         }
-    >
+    > 
         {
             isOverflowing()
-                ? <Style>
+                ? <style>
                     {
                         `@keyframes ${children.props.children.replaceAll(" ", "_").replace(/[\W_]+/g,"-")} { from {transform: translateX(0%)} to {transform: translateX(-100%)}}\n` +
                         `@keyframes ${children.props.children.replaceAll(" ", "_").replace(/[\W_]+/g,"-")}_2 { from {transform: translateX(${containerWidth/contentWidth*100}%)} to {transform: translateX(-100%)}}`
                     }
-                </Style>
+                </style>
 
                 : null
         }

@@ -8,55 +8,88 @@ import {
 } from "react-native";
 
 import { Button } from 'react-native-paper';
-
 import { useFocusEffect, useTheme } from '@react-navigation/native';
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
+
+import Navigation from '../../services/ui/Navigation';
+import Service from '../../services/device/Downloads';
+
 import Entry from "../../components/shared/Entry";
-import { loadSongLocal, localIDs, dbLoading } from "../../modules/storage/SongStorage";
 import { shelvesStyle } from '../../styles/Shelves';
-import { playLocal } from '../../modules/event/mediaNavigator';
 
 export default Downloads = ({ navigation }) => {
-    const [entries, setEntries] = useState([]);
+    const [state, setState] = useState({entries: [], loading: false});
+    const {entries, loading} = state;
+    const {colors} = useTheme();
     const playlistId = "LOCAL_DOWNLOADS";
 
     const loadEntries = async() => {
-        let entries = [];
-        for (let i = 0; i < localIDs.length; i++) {
-            let { title, artist, artwork, id } = await loadSongLocal(localIDs[i]);
-            entries.push({
-                title,
-                artist,
-                artwork,
-                id,
-                playlistId
-            });
-        }
-
-        setEntries(entries);
+        let local = await Service.loadLocalPlaylist(playlistId)
+        setState({entries: local.list, loading: false});
     }
 
     useFocusEffect(
         useCallback(() => {
-            if (!dbLoading) {
-                if (localIDs.length > 0)
-                    loadEntries();
-            } else {
-                let intervalId = setInterval(() => {
-                    if (!dbLoading) {
-                        clearInterval(intervalId);
+            loadEntries();
+            
+            let dlListener = Service.addListener(
+                Service.EVENT_REFRESH,
+                () => {
+                    if (!loading)
                         loadEntries();
-                    }
-                }, 200);
-            }
+                }
+            );
+    
+            return () => dlListener.remove();
         }, [])
-    )
+    );
 
-    const {dark, colors} = useTheme();
+    const activity = <View style={{
+        flex: 1,
+        width: "100%",
+        alignItems: "center",
+        justifyContent: "center",
+    }}>
+        <ActivityIndicator size="large"/>
+    </View>;
 
-    const emptyFiller = <View style={{height: 300, justifyContent: "space-evenly", alignItems: "center", marginTop: "auto"}}>
+    const scrollView = <ScrollView
+        style={{flexDirection: "column-reverse"}}
+        contentContainerStyle={[
+            shelvesStyle.searchContainer,
+            entries.length != 0 ? {flex: "none"} : undefined
+        ]}
+    >
+        {entries.map(track => <Entry key={track.id}
+            entry={{title: track.title, subtitle: track.artist,
+                thumbnail: track.artwork, videoId: track.id,
+                playlistId: track.playlistId}}
+            navigation={navigation}
+        />)}
+        {
+            <Button onPress={() => Navigation.playLocal("LOCAL_DOWNLOADS", navigation)}
+                mode="contained"
+                style={{margin: 20, alignItems: "stretch"}}
+                labelStyle={{alignItems: "stretch"}}
+            >
+                Play all
+            </Button>
+        }
+    </ScrollView>
+
+    const emptyView = <View style={{
+        height: 300,
+        justifyContent: "space-evenly",
+        alignItems: "center",
+        marginTop: "auto"
+    }}>
         <MaterialIcons name="get-app" color={colors.text} size={50}/>
-        <Text style={{fontSize: 20, color: colors.text}}>Downloaded songs are displayed here</Text>
+        <Text style={{
+            fontSize: 20,
+            color: colors.text
+        }}>
+            Downloaded songs are displayed here
+        </Text>
         
         <Button
             mode="outlined"
@@ -64,54 +97,13 @@ export default Downloads = ({ navigation }) => {
         >
             Look for music
         </Button>
-    </View>
+    </View>;
 
-    return dbLoading
-        ? <View style={{
-                flex: 1,
-                width: "100%",
-                alignItems: "center",
-                justifyContent: "center",
-            }}
-        >
-            <ActivityIndicator size="large"/>
-        </View>
-
+    return loading
+    
+        ? activity
         : entries.length > 0
 
-        ? <ScrollView
-            style={{flexDirection: "column-reverse"}}
-            contentContainerStyle={[
-                shelvesStyle.searchContainer,
-                entries.length != 0 ? {flex: "none"} : undefined
-            ]}
-        >
-            {
-                entries.map(track => {
-                    return <Entry
-                        key={track.id}
-                        entry={{
-                            title: track.title,
-                            subtitle: track.artist,
-                            thumbnail: track.artwork,
-                            videoId: track.id,
-                            playlistId: track.playlistId
-                        }}
-                        navigation={navigation}
-                    />
-                })
-            }
-            {
-                <Button
-                    mode="contained"
-                    style={{margin: 20, alignItems: "stretch"}}
-                    labelStyle={{alignItems: "stretch"}}
-                    onPress={() => playLocal("LOCAL_DOWNLOADS", navigation)}
-                >
-                    Play all
-                </Button>
-            }
-        </ScrollView>
-
-        : emptyFiller;
+            ? scrollView
+            : emptyView;
 }
