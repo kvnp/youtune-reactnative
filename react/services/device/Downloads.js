@@ -54,12 +54,16 @@ export default class Downloads {
                 await Downloads.waitForInitialization();
 
             try {
-                await Storage.deleteItem("Likes", videoId);
                 let index = this.#likedTracks.indexOf(videoId);
                 if (index != -1)
-                    this.#downloadedTracks.splice(index, 1);
+                    this.#likedTracks.splice(index, 1);
+                await Storage.deleteItem("Likes", videoId);
 
                 if (!this.isTrackDownloaded(videoId)) {
+                    index = this.#cachedTracks.indexOf(videoId);
+                    if (index != -1)
+                        this.#cachedTracks.splice(index, 1);
+
                     await Storage.deleteItem("Tracks", videoId);
                 }
                 
@@ -301,25 +305,23 @@ export default class Downloads {
             } else {
                 // list = await Downloads.getPlaylist(playlistId)
             }
+
             console.log(list);
             for (let i = 0; i < list.length; i++) {
                 let id = list[i];
-                console.log(id);
                 let local = await this.getTrack(id);
-                console.log(local);
                 local.artwork = IO.getBlobAsURL(local.artwork);
                 local.id = local.videoId;
                 local.playlistId = playlistId;
                 delete local.videoId;
                 localPlaylist.list.push(local);
-                console.log(local);
 
                 if (id == videoId)
                     localPlaylist.index = i;
             }
 
             localPlaylist.secondSubtitle = localPlaylist.list.length
-                + (localPlaylist.list.length > 1 ? " titles" : " title");
+                + (localPlaylist.list.length != 1 ? " titles" : " title");
             resolve(localPlaylist);
         });
     }
