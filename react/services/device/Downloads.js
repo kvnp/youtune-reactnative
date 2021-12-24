@@ -5,7 +5,7 @@ import IO from "./IO";
 import Storage from "./storage/Storage";
 
 export default class Downloads {
-    static downloadedTracks = [];
+    static #downloadedTracks = [];
     static #cachedTracks = [];
     static #likedTracks = [];
     static #downloadQueue = [];
@@ -25,7 +25,7 @@ export default class Downloads {
             
             this.#cachedTracks = await Storage.getAllKeys("Tracks");
             this.#likedTracks = await Storage.getAllKeys("Likes");
-            this.downloadedTracks = await Storage.getAllKeys("Downloads");
+            this.#downloadedTracks = await Storage.getAllKeys("Downloads");
 
             this.initialized = true;
             this.#emitter.emit(this.EVENT_REFRESH, true);
@@ -57,7 +57,7 @@ export default class Downloads {
                 await Storage.deleteItem("Likes", videoId);
                 let index = this.#likedTracks.indexOf(videoId);
                 if (index != -1)
-                    this.downloadedTracks.splice(index, 1);
+                    this.#downloadedTracks.splice(index, 1);
 
                 if (!this.isTrackDownloaded(videoId)) {
                     await Storage.deleteItem("Tracks", videoId);
@@ -79,9 +79,9 @@ export default class Downloads {
 
             try {
                 await Storage.deleteItem("Downloads", videoId);
-                let index = this.downloadedTracks.indexOf(videoId);
+                let index = this.#downloadedTracks.indexOf(videoId);
                 if (index != -1)
-                    this.downloadedTracks.splice(index, 1);
+                    this.#downloadedTracks.splice(index, 1);
 
                 if (this.isTrackLiked(videoId) == null) {
                     await Storage.deleteItem("Tracks", videoId);
@@ -105,7 +105,7 @@ export default class Downloads {
                 return reject("no id");
 
             if (!cacheOnly) {
-                let dlIndex = this.downloadedTracks.findIndex(entry => videoId == entry);
+                let dlIndex = this.#downloadedTracks.findIndex(entry => videoId == entry);
                 if (dlIndex > -1)
                     return reject("already downloaded");
             }
@@ -148,7 +148,7 @@ export default class Downloads {
                     
                     index = this.#downloadQueue.findIndex(entry => videoId in entry);
                     this.#downloadQueue.splice(index, 1);
-                    this.downloadedTracks.push(videoId);
+                    this.#downloadedTracks.push(videoId);
                     this.#emitter.emit(this.EVENT_REFRESH, true);
                 }
                 
@@ -204,7 +204,7 @@ export default class Downloads {
         if (!this.initialized || !videoId)
             return null;
 
-        return this.downloadedTracks.includes(videoId);
+        return this.#downloadedTracks.includes(videoId);
     }
 
     static isTrackCached(videoId) {
@@ -247,7 +247,7 @@ export default class Downloads {
             if (!this.initialized)
                 await Downloads.waitForInitialization();
 
-            if (!this.downloadedTracks.includes(videoId))
+            if (!this.#cachedTracks.includes(videoId))
                 return resolve(null);
             
             let track = await Storage.getItem("Tracks", videoId);
@@ -260,7 +260,7 @@ export default class Downloads {
             if (!this.initialized)
                 await Downloads.waitForInitialization();
 
-            if (!this.downloadedTracks.includes(videoId))
+            if (!this.#downloadedTracks.includes(videoId))
                 return resolve(null);
 
             let object = await Storage.getItem("Downloads", videoId);
@@ -274,14 +274,13 @@ export default class Downloads {
             if (!this.initialized)
                 await Downloads.waitForInitialization();
 
-            if (!this.downloadedTracks.includes(videoId))
+            if (!this.#downloadedTracks.includes(videoId))
                 return resolve(null);
             
             let url = await Storage.getItem("Downloads", videoId);
             resolve(url);
         });
     }
-
 
     static loadLocalPlaylist(playlistId, videoId) {
         return new Promise(async(resolve, reject) => {
@@ -294,7 +293,7 @@ export default class Downloads {
             let list;
             
             if (playlistId == "LOCAL_DOWNLOADS") {
-                list = this.downloadedTracks;
+                list = this.#downloadedTracks;
                 localPlaylist.title = "Downloads";
             } else if (playlistId == "LOCAL_LIKES") {
                 list = this.#likedTracks;
@@ -302,10 +301,12 @@ export default class Downloads {
             } else {
                 // list = await Downloads.getPlaylist(playlistId)
             }
-
+            console.log(list);
             for (let i = 0; i < list.length; i++) {
                 let id = list[i];
+                console.log(id);
                 let local = await this.getTrack(id);
+                console.log(local);
                 local.artwork = IO.getBlobAsURL(local.artwork);
                 local.id = local.videoId;
                 local.playlistId = playlistId;
@@ -318,7 +319,7 @@ export default class Downloads {
             }
 
             localPlaylist.secondSubtitle = localPlaylist.list.length
-                + (localPlaylist.list.length > 1 ? "titles" : "title");
+                + (localPlaylist.list.length > 1 ? " titles" : " title");
             resolve(localPlaylist);
         });
     }

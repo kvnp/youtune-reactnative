@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 
 import {
     ScrollView,
@@ -8,7 +8,7 @@ import {
 } from "react-native";
 
 import { Button } from 'react-native-paper';
-import { useTheme } from '@react-navigation/native';
+import { useFocusEffect, useTheme } from '@react-navigation/native';
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 
 import Navigation from '../../services/ui/Navigation';
@@ -25,40 +25,25 @@ export default Downloads = ({ navigation }) => {
     const playlistId = "LOCAL_DOWNLOADS";
 
     const loadEntries = async() => {
-        let entries = [];
-        for (let i = 0; i < Service.downloadedTracks.length; i++) {
-            let videoId = Service.downloadedTracks[i];
-            let track = await Service.getTrack(videoId);
-            if (track != undefined) {
-                let entry = {
-                    title: track.title,
-                    artist: track.artist,
-                    artwork: IO.getBlobAsURL(track.artwork),
-                    id: track.videoId,
-                    playlistId: playlistId
-                }
-                entries.push(entry);
-            }
-        }
-
-        setState({entries: entries, loading: false});
+        let local = await Service.loadLocalPlaylist(playlistId)
+        setState({entries: local.list, loading: false});
     }
-    
-    useEffect(() => {
-        Service.waitForInitialization().then(() => {
-            loadEntries();
-        });
-        
-        let dlListener = Service.addListener(
-            Service.EVENT_REFRESH,
-            () => {
-                if (!loading)
-                    loadEntries();
-            }
-        );
 
-        return () => dlListener.remove();
-    }, []);
+    useFocusEffect(
+        useCallback(() => {
+            loadEntries();
+            
+            let dlListener = Service.addListener(
+                Service.EVENT_REFRESH,
+                () => {
+                    if (!loading)
+                        loadEntries();
+                }
+            );
+    
+            return () => dlListener.remove();
+        }, [])
+    );
 
     const activity = <View style={{
         flex: 1,
