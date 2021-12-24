@@ -85,8 +85,12 @@ export default class Media {
                             "&continuation=" + continuation.continuation +
                             "&itct=" + continuation.itct +
                             "&type=next"
-            else
+            else {
+                if (browseId.slice(0, 2) == "RD")
+                    browseId = "VL" + browseId;
+                
                 requestBody.browseId = browseId;
+            }
 
             let url = API.URL.Browse;
             let type = HTTP.Type.Json;
