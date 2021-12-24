@@ -1,4 +1,5 @@
 function getPlaylist(json) {
+    console.log(json);
     let browse = {playlistId: "", title: "", subtitle: "", secondSubtitle: "", description: "", thumbnail: null, entries: []};
 
     let musicHeader = json.header.musicDetailHeaderRenderer;
@@ -12,6 +13,7 @@ function getPlaylist(json) {
     for (let s = 0; s < subtitlelist.length; s++) {
         browse.subtitle += subtitlelist[s].text;
     }
+    console.log(browse.subtitle);
 
     if (musicHeader.hasOwnProperty("description")) {
         let descriptionlist = musicHeader.description.runs;
@@ -60,8 +62,12 @@ function getPlaylist(json) {
                     entry.title += songTitlelist[stl].text;
                 }
 
-                for (let ssl = 0; ssl < songSubtitlelist.length; ssl++) {
-                    entry.subtitle += songSubtitlelist[ssl].text;
+                if (songSubtitlelist == undefined) {
+                    entry.subtitle = browse.subtitle.split("•")[1].trim()
+                } else {
+                    for (let ssl = 0; ssl < songSubtitlelist.length; ssl++) {
+                        entry.subtitle += songSubtitlelist[ssl].text;
+                    }
                 }
 
                 if (songSecondsubtitlelist != undefined)
