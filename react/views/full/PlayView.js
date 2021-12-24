@@ -303,7 +303,7 @@ const PlayView = ({route, navigation}) => {
             minimumHeight={50}
             backgroundColor={dark ? colors.card : colors.primary}
             textColor={colors.text}
-            playlist={Music.trackMetadata}
+            playlist={Music.metadataList}
             track={Music.metadata}
             style={stylesRest.container}
         />
