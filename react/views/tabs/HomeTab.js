@@ -29,7 +29,6 @@ export default HomeTab = ({navigation}) => {
     );
 
     useEffect(() => {
-        console.log("home loading")
         if (shelves.length == 0)
             startRefresh();
     }, []);

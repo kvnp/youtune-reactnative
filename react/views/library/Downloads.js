@@ -13,7 +13,6 @@ import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 
 import Navigation from '../../services/ui/Navigation';
 import Service from '../../services/device/Downloads';
-import IO from '../../services/device/IO';
 
 import Entry from "../../components/shared/Entry";
 import { shelvesStyle } from '../../styles/Shelves';

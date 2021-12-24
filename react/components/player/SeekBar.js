@@ -37,20 +37,22 @@ export default SeekBar = ({style, duration, buffering}) => {
 
     return <View style={[styles.container, style]}>
         <Slider
-            onSlidingComplete={newPosition => {
-                TrackPlayer.seekTo(newPosition)
-                    .then(() => setState({
-                        isSliding: false,
-                        cache: 0
-                    }));
+            onSlidingComplete={position => {
+                TrackPlayer.seekTo(position);
+                setState({
+                    isSliding: false,
+                    cache: 0
+                });
             }}
 
             onValueChange={value => {
-                if (state.isSliding)
+                if (state.isSliding) {
+                    //TrackPlayer.seekTo(value);
                     setState({
                         isSliding: true,
                         cache: value
                     });
+                }
             }}
             
             onSlidingStart={currentPosition => {
@@ -59,7 +61,6 @@ export default SeekBar = ({style, duration, buffering}) => {
                     cache: currentPosition
                 });
             }}
-
             
             value={realPosition}
             maximumValue={Math.max(duration, 1, realPosition)}

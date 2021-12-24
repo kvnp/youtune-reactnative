@@ -20,7 +20,7 @@ import { ActivityIndicator } from "react-native-paper";
 import Downloads from "../../services/device/Downloads";
 
 export default PlaylistView = ({ route, navigation }) => {
-    const {dark, colors} = useTheme();
+    const {colors} = useTheme();
     const [playlist, setPlaylist] = useState(null);
     const idFits = route.params?.list == Navigation.transitionPlaylist?.playlistId ||
                    route.params?.list == Navigation.transitionPlaylist?.browseId;
@@ -37,7 +37,6 @@ export default PlaylistView = ({ route, navigation }) => {
                 if (!route.params.list.startsWith("LOCAL")) {
                     Media.getBrowseData(route.params.list)
                         .then(playlist => {
-                            Navigation.transitionPlaylist = null;
                             navigation.setOptions({ title: playlist.title });
                             navigation.setParams({ list: playlist.playlistId});
                             setPlaylist(playlist);
@@ -52,8 +51,7 @@ export default PlaylistView = ({ route, navigation }) => {
                                 secondSubtitle: localPlaylist.secondSubtitle,
                                 entries: localPlaylist.list
                             };
-                            console.log(entries);
-                            Navigation.transitionPlaylist = null;
+
                             navigation.setOptions({ title: playlist.title });
                             navigation.setParams({ list: playlist.playlistId});
                             setPlaylist(playlist);
@@ -104,7 +102,7 @@ export default PlaylistView = ({ route, navigation }) => {
                         playlist == null
                         ? <>
                             {
-                                idFits && playlist != null
+                                idFits
                                     ? <Text numberOfLines={1} style={[bottomBarAlbumStyle.albumTitle, bottomBarAlbumStyle.albumText, {color: colors.text}]}>
                                         {Navigation.transitionPlaylist.title}
                                     </Text>
