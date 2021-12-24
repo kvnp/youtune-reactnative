@@ -1,6 +1,8 @@
 import Music from "../music/Music";
 
 export default class Navigation {
+    static transitionPlaylist = {};
+
     static #navigate(goal, params, navigation) {
         if (goal == "Artist" || goal == "Playlist")
             navigation.push(goal, params);

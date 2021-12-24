@@ -33,7 +33,15 @@ export default Playlist = ({ playlist, navigation, style, onPress }) => {
             onPress={
                 onPress
                     ? () => onPress()
-                    : () => Navigation.handleMedia(view, navigation)
+                    : () => {
+                        Navigation.transitionPlaylist = {
+                            playlistId: playlistId,
+                            browseId: browseId,
+                            title: title,
+                            thumbnail: thumbnail
+                        }
+                        Navigation.handleMedia(view, navigation);
+                    }
             }
             style={[style, playlistStyle.container]}
         >

@@ -14,16 +14,25 @@ import {
     bottomBarAlbumStyle
 } from "../../styles/BottomBar";
 import { rippleConfig } from "../../styles/Ripple";
+import Navigation from "../../services/ui/Navigation";
+import FlatEntries from "../../components/collections/FlatEntries";
+import { ActivityIndicator } from "react-native-paper";
 
 export default PlaylistView = ({ route, navigation }) => {
     const {dark, colors} = useTheme();
     const [playlist, setPlaylist] = useState(null);
+    const idFits = route.params.list == Navigation.transitionPlaylist?.playlistId ||
+                   route.params.list == Navigation.transitionPlaylist?.browseId;
 
     useFocusEffect(
         useCallback(() => {
-            if (playlist == null || playlist.playlistId != route.params.list)
+            if (idFits)
+                navigation.setOptions({ title: Navigation.transitionPlaylist.title });
+
+            if (playlist == null || !idFits)
                 Media.getBrowseData(route.params.list)
                     .then(playlist => {
+                        Navigation.transitionPlaylist = null;
                         navigation.setOptions({ title: playlist.title });
                         navigation.setParams({ list: playlist.playlistId});
                         setPlaylist(playlist);
@@ -38,12 +47,19 @@ export default PlaylistView = ({ route, navigation }) => {
         entries = [];
     
     return <>
-        <FlatEntries 
-            entries={entries}
-            isPlaylist={true}
-            playlistId={route.params.list}
-            navigation={navigation}
-        />
+        {
+            playlist == null
+            ? <View style={{flex: 1, justifyContent: "center"}}>
+                <ActivityIndicator/>
+            </View>
+            
+            : <FlatEntries 
+                entries={entries}
+                isPlaylist={true}
+                playlistId={route.params.list}
+                navigation={navigation}
+            />
+        }
 
         <View style={{
             alignSelf: "stretch",
@@ -53,12 +69,24 @@ export default PlaylistView = ({ route, navigation }) => {
             width: "100%"
         }}>
             <View style={bottomBarStyle.topRow}>
-                <Image style={bottomBarAlbumStyle.albumCover} source={{uri: playlist == null ? null : playlist.thumbnail}}/>
+                <Image style={bottomBarAlbumStyle.albumCover} source={{
+                    uri: idFits && playlist == null
+                        ? Navigation.transitionPlaylist?.thumbnail
+                        : playlist?.thumbnail
+                }}/>
+
                 <View>
                     {
                         playlist == null
                         ? <>
-                            <View style={{width: 250, height: 20, marginBottom: 2, backgroundColor: colors.text}}/>
+                            {
+                                idFits
+                                    ? <Text numberOfLines={1} style={[bottomBarAlbumStyle.albumTitle, bottomBarAlbumStyle.albumText, {color: colors.text}]}>
+                                        {Navigation.transitionPlaylist.title}
+                                    </Text>
+                                    : <View style={{width: 250, height: 20, marginBottom: 2, backgroundColor: colors.text}}/>
+                            }
+                            
                             <View style={{width: 200, height: 20, marginBottom: 2, backgroundColor: colors.text}}/>
                             <View style={{width: 230, height: 20, marginBottom: 2, backgroundColor: colors.text}}/>
                         </>
