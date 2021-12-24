@@ -2,8 +2,6 @@ import React, { useCallback, useState } from "react";
 import {
     ScrollView,
     StyleSheet,
-    Text,
-    Pressable,
     Platform,
     ActivityIndicator,
     View
@@ -13,7 +11,6 @@ import { useFocusEffect, useTheme } from "@react-navigation/native";
 
 import Playlist from '../../components/shared/Playlist';
 import AddPlaylistModal from "../../components/modals/AddPlaylistModal";
-import { rippleConfig } from "../../styles/Ripple";
 
 export default Playlists = ({navigation}) => {
     const [modalVisible, setModalVisible] = useState(false);
@@ -58,12 +55,15 @@ export default Playlists = ({navigation}) => {
             <ScrollView contentContainerStyle={styles.playlistCollectionContainer}>
             <>
                 <Playlist
+                    key="Add Playlist"
                     playlist={{title: "Add Playlist", placeholder: "+"}}
                     onPress={() => setModalVisible(true)}
-                    style={styles.playlist}/>
+                    style={styles.playlist}
+                />
 
                 <Playlist
-                    playlist={{title: "Liked Songs", playlistId: "LOCAL_LIKES", placeholder:"👍" }}
+                    key="LOCAL_LIKES"
+                    playlist={{title: "Liked Songs", playlistId: "LOCAL_LIKES", placeholder:"👍"}}
                     navigation={navigation}
                     style={styles.playlist}
                 />
