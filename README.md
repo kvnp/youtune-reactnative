@@ -4,7 +4,7 @@ Youtube Music client for Android, iOS and Web built with React Native that allow
 
 How to run:
 
-`npm install -f`
+`npm install`
 
 In order to run the web version type:
 
