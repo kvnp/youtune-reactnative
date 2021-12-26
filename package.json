@@ -22,7 +22,7 @@
         "test": "jest",
         "lint": "eslint .",
         "dist": "webpack",
-        "postinstall": "cd ./node_modules/react-native-track-player/ && npm install && npm run prepare && rm -rf ./node_modules && rm -rf ./src"
+        "postinstall": "cd ./node_modules/react-native-track-player/ && npm install && rm -rf ./node_modules && rm -rf ./src"
     },
     "dependencies": {
         "@react-native-async-storage/async-storage": "^1.15.14",
@@ -45,7 +45,7 @@
         "react-native-safe-area-context": "^3.3.2",
         "react-native-screens": "^3.10.1",
         "react-native-tab-view": "^3.1.1",
-        "react-native-track-player": "https://github.com/kvnp/react-native-track-player/tarball/main",
+        "react-native-track-player": "github:kvnp/react-native-track-player",
         "react-native-vector-icons": "^9.0.0",
         "react-native-web": "^0.17.5",
         "react-native-web-linear-gradient": "^1.1.2",
