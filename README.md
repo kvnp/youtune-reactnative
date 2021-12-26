@@ -4,12 +4,17 @@ Youtube Music client for Android, iOS and Web built with React Native that allow
 
 How to run:
 
-`npm install`
+`npm install -f`
 
-denpending on your platform:
+In order to run the web version type:
+
+`npm run web`
+
+Even though YouTune acts as a PWA you need to keep the proxy running when interacting with Youtube due to CORS. Youtune itself and already downloaded songs will work fine. You can also use the example nginx config for self-hosting Youtune. Run the following command to build your own distribution of Youtune:
+
+`npm run dist`
+
+Expect the Android and iOS versions to not work for now as I'm more focused on getting the web version to work reliably. You can test these using the following commands:
 
 `npm run ios`
 `npm run android`
-`npm run web`
-
-the terminal will either display an URL to follow or additional instructions
