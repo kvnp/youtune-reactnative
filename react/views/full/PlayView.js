@@ -20,7 +20,7 @@ import SeekBar from "../../components/player/SeekBar";
 import SwipePlaylist from "../../components/player/SwipePlaylist";
 import { showModal } from "../../components/modals/MoreModal";
 import ScrollingText from "../../components/shared/ScrollingText";
-import Cast from "../../services/music/Cast";
+import CastButton from "../../components/player/CastButton";
 
 const PlayView = ({route, navigation}) => {
     const forceUpdate = useReducer(() => ({}))[1];
@@ -38,10 +38,6 @@ const PlayView = ({route, navigation}) => {
 
         Downloads.likeTrack(id, like);
         setLiked(like);
-    }
-
-    const cast = () => {
-        Cast.play();
     }
 
     useEffect(() => {
@@ -183,14 +179,7 @@ const PlayView = ({route, navigation}) => {
                 <SeekBar duration={duration} buffering={state}/>
                 
                 <View style={[stylesBottom.buttonContainer, {overflow: "visible", alignSelf: "stretch", justifyContent: "space-between"}]}>
-                    <Button
-                        onPress={() => cast()}
-                        labelStyle={{marginHorizontal: 0}}
-                        style={{borderRadius: 25, alignItems: "center", padding: 0, margin: 0, minWidth: 0}}
-                        contentStyle={{alignItems: "center", width: 50, height: 50, minWidth: 0}}
-                    >
-                        <MaterialIcons style={{alignSelf: "center"}} selectable={false} name="cast" color={colors.text} size={30}/>
-                    </Button>
+                    <CastButton/>
 
                     <Button
                         labelStyle={{marginHorizontal: 0}}

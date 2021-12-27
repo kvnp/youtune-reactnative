@@ -13,6 +13,7 @@ export default class Music {
     static repeatModeString = "repeat";
     static metadataList = [];
     static metadataIndex = null;
+    static playlistId = null;
     static trackUrlLoaded = [];
 
     static transitionTrack;
@@ -286,9 +287,7 @@ export default class Music {
         Music.state = State.Buffering;
         if (playlistId?.startsWith("LOCAL")) {
             Downloads.loadLocalPlaylist(playlistId, videoId)
-                .then(localPlaylist => {
-                    Music.startPlaylist(localPlaylist);
-                })
+                .then(localPlaylist => Music.startPlaylist(localPlaylist))
                 .catch(_ => console.log(_));
         } else {
             Media.getNextSongs({videoId, playlistId})
@@ -298,7 +297,7 @@ export default class Music {
     }
 
     static async startPlaylist(playlist) {
-        Music.metadataList = playlist.list.slice();
+        Music.metadataList = playlist.list;
         Music.trackUrlLoaded = Array(playlist.list.length).fill(false);
         Music.metadataIndex = 0;
 
