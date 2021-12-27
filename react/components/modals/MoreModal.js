@@ -93,7 +93,7 @@ export default MoreModal = ({navigation}) => {
         if (liked == bool)
             bool = null;
 
-        Downloads.likeTrack(id, bool);
+        Downloads.likeTrack(videoId, bool);
         setContent({...content, liked: bool});
     }
 
