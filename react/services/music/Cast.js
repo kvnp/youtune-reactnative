@@ -1,5 +1,5 @@
 import { DeviceEventEmitter } from "react-native";
-import TrackPlayer from "react-native-track-player";
+import TrackPlayer, { RepeatMode } from "react-native-track-player";
 import Media from "../api/Media";
 import Music from "./Music";
 
@@ -43,6 +43,7 @@ export default class Cast {
                     e => {
                         if (e.castState == "CONNECTED") {
                             TrackPlayer.setVolume(0);
+                            //TrackPlayer.setRepeatMode(RepeatMode.Track);
                         } else {
                             TrackPlayer.setVolume(1);
                         }
@@ -134,6 +135,8 @@ export default class Cast {
         mediaInfo.metadata.title = media.title;
         mediaInfo.metadata.artist = media.artist;
         let request = new chrome.cast.media.LoadRequest(mediaInfo);
+        request.queueData = new chrome.cast.media.QueueData();
+        request.queueData.repeatMode = chrome.cast.media.RepeatMode.SINGLE;
         
         try {
             await session.loadMedia(request);
