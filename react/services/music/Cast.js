@@ -80,17 +80,11 @@ export default class Cast {
             Cast.deviceName = session.getCastDevice().friendlyName;
         }
         
-        let startsWithBlob = url => url != undefined
+        /*let startsWithBlob = url => url != undefined
             ? url.startsWith("blob")
             : true;
 
         let startIndex = Music.metadataIndex;
-        let request = new chrome.cast.media.LoadRequest(firstMedia);
-        request.queueData = new chrome.cast.media.QueueData();
-        request.queueData.queueType = chrome.cast.media.QueueType.PLAYLIST;
-        request.queueData.startIndex = startIndex;
-        request.queueData.items = [];
-
         let firstMedia;
         for (let i = 0; i < Music.metadataList.length; i++) {
             let currentMetadata = Music.metadataList[i];
@@ -118,12 +112,28 @@ export default class Cast {
                 firstMedia = mediaInfo;
             }
 
-            /*if (!startsWithBlob(currentMetadata.artwork)) {
+            if (!startsWithBlob(currentMetadata.artwork)) {
                 mediaInfo.metadata.images = [new chrome.cast.Image(currentMetadata.artwork)];
-            }*/
+            }
             
             request.queueData.items.push(new chrome.cast.media.QueueItem(mediaInfo));
+        }*/
+
+        let media = Music.metadata;
+        if (media.artwork.startsWith("blob")) {
+            media.artwork = (await Media.getAudioInfo({videoId: media.id})).artwork;
         }
+
+        if (media.url.startsWith("blob")) {
+            media.url = await Media.getAudioStream({videoId: media.id});
+        }
+
+        let mediaInfo = new chrome.cast.media.MediaInfo(media.url, "audio/mp4");
+        mediaInfo.metadata = new chrome.cast.media.MusicTrackMediaMetadata();
+        mediaInfo.metadata.images = [new chrome.cast.Image(media.artwork)];
+        mediaInfo.metadata.title = media.title;
+        mediaInfo.metadata.artist = media.artist;
+        let request = new chrome.cast.media.LoadRequest(mediaInfo);
         
         try {
             await session.loadMedia(request);
