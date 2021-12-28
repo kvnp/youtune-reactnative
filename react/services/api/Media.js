@@ -49,7 +49,7 @@ export default class Media {
         return new Promise(async(resolve, reject) => {
             if (browseId == undefined)
                 return resolve(null);
-            
+
             if (!API.initialized) {
                 let initialPath;
                 let slice = browseId.slice(0, 2);
@@ -66,16 +66,15 @@ export default class Media {
                 }
 
                 await API.initialize(initialPath);
-            }
+                let initialData = await API.getInitialData(browseId);
+                if (initialData != null) {
+                    let extraction = browseId == "FEmusic_home"
+                        ? Extractor.digestHomeResponse(initialData)
+                        : Extractor.digestBrowseResponse(initialData, browseId);
 
-            let initialData = await API.getInitialData(browseId);
-            if (initialData != null) {
-                let extraction = browseId == "FEmusic_home"
-                    ? Extractor.digestHomeResponse(initialData)
-                    : Extractor.digestBrowseResponse(initialData, browseId);
-
-                UI.setHeader({url: extraction?.picture});
-                return resolve(extraction);
+                    UI.setHeader({url: extraction?.picture});
+                    return resolve(extraction);
+                }
             }
 
             //TODO implement continuation properly
