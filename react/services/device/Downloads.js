@@ -41,7 +41,7 @@ export default class Downloads {
                 return resolve();
 
             let eventListener = this.addListener(
-                this.EVENT_DOWNLOAD,
+                this.EVENT_INITIALIZE,
                 () => {
                     resolve();
                     eventListener.remove();
