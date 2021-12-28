@@ -78,6 +78,7 @@ const PlayView = ({route, navigation}) => {
             like => setLiked(like)
         )
         
+        setTrack(Music.metadata);
         setState(Music.state);
 
         return () => {
