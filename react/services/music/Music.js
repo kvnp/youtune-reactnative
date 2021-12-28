@@ -175,6 +175,7 @@ export default class Music {
         }
         
         TrackPlayer.setRepeatMode(Music.repeatMode);
+        return Music.repeatModeString;
     }
 
     static get index() {

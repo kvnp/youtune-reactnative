@@ -12,7 +12,9 @@ export default class Downloads {
     static initialized = false;
 
     static #emitter = DeviceEventEmitter;
-    static EVENT_REFRESH = "event-refresh";
+    static EVENT_INITIALIZE = "event-initialize";
+    static EVENT_DOWNLOAD = "event-download";
+    static EVENT_LIKE = "event-like";
 
     static addListener(event, listener) {
         return this.#emitter.addListener(event, listener);
@@ -28,7 +30,7 @@ export default class Downloads {
             this.#downloadedTracks = await Storage.getAllKeys("Downloads");
 
             this.initialized = true;
-            this.#emitter.emit(this.EVENT_REFRESH, true);
+            this.#emitter.emit(this.EVENT_INITIALIZE, true);
             resolve(true);
         });
     }
@@ -39,40 +41,12 @@ export default class Downloads {
                 return resolve();
 
             let eventListener = this.addListener(
-                this.EVENT_REFRESH,
+                this.EVENT_DOWNLOAD,
                 () => {
                     resolve();
                     eventListener.remove();
                 }
             );
-        });
-    }
-
-    static deleteLike(videoId) {
-        return new Promise(async(resolve, reject) => {
-            if (!this.initialized)
-                await Downloads.waitForInitialization();
-
-            try {
-                let index = this.#likedTracks.indexOf(videoId);
-                if (index != -1)
-                    this.#likedTracks.splice(index, 1);
-                await Storage.deleteItem("Likes", videoId);
-
-                if (!this.isTrackDownloaded(videoId)) {
-                    index = this.#cachedTracks.indexOf(videoId);
-                    if (index != -1)
-                        this.#cachedTracks.splice(index, 1);
-
-                    await Storage.deleteItem("Tracks", videoId);
-                }
-                
-                this.#emitter.emit(this.EVENT_REFRESH, true);
-                resolve();
-
-            } catch (e) {
-                console.log(e);
-            }
         });
     }
 
@@ -91,7 +65,7 @@ export default class Downloads {
                     await Storage.deleteItem("Tracks", videoId);
                 }
                 
-                this.#emitter.emit(this.EVENT_REFRESH, true);
+                this.#emitter.emit(this.EVENT_DOWNLOAD, true);
                 resolve();
 
             } catch (e) {
@@ -108,15 +82,17 @@ export default class Downloads {
             if (videoId == undefined || videoId == null)
                 return reject("no id");
 
+            let i;
             if (!cacheOnly) {
-                let dlIndex = this.#downloadedTracks.findIndex(entry => videoId == entry);
-                if (dlIndex > -1)
-                    return reject("already downloaded");
-            }
+                i = this.#downloadedTracks.findIndex(entry => videoId == entry);
+                if (i > -1) return reject("already downloaded");
 
-            let qIndex = this.#downloadQueue.findIndex(entry => videoId in entry);
-            if (qIndex > -1)
-                return reject("still downloading");
+                i = this.#downloadQueue.findIndex(entry => videoId in entry);
+                if (i > -1) return reject("still downloading");
+            } else {
+                i = this.#cachedTracks.indexOf(videoId);
+                if (i > -1) return reject("already cached");
+            }
             
             let controllerCallback = controller => {
                 let index = this.#downloadQueue.findIndex(entry => videoId in entry);
@@ -125,7 +101,7 @@ export default class Downloads {
                         this.#downloadQueue[index][videoId] = controller;
                     else {
                         this.#downloadQueue.push({[videoId] : controller});
-                        this.#emitter.emit(this.EVENT_REFRESH, true);
+                        this.#emitter.emit(this.EVENT_DOWNLOAD, true);
                     }
 
                     controller.signal.onabort = () => {
@@ -140,20 +116,22 @@ export default class Downloads {
                 track.videoId = track.id;
                 delete track.id;
                 delete track.playable;
-                Storage.setItem("Tracks", track);
+                
+                await Storage.setItem("Tracks", track);
+                this.#cachedTracks.push(videoId);
 
                 if (!cacheOnly) {
                     let url = await Media.getAudioStream({videoId: videoId, controllerCallback});
                     url = await Media.getBlob({url: url, controllerCallback});
-                    Storage.setItem("Downloads", {
+                    await Storage.setItem("Downloads", {
                         videoId: videoId,
                         url: url
                     });
                     
-                    index = this.#downloadQueue.findIndex(entry => videoId in entry);
-                    this.#downloadQueue.splice(index, 1);
+                    i = this.#downloadQueue.findIndex(entry => videoId in entry);
+                    this.#downloadQueue.splice(i, 1);
                     this.#downloadedTracks.push(videoId);
-                    this.#emitter.emit(this.EVENT_REFRESH, true);
+                    this.#emitter.emit(this.EVENT_DOWNLOAD, true);
                 }
                 
                 resolve(videoId);
@@ -165,24 +143,40 @@ export default class Downloads {
 
     static likeTrack(videoId, like) {
         return new Promise(async(resolve, reject) => {
-            if (like == null)
-                return resolve(this.deleteLike(videoId));
-            
-            if (!this.isTrackCached(videoId))
-                await Downloads.downloadTrack(videoId, true);
-            
-            let index = this.#likedTracks.indexOf(videoId);
-            if (index == -1)
-                this.#likedTracks.push(videoId)
-            
-            this.#likedTracks.push(videoId);
-            Storage.setItem("Likes", {
-                videoId: videoId,
-                like: like
-            });
+            let prevState = await Storage.getItem("Likes", videoId);
+            let deleting = false;
+            if (prevState != null)
+                deleting = prevState.like == like;
 
-            this.#emitter.emit(this.EVENT_REFRESH, true);
-            resolve(videoId);
+            if (deleting) {
+                console.log({m: "deleting", id: videoId});
+                await Storage.deleteItem("Likes", videoId);
+                if (!this.isTrackDownloaded(videoId) && this.isTrackCached(videoId))
+                    await Storage.deleteItem("Tracks", videoId);
+            } else {
+                if (like) {
+                    console.log({m: "liking", id: videoId});
+                } else {
+                    console.log({m: "disliking", id: videoId});
+                }
+
+                await Storage.setItem("Likes", {
+                    videoId: videoId,
+                    like: like
+                });
+            }
+
+            let index = this.#likedTracks.indexOf(videoId);
+            if (!deleting && like && !this.isTrackCached(videoId)) {
+                await Downloads.downloadTrack(videoId, true);
+                if (index == -1)
+                    this.#likedTracks.push(videoId);
+            } else if ((!like || deleting) && index > -1) {
+                this.#likedTracks.splice(index, 1);
+            }
+
+            this.#emitter.emit(this.EVENT_LIKE, deleting ? null : like);
+            return resolve(videoId);
         });
     }
 
@@ -196,7 +190,7 @@ export default class Downloads {
                 let abortController = this.#downloadQueue[index][videoId];
                 abortController.abort();
                 this.#downloadQueue.splice(index, 1);
-                this.#emitter.emit(this.EVENT_REFRESH, true);
+                this.#emitter.emit(this.EVENT_DOWNLOAD, true);
                 resolve(videoId);
             } else {
                 reject(videoId);
@@ -310,7 +304,12 @@ export default class Downloads {
             for (let i = 0; i < list.length; i++) {
                 let id = list[i];
                 let local = await this.getTrack(id);
-                local.artwork = IO.getBlobAsURL(local.artwork);
+                try {
+                    local.artwork = IO.getBlobAsURL(local.artwork);
+                } catch(e) {
+                    console.log(e);
+                    console.log(local);
+                }
                 local.id = local.videoId;
                 local.playlistId = playlistId;
                 delete local.videoId;

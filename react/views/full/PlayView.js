@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useReducer, useCallback } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
     View,
     StyleSheet,
@@ -23,29 +23,20 @@ import ScrollingText from "../../components/shared/ScrollingText";
 import CastButton from "../../components/player/CastButton";
 
 const PlayView = ({route, navigation}) => {
-    const forceUpdate = useReducer(() => ({}))[1];
     const { height, width } = useWindowDimensions();
     const { dark, colors } = useTheme();
 
     const [state, setState] = useState(Music.state);
+    const [track, setTrack] = useState(Music.metadata);
+    const [repeat, setRepeat] = useState(Music.repeatModeString);
     const [isLiked, setLiked] = useState(null);
 
-    const {id, playlistId, title, artist, artwork, duration} = Music.metadata;
+    const {id, playlistId, title, artist, artwork, duration} = track;
     
     const likeSong = like => {
-        if (isLiked == like)
-            like = null;
-
         Downloads.likeTrack(id, like);
         setLiked(like);
     }
-
-    useEffect(() => {
-        Downloads.isTrackLiked(id).then(lk => {
-            if (isLiked != lk)
-                setLiked(lk);
-        });
-    });
 
     useFocusEffect(
         useCallback(() => {
@@ -54,6 +45,7 @@ const PlayView = ({route, navigation}) => {
 
             navigation.setOptions({title: title});
             navigation.setParams({v: id, list: playlistId});
+            Downloads.isTrackLiked(id).then(like => setLiked(like));
         }, [id])
     );
 
@@ -77,17 +69,21 @@ const PlayView = ({route, navigation}) => {
             Music.EVENT_METADATA_UPDATE,
             () => {
                 setState(State.Buffering);
-                forceUpdate();
+                setTrack(Music.metadata);
             }
         );
 
-        TrackPlayer.getState().then(state => {
-            setState(Music.state);
-        });
+        const lkListener = Downloads.addListener(
+            Downloads.EVENT_LIKE,
+            like => setLiked(like)
+        )
+        
+        setState(Music.state);
 
         return () => {
             stateListener.remove();
             updateListener.remove();
+            lkListener.remove();
         }
     }, []);
 
@@ -236,16 +232,13 @@ const PlayView = ({route, navigation}) => {
                         labelStyle={{marginHorizontal: 0}}
                         style={{borderRadius: 25, alignItems: "center", padding: 0, margin: 0, minWidth: 0}}
                         contentStyle={{alignItems: "center", width: 50, height: 50, minWidth: 0}}
-                        onPress={() => {
-                            Music.cycleRepeatMode();
-                            forceUpdate();
-                        }}
+                        onPress={() => setRepeat(Music.cycleRepeatMode())}
                     >
                         <MaterialIcons
                             style={{alignSelf: "center"}}
                             selectable={false}
                             color={colors.text} size={30}
-                            name={Music.repeatModeString}
+                            name={repeat}
                         />
                     </Button>
                 </View>

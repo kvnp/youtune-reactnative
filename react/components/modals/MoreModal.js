@@ -24,6 +24,7 @@ import { appColor } from "../../styles/App";
 
 export var showModal = null;
 var dlListener = null;
+var lkListener = null;
 
 export default MoreModal = ({navigation}) => {
     const [content, setContent] = useState({
@@ -54,19 +55,31 @@ export default MoreModal = ({navigation}) => {
     useEffect(() => {
         if (visible) {
             dlListener = Downloads.addListener(
-                Downloads.EVENT_REFRESH,
+                Downloads.EVENT_DOWNLOAD,
                 () => {
-                    if (visible)
+                    if (visible) {
                         setContent({
                             ...content,
                             downloading: Downloads.isTrackDownloading(videoId),
                             downloaded: Downloads.isTrackDownloaded(videoId),
                             queue: Downloads.getDownloadingLength()
-                        })
-                }
-            );
+                        });
+                    }
+                });
+
+            lkListener = Downloads.addListener(
+                Downloads.EVENT_LIKE,
+                like => {
+                    if (visible) {
+                        setContent({
+                            ...content,
+                            liked: like
+                        });
+                    }
+                });
         } else if (dlListener != null) {
             dlListener.remove();
+            lkListener.remove();
         }
     }, [visible]);
 
@@ -90,9 +103,6 @@ export default MoreModal = ({navigation}) => {
     };
 
     const like = bool => {
-        if (liked == bool)
-            bool = null;
-
         Downloads.likeTrack(videoId, bool);
         setContent({...content, liked: bool});
     }
@@ -132,7 +142,7 @@ export default MoreModal = ({navigation}) => {
 
         let isPlaying = false;
         if (Music.metadata.id == info.videoId) {
-            if (await TrackPlayer.getState() == State.Playing) {
+            if (Music.state == State.Playing) {
                 isPlaying = true;
             }
         }

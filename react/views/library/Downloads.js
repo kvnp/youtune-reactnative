@@ -21,26 +21,33 @@ export default Downloads = ({ navigation }) => {
     const [state, setState] = useState({entries: [], loading: false});
     const {entries, loading} = state;
     const {colors} = useTheme();
-    const playlistId = "LOCAL_DOWNLOADS";
 
     const loadEntries = async() => {
-        let local = await Service.loadLocalPlaylist(playlistId)
-        setState({entries: local.list, loading: false});
+        if (!loading) {
+            setState({...state, loading: true});
+            let local = await Service.loadLocalPlaylist("LOCAL_DOWNLOADS")
+            setState({entries: local.list, loading: false});
+        }
     }
 
     useFocusEffect(
         useCallback(() => {
-            loadEntries();
+            if (!loading) loadEntries();
+
+            let initListener = Service.addListener(
+                Service.EVENT_INITIALIZE,
+                () => loadEntries()
+            )
             
             let dlListener = Service.addListener(
-                Service.EVENT_REFRESH,
-                () => {
-                    if (!loading)
-                        loadEntries();
-                }
+                Service.EVENT_DOWNLOAD,
+                () => loadEntries()
             );
     
-            return () => dlListener.remove();
+            return () => {
+                initListener.remove();
+                dlListener.remove();
+            }
         }, [])
     );
 
