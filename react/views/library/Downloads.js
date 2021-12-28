@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import {
     ScrollView,
@@ -8,7 +8,7 @@ import {
 } from "react-native";
 
 import { Button } from 'react-native-paper';
-import { useFocusEffect, useTheme } from '@react-navigation/native';
+import { useTheme } from '@react-navigation/native';
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 
 import Navigation from '../../services/ui/Navigation';
@@ -25,31 +25,24 @@ export default Downloads = ({ navigation }) => {
     const loadEntries = async() => {
         if (!loading) {
             setState({...state, loading: true});
+            if (!Service.initialized) {
+                await Service.waitForInitialization();
+            }
+
             let local = await Service.loadLocalPlaylist("LOCAL_DOWNLOADS")
             setState({entries: local.list, loading: false});
         }
     }
 
-    useFocusEffect(
-        useCallback(() => {
-            if (!loading) loadEntries();
+    useEffect(() => {
+        loadEntries();
+        let dlListener = Service.addListener(
+            Service.EVENT_DOWNLOAD,
+            () => loadEntries()
+        );
 
-            let initListener = Service.addListener(
-                Service.EVENT_INITIALIZE,
-                () => loadEntries()
-            )
-            
-            let dlListener = Service.addListener(
-                Service.EVENT_DOWNLOAD,
-                () => loadEntries()
-            );
-    
-            return () => {
-                initListener.remove();
-                dlListener.remove();
-            }
-        }, [])
-    );
+        return () => dlListener.remove()
+    }, []);
 
     const activity = <View style={{
         flex: 1,
