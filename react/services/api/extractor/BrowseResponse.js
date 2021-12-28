@@ -118,50 +118,6 @@ function getPlaylist(json) {
     return browse;
 }
 
-function getAlbum(json) {
-    let updatelist = json.frameworkUpdates.entityBatchUpdate.mutations
-
-    let browse = {playlistId: "", title: "", subtitle: "", secondSubtitle: "", description: "", thumbnail: null, entries: []};
-
-    for (let ul = 0; ul < updatelist.length; ul++) {
-        let payload = updatelist[ul].payload;
-
-        if (payload.hasOwnProperty("musicTrack")) {
-            let musicTrack = payload.musicTrack;
-            let thumbnaillist = musicTrack.thumbnailDetails.thumbnails;
-
-            let entry = {title: "", subtitle: "", secondTitle: "", secondSubtitle: "", videoId: null, thumbnail: null};
-            entry.title = musicTrack.title;
-            entry.subtitle = musicTrack.artistNames;
-            entry.videoId = musicTrack.videoId;
-            entry.thumbnail = thumbnaillist.slice(-1)[0].url;
-            entry.secondTitle = msToMMSS(musicTrack.lengthMs);
-            browse.entries.push(entry);
-        }
-
-        if (payload.hasOwnProperty("musicAlbumRelease")) {
-            let albumRelease = payload.musicAlbumRelease;
-            let thumbnaillist = albumRelease.thumbnailDetails.thumbnails;
-            let minutes = msToMin(Number.parseInt(albumRelease.durationMs));
-
-            browse.title = albumRelease.title;
-            //browse.subtitle = "Album • " + albumRelease.artistDisplayName + " • " + albumRelease.releaseDate.year;
-            browse.subtitle = albumRelease.artistDisplayName + " • " + albumRelease.releaseDate.year;
-            browse.secondSubtitle = albumRelease.trackCount + " songs" + " • " + minutes + " minutes";
-            browse.thumbnail = thumbnaillist.slice(-1)[0].url;
-            browse.playlistId = albumRelease.audioPlaylistId;
-        }
-
-        if (payload.hasOwnProperty("musicAlbumReleaseDetail")) {
-            let albumDetail = payload.musicAlbumReleaseDetail;
-
-            browse.description = albumDetail.description;
-        }
-    }
-
-    return browse;
-}
-
 function getArtist(json) {
     let artist = {
         header : {
@@ -347,10 +303,8 @@ function getArtist(json) {
 }
 
 export default function digestBrowseResponse(json, browseId) {
-    if (browseId.slice(0, 2) === "VL" || browseId.slice(0, 2) === "MP") {
-        return getPlaylist(json);
-    } else if (browseId.slice(0, 2) === "UC")
+    if (browseId.slice(0, 2) === "UC")
         return getArtist(json);
     else
-        return getAlbum(json);
+        return getPlaylist(json);
 }

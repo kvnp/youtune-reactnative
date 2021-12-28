@@ -177,17 +177,16 @@ export default class API {
         }
     }
 
-    static getInitialData(browseId) {
+    static getInitialData() {
         return new Promise(async(resolve, reject) => {
             if (!API.initialized)
                 await API.initialize();
 
+            console.log(API.YTMUSIC_INITIAL_DATA);
+
             for (let i = 0; i < API.YTMUSIC_INITIAL_DATA.length; i++) {
                 if ("/browse" == API.YTMUSIC_INITIAL_DATA[i].path) {
-                    if (browseId == API.YTMUSIC_INITIAL_DATA[i].params.browseId)
-                        return resolve(API.YTMUSIC_INITIAL_DATA[i].data);
-                    else
-                        return resolve(null);
+                    resolve(API.YTMUSIC_INITIAL_DATA[i].data);
                 }
             }
         })
