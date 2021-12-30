@@ -95,7 +95,7 @@ module.exports = () => ({
     
     mode: process.env.NODE_ENV,
     entry: {
-        app: './web/index.web.js'
+        app: './web/src/index.web.js'
     },
 
     optimization: {
@@ -130,7 +130,7 @@ module.exports = () => ({
     },
 
     output: {
-        path: __dirname + '/dist',
+        path: __dirname + '/web/public',
         filename: 'app-[chunkhash].bundle.js',
         publicPath: '/'
     },
@@ -180,7 +180,7 @@ module.exports = () => ({
         }),
 
         new HtmlWebpackPlugin({
-            template: './web/index.html',
+            template: './web/src/index.html',
             filename: 'index.html',
             minify: true
         }),
@@ -199,15 +199,15 @@ module.exports = () => ({
             display: "fullscreen",
             icons: [
                 {
-                    src: './web/icon.png',
+                    src: './web/src/icon.png',
                     sizes: [96, 128, 192, 256, 384, 512] // multiple sizes
                 },
                 {
-                    src: './web/icon.png',
+                    src: './web/src/icon.png',
                     size: '1024x1024' // you can also use the specifications pattern
                 },
                 {
-                    src: './web/icon.png',
+                    src: './web/src/icon.png',
                     size: '1024x1024',
                     purpose: 'maskable'
                 }

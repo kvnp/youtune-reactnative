@@ -10,13 +10,7 @@ ENV NODE_ENV development
 ENV PORT 8080
 
 COPY package.json .
-COPY package-lock.json .
 COPY . .
 
 RUN npm install
-RUN npm run dist
-
-# Server for Built files
-RUN npm install serve
-
-CMD ./node_modules/.bin/serve dist
+RUN npm start

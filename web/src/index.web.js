@@ -2,8 +2,8 @@ import 'react-native-gesture-handler';
 import { AppRegistry } from 'react-native'
 import iconFont from 'react-native-vector-icons/Fonts/MaterialIcons.ttf';
 
-import { name } from '../react/app.json'
-import App from '../react/App'
+import { name } from '../../react/app.json'
+import App from '../../react/App'
 
 const styles = `@font-face{
     src: url(${iconFont});

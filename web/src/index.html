@@ -1,9 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
     <head>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+        <meta charset="UTF-8"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
         <title>YouTune</title>
         <link rel="shortcut icon"
               href="<%= require('./favicon.ico').default %>"
@@ -40,10 +39,11 @@
                                         case 'installed':
                                             if (navigator.serviceWorker.controller)
                                                 // new update available
-                                                resolve(true);
+                                                return resolve(true);
+                                                
                                             else
                                                 // no update available
-                                                resolve(false);
+                                                return resolve(false);
                                     }
                                 };
                             };
