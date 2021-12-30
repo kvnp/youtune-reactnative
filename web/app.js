@@ -43,14 +43,15 @@ app.get("/playlist/", function(req, res, next) {
     });
 });
 
-app.use('/proxy', createProxyMiddleware({
-    target: "https://music.youtube.com",
+app.use('/proxy/videoplayback', createProxyMiddleware({
+    target: "https://redirector.googlevideo.com",
     changeOrigin: true,
+    followRedirects: true,
     pathRewrite: {'^/proxy' : ''},
 
     headers: {
-        "Referer": "https://music.youtube.com",
-        "Origin": "https://music.youtube.com",
+        "Referer": "https://www.youtube.com",
+        "Origin": "https://www.youtube.com",
         "User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:79.0) Gecko/20100101 Firefox/79.0"
     }
 }));
@@ -79,15 +80,14 @@ app.use('/proxy/vi', createProxyMiddleware({
     }
 }));
 
-app.use('/proxy/videoplayback', createProxyMiddleware({
-    target: "https://redirector.googlevideo.com",
+app.use('/proxy', createProxyMiddleware({
+    target: "https://music.youtube.com",
     changeOrigin: true,
-    followRedirects: true,
     pathRewrite: {'^/proxy' : ''},
 
     headers: {
-        "Referer": "https://www.youtube.com",
-        "Origin": "https://www.youtube.com",
+        "Referer": "https://music.youtube.com",
+        "Origin": "https://music.youtube.com",
         "User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:79.0) Gecko/20100101 Firefox/79.0"
     }
 }));

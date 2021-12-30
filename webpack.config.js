@@ -253,7 +253,7 @@ module.exports = () => ({
 
                     {
                         urlPattern: "/proxy/*",
-                        handler: "NetworkFirst",
+                        handler: "NetworkOnly",
 
                         options: {
                             cacheName: "proxy"
