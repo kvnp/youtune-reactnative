@@ -21,7 +21,7 @@
         "web": "npx webpack serve",
         "test": "npx jest",
         "lint": "npx eslint .",
-        "postinstall": "npx run-script-os",
+        "postinstall": "run-script-os",
         "postinstall:windows": "cd node_modules/react-native-track-player && npm install && rmdir /s /q node_modules && rmdir /s /q src",
         "postinstall:default": "cd ./node_modules/react-native-track-player/ && npm install && rm -rf ./node_modules && rm -rf ./src"
     },
