@@ -34,16 +34,14 @@ function getPlaylist(json) {
         let songList = songTabs[st].tabRenderer.content.sectionListRenderer.contents;
         
         for (let sl = 0; sl < songList.length; sl++) {
-            let songs
+            let songs;
             if (songList[sl].hasOwnProperty("musicPlaylistShelfRenderer")) {
                 songs = songList[sl].musicPlaylistShelfRenderer.contents;
                 browse.playlistId = songList[sl].musicPlaylistShelfRenderer.playlistId;
             } else if (songList[sl].hasOwnProperty("musicShelfRenderer")) {
                 songs = songList[sl].musicShelfRenderer.contents;
                 browse.playlistId = json.microformat.microformatDataRenderer.urlCanonical.split("=").slice(-1)[0]
-            } else {
-                break;
-            }
+            } else break;
             
             for (let songIndex = 0; songIndex < songs.length; songIndex++) {
                 let responsiveMusicItem = songs[songIndex].musicResponsiveListItemRenderer;
@@ -120,7 +118,7 @@ function getPlaylist(json) {
 
 function getArtist(json) {
     let artist = {
-        header : {
+        header: {
             title: "",
             subscriptions: "",
             thumbnail: "",
@@ -139,9 +137,7 @@ function getArtist(json) {
         artist.header.subscriptions += subList[sl].text;
     }
 
-    let thumbnailList = json.header.musicImmersiveHeaderRenderer.thumbnail.musicThumbnailRenderer.thumbnail.thumbnails;
-    artist.header.thumbnail = thumbnailList[0].url;
-
+    artist.header.thumbnail = json.header.musicImmersiveHeaderRenderer.thumbnail?.musicThumbnailRenderer.thumbnail.thumbnails[0].url;
     let tabList = json.contents.singleColumnBrowseResultsRenderer.tabs;
     for (let tbl = 0; tbl < tabList.length; tbl++) {
 
@@ -174,8 +170,7 @@ function getArtist(json) {
                         videoId: ""
                     };
 
-                    let thumbnailList = songObject.thumbnail.musicThumbnailRenderer.thumbnail.thumbnails;
-                    entry.thumbnail = thumbnailList[0].url;
+                    entry.thumbnail = songObject.thumbnail?.musicThumbnailRenderer.thumbnail.thumbnails[0].url;
 
                     let watchEndpoint = songObject.overlay.musicItemThumbnailOverlayRenderer.content.musicPlayButtonRenderer.playNavigationEndpoint.watchEndpoint;
                     let videoId = watchEndpoint.videoId;
@@ -235,10 +230,7 @@ function getArtist(json) {
                         }
                     }
 
-                    let thumbnailList = music.thumbnailRenderer.musicThumbnailRenderer.thumbnail.thumbnails;
-                    /*for (let thbl = 0; thbl < thumbnailList.length; thbl++) {
-                    }*/
-                    album.thumbnail = thumbnailList[0].url;
+                    album.thumbnail = music.thumbnailRenderer?.musicThumbnailRenderer.thumbnail.thumbnails[0].url;
 
                     let videoId;
                     let browseId;
