@@ -20,7 +20,7 @@ export default class Cast {
         } finally {
             if (event == this.EVENT_CAST) {
                 this.#emitter.emit(this.EVENT_CAST, {
-                    castState: !window.chrome.cast
+                    castState: !window?.chrome.cast
                         ? "NOT_CONNECTED"
                         : cast.framework.CastContext.getInstance().getCastState()
                 });
@@ -29,6 +29,9 @@ export default class Cast {
     }
 
     static initialize() {
+        if (!window.hasOwnProperty("chrome"))
+            return;
+
         window['__onGCastApiAvailable'] = isAvailable => {
             if (isAvailable) {
                 let instance = cast.framework.CastContext.getInstance();
