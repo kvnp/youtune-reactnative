@@ -20,12 +20,25 @@
         />
         
         <script>
-            window.setImmediate = window.setTimeout;
             var process = undefined;
 
             if (window.Notification)
                 Notification.requestPermission();
 
+            window.onerror = (message, source, lineno, colno, error) => {
+                console.log(source);
+                console.log(error);
+                console.log(message);
+
+                let app = document.getElementById("app");
+                let header = document.createElement("h1");
+                header.textContent = error;
+                let text = document.createElement("div");
+                text.textContent = message;
+                app.appendChild(header);
+                app.appendChild(text);
+            }
+            window.setImmediate = window.setTimeout;
             window.isUpdateAvailable = new Promise(function(resolve, reject) {
                 // lazy way of disabling service workers while developing
                 if ('serviceWorker' in navigator) {
