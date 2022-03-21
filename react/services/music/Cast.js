@@ -19,11 +19,17 @@ export default class Cast {
             return this.#emitter.addListener(event, listener);
         } finally {
             if (event == this.EVENT_CAST) {
-                this.#emitter.emit(this.EVENT_CAST, {
-                    castState: !window?.chrome.cast
+                let castState = "NOT_CONNECTED";
+                if (window.hasOwnProperty("cast")) {
+                    castState = !window.chrome.cast
                         ? "NOT_CONNECTED"
                         : cast.framework.CastContext.getInstance().getCastState()
-                });
+                }
+                
+                this.#emitter.emit(
+                    this.EVENT_CAST,
+                    {castState: castState}
+                );
             }
         }
     }
