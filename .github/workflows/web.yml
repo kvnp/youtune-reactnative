@@ -6,10 +6,11 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
-      - name: npm install, build
+      - name: npm ci, build
         run: |
-          npm install
-          export NODE_ENV=production && npx webpack
+          export NODE_ENV=production
+          npm ci
+          npx webpack
       - name: Archive production artifacts
         uses: actions/upload-artifact@v2
         with:
