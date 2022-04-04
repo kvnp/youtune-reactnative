@@ -1,5 +1,5 @@
 name: Web
-on: [push, pull_request]
+on: [push, pull_request, workflow_dispatch]
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -9,7 +9,7 @@ jobs:
       - name: npm install, build
         run: |
           npm install
-          npx webpack
+          export NODE_ENV=production && npx webpack
       - name: Archive production artifacts
         uses: actions/upload-artifact@v2
         with:
