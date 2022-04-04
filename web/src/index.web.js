@@ -12,17 +12,10 @@ const styles = `@font-face{
 
 const style = document.createElement('style');
 style.rel = "stylesheet";
-
-if (style.styleSheet)
-    style.styleSheet.cssText = styles;
-else
-    style.appendChild(document.createTextNode(styles));
-
+style.appendChild(document.createTextNode(styles));
 document.head.appendChild(style);
 
 AppRegistry.registerComponent(name, () => App);
-
 AppRegistry.runApplication(name, {
-    initialProps: {},
     rootTag: document.getElementById('app'),
 });
