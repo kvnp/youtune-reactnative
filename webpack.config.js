@@ -10,13 +10,106 @@ const wwwYoutube = "https://www.youtube.com";
 const imgYoutube = "https://i.ytimg.com";
 const videoYoutube = "https://redirector.googlevideo.com";
 
-if (!process.env.NODE_ENV && !process.env.PORT)
-    process.env.NODE_ENV = "development";
-else
-    process.env.NODE_ENV = "production";
+console.log(process.env.NODE_ENV);
+
+const plugins = [
+    new HtmlWebpackPlugin({
+        template: './web/src/index.html',
+        filename: 'index.html',
+        minify: process.env.NODE_ENV != "production"
+            ? true
+            : false
+    }),
+
+    new WebpackPwaManifest({
+        name: 'YouTune',
+        short_name: 'YouTune',
+        description: 'YouTube Music Frontend',
+        background_color: '#2f4f4f',
+        theme_color: '#2f4f4f',
+        crossorigin: 'use-credentials', //can be null, use-credentials or anonymous
+        display: "fullscreen",
+        icons: [
+            {
+                src: './web/src/icon.png',
+                sizes: [96, 128, 192, 256, 384, 512] // multiple sizes
+            },
+            {
+                src: './web/src/icon.png',
+                size: '1024x1024' // you can also use the specifications pattern
+            },
+            {
+                src: './web/src/icon.png',
+                size: '1024x1024',
+                purpose: 'maskable'
+            }
+        ],
+        ios: {
+            'apple-mobile-web-app-title': "YouTune",
+            'apple-mobile-web-app-capable': "yes",
+            'apple-mobile-web-app-status-bar-style': "black-translucent"
+        }
+    }),
+
+    new GenerateSW({
+        mode: process.env.NODE_ENV,
+        navigateFallback: "/index.html",
+        maximumFileSizeToCacheInBytes: 10e+6,
+        cleanupOutdatedCaches: true,
+        inlineWorkboxRuntime: false,
+        clientsClaim: true,
+        skipWaiting: true,
+        runtimeCaching: [
+            {
+                urlPattern: /\.(?:ico|html|js|css|json)$/,
+                handler: "CacheFirst",
+
+                options: {
+                    cacheName: "main"
+                }
+            },
+            {
+                urlPattern: /\.(?:png|jpg|jpeg)$/,
+                handler: "CacheFirst",
+
+                options: {
+                    cacheName: "images",
+
+                    expiration: {
+                        maxEntries: 50,
+                    }
+                }
+            },
+            {
+                urlPattern: "/proxy/*",
+                handler: "NetworkOnly",
+
+                options: {
+                    cacheName: "proxy"
+                }
+            }
+        ],
+    })
+];
+
+if (process.env.NODE_ENV == "development")
+    plugins.push(new webpack.HotModuleReplacementPlugin());
 
 
 module.exports = () => ({
+    mode: process.env.NODE_ENV,
+    devtool: 'source-map',
+    plugins: plugins,
+    entry: {
+        app: './web/src/index.web.js'
+    },
+
+    output: {
+        path: __dirname + '/web/public',
+        filename: 'app-[chunkhash].bundle.js',
+        publicPath: '/'
+    },
+
     devServer: {
         host: "0.0.0.0",
         port: process.env.PORT || 8080,
@@ -92,15 +185,10 @@ module.exports = () => ({
             }
         }
     },
-    
-    mode: process.env.NODE_ENV,
-    entry: {
-        app: './web/src/index.web.js'
-    },
 
     optimization: {
         nodeEnv: process.env.NODE_ENV,
-        minimize: process.env.NODE_ENV == "production" && !process.env.PORT,
+        minimize: process.env.NODE_ENV == "production",
         minimizer: [ new TerserPlugin() ],
 
         splitChunks: {
@@ -128,14 +216,6 @@ module.exports = () => ({
         runtimeChunk: 'multiple',
         moduleIds: 'deterministic',
     },
-
-    output: {
-        path: __dirname + '/web/public',
-        filename: 'app-[chunkhash].bundle.js',
-        publicPath: '/'
-    },
-
-    devtool: 'source-map',
 
     module: {
         rules: [
@@ -168,101 +248,7 @@ module.exports = () => ({
                 loader: 'file-loader',
             }
         ]
-    },    
-
-    plugins: [
-        // `process.env.NODE_ENV === 'production'` must be `true` for production
-        // builds to eliminate development checks and reduce build size. You may
-        // wish to include additional optimizations.
-        new webpack.DefinePlugin({
-            'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || 'development'),
-            __DEV__: process.env.NODE_ENV === 'production' || true,
-        }),
-
-        new HtmlWebpackPlugin({
-            template: './web/src/index.html',
-            filename: 'index.html',
-            minify: true
-        }),
-
-        process.env.NODE_ENV != "production"
-            ? new webpack.HotModuleReplacementPlugin()
-            : {},
-
-        new WebpackPwaManifest({
-            name: 'YouTune',
-            short_name: 'YouTune',
-            description: 'YouTube Music Frontend',
-            background_color: '#2f4f4f',
-            theme_color: '#2f4f4f',
-            crossorigin: 'use-credentials', //can be null, use-credentials or anonymous
-            display: "fullscreen",
-            icons: [
-                {
-                    src: './web/src/icon.png',
-                    sizes: [96, 128, 192, 256, 384, 512] // multiple sizes
-                },
-                {
-                    src: './web/src/icon.png',
-                    size: '1024x1024' // you can also use the specifications pattern
-                },
-                {
-                    src: './web/src/icon.png',
-                    size: '1024x1024',
-                    purpose: 'maskable'
-                }
-            ],
-            ios: {
-                'apple-mobile-web-app-title': "YouTune",
-                'apple-mobile-web-app-capable': "yes",
-                'apple-mobile-web-app-status-bar-style': "black-translucent"
-            }
-        }),
-
-        new GenerateSW(
-            {
-                mode: process.env.NODE_ENV,
-                navigateFallback: "/index.html",
-                maximumFileSizeToCacheInBytes: 10e+6,
-                cleanupOutdatedCaches: true,
-                inlineWorkboxRuntime: false,
-                clientsClaim: true,
-                skipWaiting: true,
-                runtimeCaching: [
-                    {
-                        urlPattern: /\.(?:ico|html|js|css|json)$/,
-                        handler: "CacheFirst",
-
-                        options: {
-                            cacheName: "main"
-                        }
-                    },
-
-                    {
-                        urlPattern: /\.(?:png|jpg|jpeg)$/,
-                        handler: "CacheFirst",
-
-                        options: {
-                            cacheName: "images",
-
-                            expiration: {
-                                maxEntries: 50,
-                            }
-                        }
-                    },
-
-                    {
-                        urlPattern: "/proxy/*",
-                        handler: "NetworkOnly",
-
-                        options: {
-                            cacheName: "proxy"
-                        }
-                    }
-                ],
-            }
-        )
-    ],
+    },
     
     resolve: {
         alias: {
