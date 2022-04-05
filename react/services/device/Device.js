@@ -9,10 +9,12 @@ export default class Device {
         static #initialize() {
             let deviceLanguage;
             if (Device.Platform == "web") {
-                if (navigator.languages.length > 1)
-                    deviceLanguage = navigator.languages[1].split("-");
-                else
-                    deviceLanguage = navigator.language || navigator.userLanguage
+                deviceLanguage = (navigator.language || navigator.userLanguage).split("-")
+
+                if (deviceLanguage.length == 1)
+                    if (navigator.languages.length > 1)
+                        if (navigator.languages[1].includes("-"))
+                            deviceLanguage.push(navigator.languages[1].split("-")[1]);
     
             } else if (Device.Platform == "android")
                 deviceLanguage = require("react-native")
