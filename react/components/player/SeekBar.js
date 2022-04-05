@@ -63,7 +63,7 @@ export default SeekBar = ({style, duration, buffering}) => {
             }}
             
             value={realPosition}
-            maximumValue={Math.max(duration, 1, realPosition)}
+            maximumValue={duration}
             bufferedPosition={bufferedPosition}
             minimumTrackTintColor={colors.text}
             maximumTrackTintColor={colors.card}
@@ -89,16 +89,9 @@ const styles = StyleSheet.create({
         marginTop: -12
     },
 
-    container: Platform.OS == 'android'
-        ? {
-            paddingTop: 16,
-            marginLeft: -15,
-            marginRight: -15
-        }
-
-        : {
-            paddingTop: 16
-        },
+    container: {
+        paddingTop: 16
+    },
 
     track: {
         height: 2,

@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { Provider } from 'react-native-paper';
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
@@ -27,6 +26,7 @@ const Stack = createStackNavigator();
 
 const App = () => {
     const [dark, setDark] = useState(Settings.Values.darkMode);
+    const theme = getTheme(dark);
 
     useEffect(() => {
         const darkmodeListener = UI.addListener(
@@ -35,30 +35,28 @@ const App = () => {
         );
 
         return () => darkmodeListener.remove();
-    }, [])
+    }, []);
 
-    const theme = getTheme(dark);
+    return <Provider theme={theme}>
+        <NavigationContainer linking={linking} theme={theme}>
+            <Stack.Navigator screenOptions={{gestureEnabled: true, swipeEnabled: true, animationEnabled: true}}>
+                <Stack.Screen name="App" component={Navigator}
+                                options={navigationOptions}/>
+                
+                <Stack.Screen name="Music" component={PlayView}
+                                options={{...navigationOptions, presentation: "transparentModal"}}/>
 
-    return <GestureHandlerRootView>
-        <Provider theme={theme}>
-            <NavigationContainer linking={linking} theme={theme}>
-                <Stack.Navigator screenOptions={{gestureEnabled: true, swipeEnabled: true, animationEnabled: true}}>
-                    <Stack.Screen name="App" component={Navigator} options={navigationOptions}/>
-                    <Stack.Screen name="Music" component={PlayView} options={{...navigationOptions, presentation: "transparentModal"}}/>
-                    <Stack.Screen name="Captcha" component={CaptchaView}/>
-                    
-                    <Stack.Screen name="Playlist" component={PlaylistView}
-                                options={{headerBackImage: () => getIcon({title: "arrow-back"})}}
-                    />
-                    
-                    <Stack.Screen name="Artist" component={ArtistView}
-                                options={{headerBackImage: () => getIcon({title: "arrow-back"})}}
-                    />
-                </Stack.Navigator>
-                <UpdateBar/>
-            </NavigationContainer>
-        </Provider>
-    </GestureHandlerRootView>;
+                <Stack.Screen name="Playlist" component={PlaylistView}
+                                options={{headerBackImage: () => getIcon({title: "arrow-back"})}}/>
+                
+                <Stack.Screen name="Artist" component={ArtistView}
+                                options={{headerBackImage: () => getIcon({title: "arrow-back"})}}/>
+                
+                <Stack.Screen name="Captcha" component={CaptchaView}/>
+            </Stack.Navigator>
+            <UpdateBar/>
+        </NavigationContainer>
+    </Provider>;
 }
 
 export default App;

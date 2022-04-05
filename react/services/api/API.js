@@ -115,11 +115,12 @@ export default class API {
         });
     }
 
+    static #setMessage = msgs => this.MESSAGES = msgs;
+
     static #populate(html) {
         let ytcfg = {set: object => {
             for (let key of Object.keys(object)) {
                 this[key] = object[key];
-                
                 if (key == "YTMUSIC_INITIAL_DATA") {
                     this[key].map((element, index) =>
                         this[key][index].data = JSON.parse(element.data)
@@ -128,7 +129,6 @@ export default class API {
             }
         }};
 
-        let setMessage = msgs => this.MESSAGES = msgs;
         let initialData = [];
         this.initialData = initialData;
 
@@ -170,7 +170,7 @@ export default class API {
             if (part.includes("setMessage(")) {
                 part = part.slice(part.indexOf("setMessage(") + 11);
                 part = part.slice(0, part.indexOf(");"));
-                setMessage(JSON.parse(part));
+                API.#setMessage(JSON.parse(part));
             }
 
             html = html.slice(html.indexOf("</"));
@@ -181,8 +181,6 @@ export default class API {
         return new Promise(async(resolve, reject) => {
             if (!API.initialized)
                 await API.initialize();
-
-            console.log(API.YTMUSIC_INITIAL_DATA);
 
             for (let i = 0; i < API.YTMUSIC_INITIAL_DATA.length; i++) {
                 if ("/browse" == API.YTMUSIC_INITIAL_DATA[i].path) {

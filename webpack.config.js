@@ -11,6 +11,14 @@ const imgYoutube = "https://i.ytimg.com";
 const videoYoutube = "https://redirector.googlevideo.com";
 
 const plugins = [
+    // `process.env.NODE_ENV === 'production'` must be `true` for production
+    // builds to eliminate development checks and reduce build size. You may
+    // wish to include additional optimizations.
+    new webpack.DefinePlugin({
+        'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || 'development'),
+        __DEV__: process.env.NODE_ENV !== 'production' || true,
+    }),
+
     new HtmlWebpackPlugin({
         template: './web/src/index.html',
         filename: 'index.html',

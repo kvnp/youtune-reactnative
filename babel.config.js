@@ -4,6 +4,7 @@ module.exports = {
   ],
   plugins: [
     'react-native-paper/babel',
-    'react-native-reanimated/plugin'
+    'react-native-reanimated/plugin',
+    ["@babel/plugin-proposal-private-methods", { "loose": true }]
   ]
 };

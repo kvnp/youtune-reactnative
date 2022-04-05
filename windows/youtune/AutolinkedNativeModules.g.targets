@@ -14,9 +14,9 @@
     <ProjectReference Include="$(ProjectDir)..\..\node_modules\react-native-linear-gradient\windows\BVLinearGradient\BVLinearGradient\BVLinearGradient.vcxproj">
       <Project>{193df456-3f97-4cc1-a7d4-809857cc064e}</Project>
     </ProjectReference>
-    <!-- Projects from react-native-track-player -->
-    <ProjectReference Include="$(ProjectDir)..\..\node_modules\react-native-track-player\windows\RNTrackPlayer\RNTrackPlayer.vcxproj">
-      <Project>{CC51D49E-7FAB-42D2-825D-5E93AC57262C}</Project>
+    <!-- Projects from react-native-screens -->
+    <ProjectReference Include="$(ProjectDir)..\..\node_modules\react-native-screens\windows\RNScreens\RNScreens.vcxproj">
+      <Project>{d638f49e-29d2-4699-ac52-facd82fa7138}</Project>
     </ProjectReference>
   </ItemGroup>
 </Project>

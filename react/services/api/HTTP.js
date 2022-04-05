@@ -3,14 +3,14 @@ import IO from "../device/IO";
 
 export default class HTTP {
     static Headers = class Headers {
-        get Simple() {
+        static get Simple() {
             return {
                 "User-Agent":
-                "Mozilla/5.0 (X11; Linux x86_64; rv:79.0) Gecko/20100101 Firefox/79.0"
+                "Mozilla/5.0 (Linux x86_64; rv:99.0) Gecko/20100101 Firefox/99.0"
             };
         }
     
-        get Referer() {
+        static get Referer() {
             return {
                 "Referer":      "https://music.youtube.com/",
                 "Content-Type": "application/json"
@@ -64,8 +64,7 @@ export default class HTTP {
         //Settings.forceProxy
         if (Device.Platform == "web")
             url = this.#getProxyUrl(url);
-        
-        if (Device.Platform == "node")
+        else if (Device.Platform == "node")
             return this.#nodeFetch(url, input, type);
 
         return this.#fetch(url, input, type, controllerCallback);

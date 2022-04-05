@@ -24,11 +24,11 @@ DerivedData
 # Android/IntelliJ
 #
 build/
-release/
 .idea
 .gradle
 local.properties
 *.iml
+*.hprof
 
 # node.js
 #
@@ -56,12 +56,9 @@ buck-out/
 # Bundle artifact
 *.jsbundle
 
-# CocoaPods
+# Ruby / CocoaPods
 /ios/Pods/
+/vendor/bundle/
 
-*.apk
-
-# Webpack
 /web/public
-
 msbuild.binlog

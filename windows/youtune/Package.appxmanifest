@@ -7,11 +7,11 @@
   IgnorableNamespaces="uap mp">
 
   <Identity
-    Name="0a122960-b6ee-4d3e-be7a-467cbea679b8"
+    Name="8b30a925-96e3-4244-8eab-d49c53405b30"
     Publisher="CN=kevinpfeifer"
     Version="1.0.0.0" />
 
-  <mp:PhoneIdentity PhoneProductId="0a122960-b6ee-4d3e-be7a-467cbea679b8" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
+  <mp:PhoneIdentity PhoneProductId="8b30a925-96e3-4244-8eab-d49c53405b30" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
 
   <Properties>
     <DisplayName>youtune</DisplayName>

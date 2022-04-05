@@ -63,11 +63,12 @@ export default class Device {
     };
 
     static #initializePlatform() {
-        if ((typeof process !== 'undefined') &&
-            (typeof process.versions.node !== 'undefined'))
-                this.#platform = "node";
-        else
-                this.#platform = require("react-native")["Platform"].OS;
+        if (typeof process !== 'undefined')
+            if (process.hasOwnProperty("versions"))
+                if (process.versions.node)
+                    return this.#platform = "node";
+        
+        this.#platform = require("react-native")["Platform"].OS;
     }
 
     static get Platform() {
