@@ -144,20 +144,28 @@ export default class Downloads {
     static likeTrack(videoId, like) {
         return new Promise(async(resolve, reject) => {
             let prevState = await Storage.getItem("Likes", videoId);
+            console.log({previousState: prevState});
             let deleting = false;
             if (prevState != null)
                 deleting = prevState.like == like;
 
+            console.log({deleting: deleting});
+
             if (deleting) {
                 console.log({m: "deleting", id: videoId});
                 await Storage.deleteItem("Likes", videoId);
-                if (!this.isTrackDownloaded(videoId) && this.isTrackCached(videoId))
-                    await Storage.deleteItem("Tracks", videoId);
             } else {
+                let index = this.#likedTracks.indexOf(videoId);
                 if (like) {
                     console.log({m: "liking", id: videoId});
+                    await Downloads.downloadTrack(videoId, true);
+                    if (index == -1)
+                        this.#likedTracks.push(videoId);
                 } else {
                     console.log({m: "disliking", id: videoId});
+
+                    if (index == -1)
+                        this.#likedTracks.splice(index, 1);
                 }
 
                 await Storage.setItem("Likes", {
@@ -166,13 +174,18 @@ export default class Downloads {
                 });
             }
 
+            if (deleting || !like) {
+                if (!this.isTrackDownloaded(videoId) && this.isTrackCached(videoId))
+                    await Storage.deleteItem("Tracks", videoId);
+            }
+
             let index = this.#likedTracks.indexOf(videoId);
             if (!deleting && like && !this.isTrackCached(videoId)) {
-                await Downloads.downloadTrack(videoId, true);
-                if (index == -1)
-                    this.#likedTracks.push(videoId);
+                
+                
+                    
             } else if ((!like || deleting) && index > -1) {
-                this.#likedTracks.splice(index, 1);
+                
             }
 
             this.#emitter.emit(this.EVENT_LIKE, deleting ? null : like);
@@ -219,9 +232,11 @@ export default class Downloads {
             
             if (!videoId || !this.#likedTracks.includes(videoId))
                 return resolve(null);
+            else if (this.#likedTracks.includes(videoId))
+                return resolve(true);
             
             let object = await Storage.getItem("Likes", videoId);
-            resolve(object.like);
+            resolve(object?.like);
         });
     }
 
