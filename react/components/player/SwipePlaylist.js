@@ -1,5 +1,4 @@
-import { useTheme } from "@react-navigation/native";
-import React, { useState } from "react";
+import React, { useRef, useEffect } from "react";
 import {
     Image,
     View,
@@ -9,24 +8,44 @@ import {
     FlatList,
     Animated
 } from "react-native";
+import { useTheme } from "@react-navigation/native";
 import { TouchableRipple } from "react-native-paper";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import SlidingUpPanel from 'rn-sliding-up-panel';
-import Downloads from "../../services/device/Downloads";
 
+import Downloads from "../../services/device/Downloads";
 import Music from "../../services/music/Music";
+import Device from "../../services/device/Device";
+
+var lastY;
 
 export default SwipePlaylist = ({playlist, track, backgroundColor, textColor}) => {
     const { height } = Dimensions.get("window");
     const colors = useTheme();
-    const [draggable, setDraggable] = useState(true);
+    const panel = useRef(null);
+    const container = useRef(null);
     const draggableRange = { top: height - 50, bottom: 50 }
     const draggedValue = new Animated.Value(50);
 
+    useEffect(() => {
+        if (Device.Platform == "web") {
+            let scroll = container.current._listRef._scrollRef;
+            scroll.addEventListener("touchmove", e => {
+                let currentY = e.touches[0].clientY;
+                if (scroll.scrollTop != 0) {
+                    if (currentY > lastY) {
+                        e.stopPropagation();
+                    }
+                }
+                lastY = currentY;
+            });
+        }
+    }, []);
+
     return (
         <SlidingUpPanel
-            ref={c => (_panel = c)}
-            allowDragging={draggable}
+            ref={panel}
+            allowDragging={true}
             draggableRange={draggableRange}
             animatedValue={draggedValue}
             snappingPoints={[51, height - 50]}
@@ -37,7 +56,7 @@ export default SwipePlaylist = ({playlist, track, backgroundColor, textColor}) =
                 <TouchableRipple 
                     rippleColor={colors.primary}
                     style={[styles.panelHeader, {backgroundColor: backgroundColor}]}
-                    onPress={() => _panel.show()}
+                    onPress={() => panel.current.show()}
                 >
                     <>
                     <View style={[
@@ -54,20 +73,14 @@ export default SwipePlaylist = ({playlist, track, backgroundColor, textColor}) =
                 </TouchableRipple>
 
                 <FlatList
+                    ref={container}
                     style={{
                         height: height - 150,
                         backgroundColor: backgroundColor
                     }}
                     contentContainerStyle={stylesRest.playlistContainer}
-                    onScroll={e => {
-                        if (e.nativeEvent.contentOffset.y <= 10 && !draggable)
-                            setDraggable(true);
-                        else if (e.nativeEvent.contentOffset.y > 10 && draggable)
-                            setDraggable(false);
-                    }}
 
                     data={playlist}
-
                     keyExtractor={item => item.id}
                     renderItem={
                         ({item, index}) => <TouchableRipple 
@@ -155,7 +168,7 @@ const styles = StyleSheet.create({
         position: "relative",
         alignSelf: "center",
         width: "100%",
-        maxWidth: 800
+        maxWidth: 800,
     },
 
     panelHeader: {
