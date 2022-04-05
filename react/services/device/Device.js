@@ -1,3 +1,5 @@
+import Settings from "./Settings";
+
 export default class Device {
     static #platform;
     static Language = class Language {
@@ -6,12 +8,13 @@ export default class Device {
     
         static #initialize() {
             let deviceLanguage;
-            if (Device.Platform == "web")
-                deviceLanguage = navigator
-                    .language
-                    .split("-");
+            if (Device.Platform == "web") {
+                if (navigator.languages.length > 1)
+                    deviceLanguage = navigator.languages[1].split("-");
+                else
+                    deviceLanguage = navigator.language || navigator.userLanguage
     
-            else if (Device.Platform == "android")
+            } else if (Device.Platform == "android")
                 deviceLanguage = require("react-native")
                     .NativeModules
                     .I18nManager
@@ -43,15 +46,17 @@ export default class Device {
         static get GL() {
             if (!this.#gl)
                 this.#initialize();
-            
-            return this.#gl;
+
+            if (Settings.Values.transmitLanguage)
+                return this.#gl;
         }
     
         static get HL() {
             if (!this.#hl)
                 this.#initialize();
             
-            return this.#hl;
+            if (Settings.Values.transmitLanguage)
+                return this.#hl;
         }
     };
 
