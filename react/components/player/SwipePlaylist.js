@@ -60,13 +60,10 @@ export default SwipePlaylist = ({playlist, track, backgroundColor, textColor}) =
                     }}
                     contentContainerStyle={stylesRest.playlistContainer}
                     onScroll={e => {
-                        if (e.nativeEvent.contentOffset.y <= 10 && !draggable) {
+                        if (e.nativeEvent.contentOffset.y <= 10 && !draggable)
                             setDraggable(true);
-                        }
-
-                        if (e.nativeEvent.contentOffset.y > 10 && draggable) {
+                        else if (e.nativeEvent.contentOffset.y > 10 && draggable)
                             setDraggable(false);
-                        }
                     }}
 
                     data={playlist}
@@ -111,6 +108,24 @@ export default SwipePlaylist = ({playlist, track, backgroundColor, textColor}) =
                                                 textAlignVertical: "center"
                                             }}
                                             name="file-download-done"
+                                            color={textColor}
+                                            size={20}
+                                        />
+
+                                        : undefined
+                                    : undefined
+                                }
+
+                                {
+                                    item != null
+                                    ? Downloads.isTrackLikedSync(item.id)
+                                        ? <MaterialIcons
+                                            style={{
+                                                width: 30,
+                                                textAlign: "center",
+                                                textAlignVertical: "center"
+                                            }}
+                                            name="thumb-up"
                                             color={textColor}
                                             size={20}
                                         />

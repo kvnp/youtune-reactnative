@@ -225,15 +225,21 @@ export default class Downloads {
         return this.#cachedTracks.includes(videoId);
     }
 
+    static isTrackLikedSync(videoId) {
+        if (!videoId || !this.#likedTracks.includes(videoId))
+            return null;
+        else if (this.#likedTracks.includes(videoId))
+            return true;
+    }
+
     static isTrackLiked(videoId) {
         return new Promise(async(resolve, reject) => {
             if (!this.initialized)
                 await Downloads.waitForInitialization();
             
-            if (!videoId || !this.#likedTracks.includes(videoId))
-                return resolve(null);
-            else if (this.#likedTracks.includes(videoId))
-                return resolve(true);
+            let sync = Downloads.isTrackLikedSync(videoId);
+            if (typeof sync != "undefined")
+                resolve(sync);
             
             let object = await Storage.getItem("Likes", videoId);
             resolve(object?.like);
