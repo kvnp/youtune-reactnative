@@ -249,7 +249,7 @@ const PlayView = ({route, navigation}) => {
                         labelStyle={{marginHorizontal: 0}}
                         style={{borderRadius: 25, alignItems: "center", padding: 0, margin: 0, minWidth: 0}}
                         contentStyle={{alignItems: "center", width: 50, height: 50, minWidth: 0}}
-                        onPress={() => navigation.goBack()}
+                        onPress={() => navigation.navigate("App")}
                     >
                         <MaterialIcons
                             style={{alignSelf: "center"}}
