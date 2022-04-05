@@ -10,8 +10,6 @@ const wwwYoutube = "https://www.youtube.com";
 const imgYoutube = "https://i.ytimg.com";
 const videoYoutube = "https://redirector.googlevideo.com";
 
-console.log(process.env.NODE_ENV);
-
 const plugins = [
     new HtmlWebpackPlugin({
         template: './web/src/index.html',
@@ -49,9 +47,13 @@ const plugins = [
             'apple-mobile-web-app-capable': "yes",
             'apple-mobile-web-app-status-bar-style': "black-translucent"
         }
-    }),
+    })
+];
 
-    new GenerateSW({
+if (process.env.NODE_ENV == "development")
+    plugins.push(new webpack.HotModuleReplacementPlugin());
+else
+    plugins.push(new GenerateSW({
         mode: process.env.NODE_ENV,
         navigateFallback: "/index.html",
         maximumFileSizeToCacheInBytes: 10e+6,
@@ -89,12 +91,7 @@ const plugins = [
                 }
             }
         ],
-    })
-];
-
-if (process.env.NODE_ENV == "development")
-    plugins.push(new webpack.HotModuleReplacementPlugin());
-
+    }));
 
 module.exports = () => ({
     mode: process.env.NODE_ENV,
