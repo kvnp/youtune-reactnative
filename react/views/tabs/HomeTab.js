@@ -1,14 +1,13 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import {
     Text,
     Pressable,
-    FlatList,
     View,
     ActivityIndicator,
     Platform
 } from 'react-native';
-
+import { FlatList } from 'react-native-gesture-handler';
 import { useTheme } from '@react-navigation/native';
 import { Button } from 'react-native-paper';
 

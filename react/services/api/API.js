@@ -130,8 +130,6 @@ export default class API {
         }};
 
         let initialData = [];
-        this.initialData = initialData;
-
         while (html.includes("<script")) {
             html = html.slice(html.indexOf("<script"));
 

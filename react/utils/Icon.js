@@ -1,5 +1,3 @@
-import React from 'react';
-
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import { useTheme } from "@react-navigation/native";
 

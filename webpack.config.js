@@ -230,18 +230,7 @@ module.exports = () => ({
                     loader: 'babel-loader',
                     options: {
                         cacheDirectory: true,
-                        presets: [
-                            ["@babel/env", {loose: true}],
-                            "@babel/react"
-                        ],
-                        
                         plugins: [
-                            ["transform-react-remove-prop-types", {
-                                removeImport: true,
-                                additionalLibraries: ["react-style-proptype"]
-                            }],
-                            'react-native-paper/babel',
-                            'react-native-reanimated/plugin',
                             ["react-native-web", {commonjs: true}]
                         ],
                     },

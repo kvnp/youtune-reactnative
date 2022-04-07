@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { StyleSheet, View, Image, Text } from "react-native";
 
 import { TouchableRipple} from "react-native-paper";

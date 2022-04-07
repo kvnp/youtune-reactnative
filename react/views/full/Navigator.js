@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Dimensions } from "react-native";
 
 import { useFocusEffect, useNavigation } from "@react-navigation/core";

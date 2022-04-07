@@ -1,5 +1,4 @@
 import Device from "../device/Device";
-import IO from "../device/IO";
 
 export default class HTTP {
     static Headers = class Headers {

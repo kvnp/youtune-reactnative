@@ -1,5 +1,5 @@
 import { useTheme } from "@react-navigation/native";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "react-native-paper"
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import Cast from "../../services/music/Cast";

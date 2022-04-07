@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import { ScrollView, View } from "react-native";
 
 const ScrollingText = ({children, style}) => {

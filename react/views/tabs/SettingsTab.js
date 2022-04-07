@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import {
     StyleSheet,
@@ -6,9 +6,9 @@ import {
     Text,
     Platform,
     Linking,
-    FlatList,
     View
 } from 'react-native';
+import { FlatList } from 'react-native-gesture-handler';
 import { TouchableRipple } from 'react-native-paper';
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import { useTheme } from '@react-navigation/native';

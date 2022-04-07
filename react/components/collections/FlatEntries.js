@@ -1,5 +1,4 @@
-import React from 'react';
-import { FlatList } from "react-native";
+import { FlatList } from 'react-native-gesture-handler';
 import Entry from '../shared/Entry';
 
 export default FlatEntries = ({entries, playlistId, navigation}) => {

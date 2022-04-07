@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { ImageBackground, Text } from "react-native";
 import { useTheme } from '@react-navigation/native';
 import LinearGradient from 'react-native-linear-gradient';
