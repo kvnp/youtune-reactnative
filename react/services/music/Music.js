@@ -11,7 +11,7 @@ export default class Music {
     static position = 0;
     static #positionInterval = null;
     static #positionListener = null;
-    static #isStreaming = false;
+    static isStreaming = false;
 
     static repeatMode = RepeatMode.Off;
     static repeatModeString = "repeat";
@@ -31,7 +31,7 @@ export default class Music {
     static TrackPlayerTaskProvider = () => {
         return async function() {
             TrackPlayer.addEventListener(Event.PlaybackState, params => {
-                if (Music.#isStreaming)
+                if (Music.isStreaming)
                     return;
 
                 if (params.state != State.Playing)
@@ -48,7 +48,7 @@ export default class Music {
             });
     
             TrackPlayer.addEventListener(Event.PlaybackTrackChanged, params => {
-                if (Music.#isStreaming)
+                if (Music.isStreaming)
                     return;
 
                 if (Music.metadataIndex != params.nextTrack) {
@@ -129,21 +129,21 @@ export default class Music {
     }
 
     static play = () => {
-        if (Music.#isStreaming)
+        if (Music.isStreaming)
             Cast.play();
         else
             TrackPlayer.play();
     }
 
     static pause = () => {
-        if (Music.#isStreaming)
+        if (Music.isStreaming)
             Cast.pause();
         else
             TrackPlayer.pause();
     }
 
     static reset = () => {
-        if (Music.#isStreaming)
+        if (!Music.isStreaming)
             Cast.reset();
         else
             TrackPlayer.reset();
@@ -151,7 +151,7 @@ export default class Music {
 
     static seekTo = position => {
         Music.#updatePositon(position);
-        if (Music.#isStreaming)
+        if (Music.isStreaming)
             Cast.seekTo(position);
         else {
             TrackPlayer.seekTo(position);
@@ -194,11 +194,9 @@ export default class Music {
                 if (trackIndex == -1)
                     return;
 
-                if (!Music.#isStreaming) {
-                    await TrackPlayer.remove(trackIndex);
-                    await TrackPlayer.add(track, trackIndex);
-                    Music.trackUrlLoaded[trackIndex] = true;
-                }
+                await TrackPlayer.remove(trackIndex);
+                await TrackPlayer.add(track, trackIndex);
+                Music.trackUrlLoaded[trackIndex] = true;
 
                 if (Music.metadata.id != track.id)
                     return;
@@ -210,14 +208,9 @@ export default class Music {
 
             Cast.initialize();
             Cast.addListener(Cast.EVENT_CAST, e => {
-                if (e.castState == "NOT_CONNECTED") {
-                    Music.#isStreaming = false;
-                    if (Music.#positionListener)
-                        Music.#positionListener.remove();
-
-                } else {
-                    if (!Music.#isStreaming) {
-                        Music.#isStreaming = true;
+                if (e.castState == "CONNECTED") {
+                    if (!Music.isStreaming) {
+                        Music.isStreaming = true;
                         TrackPlayer.reset();
                         clearInterval(Music.#positionInterval);
 
@@ -226,6 +219,17 @@ export default class Music {
                             pos => Music.#updatePositon(pos)
                         );
                     }
+                } else {
+                    if (!Music.isStreaming)
+                        return;
+
+                    Music.isStreaming = false;
+                    Music.#positionListener.remove();
+                    if (Music.metadataList.length > 0)
+                        Music.startPlaylist({
+                            list: Music.metadataList,
+                            index: Music.metadataIndex
+                        }, Music.position);
                 }
             });
 
@@ -240,12 +244,14 @@ export default class Music {
     }
 
     static reset = () => {
-        if (Music.#isStreaming)
+        if (Music.isStreaming)
             Cast.reset();
-        else 
+        else {
             TrackPlayer.reset();
-        Music.metadataIndex = 0;
-        Music.metadataList = [];
+            Music.position = 0;
+            Music.metadataIndex = 0;
+            Music.metadataList = [];
+        }
     }
 
     static cycleRepeatMode = () => {
@@ -324,19 +330,22 @@ export default class Music {
             if (!seek)
                 Music.#skip(index);
         } else {
-            Music.#queue.enqueue(() => {
-                return new Promise(async(resolve, reject) => {
-                    let track = Music.metadataList[Music.metadataIndex];
-                    track.url = await Music.getStream({videoId: track.id});
-                    resolve(track);
+            if (!Music.isStreaming)
+                Music.#queue.enqueue(() => {
+                    return new Promise(async(resolve, reject) => {
+                        let track = Music.metadataList[Music.metadataIndex];
+                        track.url = await Music.getStream({videoId: track.id});
+                        resolve(track);
+                    });
                 });
-            });
+            else
+                Music.#skip(index);
         }
     }
 
     static #skip(index) {
-        if (Music.#isStreaming) {
-            //TODO
+        if (Music.isStreaming) {
+            Cast.cast();
         } else {
             TrackPlayer.skip(index);
         }
@@ -377,7 +386,8 @@ export default class Music {
                 }
             }
 
-            Music.reset();
+            if (!Music.isStreaming)
+                TrackPlayer.reset();
         }
 
         Music.state = State.Buffering;
@@ -392,7 +402,7 @@ export default class Music {
         }
     }
 
-    static async startPlaylist(playlist) {
+    static async startPlaylist(playlist, position) {
         Music.metadataList = playlist.list;
         Music.trackUrlLoaded = Array(playlist.list.length).fill(false);
         Music.metadataIndex = 0;
@@ -412,9 +422,12 @@ export default class Music {
             }
         }
 
-        if (!Music.#isStreaming) {
+        if (!Music.isStreaming) {
             await TrackPlayer.add(playlist.list);
             await TrackPlayer.skip(Music.metadataIndex);
+            if (position)
+                await TrackPlayer.seekTo(position);
+
             TrackPlayer.play();
         } else {
             Cast.cast();

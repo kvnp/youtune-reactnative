@@ -139,7 +139,11 @@ export default MiniPlayer = ({style, containerStyle}) => {
                     onPress={onStop}
                 >
                     <MaterialIcons
-                        name="clear"
+                        name={
+                            Music.isStreaming
+                                ? "cast-connected"
+                                : "clear"
+                        }
                         color={colors.text}
                         size={29}
                     />

@@ -10,7 +10,6 @@ export default class Cast {
     static deviceName = null;
     static sessionId = null;
 
-    static metadataListener = null;
     static #emitter = DeviceEventEmitter;
     static EVENT_SESSION = "event-cast-session";
     static EVENT_CAST = "event-cast-status";
@@ -99,12 +98,6 @@ export default class Cast {
                     }
                 );
 
-                Music.metadataListener = Music.addListener(Music.EVENT_METADATA_UPDATE, () => {
-                    let currentSession = cast.framework.CastContext.getInstance().getCurrentSession()
-                    if (currentSession?.status == "CONNECTED")
-                            Cast.cast();
-                });
-
                 Cast.initialized = true;
             }
         };
@@ -117,11 +110,13 @@ export default class Cast {
     }
 
     static async cast() {
+        let currentTime = 0;
         let session = cast.framework.CastContext.getInstance().getCurrentSession();
         if (!session) {
             await cast.framework.CastContext.getInstance().requestSession();
             session = cast.framework.CastContext.getInstance().getCurrentSession();
             Cast.deviceName = session.getCastDevice().friendlyName;
+            currentTime = Music.position;
         }
         
         /*let startsWithBlob = url => url != undefined
@@ -164,11 +159,11 @@ export default class Cast {
         }*/
 
         let media = Music.metadata;
-        if (media.artwork?.startsWith("blob")) {
+        if (media.artwork?.startsWith("blob") || !media.artwork) {
             media.artwork = (await Media.getAudioInfo({videoId: media.id})).artwork;
         }
 
-        if (media.url?.startsWith("blob")) {
+        if (media.url?.startsWith("blob") || !media.url) {
             media.url = await Media.getAudioStream({videoId: media.id});
         }
 
@@ -178,6 +173,7 @@ export default class Cast {
         mediaInfo.metadata.title = media.title;
         mediaInfo.metadata.artist = media.artist;
         let request = new chrome.cast.media.LoadRequest(mediaInfo);
+        request.currentTime = currentTime;
         request.queueData = new chrome.cast.media.QueueData();
         request.queueData.repeatMode = chrome.cast.media.RepeatMode.SINGLE;
         
@@ -217,6 +213,7 @@ export default class Cast {
     }
 
     static disconnect() {
-        cast.framework.CastContext.getInstance().endCurrentSession();
+        let session = cast.framework.CastContext.getInstance().getCurrentSession();
+        session.endSession(true);
     }
 }
