@@ -1,9 +1,10 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, Platform } from 'react-native';
 
 import { useTheme } from '@react-navigation/native';
 import Slider from '@react-native-community/slider';
-import TrackPlayer, { State, useProgress } from 'react-native-track-player';
+import TrackPlayer, { State } from 'react-native-track-player';
+import Music from '../../services/music/Music';
 
 function pad(n, width, z = 0) {
     n = n + '';
@@ -19,8 +20,7 @@ const minutesAndSeconds = position => ([
 
 export default SeekBar = ({style, duration, buffering}) => {
     const { colors } = useTheme();
-    const { position, bufferedPosition } = useProgress(500);
-
+    const [position, setPosition] = useState(Music.position);
     const [state, setState] = useState({
         isSliding: false,
         cache: 0
@@ -35,10 +35,19 @@ export default SeekBar = ({style, duration, buffering}) => {
     const elapsed = minutesAndSeconds(realPosition);
     const remaining = minutesAndSeconds(duration - realPosition);
 
+    useEffect(() => {
+        const listener = Music.addListener(
+            Music.EVENT_POSITION_UPDATE,
+            pos => setPosition(pos)
+        );
+
+        return () => listener.remove();
+    }, []);
+
     return <View style={[styles.container, style]}>
         <Slider
             onSlidingComplete={position => {
-                TrackPlayer.seekTo(position);
+                Music.seekTo(position);
                 setState({
                     isSliding: false,
                     cache: 0
@@ -47,7 +56,6 @@ export default SeekBar = ({style, duration, buffering}) => {
 
             onValueChange={value => {
                 if (state.isSliding) {
-                    //TrackPlayer.seekTo(value);
                     setState({
                         isSliding: true,
                         cache: value
@@ -64,7 +72,6 @@ export default SeekBar = ({style, duration, buffering}) => {
             
             value={realPosition}
             maximumValue={duration}
-            bufferedPosition={bufferedPosition}
             minimumTrackTintColor={colors.text}
             maximumTrackTintColor={colors.card}
             thumbTintColor={colors.primary}

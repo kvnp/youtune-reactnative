@@ -1,5 +1,5 @@
 import { DeviceEventEmitter } from "react-native";
-import TrackPlayer, { RepeatMode } from "react-native-track-player";
+import TrackPlayer, { RepeatMode, State } from "react-native-track-player";
 import Media from "../api/Media";
 import Music from "./Music";
 
@@ -10,9 +10,13 @@ export default class Cast {
     static deviceName = null;
     static sessionId = null;
 
+    static metadataListener = null;
     static #emitter = DeviceEventEmitter;
-    static EVENT_SESSION = "event-session";
-    static EVENT_CAST = "event-cast";
+    static EVENT_SESSION = "event-cast-session";
+    static EVENT_CAST = "event-cast-status";
+    static EVENT_POSITION = "event-cast-position";
+    static EVENT_METADATA = "event-cast-metadata";
+    static EVENT_PLAYERSTATE = "event-cast-playerstate";
 
     static addListener(event, listener) {
         try {
@@ -40,6 +44,9 @@ export default class Cast {
 
         window['__onGCastApiAvailable'] = isAvailable => {
             if (isAvailable) {
+                Cast.player = new cast.framework.RemotePlayer();
+                Cast.controller = new cast.framework.RemotePlayerController(Cast.player);
+
                 let instance = cast.framework.CastContext.getInstance();
                 instance.setOptions({
                     receiverApplicationId: chrome.cast.media.DEFAULT_MEDIA_RECEIVER_APP_ID,
@@ -49,26 +56,53 @@ export default class Cast {
 
                 instance.addEventListener(
                     cast.framework.CastContextEventType.CAST_STATE_CHANGED,
-                    e => {
-                        if (e.castState == "CONNECTED") {
-                            TrackPlayer.setVolume(0);
-                            //TrackPlayer.setRepeatMode(RepeatMode.Track);
-                        } else {
-                            TrackPlayer.setVolume(1);
-                        }
+                    e => this.#emitter.emit(this.EVENT_CAST, e)
+                );
 
-                        this.#emitter.emit(this.EVENT_CAST, e);
+                let session = cast.framework.CastContext.getInstance().getCurrentSession();
+                if (session)
+                    Cast.deviceName = session.getCastDevice().friendlyName;
+                
+                Cast.controller.addEventListener(
+                    cast.framework.RemotePlayerEventType.CURRENT_TIME_CHANGED,
+                    e => this.#emitter.emit(this.EVENT_POSITION, e.value)
+                );
+
+                /*Cast.controller.addEventListener(
+                    cast.framework.RemotePlayerEventType.MEDIA_INFO_CHANGED,
+                    e => console.log(e)
+                );
+
+                Cast.controller.addEventListener(
+                    cast.framework.RemotePlayerEventType.QUEUE_INFO_CHANGED,
+                    e => console.log(e)
+                );*/
+
+                Cast.controller.addEventListener(
+                    cast.framework.RemotePlayerEventType.PLAYER_STATE_CHANGED,
+                    e => {
+                        let state;
+                        switch (e.value) {
+                            case "IDLE":
+                                state = State.Ready;
+                                break;
+                            case "PLAYING":
+                                state = State.Playing;
+                                break;
+                            case "PAUSED":
+                                state = State.Paused;
+                                break;
+                            case "BUFFERING":
+                                state = State.Buffering;
+                        }
+                        this.#emitter.emit(this.EVENT_PLAYERSTATE, state);
                     }
                 );
 
-                instance.addEventListener(
-                    cast.framework.CastContextEventType.SESSION_STATE_CHANGED,
-                    e => this.#emitter.emit(this.EVENT_SESSION, e)
-                );
-
-                Music.addListener(Music.EVENT_METADATA_UPDATE, () => {
-                    if (cast.framework.CastContext.getInstance().getCurrentSession() != null)
-                        Cast.cast();
+                Music.metadataListener = Music.addListener(Music.EVENT_METADATA_UPDATE, () => {
+                    let currentSession = cast.framework.CastContext.getInstance().getCurrentSession()
+                    if (currentSession?.status == "CONNECTED")
+                            Cast.cast();
                 });
 
                 Cast.initialized = true;
@@ -130,11 +164,11 @@ export default class Cast {
         }*/
 
         let media = Music.metadata;
-        if (media.artwork.startsWith("blob")) {
+        if (media.artwork?.startsWith("blob")) {
             media.artwork = (await Media.getAudioInfo({videoId: media.id})).artwork;
         }
 
-        if (media.url.startsWith("blob")) {
+        if (media.url?.startsWith("blob")) {
             media.url = await Media.getAudioStream({videoId: media.id});
         }
 
@@ -152,6 +186,34 @@ export default class Cast {
         } catch (e) {
             throw e;
         }
+    }
+
+    static setRepeatMode() {
+        //TODO
+    }
+
+    static seekTo(position) {
+        let session = cast.framework.CastContext.getInstance().getCurrentSession();
+        if (session) {
+            session.sendMessage("urn:x-cast:com.google.cast.media", {
+                mediaSessionId: session.getMediaSession().mediaSessionId,
+                requestId: 1,
+                type: "SEEK",
+                currentTime: position
+            });
+        }
+    }
+
+    static play() {
+        Cast.controller.playOrPause();
+    }
+
+    static pause() {
+        Cast.controller.playOrPause();
+    }
+
+    static reset() {
+        this.disconnect();
     }
 
     static disconnect() {

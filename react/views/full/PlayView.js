@@ -8,7 +8,7 @@ import {
     useWindowDimensions
 } from "react-native";
 
-import TrackPlayer, { Event, State } from 'react-native-track-player';
+import { State } from 'react-native-track-player';
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import { useFocusEffect, useTheme } from "@react-navigation/native";
 import { Button } from "react-native-paper";
@@ -60,12 +60,12 @@ const PlayView = ({route, navigation}) => {
             playlistId: route.params.list
         });
 
-        const stateListener = TrackPlayer.addEventListener(
-            Event.PlaybackState,
-            e => setState(e.state)
+        const stateListener = Music.addListener(
+            Music.EVENT_STATE_UPDATE,
+            e => setState(e)
         );
 
-        const updateListener = Music.addListener(
+        const metadataListener = Music.addListener(
             Music.EVENT_METADATA_UPDATE,
             () => {
                 setState(State.Buffering);
@@ -83,7 +83,7 @@ const PlayView = ({route, navigation}) => {
 
         return () => {
             stateListener.remove();
-            updateListener.remove();
+            metadataListener.remove();
             lkListener.remove();
         }
     }, []);
@@ -201,8 +201,8 @@ const PlayView = ({route, navigation}) => {
                                     contentStyle={{alignItems: "center", width: 60, height: 60, minWidth: 0}}
                                     onPress={
                                         state == State.Playing
-                                            ? TrackPlayer.pause
-                                            : TrackPlayer.play
+                                            ? Music.pause
+                                            : Music.play
                                     }
                                 >
                                     <MaterialIcons

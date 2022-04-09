@@ -4,55 +4,59 @@ import { StyleSheet, View, Image, Text } from "react-native";
 import { TouchableRipple} from "react-native-paper";
 import { useNavigation, useTheme } from "@react-navigation/native";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
-import TrackPlayer, { useProgress, State, Event } from 'react-native-track-player';
+import TrackPlayer, { State } from 'react-native-track-player';
 import Music from "../../services/music/Music";
 
 import ScrollingText from "../shared/ScrollingText";
 
 export default MiniPlayer = ({style, containerStyle}) => {
-    const [state, setState] = useState(State.Stopped);
     const navigation = useNavigation();
-    const [track, setTrack] = useState({
-        title: null,
-        artist: null,
-        artwork: null
-    });
+    const { colors } = useTheme();
 
-    const { dark, colors } = useTheme();
-    const { position, duration } = useProgress();
+    const [state, setState] = useState(Music.state);
+    const [track, setTrack] = useState(Music.metadata);
+    const [position, setPosition] = useState(Music.position);
 
-    const positionLength = (100 / duration * position);
+    const positionLength = (100 / track.duration * position);
 
     const positionWidth = positionLength + "%";
     const remainingWidth = (100 - positionLength) + "%";
 
     useEffect(() => {
-        TrackPlayer.getState().then(state => setState(state));
-        TrackPlayer.getCurrentTrack().then(id => {
-            if (id != null)
-                refreshTrack({nextTrack: id});
-        });
-
-        const playback = TrackPlayer.addEventListener(
-            Event.PlaybackState, e => setState(e.state)
+        const stateListener = Music.addListener(
+            Music.EVENT_STATE_UPDATE,
+            state => setState(state)
         );
 
-        const trackChanged = TrackPlayer.addEventListener(
-            Event.PlaybackTrackChanged, refreshTrack
+        const metadataListener = Music.addListener(
+            Music.EVENT_METADATA_UPDATE,
+            metadata => setTrack(metadata)
+        );
+
+        const positionListener = Music.addListener(
+            Music.EVENT_POSITION_UPDATE,
+            pos => setPosition(pos)
         );
 
         return () => {
-            playback.remove();
-            trackChanged.remove();
+            stateListener.remove();
+            metadataListener.remove();
+            positionListener.remove();
         }
     }, []);
 
-    const refreshTrack = async(e) => {
-        if (!e) e = {nextTrack: await TrackPlayer.getCurrentTrack()};
-        let track = await TrackPlayer.getTrack(e.nextTrack);
-        if (track != null)
-            setTrack(track);
+    const onNext = () => Music.skipNext();
+    const onStop = () => Music.reset();
+
+    const isInactive = () => {
+        return state == State.Stopped || state == State.None;
     }
+
+    const onPlay = () => {
+        state == State.Playing
+            ? Music.pause()
+            : Music.play();
+    };
 
     const onOpen = () => {
         Music.setTransitionTrack({
@@ -67,20 +71,6 @@ export default MiniPlayer = ({style, containerStyle}) => {
             v: track.id,
             list: track.playlistId
         });
-    }
-
-    const onNext = () => Music.skipNext();
-
-    const onPlay = () => {
-        state == State.Playing
-            ? TrackPlayer.pause()
-            : TrackPlayer.play();
-    };
-
-    const onStop = () => Music.reset();
-
-    const isInactive = () => {
-        return state == State.Stopped || state == State.None;
     }
     
     const { title, artist, artwork } = track;

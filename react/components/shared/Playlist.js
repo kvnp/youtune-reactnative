@@ -1,5 +1,3 @@
-
-
 import {
     Text,
     Image
