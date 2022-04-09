@@ -201,7 +201,7 @@ export default class Music {
                 if (Music.metadata.id != track.id)
                     return;
 
-                Music.#skip(trackIndex);
+                Music.skip(trackIndex);
                 /*await TrackPlayer.skip(trackIndex);
                 TrackPlayer.play();*/
             });
@@ -322,13 +322,12 @@ export default class Music {
         if (seek)
             Music.seekTo(0)
         else {
-            Music.metadataIndex = index;
-            Music.#emitter.emit(Music.EVENT_METADATA_UPDATE, Music.metadata);
+            Music.skip(index);
         }
         
         if (Music.trackUrlLoaded[Music.metadataIndex]) {
             if (!seek)
-                Music.#skip(index);
+                Music.skip(index);
         } else {
             if (!Music.isStreaming)
                 Music.#queue.enqueue(() => {
@@ -339,16 +338,18 @@ export default class Music {
                     });
                 });
             else
-                Music.#skip(index);
+                Music.skip(index);
         }
     }
 
-    static #skip(index) {
+    static skip(index) {
         if (Music.isStreaming) {
+            Music.metadataIndex = index;
             Cast.cast();
         } else {
             TrackPlayer.skip(index);
         }
+        Music.#emitter.emit(Music.EVENT_METADATA_UPDATE, Music.metadata);
     }
     
     static skipNext() {
@@ -381,7 +382,7 @@ export default class Music {
                 
                 for (let i = 0; i < queue.length; i++) {
                     if (queue[i].id == videoId) {
-                        return Music.skipTo(i);
+                        return Music.skip(i);
                     }
                 }
             }

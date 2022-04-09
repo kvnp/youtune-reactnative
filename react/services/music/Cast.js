@@ -1,5 +1,5 @@
 import { DeviceEventEmitter } from "react-native";
-import TrackPlayer, { RepeatMode, State } from "react-native-track-player";
+import { State } from "react-native-track-player";
 import Media from "../api/Media";
 import Music from "./Music";
 
@@ -55,7 +55,10 @@ export default class Cast {
 
                 instance.addEventListener(
                     cast.framework.CastContextEventType.CAST_STATE_CHANGED,
-                    e => this.#emitter.emit(this.EVENT_CAST, e)
+                    e => {
+                        this.#emitter.emit(this.EVENT_CAST, e);
+                        console.log(e);
+                    }
                 );
 
                 let session = cast.framework.CastContext.getInstance().getCurrentSession();
@@ -67,7 +70,7 @@ export default class Cast {
                     e => this.#emitter.emit(this.EVENT_POSITION, e.value)
                 );
 
-                /*Cast.controller.addEventListener(
+                Cast.controller.addEventListener(
                     cast.framework.RemotePlayerEventType.MEDIA_INFO_CHANGED,
                     e => console.log(e)
                 );
@@ -75,7 +78,7 @@ export default class Cast {
                 Cast.controller.addEventListener(
                     cast.framework.RemotePlayerEventType.QUEUE_INFO_CHANGED,
                     e => console.log(e)
-                );*/
+                );
 
                 Cast.controller.addEventListener(
                     cast.framework.RemotePlayerEventType.PLAYER_STATE_CHANGED,
@@ -213,7 +216,11 @@ export default class Cast {
     }
 
     static disconnect() {
-        let session = cast.framework.CastContext.getInstance().getCurrentSession();
-        session.endSession(true);
+        let instance = cast.framework.CastContext.getInstance()
+        let session = instance.getCurrentSession();
+        if (!session)
+            instance.endCurrentSession();
+        else
+            session.endSession(true);
     }
 }

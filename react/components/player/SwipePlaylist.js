@@ -92,7 +92,7 @@ export default SwipePlaylist = ({playlist, track, backgroundColor, textColor}) =
                                     marginVertical: 5
                                 }}
 
-                                onPress={() => Music.skipTo(index)}
+                                onPress={() => Music.skip(index)}
                             >
                                 <>
                                 {

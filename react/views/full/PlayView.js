@@ -27,7 +27,11 @@ const PlayView = ({route, navigation}) => {
     const { dark, colors } = useTheme();
 
     const [state, setState] = useState(Music.state);
-    const [track, setTrack] = useState(Music.metadata);
+    const [track, setTrack] = useState(
+        Music.transitionTrack
+            ? Music.transitionTrack
+            : Music.metadata
+    );
     const [repeat, setRepeat] = useState(Music.repeatModeString);
     const [isLiked, setLiked] = useState(null);
 
@@ -173,7 +177,7 @@ const PlayView = ({route, navigation}) => {
                     </Button>
                 </View>
 
-                <SeekBar duration={duration} buffering={state}/>
+                <SeekBar buffering={state}/>
                 
                 <View style={[stylesBottom.buttonContainer, {overflow: "visible", alignSelf: "stretch", justifyContent: "space-between"}]}>
                     <CastButton/>

@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, Platform } from 'react-native';
 
 import { useTheme } from '@react-navigation/native';
 import Slider from '@react-native-community/slider';
-import TrackPlayer, { State } from 'react-native-track-player';
+import { State } from 'react-native-track-player';
 import Music from '../../services/music/Music';
 
 function pad(n, width, z = 0) {
@@ -18,8 +18,9 @@ const minutesAndSeconds = position => ([
     pad( ~~(position % 60), 2),
 ]);
 
-export default SeekBar = ({style, duration, buffering}) => {
+export default SeekBar = ({style, buffering}) => {
     const { colors } = useTheme();
+    const { duration } = Music.metadata;
     const [position, setPosition] = useState(Music.position);
     const [state, setState] = useState({
         isSliding: false,
