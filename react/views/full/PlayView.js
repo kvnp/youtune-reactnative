@@ -100,7 +100,6 @@ const PlayView = ({route, navigation}) => {
 
             <View style={[stylesBottom.container, {width: width - 50, height: height / 2.6}]}>
                 <View style={controlStyles.container}>
-                    
                     <Button
                         onPress={() => likeSong(false)}
                         labelStyle={{marginHorizontal: 0}}
@@ -234,6 +233,11 @@ const PlayView = ({route, navigation}) => {
                     </Button>
 
                     <Button
+                        disabled={
+                            Music.isStreaming
+                                ? true
+                                : false
+                        }
                         labelStyle={{marginHorizontal: 0}}
                         style={{borderRadius: 25, alignItems: "center", padding: 0, margin: 0, minWidth: 0}}
                         contentStyle={{alignItems: "center", width: 50, height: 50, minWidth: 0}}
@@ -243,7 +247,10 @@ const PlayView = ({route, navigation}) => {
                             style={{alignSelf: "center"}}
                             selectable={false}
                             color={colors.text} size={30}
-                            name={repeat}
+                            name={!Music.isStreaming
+                                ? repeat
+                                : "repeat-one-on"
+                            }
                         />
                     </Button>
                 </View>

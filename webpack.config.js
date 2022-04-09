@@ -3,6 +3,7 @@ const TerserPlugin = require("terser-webpack-plugin");
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const WebpackPwaManifest = require('webpack-pwa-manifest');
 const { GenerateSW } = require('workbox-webpack-plugin');
+const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
 
 const userAgent = "Mozilla/5.0 (X11; Linux x86_64; rv:79.0) Gecko/20100101 Firefox/79.0";
 const musicYoutube = "https://music.youtube.com";
@@ -22,9 +23,11 @@ const plugins = [
     new HtmlWebpackPlugin({
         template: './web/src/index.html',
         filename: 'index.html',
-        minify: process.env.NODE_ENV != "production"
-            ? true
-            : false
+        minify: {
+            removeAttributeQuotes: true,
+            collapseWhitespace: true,
+            removeComments: true,
+        },
     }),
 
     new WebpackPwaManifest({
@@ -194,7 +197,13 @@ module.exports = () => ({
     optimization: {
         nodeEnv: process.env.NODE_ENV,
         minimize: process.env.NODE_ENV == "production",
-        minimizer: [ new TerserPlugin() ],
+        mergeDuplicateChunks: true,
+        minimizer: [
+            new TerserPlugin({
+                parallel: true
+            }),
+            new CssMinimizerPlugin(),
+        ],
 
         splitChunks: {
             chunks: 'async',
