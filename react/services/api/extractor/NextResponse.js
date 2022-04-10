@@ -1,6 +1,7 @@
 import Playlist from "../../../models/music/playlist";
 import Track from "../../../models/music/track";
 import { textToSec } from "../../../utils/Time";
+import Music from "../../music/Music";
 
 export default function digestNextResults(json) {
     let playlist = new Playlist();
@@ -24,7 +25,26 @@ export default function digestNextResults(json) {
         } else {
             playlistRenderer = musicQueueRenderer.content.playlistPanelRenderer;
         }*/
-        playlistRenderer = musicQueueRenderer.content.playlistPanelRenderer;
+        if (musicQueueRenderer.hasOwnProperty("content")) {
+            playlistRenderer = musicQueueRenderer.content.playlistPanelRenderer;
+        } else {
+            let videoId = json.currentVideoEndpoint.watchEndpoint.videoId;
+            let artwork = null;
+            let playlistId = null;
+            let title = null;
+            let artist = null;
+            let duration = 0;
+
+            if (Music.transitionTrack?.id == videoId) {
+                artwork = json.playerOverlays.playerOverlayRenderer.browserMediaSession.browserMediaSessionRenderer.thumbnailDetails.thumbnails[3].url;
+                playlistId = Music.transitionTrack.playlistId;
+                title = Music.transitionTrack.title;
+                artist = Music.transitionTrack.artist;
+            }
+
+            playlist.list.push(new Track(videoId, playlistId, title, artist, artwork, duration));
+            return playlist;
+        }
     }
 
     playlist.index = json.currentVideoEndpoint.watchEndpoint.index;
