@@ -17,6 +17,7 @@ export default class Media {
         let type = HTTP.Type.Json;
         let input = {
             method: HTTP.Method.POST,
+            credentials: "omit",
             headers: HTTP.Headers.Referer,
             body: JSON.stringify(requestBody)
         };
@@ -35,6 +36,7 @@ export default class Media {
         let url = API.URL.Suggestion;
         let input = {
             method: HTTP.Method.POST,
+            credentials: "omit",
             headers: HTTP.Headers.Referer,
             body: JSON.stringify(requestBody)
         }
@@ -95,6 +97,7 @@ export default class Media {
             let type = HTTP.Type.Json;
             let input = {
                 method: HTTP.Method.POST,
+                credentials: "omit",
                 headers: HTTP.Headers.Referer,
                 body: JSON.stringify(requestBody)
             };
@@ -121,6 +124,7 @@ export default class Media {
         let type = HTTP.Type.Json;
         let input = {
             method: HTTP.Method.POST,
+            credentials: "omit",
             headers: HTTP.Headers.Referer,
             body: JSON.stringify(requestBody)
         };
@@ -143,6 +147,7 @@ export default class Media {
         let type = HTTP.Type.Json;
         let input = {
             method: HTTP.Method.POST,
+            credentials: "omit",
             headers: HTTP.Headers.Referer,
             body: JSON.stringify(requestBody)
         };
@@ -167,6 +172,7 @@ export default class Media {
         let type = HTTP.Type.Json;
         let input = {
             method: HTTP.Method.POST,
+            credentials: "omit",
             headers: HTTP.Headers.Referer,
             body: JSON.stringify(requestBody)
         };
@@ -184,6 +190,7 @@ export default class Media {
         let type = HTTP.Type.Blob;
         let input = {
             method: HTTP.Method.GET,
+            credentials: "omit",
             headers: HTTP.Headers.Referer
         };
         
