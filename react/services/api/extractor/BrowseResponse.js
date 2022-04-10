@@ -13,7 +13,7 @@ function getPlaylist(json) {
         browse.subtitle += subtitlelist[s].text;
     }
 
-    if (musicHeader.hasOwnProperty("description")) {
+    if (musicHeader?.description) {
         let descriptionlist = musicHeader.description.runs;
         for (let d = 0; d < descriptionlist.length; d++) {
             browse.description += descriptionlist[d].text;
@@ -35,10 +35,10 @@ function getPlaylist(json) {
         
         for (let sl = 0; sl < songList.length; sl++) {
             let songs;
-            if (songList[sl].hasOwnProperty("musicPlaylistShelfRenderer")) {
+            if (songList[sl]?.musicPlaylistShelfRenderer) {
                 songs = songList[sl].musicPlaylistShelfRenderer.contents;
                 browse.playlistId = songList[sl].musicPlaylistShelfRenderer.playlistId;
-            } else if (songList[sl].hasOwnProperty("musicShelfRenderer")) {
+            } else if (songList[sl]?.musicShelfRenderer) {
                 songs = songList[sl].musicShelfRenderer.contents;
                 browse.playlistId = json.microformat.microformatDataRenderer.urlCanonical.split("=").slice(-1)[0]
             } else break;
@@ -88,13 +88,13 @@ function getPlaylist(json) {
                 for (let ml = 0; ml < menuList.length; ml++) {
                     let menuObject = menuList[ml];
 
-                    if (menuObject.hasOwnProperty("menuNavigationItemRenderer")) {
+                    if (menuObject?.menuNavigationItemRenderer) {
                         let menuItem = menuList[ml].menuNavigationItemRenderer;
 
-                        if (menuItem.hasOwnProperty("navigationEndpoint")) {
+                        if (menuItem?.navigationEndpoint) {
                             let navigation = menuItem.navigationEndpoint;
     
-                            if (navigation.hasOwnProperty("watchEndpoint")) {
+                            if (navigation?.watchEndpoint) {
                                 entry.videoId = navigation.watchEndpoint.videoId;
 
                                 if (browse.playlistId != null)
@@ -146,7 +146,7 @@ function getArtist(json) {
             let shelfEntry = contentList[ctl];
 
             let shelf = {title: "", subtitle: "", type: ""};
-            if (shelfEntry.hasOwnProperty("musicShelfRenderer")) {
+            if (shelfEntry?.musicShelfRenderer) {
                 shelf.type = "Songs";
                 shelf.entries = [];
 
@@ -202,7 +202,7 @@ function getArtist(json) {
                 }
             }
 
-            if (shelfEntry.hasOwnProperty("musicCarouselShelfRenderer")) {
+            if (shelfEntry?.musicCarouselShelfRenderer) {
                 shelf.type = "Playlists";
                 shelf.albums = [];
                 let playlistShelf = shelfEntry.musicCarouselShelfRenderer;
@@ -236,18 +236,18 @@ function getArtist(json) {
                     let browseId;
                     let playlistId;
 
-                    if (music.hasOwnProperty("navigationEndpoint")) {
+                    if (music?.navigationEndpoint) {
                         let navigationEndpoint = music.navigationEndpoint;
-                        if (navigationEndpoint.hasOwnProperty("browseEndpoint")) {
-                            if (navigationEndpoint.browseEndpoint.hasOwnProperty("browseId"))
+                        if (navigationEndpoint?.browseEndpoint) {
+                            if (navigationEndpoint.browseEndpoint?.browseId)
                                 browseId = navigationEndpoint.browseEndpoint.browseId;
                         }
 
-                        if (navigationEndpoint.hasOwnProperty("watchEndpoint")) {
-                            if (navigationEndpoint.watchEndpoint.hasOwnProperty("playlistId"))
+                        if (navigationEndpoint?.watchEndpoint) {
+                            if (navigationEndpoint.watchEndpoint?.playlistId)
                                 playlistId = navigationEndpoint.watchEndpoint.playlistId;
 
-                            if (navigationEndpoint.watchEndpoint.hasOwnProperty("videoId"))
+                            if (navigationEndpoint.watchEndpoint?.videoId)
                                 videoId = navigationEndpoint.watchEndpoint.videoId;
                         }
                     }
@@ -265,7 +265,7 @@ function getArtist(json) {
                 }
             }
 
-            if (shelfEntry.hasOwnProperty("musicDescriptionShelfRenderer")) {
+            if (shelfEntry?.musicDescriptionShelfRenderer) {
                 shelf.description = "";
                 let descriptionShelf = shelfEntry.musicDescriptionShelfRenderer;
 
@@ -274,7 +274,7 @@ function getArtist(json) {
                     shelf.title += headerList[ttll].text;
                 }
 
-                if (descriptionShelf.hasOwnProperty("subheader")) {
+                if (descriptionShelf?.subheader) {
                     let subheaderList = descriptionShelf.subheader.runs;
                     for (let stll = 0; stll < titleList.length; stll++) {
                         shelf.subtitle += subheaderList[stll].text;

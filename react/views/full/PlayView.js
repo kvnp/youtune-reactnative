@@ -21,18 +21,16 @@ import SwipePlaylist from "../../components/player/SwipePlaylist";
 import { showModal } from "../../components/modals/MoreModal";
 import ScrollingText from "../../components/shared/ScrollingText";
 import CastButton from "../../components/player/CastButton";
+import Cast from "../../services/music/Cast";
 
 const PlayView = ({route, navigation}) => {
     const { height, width } = useWindowDimensions();
     const { dark, colors } = useTheme();
 
     const [state, setState] = useState(Music.state);
-    const [track, setTrack] = useState(
-        Music.transitionTrack
-            ? Music.transitionTrack
-            : Music.metadata
-    );
+    const [track, setTrack] = useState(Music.metadata);
     const [repeat, setRepeat] = useState(Music.repeatModeString);
+    const [connected, setConnected] = useState(Music.isStreaming);
     const [isLiked, setLiked] = useState(null);
 
     const {id, playlistId, title, artist, artwork, duration} = track;
@@ -63,6 +61,16 @@ const PlayView = ({route, navigation}) => {
             videoId: route.params.v,
             playlistId: route.params.list
         });
+
+        const castListener = Cast.addListener(
+            Cast.EVENT_CAST,
+            e => {
+                if (e.castState == "CONNECTED")
+                    setConnected(true);
+                else
+                    setConnected(false);
+            }
+        )
 
         const stateListener = Music.addListener(
             Music.EVENT_STATE_UPDATE,
@@ -110,6 +118,7 @@ const PlayView = ({route, navigation}) => {
                             style={{alignSelf: "center"}}
                             selectable={false}
                             name="thumb-down"
+                            size={30}
                             color={
                                 isLiked == null
                                     ? "dimgray"
@@ -117,8 +126,6 @@ const PlayView = ({route, navigation}) => {
                                         ? colors.text
                                         : "dimgray"
                             }
-
-                            size={30}
                         />
                     </Button>
                     
@@ -234,7 +241,7 @@ const PlayView = ({route, navigation}) => {
 
                     <Button
                         disabled={
-                            Music.isStreaming
+                            connected
                                 ? true
                                 : false
                         }

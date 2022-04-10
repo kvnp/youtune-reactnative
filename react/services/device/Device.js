@@ -64,7 +64,7 @@ export default class Device {
 
     static #initializePlatform() {
         if (typeof process !== 'undefined')
-            if (process.hasOwnProperty("versions"))
+            if (process?.versions)
                 if (process.versions.node)
                     return this.#platform = "node";
         

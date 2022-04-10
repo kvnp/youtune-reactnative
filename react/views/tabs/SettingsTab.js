@@ -66,11 +66,11 @@ export default SettingsTab = () => {
         const desc = item.description;
         const useSwitch = item.switch;
 
-        const disabled = item.hasOwnProperty("override") && Platform.OS == "web"
+        const disabled = item?.override && Platform.OS == "web"
             ? item.override.web.disabled
             : false;
         
-        const state = item.hasOwnProperty("override") && Platform.OS == "web"
+        const state = item?.override && Platform.OS == "web"
             ? item.override.web.state
             : item.state;
 

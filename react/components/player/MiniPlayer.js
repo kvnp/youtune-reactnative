@@ -4,12 +4,14 @@ import { StyleSheet, View, Image, Text } from "react-native";
 import { TouchableRipple} from "react-native-paper";
 import { useNavigation, useTheme } from "@react-navigation/native";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
-import TrackPlayer, { State } from 'react-native-track-player';
+import { State } from 'react-native-track-player';
 import Music from "../../services/music/Music";
+import Cast from "../../services/music/Cast";
 
 import ScrollingText from "../shared/ScrollingText";
+import { showStreamModal } from "../modals/StreamModal";
 
-export default MiniPlayer = ({style, containerStyle}) => {
+export default MiniPlayer = ({style, containerStyle, height}) => {
     const navigation = useNavigation();
     const { colors } = useTheme();
 
@@ -18,7 +20,6 @@ export default MiniPlayer = ({style, containerStyle}) => {
     const [position, setPosition] = useState(Music.position);
 
     const positionLength = (100 / track.duration * position);
-
     const positionWidth = positionLength + "%";
     const remainingWidth = (100 - positionLength) + "%";
 
@@ -46,11 +47,12 @@ export default MiniPlayer = ({style, containerStyle}) => {
     }, []);
 
     const onNext = () => Music.skipNext();
-    const onStop = () => Music.reset();
-
-    const isInactive = () => {
-        return state == State.Stopped || state == State.None;
-    }
+    const onStop = () => {
+        if (Music.isStreaming)
+            Cast.reset();
+        else
+            Music.reset();
+    };
 
     const onPlay = () => {
         state == State.Playing
@@ -76,9 +78,8 @@ export default MiniPlayer = ({style, containerStyle}) => {
     const { title, artist, artwork } = track;
 
     return <View
-        style={[
-            styles.main, {
-            height: isInactive() ? 0 : 50,
+        style={[styles.main, {
+            height: height,
             backgroundColor: colors.card
         }, containerStyle]}
     >
@@ -137,6 +138,7 @@ export default MiniPlayer = ({style, containerStyle}) => {
                         {color: colors.card, borderRadius: 25}
                     ]}
                     onPress={onStop}
+                    onLongPress={Music.isStreaming ? showStreamModal : undefined}
                 >
                     <MaterialIcons
                         name={

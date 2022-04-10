@@ -144,9 +144,11 @@ export default class Music {
 
     static reset = () => {
         if (!Music.isStreaming)
-            Cast.reset();
-        else
             TrackPlayer.reset();
+
+        Music.metadataList = [];
+        Music.metadataIndex = 0;
+        Music.position = 0;
     }
 
     static seekTo = position => {
@@ -243,17 +245,6 @@ export default class Music {
         });
     }
 
-    static reset = () => {
-        if (Music.isStreaming)
-            Cast.reset();
-        else {
-            TrackPlayer.reset();
-            Music.position = 0;
-            Music.metadataIndex = 0;
-            Music.metadataList = [];
-        }
-    }
-
     static cycleRepeatMode = () => {
         if (!Music.#initialized)
             return reject("Music needs to be initialized by calling initialize()");
@@ -273,7 +264,6 @@ export default class Music {
         }
         
         TrackPlayer.setRepeatMode(Music.repeatMode);
-        Cast.setRepeatMode(Music.repeatMode);
         return Music.repeatModeString;
     }
 
@@ -283,7 +273,7 @@ export default class Music {
 
     static get metadata() {
         if (Music.metadataList.length == 0)
-            if (Music.transitionTrack == null)
+            if (!Music.transitionTrack)
                 return {id: null, playlistId: null, title: null, artist: null, artwork: null, duration: 0};
             else
                 return Music.transitionTrack;
@@ -371,6 +361,13 @@ export default class Music {
             return Media.getAudioStream({videoId});
     }
 
+    static getMetadata({videoId}) {
+        if (Downloads.isTrackCached(videoId))
+            return Downloads.getTrack(videoId);
+        else
+            return Media.getAudioInfo({videoId});
+    }
+
     static handlePlayback = async({videoId, playlistId}) => {
         let queue = Music.metadataList;
         if (queue.length > 0) {
@@ -387,12 +384,17 @@ export default class Music {
                 }
             }
 
-            if (!Music.isStreaming)
-                TrackPlayer.reset();
+            Music.reset();
         }
 
         Music.state = State.Buffering;
-        if (playlistId?.startsWith("LOCAL")) {
+
+        let local = false;
+        if (typeof playlistId == "string")
+            if (playlistId.startsWith("LOCAL"))
+                local = true;
+
+        if (local) {
             Downloads.loadLocalPlaylist(playlistId, videoId)
                 .then(localPlaylist => Music.startPlaylist(localPlaylist))
                 .catch(_ => console.log(_));
@@ -406,7 +408,6 @@ export default class Music {
     static async startPlaylist(playlist, position) {
         Music.metadataList = playlist.list;
         Music.trackUrlLoaded = Array(playlist.list.length).fill(false);
-        Music.metadataIndex = 0;
 
         for (let i = 0; i < playlist.list.length; i++) {
             if (i == playlist.index) {
@@ -414,6 +415,12 @@ export default class Music {
             }
 
             if (i == playlist.index || i == playlist.index + 1) {
+                if (Downloads.isTrackDownloaded(playlist.list[i].id) || playlist.list[i].duration == 0) {
+                    playlist.list[i] = await Music.getMetadata({videoId: playlist.list[i].id});
+                    playlist.list[i].id = playlist.list[i].videoId;
+                    playlist.list[i].videoId = undefined;
+                }
+
                 playlist.list[i].url = await Music.getStream({videoId: playlist.list[i].id});
                 Music.trackUrlLoaded[i] = true;
             }

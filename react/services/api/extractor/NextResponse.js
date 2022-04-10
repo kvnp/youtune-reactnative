@@ -1,18 +1,18 @@
+import Music from "../../music/Music";
 import Playlist from "../../../models/music/playlist";
 import Track from "../../../models/music/track";
 import { textToSec } from "../../../utils/Time";
-import Music from "../../music/Music";
 
 export default function digestNextResults(json) {
     let playlist = new Playlist();
 
     let playlistRenderer;
-    if (json.contents.singleColumnMusicWatchNextResultsRenderer.hasOwnProperty("playlist"))
+    if (json.contents.singleColumnMusicWatchNextResultsRenderer?.playlist)
         playlistRenderer = json.contents.singleColumnMusicWatchNextResultsRenderer
                                 .playlist.playlistPanelRenderer;
     else {
         let musicQueueRenderer = json.contents.singleColumnMusicWatchNextResultsRenderer.tabbedRenderer.watchNextTabbedResultsRenderer.tabs[0].tabRenderer.content.musicQueueRenderer;
-        /*if (musicQueueRenderer.hasOwnProperty("hack") && hackTracks != null) {
+        /*if (musicQueueRenderer?."hack") && hackTracks != null) {
             playlist = hackTracks;
             let currentVideoId = json.currentVideoEndpoint.watchEndpoint.videoId;
             
@@ -25,9 +25,9 @@ export default function digestNextResults(json) {
         } else {
             playlistRenderer = musicQueueRenderer.content.playlistPanelRenderer;
         }*/
-        if (musicQueueRenderer.hasOwnProperty("content")) {
+        if (musicQueueRenderer?.content)
             playlistRenderer = musicQueueRenderer.content.playlistPanelRenderer;
-        } else {
+        else {
             let videoId = json.currentVideoEndpoint.watchEndpoint.videoId;
             let artwork = null;
             let playlistId = null;
@@ -51,9 +51,8 @@ export default function digestNextResults(json) {
 
     for (let i = 0; i < playlistRenderer.contents.length; i++) {
         // skips automixPreviewVideoRenderer and playlistExpandableMessageRenderer
-        if (!playlistRenderer.contents[i].hasOwnProperty("playlistPanelVideoRenderer")) {
+        if (!playlistRenderer.contents[i]?.playlistPanelVideoRenderer)
             continue;
-        }
 
         let panelRenderer = playlistRenderer.contents[i].playlistPanelVideoRenderer;
 

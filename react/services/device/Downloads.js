@@ -270,6 +270,7 @@ export default class Downloads {
                 return resolve(null);
             
             let track = await Storage.getItem("Tracks", videoId);
+            track.artwork = IO.getBlobAsURL(track.artwork);
             resolve(track);
         });
     }
@@ -321,16 +322,9 @@ export default class Downloads {
                 // list = await Downloads.getPlaylist(playlistId)
             }
 
-            console.log(list);
             for (let i = 0; i < list.length; i++) {
                 let id = list[i];
                 let local = await this.getTrack(id);
-                try {
-                    local.artwork = IO.getBlobAsURL(local.artwork);
-                } catch(e) {
-                    console.log(e);
-                    console.log(local);
-                }
                 local.id = local.videoId;
                 local.playlistId = playlistId;
                 delete local.videoId;

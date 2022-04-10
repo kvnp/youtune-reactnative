@@ -8,16 +8,15 @@ export default function digestResultResponse(json) {
     };
 
     let sectionList = json.contents.tabbedSearchResultsRenderer.tabs[0].tabRenderer.content.sectionListRenderer.contents;
-    if (sectionList[0].hasOwnProperty("itemSectionRenderer")) {
-
+    if (sectionList[0]?.itemSectionRenderer) {
         let itemSection = sectionList[0].itemSectionRenderer.contents[0];
         
-        if (itemSection.hasOwnProperty("messageRenderer")) {
+        if (itemSection?.messageRenderer) {
             let message = itemSection.messageRenderer.text.runs[0].text;
             final.reason = message;
             return final;
 
-        } else if (itemSection.hasOwnProperty("didYouMeanRenderer")) {
+        } else if (itemSection?.didYouMeanRenderer) {
             final.suggestionOption = {correctedList: [], endpoints: {text: "", query: ""}};
             let renderer = itemSection.didYouMeanRenderer;
 
@@ -29,7 +28,7 @@ export default function digestResultResponse(json) {
                 final.suggestionOption.correctedList.push(renderer.correctedQuery.runs[crq]);
             
 
-        } else if (itemSection.hasOwnProperty("showingResultsForRenderer")) {
+        } else if (itemSection?.showingResultsForRenderer) {
             final.insteadOption = {correctedList: [], originalList: [], endpoints: {corrected: {text: "", query: ""}, original: {text: "", query: ""}}};
 
             let renderer = itemSection.showingResultsForRenderer;
@@ -55,7 +54,7 @@ export default function digestResultResponse(json) {
     for (let sl = 0; sl < sectionList.length; sl++) {
         let itemSection = sectionList[sl];
 
-        if (itemSection.hasOwnProperty("musicShelfRenderer")) {
+        if (itemSection?.musicShelfRenderer) {
             let musicShelf = itemSection.musicShelfRenderer;
 
             let titlelist = musicShelf.title.runs;
@@ -65,7 +64,7 @@ export default function digestResultResponse(json) {
                 title += titlelist[ttl].text;
 
             let bottomEndpoint = null;
-            if (musicShelf.hasOwnProperty("bottomEndpoint")) {
+            if (musicShelf?.bottomEndpoint) {
                 let bottomText = "";
                 let textArray = musicShelf.bottomText.runs;
                 for (let botText = 0; botText < textArray.length; botText++) {
@@ -124,8 +123,8 @@ export default function digestResultResponse(json) {
                 let thumbnaillist = responsiveMusicItem.thumbnail.musicThumbnailRenderer.thumbnail.thumbnails;
                 entry.thumbnail = thumbnaillist[thumbnaillist.length - 1].url;
                 
-                if (responsiveMusicItem.hasOwnProperty("navigationEndpoint")) {
-                    if (responsiveMusicItem.navigationEndpoint.hasOwnProperty("watchEndpoint")) {
+                if (responsiveMusicItem?.navigationEndpoint) {
+                    if (responsiveMusicItem.navigationEndpoint?.watchEndpoint) {
                         entry.type = "Title";
                         entry.playlistId = responsiveMusicItem.navigationEndpoint.watchEndpoint.playlistId;
                         entry.videoId = responsiveMusicItem.navigationEndpoint.watchEndpoint.videoId;
@@ -142,7 +141,7 @@ export default function digestResultResponse(json) {
 
                             let playNavigationEndpoint = responsiveMusicItem.overlay.musicItemThumbnailOverlayRenderer.content.musicPlayButtonRenderer.playNavigationEndpoint;
 
-                            if (playNavigationEndpoint.hasOwnProperty("watchPlaylistEndpoint"))
+                            if (playNavigationEndpoint?.watchPlaylistEndpoint)
                                 entry.playlistId = playNavigationEndpoint.watchPlaylistEndpoint.playlistId;
                             else
                                 entry.playlistId = playNavigationEndpoint.watchEndpoint.playlistId;

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
     Modal,
     Pressable,
@@ -8,27 +8,72 @@ import {
     Text
 } from "react-native";
 
-import { Button, TextInput } from "react-native-paper";
-
-import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import { useTheme } from "@react-navigation/native";
+import Slider from "@react-native-community/slider";
+import { Button } from "react-native-paper";
+import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 
 import { appColor } from "../../styles/App";
+import Music from "../../services/music/Music";
+import Cast from "../../services/music/Cast";
 
-export default AddPlaylistModal = ({visible, addCallback, cancelCallback}) => {
+export var showStreamModal;
+
+export default StreamModal = () => {
     const {colors} = useTheme();
-    const [title, setTitle] = useState("");
-    const [description, setDescription] = useState("");
+    const [deviceName, setDeviceName] = useState("");
+    const [volume, setVolume] = useState(0);
+    const [visible, setVisible] = useState(false);
+
+    const getIcon = capabilities => {
+        if (capabilities)
+            if (capabilities.includes("video_out"))
+                return "tv";
+        
+        return "speaker";
+    }
+
+    useEffect(() => {
+        showStreamModal = () => {
+            setVolume(Cast.volume);
+            setVisible(true);
+        };
+
+        const volumeListener = Cast.addListener(Cast.EVENT_VOLUME, value => setVolume(value));
+        const castListener = Cast.addListener(Cast.EVENT_CAST, e => {
+            let name;
+            if (e.castState == "NOT_CONNECTED")
+                name = "Disconnected";
+            else if (e.castState == "CONNECTING")
+                name = "Connecting";
+            else if (e.castState == "CONNECTED")
+                name = Cast.deviceInfo.receiverType[0].toUpperCase() + Cast.deviceInfo.receiverType.slice(1)
+                       + " | " +
+                       Cast.deviceInfo.friendlyName;
+
+            if (name != deviceName)
+                setDeviceName(name);
+        });
+
+        return () => {
+            castListener.remove();
+            volumeListener.remove();
+            showStreamModal = null;
+        };
+    }, []);
 
     return <Modal
         animationType="slide"
         transparent={true}
         visible={visible}
-        onRequestClose={() => cancelCallback()}
-        onDismiss={() => cancelCallback()}
+        onRequestClose={() => setVisible(false)}
+        onDismiss={() => setVisible(false)}
         hardwareAccelerated={true}
     >
-        <Pressable onPress={() => cancelCallback()} style={{height: "100%", width: "100%", justifyContent: "flex-end", backgroundColor: "rgba(0, 0, 0, 0.3)"}}>
+        <Pressable
+            style={{height: "100%", width: "100%", justifyContent: "flex-end", backgroundColor: "rgba(0, 0, 0, 0.3)"}}
+            onPress={() => setVisible(false)}
+        >
             <Pressable style={{
                 paddingHorizontal: 10,
                 maxWidth: 800,
@@ -36,44 +81,48 @@ export default AddPlaylistModal = ({visible, addCallback, cancelCallback}) => {
                 width: "100%"
             }}>
                 <View style={[modalStyles.header, {backgroundColor: colors.border}, Platform.OS == "web" ? {cursor: "default"} : undefined]}>
-                    <View style={modalStyles.headerText}>
-                        <Text style={{color: colors.text}} numberOfLines={1}>Add playlist</Text>
-                        <Text style={{color: colors.text}} numberOfLines={1}></Text>
+                    <View style={[modalStyles.headerText, {flexDirection: "row", alignItems: "center"}]}>
+                        <MaterialIcons
+                            color={colors.text}
+                            size={25}
+                            name={
+                                Music.isStreaming
+                                    ? getIcon(Cast.deviceInfo.capabilities)
+                                    : "broadcast-off"
+                            }
+                        />
+                        
+                        <Text style={{color: colors.text, paddingLeft: 20}} numberOfLines={1}>
+                            {deviceName}
+                        </Text>
                     </View>
                 </View>
 
                 <View style={{height: 80, alignItems: "center", paddingHorizontal: 50, flexDirection: "row", backgroundColor: colors.card, cursor: Platform.OS == "web" ? "default" : undefined}}>
-                    <MaterialIcons name="title" color={colors.text} size={25}/>
-                    <TextInput
-                        placeholderTextColor={colors.text}
-                        underlineColor={colors.border}
-                        style={[styles.inputText, {color: colors.text, backgroundColor: colors.card, marginLeft: 20, flex: 1}]}
-                        value={title}
-                        onChangeText={text => setTitle(text)}
-                        placeholder="Title"
-                        mode="flat"
-                    />
-                </View>
-
-                <View style={{height: 80, alignItems: "center", paddingHorizontal: 50, flexDirection: "row", backgroundColor: colors.card, cursor: Platform.OS == "web" ? "default" : undefined}}>
-                    <MaterialIcons name="description" color={colors.text} size={25}/>
-                    <TextInput
-                        placeholderTextColor={colors.text}
-                        underlineColor={colors.border}
-                        style={[styles.inputText, {color: colors.text, backgroundColor: colors.card, marginLeft: 20, flex: 1}]}
-                        value={description}
-                        onChangeText={text => setDescription(text)}
-                        placeholder="Description"
+                    <MaterialIcons name="volume-up" color={colors.text} size={25}/>
+                    <Slider
+                        onSlidingComplete={position => {
+                            Cast.volume = position;
+                            setVolume(volume);
+                        }}
+                        
+                        value={volume}
+                        maximumValue={1}
+                        minimumTrackTintColor={colors.text}
+                        maximumTrackTintColor={colors.border}
+                        thumbTintColor={colors.primary}
+                        thumbStyle={{color: colors.primary}}
+                        style={{paddingLeft: 20}}
                     />
                 </View>
 
                 <View style={{height: 80, width: "100%", backgroundColor: colors.card, flexDirection: "row", justifyContent: "center", cursor: Platform.OS == "web" ? "default" : undefined}}>
-                    <Button mode="text" style={{marginHorizontal: 20, alignSelf: "center"}} onPress={() => cancelCallback()}>
-                        <Text>CANCEL</Text>
-                    </Button>
-
-                    <Button mode="contained" style={{ marginHorizontal: 20, alignSelf: "center"}} onPress={() => addCallback(title, description)}>
-                        <Text>CREATE</Text>
+                    <Button
+                        mode="contained"
+                        style={{ marginHorizontal: 20, alignSelf: "center"}}
+                        onPress={() => Cast.disconnect()}
+                    >
+                        <Text>DISCONNECT</Text>
                     </Button>
                 </View>
             </Pressable>

@@ -27,7 +27,7 @@ export default PlaylistView = ({ route, navigation }) => {
 
     useFocusEffect(
         useCallback(() => {
-            if (!route.params.hasOwnProperty("list"))
+            if (!route.params?.list)
                 navigation.pop();
 
             if (idFits)

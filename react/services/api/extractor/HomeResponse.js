@@ -2,13 +2,13 @@ export default function digestHomeResponse(json) {
     let tabRenderer = json.contents.singleColumnBrowseResultsRenderer.tabs[0].tabRenderer;
     
     let sectionList = null;
-    if (tabRenderer.hasOwnProperty("content"))
+    if (tabRenderer?.content)
         sectionList = tabRenderer.content.sectionListRenderer;
     else
         sectionList = json.continuationContents.sectionListContinuation;
 
     let final = {shelves: [], continuation: null, picture: null};
-    if (sectionList.hasOwnProperty("continuations")) {
+    if (sectionList?.continuations) {
         let continuations = sectionList.continuations[0].nextContinuationData;
         final.continuation = {
             continuation: continuations.continuation,
@@ -21,14 +21,14 @@ export default function digestHomeResponse(json) {
         let shelf = {title: "", albums: []};
         let shelfRenderer;
 
-        if (contentList[y].hasOwnProperty("musicImmersiveCarouselShelfRenderer")) {
+        if (contentList[y]?.musicImmersiveCarouselShelfRenderer) {
             shelfRenderer = contentList[y].musicImmersiveCarouselShelfRenderer;
 
             let index = shelfRenderer.backgroundImage.simpleVideoThumbnailRenderer.thumbnail.thumbnails.length - 1;
             let picture = shelfRenderer.backgroundImage.simpleVideoThumbnailRenderer.thumbnail.thumbnails[index].url;
             final.picture = picture;
 
-        } else if (contentList[y].hasOwnProperty("musicCarouselShelfRenderer"))
+        } else if (contentList[y]?.musicCarouselShelfRenderer)
             shelfRenderer = contentList[y].musicCarouselShelfRenderer;
 
         else continue;
@@ -40,7 +40,7 @@ export default function digestHomeResponse(json) {
             let album = {title: "", subtitle: ""};
             
             let itemRenderer;
-            if (shelfRenderer.contents[m].hasOwnProperty("musicTwoRowItemRenderer")) {
+            if (shelfRenderer.contents[m]?.musicTwoRowItemRenderer) {
                 itemRenderer = shelfRenderer.contents[m].musicTwoRowItemRenderer;
 
                 for (let k = 0; k < itemRenderer.title.runs.length; k++)
@@ -67,21 +67,21 @@ export default function digestHomeResponse(json) {
             let playlistId;
 
             let navigationEndpoint;
-            if (itemRenderer.hasOwnProperty("navigationEndpoint"))
+            if (itemRenderer?.navigationEndpoint)
                 navigationEndpoint = itemRenderer.navigationEndpoint;
             else
                 navigationEndpoint = itemRenderer.overlay.musicItemThumbnailOverlayRenderer.content.musicPlayButtonRenderer.playNavigationEndpoint;
 
-            if (navigationEndpoint.hasOwnProperty("watchEndpoint")) {
-                if (navigationEndpoint.watchEndpoint.hasOwnProperty("watchPlaylistEndpoint"))
+            if (navigationEndpoint?.watchEndpoint) {
+                if (navigationEndpoint.watchEndpoint?.watchPlaylistEndpoint)
                     playlistId = playNavigationEndpoint.watchPlaylistEndpoint.playlistId;
 
-                if (navigationEndpoint.watchEndpoint.hasOwnProperty("videoId"))
+                if (navigationEndpoint.watchEndpoint?.videoId)
                     videoId = navigationEndpoint.watchEndpoint.videoId;
             }
 
-            if (navigationEndpoint.hasOwnProperty("browseEndpoint")) {
-                if (navigationEndpoint.browseEndpoint.hasOwnProperty("browseId"))
+            if (navigationEndpoint?.browseEndpoint) {
+                if (navigationEndpoint.browseEndpoint?.browseId)
                     browseId = navigationEndpoint.browseEndpoint.browseId;
             }
 

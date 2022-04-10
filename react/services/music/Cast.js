@@ -1,5 +1,7 @@
 import { DeviceEventEmitter } from "react-native";
 import { State } from "react-native-track-player";
+import Playlist from "../../models/music/playlist";
+import Track from "../../models/music/track";
 import Media from "../api/Media";
 import Music from "./Music";
 
@@ -7,7 +9,6 @@ export default class Cast {
     static player = null;
     static controller = null;
     static initialized = false;
-    static deviceName = null;
     static sessionId = null;
 
     static #emitter = DeviceEventEmitter;
@@ -16,6 +17,7 @@ export default class Cast {
     static EVENT_POSITION = "event-cast-position";
     static EVENT_METADATA = "event-cast-metadata";
     static EVENT_PLAYERSTATE = "event-cast-playerstate";
+    static EVENT_VOLUME = "event-cast-volume";
 
     static addListener(event, listener) {
         try {
@@ -23,7 +25,7 @@ export default class Cast {
         } finally {
             if (event == this.EVENT_CAST) {
                 let castState = "NOT_CONNECTED";
-                if (window.hasOwnProperty("cast")) {
+                if (window?.cast) {
                     castState = !window.chrome.cast
                         ? "NOT_CONNECTED"
                         : cast.framework.CastContext.getInstance().getCastState()
@@ -37,8 +39,27 @@ export default class Cast {
         }
     }
 
+    static async #getSession(requestSession) {
+        let sessionIsNew = false;
+        let session = cast.framework.CastContext.getInstance().getCurrentSession();
+        if (!session && requestSession) {
+            await cast.framework.CastContext.getInstance().requestSession();
+            sessionIsNew = true;
+            session = cast.framework.CastContext.getInstance().getCurrentSession();
+            session.addEventListener("VOLUME_CHANGED", e => {
+                console.log(e);
+                this.#emitter.emit(this.EVENT_VOLUME, e.value);
+            });
+        }
+
+        return {
+            session: session,
+            sessionIsNew: sessionIsNew
+        }
+    }
+
     static initialize() {
-        if (!window.hasOwnProperty("chrome"))
+        if (!window?.chrome)
             return;
 
         window['__onGCastApiAvailable'] = isAvailable => {
@@ -57,14 +78,11 @@ export default class Cast {
                     cast.framework.CastContextEventType.CAST_STATE_CHANGED,
                     e => {
                         this.#emitter.emit(this.EVENT_CAST, e);
-                        console.log(e);
+                        if (e.castState)
+                            this.restoreMediaInfo();
                     }
                 );
 
-                let session = cast.framework.CastContext.getInstance().getCurrentSession();
-                if (session)
-                    Cast.deviceName = session.getCastDevice().friendlyName;
-                
                 Cast.controller.addEventListener(
                     cast.framework.RemotePlayerEventType.CURRENT_TIME_CHANGED,
                     e => this.#emitter.emit(this.EVENT_POSITION, e.value)
@@ -72,7 +90,11 @@ export default class Cast {
 
                 Cast.controller.addEventListener(
                     cast.framework.RemotePlayerEventType.MEDIA_INFO_CHANGED,
-                    e => console.log(e)
+                    e => {
+                        console.log(e);
+                        if (Music.metadata.id != e.value?.metadata.songName && e.value)
+                            this.restoreMediaInfo();
+                    }
                 );
 
                 Cast.controller.addEventListener(
@@ -112,16 +134,34 @@ export default class Cast {
         }
     }
 
-    static async cast() {
-        let currentTime = 0;
+    static getMediaInfo() {
         let session = cast.framework.CastContext.getInstance().getCurrentSession();
-        if (!session) {
-            await cast.framework.CastContext.getInstance().requestSession();
-            session = cast.framework.CastContext.getInstance().getCurrentSession();
-            Cast.deviceName = session.getCastDevice().friendlyName;
-            currentTime = Music.position;
-        }
+        if (!session)
+            return null;
         
+        let media = session.getMediaSession();
+        if (!media)
+            return;
+
+        let metadata = media.media.metadata;
+        let playlist = new Playlist();
+        playlist.index = 0;
+        playlist.list.push(new Track(
+            metadata.songName, "CAST", metadata.title,
+            metadata.artist, metadata.images[0].url,
+            media.media.duration
+        ));
+
+        return {playlist: playlist, position: media.getEstimatedTime()};
+    }
+
+    static restoreMediaInfo() {
+        let mediaInfo = this.getMediaInfo();
+        if (mediaInfo)
+            Music.startPlaylist(mediaInfo.playlist, mediaInfo.position);
+    }
+
+    static async cast() {
         /*let startsWithBlob = url => url != undefined
             ? url.startsWith("blob")
             : true;
@@ -162,17 +202,28 @@ export default class Cast {
         }*/
 
         let media = Music.metadata;
-        if (media.artwork?.startsWith("blob") || !media.artwork) {
-            media.artwork = (await Media.getAudioInfo({videoId: media.id})).artwork;
+        let info = Cast.getMediaInfo();
+        if (info) {
+            let currentId = info.playlist.list[info.playlist.index].id;
+            if (currentId == media.id)
+                return;
         }
 
-        if (media.url?.startsWith("blob") || !media.url) {
+        let currentTime = 0;
+        let {session, sessionIsNew} = await Cast.#getSession(true);
+        if (sessionIsNew)
+            currentTime = Music.position;
+
+        if (media.artwork?.startsWith("blob") || !media.artwork)
+            media.artwork = (await Media.getAudioInfo({videoId: media.id})).artwork;
+
+        if (media.url?.startsWith("blob") || !media.url)
             media.url = await Media.getAudioStream({videoId: media.id});
-        }
 
         let mediaInfo = new chrome.cast.media.MediaInfo(media.url, "audio/mp4");
         mediaInfo.metadata = new chrome.cast.media.MusicTrackMediaMetadata();
         mediaInfo.metadata.images = [new chrome.cast.Image(media.artwork)];
+        mediaInfo.metadata.songName = media.id;
         mediaInfo.metadata.title = media.title;
         mediaInfo.metadata.artist = media.artist;
         let request = new chrome.cast.media.LoadRequest(mediaInfo);
@@ -187,20 +238,37 @@ export default class Cast {
         }
     }
 
-    static setRepeatMode() {
-        //TODO
-    }
-
-    static seekTo(position) {
-        let session = cast.framework.CastContext.getInstance().getCurrentSession();
-        if (session) {
+    static async seekTo(position) {
+        let {session} = await Cast.#getSession(false);
+        if (session)
             session.sendMessage("urn:x-cast:com.google.cast.media", {
                 mediaSessionId: session.getMediaSession().mediaSessionId,
                 requestId: 1,
                 type: "SEEK",
                 currentTime: position
             });
-        }
+    }
+
+    static get volume() {
+        return this.player?.volumeLevel;
+    }
+
+    static set volume(value) {
+        if (!this.player)
+            return;
+
+        this.player.volumeLevel = value;
+        this.controller.setVolumeLevel();
+    }
+
+    static get deviceInfo() {
+        let session = cast.framework.CastContext.getInstance().getCurrentSession();
+        return {
+            displayName: this.player?.displayName,
+            receiverType: session?.getCastDevice().receiverType,
+            capabilities: session?.getCastDevice().capabilities,
+            friendlyName: session?.getCastDevice().friendlyName
+        };
     }
 
     static play() {
@@ -216,8 +284,7 @@ export default class Cast {
     }
 
     static disconnect() {
-        let instance = cast.framework.CastContext.getInstance()
-        let session = instance.getCurrentSession();
+        let session = cast.framework.CastContext.getInstance().getCurrentSession();
         if (!session)
             instance.endCurrentSession();
         else
