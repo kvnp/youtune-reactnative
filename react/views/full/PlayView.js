@@ -52,6 +52,7 @@ const PlayView = ({route, navigation}) => {
     );
 
     useEffect(() => {
+        console.log(navigation.getState());
         if (id != null) {
             navigation.setOptions({title: title});
             navigation.setParams({v: id, list: playlistId});
@@ -94,6 +95,7 @@ const PlayView = ({route, navigation}) => {
         setState(Music.state);
 
         return () => {
+            castListener.remove();
             stateListener.remove();
             metadataListener.remove();
             lkListener.remove();
@@ -267,7 +269,12 @@ const PlayView = ({route, navigation}) => {
                         labelStyle={{marginHorizontal: 0}}
                         style={{borderRadius: 25, alignItems: "center", padding: 0, margin: 0, minWidth: 0}}
                         contentStyle={{alignItems: "center", width: 50, height: 50, minWidth: 0}}
-                        onPress={() => navigation.navigate("App")}
+                        onPress={() => {
+                            if (navigation.canGoBack())
+                                navigation.pop();
+                            else
+                                navigation.navigate("App");
+                        }}
                     >
                         <MaterialIcons
                             style={{alignSelf: "center"}}

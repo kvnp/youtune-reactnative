@@ -125,8 +125,16 @@ export default PlaylistView = ({ route, navigation }) => {
                         </>
                     }
                 </View>
-                <Pressable android_ripple={rippleConfig} style={[bottomBarStyle.closeButton, {backgroundColor: colors.border}]}
-                            onPress={() => navigation.pop()}>
+                <Pressable
+                    android_ripple={rippleConfig}
+                    style={[bottomBarStyle.closeButton, {backgroundColor: colors.border}]}
+                    onPress={() => {
+                        if (navigation.canGoBack())
+                            navigation.pop();
+                        else
+                            navigation.navigate("App");
+                    }}
+                >
                     <MaterialIcons name="arrow-back" color={colors.text} size={20}/>
                 </Pressable>
             </View>

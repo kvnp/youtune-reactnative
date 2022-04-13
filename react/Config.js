@@ -100,7 +100,6 @@ const fontConfig = {
 export const linking = {
     prefixes: ["https://youtune.kvnp.eu"],
     config: {
-        initialRouteName: "App",
         screens: {
             App: {
                 initialRouteName: "Home",

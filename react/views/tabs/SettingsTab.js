@@ -135,7 +135,7 @@ export default SettingsTab = () => {
     const items = [
         {
             icon: "code",
-            description: "View code on github",
+            description: "View project on Github",
             state: true,
             function: openRepo,
             switch: false
