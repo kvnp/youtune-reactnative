@@ -98,6 +98,7 @@ const fontConfig = {
 };
 
 export const linking = {
+    enabled: true,
     prefixes: ["https://youtune.kvnp.eu"],
     config: {
         screens: {

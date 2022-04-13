@@ -16,6 +16,7 @@ import FlatShelves from "../../components/collections/FlatShelves";
 
 import { bottomBarStyle } from "../../styles/BottomBar";
 import { rippleConfig } from "../../styles/Ripple";
+import { insertBeforeLast } from "../../utils/Navigation";
 
 export default ArtistView = ({ route, navigation }) => {
     const {dark, colors}  = useTheme();
@@ -63,10 +64,9 @@ export default ArtistView = ({ route, navigation }) => {
                     <Pressable
                         android_ripple={rippleConfig}
                         onPress={() => {
-                            if (navigation.canGoBack())
-                                navigation.pop();
-                            else
-                                navigation.navigate("App");
+                            if (!navigation.canGoBack())
+                                navigation.dispatch(insertBeforeLast("App"));
+                            navigation.navigate("App");
                         }}
                     >
                         <View style={[bottomBarStyle.closeButton, {backgroundColor: colors.card}]}>

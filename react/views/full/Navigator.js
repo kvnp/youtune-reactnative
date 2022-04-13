@@ -35,15 +35,17 @@ const tabOptions = {
     animationEnabled: true
 };
 
+const getHeight = state => [State.Stopped, State.None].includes(state) ? 0 : 50;
+
 export default Navigator = () => {
-    const [bottomMargin, setBottomMargin] = useState(0);
+    const [bottomMargin, setBottomMargin] = useState(getHeight(Music.state));
     const [headerTitle, setHeaderTitle] = useState(null);
     const navigation = useNavigation();
     
     useEffect(() => {
         const stateListener = Music.addListener(
             Music.EVENT_STATE_UPDATE,
-            state => setBottomMargin(state == State.Stopped || state == State.None ? 0 : 50)
+            state => setBottomMargin(getHeight(state))
         );
 
         return () => stateListener.remove();

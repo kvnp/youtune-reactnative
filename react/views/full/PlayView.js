@@ -22,6 +22,7 @@ import { showModal } from "../../components/modals/MoreModal";
 import ScrollingText from "../../components/shared/ScrollingText";
 import CastButton from "../../components/player/CastButton";
 import Cast from "../../services/music/Cast";
+import { insertBeforeLast } from "../../utils/Navigation";
 
 const PlayView = ({route, navigation}) => {
     const { height, width } = useWindowDimensions();
@@ -52,7 +53,6 @@ const PlayView = ({route, navigation}) => {
     );
 
     useEffect(() => {
-        console.log(navigation.getState());
         if (id != null) {
             navigation.setOptions({title: title});
             navigation.setParams({v: id, list: playlistId});
@@ -270,10 +270,9 @@ const PlayView = ({route, navigation}) => {
                         style={{borderRadius: 25, alignItems: "center", padding: 0, margin: 0, minWidth: 0}}
                         contentStyle={{alignItems: "center", width: 50, height: 50, minWidth: 0}}
                         onPress={() => {
-                            if (navigation.canGoBack())
-                                navigation.pop();
-                            else
-                                navigation.navigate("App");
+                            if (!navigation.canGoBack())
+                                navigation.dispatch(insertBeforeLast("App"));
+                            navigation.navigate("App");
                         }}
                     >
                         <MaterialIcons

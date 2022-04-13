@@ -18,6 +18,7 @@ import Navigation from "../../services/ui/Navigation";
 import FlatEntries from "../../components/collections/FlatEntries";
 import { ActivityIndicator } from "react-native-paper";
 import Downloads from "../../services/device/Downloads";
+import { insertBeforeLast } from "../../utils/Navigation";
 
 export default PlaylistView = ({ route, navigation }) => {
     const {colors} = useTheme();
@@ -129,10 +130,9 @@ export default PlaylistView = ({ route, navigation }) => {
                     android_ripple={rippleConfig}
                     style={[bottomBarStyle.closeButton, {backgroundColor: colors.border}]}
                     onPress={() => {
-                        if (navigation.canGoBack())
-                            navigation.pop();
-                        else
-                            navigation.navigate("App");
+                        if (!navigation.canGoBack())
+                            navigation.dispatch(insertBeforeLast("App"));
+                        navigation.navigate("App");
                     }}
                 >
                     <MaterialIcons name="arrow-back" color={colors.text} size={20}/>
