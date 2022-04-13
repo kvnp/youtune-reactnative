@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { Dimensions } from "react-native";
 
-import { useNavigation } from "@react-navigation/core";
 import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
 import { State } from 'react-native-track-player';
 
@@ -37,15 +36,20 @@ const tabOptions = {
 
 const getHeight = state => [State.Stopped, State.None].includes(state) ? 0 : 50;
 
-export default Navigator = () => {
+var firstRoute;
+var fixedNavigation;
+export default Navigator = ({navigation}) => {
     const [bottomMargin, setBottomMargin] = useState(getHeight(Music.state));
     const [headerTitle, setHeaderTitle] = useState(null);
-    const navigation = useNavigation();
     
     useEffect(() => {
         const stateListener = Music.addListener(
             Music.EVENT_STATE_UPDATE,
-            state => setBottomMargin(getHeight(state))
+            state => {
+                let height = getHeight(state);
+                if (bottomMargin != height)
+                    setBottomMargin(height);
+            }
         );
 
         return () => stateListener.remove();
@@ -53,13 +57,29 @@ export default Navigator = () => {
 
     return <>
         <Header style={headerStyle.headerPicture} title={headerTitle}/>
-        <Nav.Navigator
-            initialRouteName="Home" tabBarPosition="bottom"
-            shifting={true} labeled={true} sceneAnimationEnabled={true}
-            initialLayout={{width: Dimensions.get('window').width}}
+        <Nav.Navigator tabBarPosition="bottom"
+            sceneAnimationEnabled={true} shifting={true} labeled={true}
             sceneContainerStyle={{marginBottom: bottomMargin}}
             screenOptions={{...tabOptions, ...navigationOptions}}
-            screenListeners={({route}) => setHeaderTitle(route.name)}
+            screenListeners={({route, navigation}) => {
+                if (!fixedNavigation) {
+                    if (firstRoute == undefined) {
+                        firstRoute = route.name;
+                        if (route.name == "Home")
+                            fixedNavigation = true;
+                    } else {
+                        if (route.name == "Home") {
+                            fixedNavigation = true;
+                            navigation.reset({
+                                index: 0,
+                                routes: [{name: "Home"}],
+                            });
+                        }
+                    }
+                }
+
+                setHeaderTitle(route.name);
+            }}
         >
             <Nav.Screen name="Home" component={HomeTab} options={getTabOptions("home")}/>
             <Nav.Screen name="Search" component={SearchTab} options={getTabOptions("search")}/>

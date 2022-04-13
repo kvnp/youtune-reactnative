@@ -103,8 +103,6 @@ export const linking = {
     config: {
         screens: {
             App: {
-                initialRouteName: "Home",
-                path: "",
                 screens: {
                     Home: "",
                     Search: "search",
