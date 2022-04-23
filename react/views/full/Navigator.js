@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { Dimensions } from "react-native";
 
 import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
 import { State } from 'react-native-track-player';
@@ -14,8 +13,6 @@ import { getIcon } from "../../utils/Icon";
 import { headerStyle } from "../../styles/App";
 import { navigationOptions } from "../../App";
 import Header from "../../components/overlay/Header";
-import MoreModal from "../../components/modals/MoreModal";
-import StreamModal from "../../components/modals/StreamModal";
 import MiniPlayer from "../../components/player/MiniPlayer";
 
 const getTabOptions = title => {
@@ -38,7 +35,7 @@ const getHeight = state => [State.Stopped, State.None].includes(state) ? 0 : 50;
 
 var firstRoute;
 var fixedNavigation;
-export default Navigator = ({navigation}) => {
+export default Navigator = () => {
     const [bottomMargin, setBottomMargin] = useState(getHeight(Music.state));
     const [headerTitle, setHeaderTitle] = useState(null);
     
@@ -91,7 +88,5 @@ export default Navigator = ({navigation}) => {
             style={{maxWidth: 800}}
             height={bottomMargin}
         />
-        <MoreModal navigation={navigation}/>
-        <StreamModal/>
     </>
 }

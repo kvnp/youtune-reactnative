@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Provider } from 'react-native-paper';
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
@@ -12,6 +12,8 @@ import CaptchaView from "./views/full/CaptchaView";
 import { getTheme, linking } from "./Config";
 import { getIcon } from "./utils/Icon";
 import UpdateBar from "./components/shared/UpdateBar";
+import MoreModal from "./components/modals/MoreModal";
+import StreamModal from "./components/modals/StreamModal";
 import UI from "./services/ui/UI";
 import Settings from "./services/device/Settings";
 
@@ -27,6 +29,7 @@ const Stack = createStackNavigator();
 const App = () => {
     const [dark, setDark] = useState(Settings.Values.darkMode);
     const theme = getTheme(dark);
+    const navigationRef = useRef(null);
 
     useEffect(() => {
         const darkmodeListener = UI.addListener(
@@ -38,7 +41,7 @@ const App = () => {
     }, []);
 
     return <Provider theme={theme}>
-        <NavigationContainer linking={linking} theme={theme}>
+        <NavigationContainer ref={navigationRef} linking={linking} theme={theme}>
             <Stack.Navigator screenOptions={{gestureEnabled: true, swipeEnabled: true, animationEnabled: true}}>
                 <Stack.Screen name="App" component={Navigator}
                                 options={navigationOptions}/>
@@ -55,6 +58,8 @@ const App = () => {
                 <Stack.Screen name="Captcha" component={CaptchaView}/>
             </Stack.Navigator>
             <UpdateBar/>
+            <MoreModal navigation={navigationRef.current}/>
+            <StreamModal/>
         </NavigationContainer>
     </Provider>;
 }
