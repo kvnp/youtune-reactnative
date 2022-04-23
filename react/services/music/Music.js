@@ -32,15 +32,15 @@ export default class Music {
         return async function() {
             TrackPlayer.addEventListener(Event.PlaybackState, params => {
                 if (Music.isStreaming)
-                    return;
+                    return clearInterval(Music.#positionInterval)
 
                 if (params.state != State.Playing)
                     clearInterval(Music.#positionInterval);
                 else {
                     if (params.state != Music.state)
-                        Music.#positionInterval = setInterval(async() => {
-                            Music.#updatePositon(await TrackPlayer.getPosition());
-                        }, 500);
+                        Music.#positionInterval = setInterval(async() =>
+                            Music.#updatePositon(await TrackPlayer.getPosition())
+                        , 500);
                 }
 
                 Music.state = params.state;
@@ -146,6 +146,8 @@ export default class Music {
         if (!Music.isStreaming)
             TrackPlayer.reset();
 
+        Music.state = State.None;
+        Music.#emitter.emit(Music.EVENT_STATE_UPDATE, State.None);
         Music.metadataList = [];
         Music.metadataIndex = 0;
         Music.position = 0;
@@ -158,9 +160,9 @@ export default class Music {
         else {
             TrackPlayer.seekTo(position);
             clearInterval(Music.#positionInterval);
-            Music.#positionInterval = setInterval(async() => {
-                Music.#updatePositon(await TrackPlayer.getPosition());
-            }, 500);
+            Music.#positionInterval = setInterval(async() =>
+                Music.#updatePositon(await TrackPlayer.getPosition())
+            , 500);
         }
     }
 
@@ -176,13 +178,9 @@ export default class Music {
             await TrackPlayer.updateOptions(TrackPlayerOptions);
             TrackPlayer.setRepeatMode(Music.repeatMode);
 
-            Music.#queue.on("start", () => {});
-            Music.#queue.on("stop", () => {});
-            Music.#queue.on("end", () => {});
-
-            Music.#queue.on("reject", error => {});
+            Music.#queue.on("reject", error => console.log(error));
             Music.#queue.on("resolve", async(track) => {
-                if (Music.metadataList == null)
+                if (!Music.metadataList?.length)
                     return;
 
                 let trackIndex = -1;
@@ -378,9 +376,8 @@ export default class Music {
                     return;
                 
                 for (let i = 0; i < queue.length; i++) {
-                    if (queue[i].id == videoId) {
+                    if (queue[i].id == videoId)
                         return Music.skip(i);
-                    }
                 }
             }
 
@@ -388,6 +385,7 @@ export default class Music {
         }
 
         Music.state = State.Buffering;
+        Music.#emitter.emit(Music.EVENT_STATE_UPDATE, State.Buffering);
 
         let local = false;
         if (typeof playlistId == "string")
@@ -410,12 +408,11 @@ export default class Music {
         Music.trackUrlLoaded = Array(playlist.list.length).fill(false);
 
         for (let i = 0; i < playlist.list.length; i++) {
-            if (i == playlist.index) {
+            if (i == playlist.index)
                 Music.metadataIndex = i;
-            }
 
             if (i == playlist.index || i == playlist.index + 1) {
-                if (Downloads.isTrackDownloaded(playlist.list[i].id) || playlist.list[i].duration == 0) {
+                if (Downloads.isTrackDownloaded(playlist.list[i].id) || !playlist.list[i].duration) {
                     playlist.list[i] = await Music.getMetadata({videoId: playlist.list[i].id});
                     playlist.list[i].id = playlist.list[i].videoId;
                     playlist.list[i].videoId = undefined;
@@ -425,9 +422,8 @@ export default class Music {
                 Music.trackUrlLoaded[i] = true;
             }
 
-            if (i == playlist.index + 1) {
+            if (i == playlist.index + 1)
                 break;
-            }
         }
 
         if (!Music.isStreaming) {
