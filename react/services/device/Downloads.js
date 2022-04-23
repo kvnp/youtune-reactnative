@@ -111,26 +111,38 @@ export default class Downloads {
             }
             
             try {
-                let track = await Media.getAudioInfo({videoId: videoId, controllerCallback});
-                track.artwork = await Media.getBlob({url: track.artwork, controllerCallback});
-                track.videoId = track.id;
-                delete track.id;
-                delete track.playable;
-                
-                await Storage.setItem("Tracks", track);
-                this.#cachedTracks.push(videoId);
+                let includedBefore = true;
+                if (!this.#cachedTracks.includes(videoId)) {
+                    includedBefore = false;
+                    let track = await Media.getAudioInfo({videoId: videoId, controllerCallback});
+                    track.artwork = await Media.getBlob({url: track.artwork, controllerCallback});
+                    track.videoId = track.id;
+                    delete track.id;
+                    delete track.playable;
+                    
+                    await Storage.setItem("Tracks", track);
+                    this.#cachedTracks.push(videoId);
+                }
 
                 if (!cacheOnly) {
                     let url = await Media.getAudioStream({videoId: videoId, controllerCallback});
-                    url = await Media.getBlob({url: url, controllerCallback});
-                    await Storage.setItem("Downloads", {
-                        videoId: videoId,
-                        url: url
-                    });
-                    
+                    let blob = await Media.getBlob({url: url, controllerCallback});
+
                     i = this.#downloadQueue.findIndex(entry => videoId in entry);
                     this.#downloadQueue.splice(i, 1);
-                    this.#downloadedTracks.push(videoId);
+                    if (blob.type.includes("audio")) {
+                        await Storage.setItem("Downloads", {
+                            videoId: videoId,
+                            url: blob
+                        });
+                        
+                        this.#downloadedTracks.push(videoId);
+                    } else if (!includedBefore) {
+                        await Storage.deleteItem("Tracks", videoId)
+                        i = this.#cachedTracks.findIndex(entry => videoId in entry);
+                        this.#cachedTracks.splice(i, 1);
+                    }
+                    
                     this.#emitter.emit(this.EVENT_DOWNLOAD, true);
                 }
                 
