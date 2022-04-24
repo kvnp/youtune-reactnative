@@ -20,7 +20,7 @@ const host = Platform.OS == "web"
     : "youtune.kvnp.eu";
 
 export default SettingsTab = () => {
-    const [initialized, setInitialized] = useState(false);
+    const [initialized, setInitialized] = useState(Settings.initialized);
     const [transmitLanguage, setTransmitLanguage] = useState(Settings.Values.transmitLanguage);
     const [proxyYTM, setProxyYTM] = useState(Settings.Values.proxyYTM);
     const [safetyMode, setSafetyMode] = useState(Settings.Values.safetyMode);
