@@ -19,14 +19,31 @@ export default class Settings {
                 }
             }
             
+            this.#emitter.emit(this.EVENT_INITIALIZE, undefined);
             this.#emitter.emit(this.EVENT_SETTINGS, this.Values);
             this.initialized = true;
             resolve(true);
         });
     }
 
+    static waitForInitialization() {
+        return new Promise((resolve, reject) => {
+            if (this.initialized)
+                return resolve();
+
+            let eventListener = this.addListener(
+                this.EVENT_INITIALIZE,
+                () => {
+                    resolve();
+                    eventListener.remove();
+                }
+            );
+        });
+    }
+
     static #emitter = DeviceEventEmitter;
     static EVENT_SETTINGS = "event-settings";
+    static EVENT_INITIALIZE = "event-initialize";
 
     static addListener(event, listener) {
         return this.#emitter.addListener(event, listener);
@@ -97,9 +114,7 @@ export default class Settings {
     }
 
     static enableAudioVisualizer(boolean) {
-        if (boolean != this.Values.visualizer) {
-            this.Values.visualizer = boolean;
-            this.#storeSetting("visualizer");
-        }
+        this.Values.visualizer = boolean;
+        this.#storeSetting("visualizer");
     }
 }

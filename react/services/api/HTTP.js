@@ -79,19 +79,25 @@ export default class HTTP {
         }
         
         return new Promise((resolve, reject) => {
-            fetch(url, input)
-                .then(response => {
-                    if (type == HTTP.Type.Json)
-                        resolve(response.json());
-                    else if (type == HTTP.Type.Blob)
-                        resolve(response.blob());
-                    else
-                        resolve(response.text());
-                })
+            const attempt = () => {
+                fetch(url, input)
+                    .then(response => {
+                        if (response.status == 200) {
+                            if (type == HTTP.Type.Json)
+                                resolve(response.json());
+                            else if (type == HTTP.Type.Blob)
+                                resolve(response.blob());
+                            else
+                                resolve(response.text());
+                        } else attempt();
+                    })
 
-                .catch(reason => {
-                    reject(reason);
-                })
+                    .catch(reason => {
+                        reject(reason);
+                    });
+            }
+
+            attempt();
         });
     }
 

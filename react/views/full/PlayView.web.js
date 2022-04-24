@@ -54,6 +54,11 @@ const PlayView = ({route, navigation}) => {
     }
 
     useEffect(() => {
+        if (!Settings.initialized) {
+            Settings.waitForInitialization().then(() => Settings.enableAudioVisualizer(false));
+            return;
+        }
+
         if (!Settings.Values.visualizer)
             return;
 
