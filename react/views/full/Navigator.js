@@ -42,11 +42,7 @@ export default Navigator = () => {
     useEffect(() => {
         const stateListener = Music.addListener(
             Music.EVENT_STATE_UPDATE,
-            state => {
-                let height = getHeight(state);
-                if (bottomMargin != height)
-                    setBottomMargin(height);
-            }
+            state => setBottomMargin(getHeight(state))
         );
 
         return () => stateListener.remove();
