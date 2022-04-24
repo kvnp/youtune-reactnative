@@ -9,3 +9,37 @@ body {
     height: 100%;
     width: 100%;
 }
+
+#container {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+}
+
+#canvas {
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0.9;
+    transition: opacity .5s ease-in-out;
+}
+
+#background {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    background: linear-gradient(transparent,#00035f,transparent);
+    background-size: 100% 7px;
+    animation: bg 1s infinite linear;
+    z-index: 2;
+    opacity: 0.5;
+}
+  
+@keyframes bg {
+    0%{ background-position: 0 0; }
+    100%{ background-position: 8px 8px; }
+}

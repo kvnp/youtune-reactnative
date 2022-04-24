@@ -154,7 +154,6 @@ export default class Media {
 
         let response = await HTTP.getResponse(url, input, type, controllerCallback);
         let stream = Extractor.digestStreamResponse(response);
-
         return stream;
     }
 

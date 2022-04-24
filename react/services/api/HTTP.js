@@ -41,7 +41,7 @@ export default class HTTP {
         }
     }
 
-    static #getProxyUrl(url) {
+    static getProxyUrl(url) {
         if (!url.startsWith("http"))
             return url;
 
@@ -62,7 +62,7 @@ export default class HTTP {
         //TODO implement custom proxy setting
         //Settings.forceProxy
         if (Device.Platform == "web")
-            url = this.#getProxyUrl(url);
+            url = this.getProxyUrl(url);
         else if (Device.Platform == "node")
             return this.#nodeFetch(url, input, type);
 

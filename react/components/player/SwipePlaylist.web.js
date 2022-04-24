@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useRef, useEffect } from "react";
 import {
     Image,
     View,
@@ -16,13 +16,28 @@ import SlidingUpPanel from 'rn-sliding-up-panel';
 import Downloads from "../../services/device/Downloads";
 import Music from "../../services/music/Music";
 
-export default SwipePlaylist = ({playlist, track, backgroundColor, textColor}) => {
+var lastY;
+export default SwipePlaylist = ({playlist, track, style, backgroundColor, textColor}) => {
     const { height } = Dimensions.get("window");
     const colors = useTheme();
     const panel = useRef(null);
     const container = useRef(null);
     const draggableRange = { top: height - 50, bottom: 50 }
     const draggedValue = new Animated.Value(50);
+
+    useEffect(() => {
+        for (let e in style) panel.current._content.style[e] = style[e];
+        let scroll = container.current._listRef._scrollRef;
+        scroll.addEventListener("touchmove", e => {
+            let currentY = e.touches[0].clientY;
+            if (scroll.scrollTop != 0) {
+                if (currentY > lastY) {
+                    e.stopPropagation();
+                }
+            }
+            lastY = currentY;
+        });
+    }, []);
 
     return <SlidingUpPanel
         ref={panel}

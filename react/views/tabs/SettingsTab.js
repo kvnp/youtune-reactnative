@@ -60,6 +60,11 @@ export default SettingsTab = () => {
         Settings.enableDarkMode(boolean);
     };
 
+    const toggleAudioVisualizer = boolean => {
+        setSettings({...settings, audioVisualizer: boolean});
+        Settings.enableAudioVisualizer(boolean);
+    }
+
     const drawItem = ({item}) => {
         const func = item.function;
         const icon = item.icon;
@@ -178,6 +183,14 @@ export default SettingsTab = () => {
             function: toggleDarkMode,
             switch: true
         },
+
+        {
+            icon: "animation",
+            description: "Enable audio visualizer",
+            state: settings.visualizerEnabled,
+            function: toggleAudioVisualizer,
+            switch: true
+        }
     ];
     
     return <FlatList
