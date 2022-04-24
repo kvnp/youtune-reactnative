@@ -54,7 +54,7 @@ const PlayView = ({route, navigation}) => {
     }
 
     useEffect(() => {
-        if (!Settings.Values.visualizerEnabled)
+        if (!Settings.Values.visualizer)
             return;
 
         playViewActive = true;

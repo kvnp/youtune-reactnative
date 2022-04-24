@@ -28,7 +28,7 @@ export default function digestStreamResponse(parse) {
             }
             
             if (audioQuality > current.audioQuality) {
-                let url = Settings.Values.visualizerEnabled && Device.Platform == "web"
+                let url = Settings.Values.visualizer && Device.Platform == "web"
                     ? HTTP.getProxyUrl(formats[i].url)
                     : formats[i].url;
                 current = {
