@@ -19,6 +19,7 @@ export default class Settings {
                 }
             }
             
+            this.#emitter.emit(this.EVENT_SETTINGS, this.Values);
             resolve(true);
         });
     }
@@ -35,6 +36,8 @@ export default class Settings {
             setting: key,
             value: this.Values[key]
         };
+
+        this.#emitter.emit(this.EVENT_SETTINGS, this.Values);
         return Storage.setItem("Settings", data);
     }
 
@@ -44,7 +47,7 @@ export default class Settings {
         safetyMode: true,
         darkMode: true,
         headerState: null,
-        visualizerEnabled: false
+        visualizer: false
     }
 
     static enableLanguageTransmission(boolean) {
@@ -93,9 +96,9 @@ export default class Settings {
     }
 
     static enableAudioVisualizer(boolean) {
-        if (boolean != this.Values.visualizerEnabled) {
-            this.Values.visualizerEnabled = boolean;
-            this.#storeSetting("visualizerEnabled");
+        if (boolean != this.Values.visualizer) {
+            this.Values.visualizer = boolean;
+            this.#storeSetting("visualizer");
         }
     }
 }

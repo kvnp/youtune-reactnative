@@ -20,13 +20,25 @@ const host = Platform.OS == "web"
     : "youtune.kvnp.eu";
 
 export default SettingsTab = () => {
-    const [settings, setSettings] = useState(Settings.Values);
+    const [initialized, setInitialized] = useState(false);
+    const [transmitLanguage, setTransmitLanguage] = useState(Settings.Values.transmitLanguage);
+    const [proxyYTM, setProxyYTM] = useState(Settings.Values.proxyYTM);
+    const [safetyMode, setSafetyMode] = useState(Settings.Values.safetyMode);
+    const [darkMode, setDarkMode] = useState(Settings.Values.darkMode);
+    const [visualizer, setVisualizer] = useState(Settings.Values.visualizer);
     const { colors } = useTheme();
 
     useEffect(() => {
         const settingsListener = Settings.addListener(
             Settings.EVENT_SETTINGS,
-            settings => setSettings(settings)
+            values => {
+                if (!initialized) setInitialized(true);
+                setTransmitLanguage(values.transmitLanguage);
+                setProxyYTM(values.proxyYTM);
+                setSafetyMode(values.safetyMode);
+                setDarkMode(values.darkMode);
+                setVisualizer(values.visualizer);
+            }
         );
                 
         return () => settingsListener.remove();
@@ -41,27 +53,27 @@ export default SettingsTab = () => {
     };
 
     const toggleLanguage = boolean => {
-        setSettings({...settings, transmitLanguage: boolean});
+        setTransmitLanguage(boolean);
         Settings.enableLanguageTransmission(boolean);
     };
     
     const toggleProxy = boolean => {
-        setSettings({...settings, proxyYTM: boolean});
+        setProxyYTM(boolean);
         Settings.enableProxy(boolean);
     };
 
     const toggleSafetyMode = boolean => {
-        setSettings({...settings, safetyMode: boolean});
+        setSafetyMode(boolean);
         Settings.enableSafetyMode(boolean);
     };
 
     const toggleDarkMode = boolean => {
-        setSettings({...settings, darkMode: boolean});
+        setDarkMode(boolean);
         Settings.enableDarkMode(boolean);
     };
 
     const toggleAudioVisualizer = boolean => {
-        setSettings({...settings, audioVisualizer: boolean});
+        setVisualizer(boolean);
         Settings.enableAudioVisualizer(boolean);
     }
 
@@ -81,7 +93,7 @@ export default SettingsTab = () => {
 
         return <TouchableRipple
             borderless={true}
-            disabled={disabled}
+            disabled={initialized ? disabled : true}
             style={{
                 marginHorizontal: 5,
                 borderRadius: 5,
@@ -123,8 +135,8 @@ export default SettingsTab = () => {
                             trackColor={{ false: "gray", true: colors.primary }}
                             thumbColor="darkgray"
                             onValueChange={disabled ? null : func}
-                            value={state}
-                            disabled={disabled}
+                            value={initialized ? state : false}
+                            disabled={initialized ? disabled : true}
                         />
 
                         : <MaterialIcons
@@ -149,7 +161,7 @@ export default SettingsTab = () => {
         {
             icon: "language",
             description: "Transmit device language",
-            state: settings.transmitLanguage,
+            state: transmitLanguage,
             function: toggleLanguage,
             switch: true
         },
@@ -157,7 +169,7 @@ export default SettingsTab = () => {
         {
             icon: "public",
             description: "Proxy search and browse requests over " + host,
-            state: settings.proxyYTM,
+            state: proxyYTM,
             function: toggleProxy,
             switch: true,
             override: {
@@ -171,7 +183,7 @@ export default SettingsTab = () => {
         {
             icon: "child-friendly",
             description: "Enable safety mode",
-            state: settings.safetyMode,
+            state: safetyMode,
             function: toggleSafetyMode,
             switch: true
         },
@@ -179,7 +191,7 @@ export default SettingsTab = () => {
         {
             icon: "brightness-low",
             description: "Enable dark mode",
-            state: settings.darkMode,
+            state: darkMode,
             function: toggleDarkMode,
             switch: true
         },
@@ -187,7 +199,7 @@ export default SettingsTab = () => {
         {
             icon: "animation",
             description: "Enable audio visualizer",
-            state: settings.visualizerEnabled,
+            state: visualizer,
             function: toggleAudioVisualizer,
             switch: true
         }
