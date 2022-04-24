@@ -4,12 +4,15 @@ export default function digestStreamResponse(parse) {
         url: null
     };
 
-    for (let i = 0; i < parse.streamingData.adaptiveFormats.length; i++) {
-        let mimeType = parse.streamingData.adaptiveFormats[i].mimeType;
-        if (mimeType.split("/")[0] == "audio") {
+    let formats = parse.streamingData.adaptiveFormats
+        ? parse.streamingData.adaptiveFormats
+        : parse.streamingData.formats
 
+    for (let i = 0; i < formats.length; i++) {
+        let mimeType = formats[i].mimeType;
+        if (["audio", "video"].includes(mimeType.split("/")[0])) {
             let audioQuality;
-            switch (parse.streamingData.adaptiveFormats[i].audioQuality) {
+            switch (formats[i].audioQuality) {
                 case "AUDIO_QUALITY_MEDIUM":
                     audioQuality = 2;
                     break;
@@ -21,7 +24,7 @@ export default function digestStreamResponse(parse) {
             }
             
             if (audioQuality > current.audioQuality) {
-                let url = parse.streamingData.adaptiveFormats[i].url;
+                let url = formats[i].url;
                 current = {
                     audioQuality: audioQuality,
                     url: url

@@ -130,7 +130,7 @@ export default class Downloads {
 
                     i = this.#downloadQueue.findIndex(entry => videoId in entry);
                     this.#downloadQueue.splice(i, 1);
-                    if (blob.type.includes("audio")) {
+                    if (["audio", "video"].includes(blob.type.split("/")[0])) {
                         await Storage.setItem("Downloads", {
                             videoId: videoId,
                             url: blob
