@@ -36,12 +36,10 @@ export default class Music {
 
                 if (params.state != State.Playing)
                     clearInterval(Music.#positionInterval);
-                else {
-                    if (params.state != Music.state)
-                        Music.#positionInterval = setInterval(async() =>
-                            Music.#updatePositon(await TrackPlayer.getPosition())
-                        , 500);
-                }
+                else if (params.state != Music.state)
+                    Music.#positionInterval = setInterval(async() =>
+                        Music.#updatePositon(await TrackPlayer.getPosition())
+                    , 500);
 
                 Music.state = params.state;
                 Music.#emitter.emit(Music.EVENT_STATE_UPDATE, params.state);
@@ -271,7 +269,7 @@ export default class Music {
 
     static get metadata() {
         if (Music.metadataList.length == 0)
-            if (!Music.transitionTrack)
+            if (!Music.transitionTrack || !Music.transitionTrack)
                 return {id: null, playlistId: null, title: null, artist: null, artwork: null, duration: 0};
             else
                 return Music.transitionTrack;
@@ -288,16 +286,14 @@ export default class Music {
             if (Music.repeatMode == RepeatMode.Queue) {
                 index = Music.metadataList.length - 1;
                 forward = false;
-            } else {
+            } else
                 index = 0;
-            }
         } else if (index + 1 > Music.metadataList.length) {
             if (Music.repeatMode == RepeatMode.Queue) {
                 index = 0;
                 forward = true;
-            } else {
+            } else
                 index = Music.metadataList.length - 1;
-            }
         }
         
         forward = forward != undefined
@@ -309,9 +305,8 @@ export default class Music {
 
         if (seek)
             Music.seekTo(0)
-        else {
+        else
             Music.skip(index);
-        }
         
         if (Music.trackUrlLoaded[Music.metadataIndex]) {
             if (!seek)

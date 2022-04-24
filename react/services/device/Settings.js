@@ -43,7 +43,8 @@ export default class Settings {
         proxyYTM: false,
         safetyMode: true,
         darkMode: true,
-        headerState: null
+        headerState: null,
+        visualizerEnabled: false
     }
 
     static enableLanguageTransmission(boolean) {
@@ -89,5 +90,12 @@ export default class Settings {
                     });
             }
         }   
+    }
+
+    static enableAudioVisualizer(boolean) {
+        if (boolean != this.Values.visualizerEnabled) {
+            this.Values.visualizerEnabled = boolean;
+            this.#storeSetting("visualizerEnabled");
+        }
     }
 }
