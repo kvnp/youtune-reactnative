@@ -20,6 +20,7 @@ export default class Settings {
             }
             
             this.#emitter.emit(this.EVENT_SETTINGS, this.Values);
+            this.initialized = true;
             resolve(true);
         });
     }
