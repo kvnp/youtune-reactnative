@@ -196,34 +196,43 @@ const PlayView = ({route, navigation}) => {
             return;
 
         requestAnimationFrame(renderFrame); // Takes callback function to invoke before rendering
-        x = 0;
-    
+
         analyser.getByteFrequencyData(dataArray); // Copies the frequency data into dataArray
         // Results in a normalized array of values between 0 and 255
         // Before this step, dataArray's values are all zeros (but with length of 8192)
-    
+
         ctx.fillStyle = "rgba(0,0,0,0.2)"; // Clears canvas before rendering bars (black with opacity 0.2)
         ctx.fillRect(0, 0, width, height); // Fade effect, set opacity to 1 for sharper rendering of bars
-    
+
+        x = 0;
         let r, g, b;
-        let bars = 118 // Set total number of bars you want per frame
+        let bars = 0; // Set total number of bars you want per frame
+        let canvasWidth = 0;
+
+        while (canvasWidth <= width) {
+            if (bars >= dataArray.length)
+                break;
+
+            canvasWidth += barWidth + 10;
+            bars++;
+        }
     
         for (let i = 0; i < bars; i++) {
             barHeight = (dataArray[i] * 2.5);
     
-            if (dataArray[i] > 210){ // pink
+            if (dataArray[i] > 210) { // pink
                 r = 250
                 g = 0
                 b = 255
-            } else if (dataArray[i] > 200){ // yellow
+            } else if (dataArray[i] > 200) { // yellow
                 r = 250
                 g = 255
                 b = 0
-            } else if (dataArray[i] > 190){ // yellow/green
+            } else if (dataArray[i] > 190) { // yellow/green
                 r = 204
                 g = 255
                 b = 0
-            } else if (dataArray[i] > 180){ // blue/green
+            } else if (dataArray[i] > 180) { // blue/green
                 r = 0
                 g = 219
                 b = 131
@@ -333,7 +342,6 @@ const PlayView = ({route, navigation}) => {
                 </View>
 
                 <SeekBar buffering={state}/>
-                
                 <View style={[stylesBottom.buttonContainer, {overflow: "visible", alignSelf: "stretch", justifyContent: "space-between"}]}>
                     <CastButton/>
 
