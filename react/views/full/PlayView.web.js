@@ -29,12 +29,14 @@ import Settings from "../../services/device/Settings";
 var audio;
 var ctx;
 var context;
-var dataArray
+var dataArray;
 var analyser;
-var playViewActive = false;
+var playViewId;
 var barHeight;
 var barWidth;
 var x = 0;
+var bars = 0; // Set total number of bars you want per frame
+var canvasWidth = 0;
 
 const PlayView = ({route, navigation}) => {
     const { height, width } = useWindowDimensions();
@@ -55,15 +57,14 @@ const PlayView = ({route, navigation}) => {
     }
 
     useEffect(() => {
-        if (!Settings.initialized) {
+        if (!Settings.initialized)
             Settings.waitForInitialization().then(() => Settings.enableAudioVisualizer(false));
-            return;
-        }
 
         if (!Settings.Values.visualizer)
             return;
 
-        playViewActive = true;
+        canvas.current.width = width;
+        canvas.current.height = height;
         ctx = canvas.current.getContext("2d");
         if (!context) {
             context = new AudioContext(); // (Interface) Audio-processing graph
@@ -118,7 +119,8 @@ const PlayView = ({route, navigation}) => {
 
         console.log('TOTAL width: ', (117*10)+(118*barWidth)) // (total space between bars)+(total width of all bars)
         renderFrame();
-        return () => playViewActive = false;
+
+        return () => cancelAnimationFrame(playViewId);
     }, []);
 
     useFocusEffect(
@@ -184,6 +186,17 @@ const PlayView = ({route, navigation}) => {
     useEffect(() => {
         canvas.current.width = width;
         canvas.current.height = height;
+        if (dataArray) {
+            bars = 0;
+            canvasWidth = 0;
+            while (canvasWidth <= canvas.current.width) {
+                if (bars >= dataArray.length)
+                    break;
+
+                canvasWidth += barWidth + 10;
+                bars++;
+            }
+        }
     }, [width, height]);
 
     useEffect(() => {
@@ -192,10 +205,7 @@ const PlayView = ({route, navigation}) => {
     }, [dark]);
 
     const renderFrame = () => {
-        if (!playViewActive)
-            return;
-
-        requestAnimationFrame(renderFrame); // Takes callback function to invoke before rendering
+        playViewId = requestAnimationFrame(renderFrame); // Takes callback function to invoke before rendering
         analyser.getByteFrequencyData(dataArray); // Copies the frequency data into dataArray
         // Results in a normalized array of values between 0 and 255
         // Before this step, dataArray's values are all zeros (but with length of 8192)
@@ -204,17 +214,6 @@ const PlayView = ({route, navigation}) => {
         ctx.fillRect(0, 0, canvas.current.width, canvas.current.height); // Fade effect, set opacity to 1 for sharper rendering of bars
 
         let r, g, b;
-        let bars = 0; // Set total number of bars you want per frame
-        let canvasWidth = 0;
-
-        while (canvasWidth <= canvas.current.width) {
-            if (bars >= dataArray.length)
-                break;
-
-            canvasWidth += barWidth + 10;
-            bars++;
-        }
-
         x = (canvas.current.width - canvasWidth)/2;
         for (let i = 0; i < bars; i++) {
             barHeight = (dataArray[i] * 2.5);
