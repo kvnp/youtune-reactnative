@@ -37,6 +37,7 @@ var barWidth;
 var x = 0;
 var bars = 0; // Set total number of bars you want per frame
 var canvasWidth = 0;
+var canvasFillStyle = null;
 
 const PlayView = ({route, navigation}) => {
     const { height, width } = useWindowDimensions();
@@ -202,6 +203,9 @@ const PlayView = ({route, navigation}) => {
     useEffect(() => {
         let container = document.getElementById("container");
         container.style.backgroundColor = dark ? "black" : "white";
+        canvasFillStyle = dark
+            ? "rgba(0,0,0,0.2)" // Clears canvas before rendering bars (black with opacity 0.2)
+            : "rgba(255,255,255,0.2)"; 
     }, [dark]);
 
     const renderFrame = () => {
@@ -210,7 +214,7 @@ const PlayView = ({route, navigation}) => {
         // Results in a normalized array of values between 0 and 255
         // Before this step, dataArray's values are all zeros (but with length of 8192)
 
-        ctx.fillStyle = "rgba(0,0,0,0.2)"; // Clears canvas before rendering bars (black with opacity 0.2)
+        ctx.fillStyle = canvasFillStyle; // Clears canvas before rendering bars (black with opacity 0.2)
         ctx.fillRect(0, 0, canvas.current.width, canvas.current.height); // Fade effect, set opacity to 1 for sharper rendering of bars
 
         let r, g, b;
