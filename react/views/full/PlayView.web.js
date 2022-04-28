@@ -40,6 +40,7 @@ const PlayView = ({route, navigation}) => {
     const { height, width } = useWindowDimensions();
     const { dark, colors } = useTheme();
 
+    const canvas = useRef(null);
     const [state, setState] = useState(Music.state);
     const [track, setTrack] = useState(Music.metadata);
     const [repeat, setRepeat] = useState(Music.repeatModeString);
@@ -180,7 +181,6 @@ const PlayView = ({route, navigation}) => {
         }
     }, []);
 
-    const canvas = useRef(null);
     useEffect(() => {
         canvas.current.width = width;
         canvas.current.height = height;
