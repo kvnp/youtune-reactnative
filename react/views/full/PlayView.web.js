@@ -196,27 +196,26 @@ const PlayView = ({route, navigation}) => {
             return;
 
         requestAnimationFrame(renderFrame); // Takes callback function to invoke before rendering
-
         analyser.getByteFrequencyData(dataArray); // Copies the frequency data into dataArray
         // Results in a normalized array of values between 0 and 255
         // Before this step, dataArray's values are all zeros (but with length of 8192)
 
         ctx.fillStyle = "rgba(0,0,0,0.2)"; // Clears canvas before rendering bars (black with opacity 0.2)
-        ctx.fillRect(0, 0, width, height); // Fade effect, set opacity to 1 for sharper rendering of bars
+        ctx.fillRect(0, 0, canvas.current.width, canvas.current.height); // Fade effect, set opacity to 1 for sharper rendering of bars
 
-        x = 0;
         let r, g, b;
         let bars = 0; // Set total number of bars you want per frame
         let canvasWidth = 0;
 
-        while (canvasWidth <= width) {
+        while (canvasWidth <= canvas.current.width) {
             if (bars >= dataArray.length)
                 break;
 
             canvasWidth += barWidth + 10;
             bars++;
         }
-    
+
+        x = (canvas.current.width - canvasWidth)/2;
         for (let i = 0; i < bars; i++) {
             barHeight = (dataArray[i] * 2.5);
     
@@ -242,12 +241,8 @@ const PlayView = ({route, navigation}) => {
                 b = 255
             }
     
-            // if (i === 0){
-            //   console.log(dataArray[i])
-            // }
-    
             ctx.fillStyle = `rgb(${r},${g},${b})`;
-            ctx.fillRect(x, (height - barHeight), barWidth, barHeight);
+            ctx.fillRect(x, (canvas.current.height - barHeight), barWidth, barHeight);
             // (x, y, i, j)
             // (x, y) Represents start point
             // (i, j) Represents end point
