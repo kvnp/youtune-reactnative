@@ -28,6 +28,8 @@ export default class Music {
     static EVENT_POSITION_UPDATE = "event-position-update";
     static EVENT_STATE_UPDATE = "event-state-update";
 
+    static audioContext;
+
     static TrackPlayerTaskProvider = () => {
         return async function() {
             TrackPlayer.addEventListener(Event.PlaybackState, params => {
@@ -129,8 +131,11 @@ export default class Music {
     static play = () => {
         if (Music.isStreaming)
             Cast.play();
-        else
+        else {
+            if (Music.audioContext)
+                Music.audioContext.resume();
             TrackPlayer.play();
+        }
     }
 
     static pause = () => {

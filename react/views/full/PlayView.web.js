@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
     View,
     StyleSheet,
@@ -10,7 +10,7 @@ import {
 
 import { State } from 'react-native-track-player';
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
-import { useFocusEffect, useTheme } from "@react-navigation/native";
+import { useTheme } from "@react-navigation/native";
 import { Button } from "react-native-paper";
 
 import Music from "../../services/music/Music";
@@ -28,7 +28,6 @@ import Settings from "../../services/device/Settings";
 // Audio visualizer from https://github.com/gg-1414/music-visualizer
 var audio;
 var ctx;
-var context;
 var dataArray;
 var analyser;
 var playViewId;
@@ -72,13 +71,12 @@ const PlayView = ({route, navigation}) => {
             }
         }
     }
+    useEffect(prepareCanvas, [width, height]);
 
-    const handlePlayback = () => {
-        Music.handlePlayback({
-            videoId: route.params.v,
-            playlistId: route.params.list
-        });
-    };
+    const handlePlayback = () => Music.handlePlayback({
+        videoId: route.params.v,
+        playlistId: route.params.list
+    });
 
     useEffect(() => {
         Settings.waitForInitialization().then(e => {
@@ -86,15 +84,15 @@ const PlayView = ({route, navigation}) => {
                 return;
 
             ctx = canvas.current.getContext("2d");
-            if (!context) {
-                context = new AudioContext(); // (Interface) Audio-processing graph
+            if (!Music.audioContext) {
+                Music.audioContext = new AudioContext(); // (Interface) Audio-processing graph
                 if (!audio) audio = document.getElementsByTagName("audio")[0];
-                let src = context.createMediaElementSource(audio); // Give the audio context an audio source,
+                let src = Music.audioContext.createMediaElementSource(audio); // Give the audio context an audio source,
                 // to which can then be played and manipulated
-                analyser = context.createAnalyser(); // Create an analyser for the audio context
+                analyser = Music.audioContext.createAnalyser(); // Create an analyser for the audio context
 
                 src.connect(analyser); // Connects the audio context source to the analyser
-                analyser.connect(context.destination); // End destination of an audio graph in a given context
+                analyser.connect(Music.audioContext.destination); // End destination of an audio graph in a given context
                 // Sends sound to the speakers or headphones
             }
 
@@ -138,27 +136,17 @@ const PlayView = ({route, navigation}) => {
         return () => cancelAnimationFrame(playViewId);
     }, []);
 
-    useFocusEffect(
-        useCallback(() => {
-            if (id == null)
-                return;
-
-            navigation.setOptions({title: title});
-            navigation.setParams({v: id, list: playlistId});
-            Downloads.isTrackLiked(id).then(like => setLiked(like));
-        }, [id])
-    );
-
     useEffect(() => {
         if (id != null) {
             navigation.setOptions({title: title});
             navigation.setParams({v: id, list: playlistId});
+            Downloads.isTrackLiked(id).then(like => setLiked(like));
         }
 
         if (Settings.initialized)
             handlePlayback();
         else
-            Settings.waitForInitialization().then(() => handlePlayback());
+            Settings.waitForInitialization().then(handlePlayback);
             
         const castListener = Cast.addListener(
             Cast.EVENT_CAST,
@@ -197,8 +185,6 @@ const PlayView = ({route, navigation}) => {
             lkListener.remove();
         }
     }, []);
-
-    useEffect(prepareCanvas, [width, height]);
 
     useEffect(() => {
         let container = document.getElementById("container");
