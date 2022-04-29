@@ -14,9 +14,8 @@ export default class Settings {
             let keys = Object.keys(this.Values);
             for (let i = 0; i < keys.length; i++) {
                 let result = await Storage.getItem("Settings", keys[i]);
-                if (result !== undefined && result !== null) {
+                if (result !== undefined && result !== null)
                     this.Values[keys[i]] = result.value;
-                }
             }
             
             this.#emitter.emit(this.EVENT_INITIALIZE, undefined);
@@ -32,8 +31,7 @@ export default class Settings {
                 return resolve();
 
             let eventListener = this.addListener(
-                this.EVENT_INITIALIZE,
-                () => {
+                this.EVENT_INITIALIZE, e => {
                     resolve();
                     eventListener.remove();
                 }
@@ -42,8 +40,8 @@ export default class Settings {
     }
 
     static #emitter = DeviceEventEmitter;
-    static EVENT_SETTINGS = "event-settings";
-    static EVENT_INITIALIZE = "event-initialize";
+    static EVENT_SETTINGS = "event-settings-values";
+    static EVENT_INITIALIZE = "event-settings-initialize";
 
     static addListener(event, listener) {
         return this.#emitter.addListener(event, listener);

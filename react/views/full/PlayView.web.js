@@ -57,69 +57,83 @@ const PlayView = ({route, navigation}) => {
         setLiked(like);
     }
 
-    useEffect(() => {
-        if (!Settings.initialized)
-            Settings.waitForInitialization().then(() => Settings.enableAudioVisualizer(false));
-
-        if (!Settings.Values.visualizer)
-            return;
-
+    const prepareCanvas = () => {
         canvas.current.width = width;
         canvas.current.height = height;
-        ctx = canvas.current.getContext("2d");
-        if (!context) {
-            context = new AudioContext(); // (Interface) Audio-processing graph
-            if (!audio) audio = document.getElementsByTagName("audio")[0];
-            let src = context.createMediaElementSource(audio); // Give the audio context an audio source,
-            // to which can then be played and manipulated
-            analyser = context.createAnalyser(); // Create an analyser for the audio context
+        if (dataArray) {
+            bars = 0;
+            canvasWidth = 0;
+            while (canvasWidth <= canvas.current.width) {
+                if (bars >= dataArray.length)
+                    break;
 
-            src.connect(analyser); // Connects the audio context source to the analyser
-            analyser.connect(context.destination); // End destination of an audio graph in a given context
-            // Sends sound to the speakers or headphones
+                canvasWidth += barWidth + 10;
+                bars++;
+            }
         }
+    }
 
-        /////////////// ANALYSER FFTSIZE ////////////////////////
-        // analyser.fftSize = 32;
-        // analyser.fftSize = 64;
-        // analyser.fftSize = 128;
-        // analyser.fftSize = 256;
-        // analyser.fftSize = 512;
-        // analyser.fftSize = 1024;
-        // analyser.fftSize = 2048;
-        // analyser.fftSize = 4096;
-        // analyser.fftSize = 8192;
-        analyser.fftSize = 16384;
-        // analyser.fftSize = 32768;
+    const handlePlayback = () => {
+        Music.handlePlayback({
+            videoId: route.params.v,
+            playlistId: route.params.list
+        });
+    };
 
-        // (FFT) is an algorithm that samples a signal over a period of time
-        // and divides it into its frequency components (single sinusoidal oscillations).
-        // It separates the mixed signals and shows what frequency is a violent vibration.
+    useEffect(() => {
+        Settings.waitForInitialization().then(e => {
+            if (!Settings.Values.visualizer)
+                return;
 
-        // (FFTSize) represents the window size in samples that is used when performing a FFT
+            ctx = canvas.current.getContext("2d");
+            if (!context) {
+                context = new AudioContext(); // (Interface) Audio-processing graph
+                if (!audio) audio = document.getElementsByTagName("audio")[0];
+                let src = context.createMediaElementSource(audio); // Give the audio context an audio source,
+                // to which can then be played and manipulated
+                analyser = context.createAnalyser(); // Create an analyser for the audio context
 
-        // Lower the size, the less bars (but wider in size)
-        ///////////////////////////////////////////////////////////
+                src.connect(analyser); // Connects the audio context source to the analyser
+                analyser.connect(context.destination); // End destination of an audio graph in a given context
+                // Sends sound to the speakers or headphones
+            }
 
+            /////////////// ANALYSER FFTSIZE ////////////////////////
+            // analyser.fftSize = 32;
+            // analyser.fftSize = 64;
+            // analyser.fftSize = 128;
+            // analyser.fftSize = 256;
+            // analyser.fftSize = 512;
+            // analyser.fftSize = 1024;
+            // analyser.fftSize = 2048;
+            // analyser.fftSize = 4096;
+            // analyser.fftSize = 8192;
+            analyser.fftSize = 16384;
+            // analyser.fftSize = 32768;
 
-        const bufferLength = analyser.frequencyBinCount; // (read-only property)
-        // Unsigned integer, half of fftSize (so in this case, bufferLength = 8192)
-        // Equates to number of data values you have to play with for the visualization
+            // (FFT) is an algorithm that samples a signal over a period of time
+            // and divides it into its frequency components (single sinusoidal oscillations).
+            // It separates the mixed signals and shows what frequency is a violent vibration.
 
-        // The FFT size defines the number of bins used for dividing the window into equal strips, or bins.
-        // Hence, a bin is a spectrum sample, and defines the frequency resolution of the window.
+            // (FFTSize) represents the window size in samples that is used when performing a FFT
 
-        dataArray = new Uint8Array(bufferLength); // Converts to 8-bit unsigned integer array
-        // At this point dataArray is an array with length of bufferLength but no values
-        console.log('DATA-ARRAY: ', dataArray) // Check out this array of frequency values!
+            // Lower the size, the less bars (but wider in size)
+            ///////////////////////////////////////////////////////////
 
-        console.log('width: ', width, 'height: ', height)
+            const bufferLength = analyser.frequencyBinCount; // (read-only property)
+            // Unsigned integer, half of fftSize (so in this case, bufferLength = 8192)
+            // Equates to number of data values you have to play with for the visualization
 
-        barWidth = (width / bufferLength) * 13;
-        console.log('BARwidth: ', barWidth)
+            // The FFT size defines the number of bins used for dividing the window into equal strips, or bins.
+            // Hence, a bin is a spectrum sample, and defines the frequency resolution of the window.
 
-        console.log('TOTAL width: ', (117*10)+(118*barWidth)) // (total space between bars)+(total width of all bars)
-        renderFrame();
+            dataArray = new Uint8Array(bufferLength); // Converts to 8-bit unsigned integer array
+            // At this point dataArray is an array with length of bufferLength but no values
+            barWidth = (width / bufferLength) * 13;
+            
+            prepareCanvas();
+            renderFrame();
+        });
 
         return () => cancelAnimationFrame(playViewId);
     }, []);
@@ -141,11 +155,11 @@ const PlayView = ({route, navigation}) => {
             navigation.setParams({v: id, list: playlistId});
         }
 
-        Music.handlePlayback({
-            videoId: route.params.v,
-            playlistId: route.params.list
-        });
-
+        if (Settings.initialized)
+            handlePlayback();
+        else
+            Settings.waitForInitialization().then(() => handlePlayback());
+            
         const castListener = Cast.addListener(
             Cast.EVENT_CAST,
             e => {
@@ -184,21 +198,7 @@ const PlayView = ({route, navigation}) => {
         }
     }, []);
 
-    useEffect(() => {
-        canvas.current.width = width;
-        canvas.current.height = height;
-        if (dataArray) {
-            bars = 0;
-            canvasWidth = 0;
-            while (canvasWidth <= canvas.current.width) {
-                if (bars >= dataArray.length)
-                    break;
-
-                canvasWidth += barWidth + 10;
-                bars++;
-            }
-        }
-    }, [width, height]);
+    useEffect(prepareCanvas, [width, height]);
 
     useEffect(() => {
         let container = document.getElementById("container");
