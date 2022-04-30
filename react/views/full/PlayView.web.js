@@ -116,7 +116,7 @@ const PlayView = ({route, navigation}) => {
         if (diff > 1.25 && !Music.isStreaming)
             Cast.cast();
 
-        container.current.style.height = height + "px";
+        container.current.style.height = "100%";
         container.current.style.opacity = 1;
     }
 
@@ -324,7 +324,7 @@ const PlayView = ({route, navigation}) => {
 
     return <View
         ref={container}
-        style={{position: "fixed", height: height, width: "100%", bottom: 0, overflow: "hidden"}}
+        style={{position: "fixed", height: "100%", width: "100%", bottom: 0, overflow: "hidden"}}
     >
         <canvas id="canvas" ref={canvas}/>
         <div ref={background} id="background"/>
@@ -410,7 +410,8 @@ const PlayView = ({route, navigation}) => {
                     </Button>
                 </View>
 
-                <SeekBar buffering={state}/>
+                <View><SeekBar buffering={state}/></View>
+
                 <View style={[stylesBottom.buttonContainer, {overflow: "visible", alignSelf: "stretch", justifyContent: "space-between"}]}>
                     <CastButton/>
 

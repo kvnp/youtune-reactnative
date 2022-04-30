@@ -81,6 +81,7 @@ export default SeekBar = ({style, buffering}) => {
             thumbStyle={{color: colors.primary}}
             trackStyle={styles.track}
             style={{width: width}}
+            tapToSeek={true}
         />
 
         <View style={{ flexDirection: 'row', paddingRight: 15, paddingLeft: 15 }}>
