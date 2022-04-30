@@ -36,12 +36,14 @@ export default class Music {
                 if (Music.isStreaming)
                     return clearInterval(Music.#positionInterval)
 
-                if (params.state != State.Playing)
+                if (params.state != State.Playing) {
                     clearInterval(Music.#positionInterval);
-                else if (params.state != Music.state)
+                    TrackPlayer.getPosition().then(Music.#updatePosition);
+                } else if (params.state != Music.state) {
                     Music.#positionInterval = setInterval(async() =>
-                        Music.#updatePositon(await TrackPlayer.getPosition())
+                        Music.#updatePosition(await TrackPlayer.getPosition())
                     , 500);
+                }
 
                 Music.state = params.state;
                 Music.#emitter.emit(Music.EVENT_STATE_UPDATE, params.state);
@@ -54,6 +56,7 @@ export default class Music {
                 if (Music.metadataIndex != params.nextTrack) {
                     Music.metadataIndex = params.nextTrack;
                     Music.#emitter.emit(Music.EVENT_METADATA_UPDATE, Music.metadata);
+                    Music.#updatePosition(0);
                 }
 
                 if (params.nextTrack < Music.metadataList.length - 1 && params.nextTrack >= 0) {
@@ -157,19 +160,19 @@ export default class Music {
     }
 
     static seekTo = position => {
-        Music.#updatePositon(position);
+        Music.#updatePosition(position);
         if (Music.isStreaming)
             Cast.seekTo(position);
         else {
             TrackPlayer.seekTo(position);
             clearInterval(Music.#positionInterval);
             Music.#positionInterval = setInterval(async() =>
-                Music.#updatePositon(await TrackPlayer.getPosition())
+                Music.#updatePosition(await TrackPlayer.getPosition())
             , 500);
         }
     }
 
-    static #updatePositon = pos => {
+    static #updatePosition = pos => {
         this.position = pos;
         Music.#emitter.emit(this.EVENT_POSITION_UPDATE, pos);
     }
@@ -219,7 +222,7 @@ export default class Music {
 
                         Music.#positionListener = Cast.addListener(
                             Cast.EVENT_POSITION,
-                            pos => Music.#updatePositon(pos)
+                            pos => Music.#updatePosition(pos)
                         );
                     }
                 } else {
