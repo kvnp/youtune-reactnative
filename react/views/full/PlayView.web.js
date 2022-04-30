@@ -2,6 +2,8 @@ import { useState, useEffect, useRef } from "react";
 import {
     View,
     StyleSheet,
+    Animated,
+    PanResponder,
     Image,
     ActivityIndicator,
     Text,
@@ -15,15 +17,15 @@ import { Button } from "react-native-paper";
 
 import Music from "../../services/music/Music";
 import Downloads from "../../services/device/Downloads";
+import Settings from "../../services/device/Settings";
+import Cast from "../../services/music/Cast";
 
+import { insertBeforeLast } from "../../utils/Navigation";
 import SeekBar from "../../components/player/SeekBar";
 import SwipePlaylist from "../../components/player/SwipePlaylist";
 import { showModal } from "../../components/modals/MoreModal";
 import ScrollingText from "../../components/shared/ScrollingText";
 import CastButton from "../../components/player/CastButton";
-import Cast from "../../services/music/Cast";
-import { insertBeforeLast } from "../../utils/Navigation";
-import Settings from "../../services/device/Settings";
 
 // Audio visualizer from https://github.com/gg-1414/music-visualizer
 var audio;
@@ -43,6 +45,10 @@ const PlayView = ({route, navigation}) => {
     const { dark, colors } = useTheme();
 
     const canvas = useRef(null);
+    const container = useRef(null);
+    const vertContainer = useRef(null);
+    const background = useRef(null);
+
     const [state, setState] = useState(Music.state);
     const [track, setTrack] = useState(Music.metadata);
     const [repeat, setRepeat] = useState(Music.repeatModeString);
@@ -77,6 +83,53 @@ const PlayView = ({route, navigation}) => {
         videoId: route.params.v,
         playlistId: route.params.list
     });
+
+    const handleMovement = e => {
+        console.log(e);
+    };
+
+    const enableMovement = node => node.addEventListener("mousemove", handleMovement);
+    const disableMovement = node => node.removeEventListener("mousemove", handleMovement);
+
+    useEffect(() => {
+        container.current.style.pointerEvents = "none";
+        for (let node of container.current.childNodes) {
+            node.style.pointerEvents = "auto";
+        }
+
+        vertContainer.current.style.pointerEvents = "none";
+        for (let node of vertContainer.current.childNodes) {
+            node.style.pointerEvents = "auto";
+            node.addEventListener("touchmove", handleMovement);
+            node.addEventListener("mousedown", () => enableMovement(node));
+            node.addEventListener("mouseup", () => disableMovement(node));
+            node.addEventListener("mouseover", () => canvas.current.style.opacity = 0.3);
+            node.addEventListener("mouseleave", () => {
+                canvas.current.style.opacity = 0.9;
+                disableMovement(node);
+            });
+        }
+
+        background.current.addEventListener("touchmove", handleMovement);
+        background.current.addEventListener("mousedown", () => enableMovement(background.current));
+        background.current.addEventListener("mouseup", () => disableMovement(background.current));
+        background.current.addEventListener("mouseleave", () => disableMovement(background.current));
+    }, []);
+
+    useEffect(() => {
+        if (id != null) {
+            navigation.setOptions({title: title});
+            navigation.setParams({v: id, list: playlistId});
+            Downloads.isTrackLiked(id).then(like => setLiked(like));
+        }
+    }, [id, playlistId]);
+
+    useEffect(() => {
+        container.current.style.backgroundColor = dark ? "black" : "white";
+        canvasFillStyle = dark
+            ? "rgba(0,0,0,0.2)" // Clears canvas before rendering bars (black with opacity 0.2)
+            : "rgba(255,255,255,0.2)"; 
+    }, [dark]);
 
     useEffect(() => {
         Settings.waitForInitialization().then(e => {
@@ -137,12 +190,6 @@ const PlayView = ({route, navigation}) => {
     }, []);
 
     useEffect(() => {
-        if (id != null) {
-            navigation.setOptions({title: title});
-            navigation.setParams({v: id, list: playlistId});
-            Downloads.isTrackLiked(id).then(like => setLiked(like));
-        }
-
         if (Settings.initialized)
             handlePlayback();
         else
@@ -172,11 +219,6 @@ const PlayView = ({route, navigation}) => {
             Downloads.EVENT_LIKE,
             like => setLiked(like)
         )
-        
-        for (let element of container.childNodes[2].childNodes) {
-            element.addEventListener("mouseover", () => canvas.current.style.opacity = 0.3);
-            element.addEventListener("mouseleave", () => canvas.current.style.opacity = 0.9);
-        }
 
         return () => {
             castListener.remove();
@@ -185,14 +227,6 @@ const PlayView = ({route, navigation}) => {
             lkListener.remove();
         }
     }, []);
-
-    useEffect(() => {
-        let container = document.getElementById("container");
-        container.style.backgroundColor = dark ? "black" : "white";
-        canvasFillStyle = dark
-            ? "rgba(0,0,0,0.2)" // Clears canvas before rendering bars (black with opacity 0.2)
-            : "rgba(255,255,255,0.2)"; 
-    }, [dark]);
 
     const renderFrame = () => {
         playViewId = requestAnimationFrame(renderFrame); // Takes callback function to invoke before rendering
@@ -240,10 +274,13 @@ const PlayView = ({route, navigation}) => {
         }
     }
 
-    return <div id="container">
+    return <View
+        ref={container}
+        style={{position: "fixed", height: height, width: "100%", bottom: 0}}
+    >
         <canvas id="canvas" ref={canvas}/>
-        <div id="background"/>
-        <View style={[stylesTop.vertContainer, {zIndex: 2, flexDirection: "column"}]}>
+        <div ref={background} id="background"/>
+        <View ref={vertContainer} style={[stylesTop.vertContainer, {zIndex: 2, flexDirection: "column"}]}>
             <View style={[imageStyles.view, {height: height / 2.6}]}>
                 <Image resizeMode="contain" style={imageStyles.image} source={{uri: artwork}}/>
             </View>
@@ -453,7 +490,7 @@ const PlayView = ({route, navigation}) => {
             track={Music.metadata}
             style={{zIndex: 2}}
         />
-    </div>
+    </View>
 }
 
 export default PlayView;

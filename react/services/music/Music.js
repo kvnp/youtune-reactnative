@@ -435,7 +435,7 @@ export default class Music {
             if (position)
                 await TrackPlayer.seekTo(position);
 
-            TrackPlayer.play();
+            Music.play();
         } else {
             Cast.cast();
         }
