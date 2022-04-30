@@ -33,12 +33,22 @@
                 console.log(message);
 
                 let app = document.getElementById("app");
-                let header = document.createElement("h1");
+                let header = document.getElementById("header");
+                if (!header) {
+                    header = document.createElement("h1");
+                    header.setAttribute("id", "header");
+                    app.appendChild(header);
+                }
+                
+                let text = document.getElementById("text");
+                if (!text) {
+                    text = document.createElement("div");
+                    text.setAttribute("id", "text");
+                    app.appendChild(text);
+                }
+                
                 header.textContent = error;
-                let text = document.createElement("div");
                 text.textContent = message;
-                app.appendChild(header);
-                app.appendChild(text);
             }
             window.setImmediate = window.setTimeout;
             window.isUpdateAvailable = new Promise(function(resolve, reject) {
