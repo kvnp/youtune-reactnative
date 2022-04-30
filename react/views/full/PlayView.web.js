@@ -2,8 +2,6 @@ import { useState, useEffect, useRef } from "react";
 import {
     View,
     StyleSheet,
-    Animated,
-    PanResponder,
     Image,
     ActivityIndicator,
     Text,
@@ -40,6 +38,8 @@ var bars = 0; // Set total number of bars you want per frame
 var canvasWidth = 0;
 var canvasFillStyle = null;
 
+var firstPoint = 0;
+var clientY = 0;
 const PlayView = ({route, navigation}) => {
     const { height, width } = useWindowDimensions();
     const { dark, colors } = useTheme();
@@ -84,12 +84,48 @@ const PlayView = ({route, navigation}) => {
         playlistId: route.params.list
     });
 
+    const goBack = () => {
+        if (!navigation.canGoBack())
+            navigation.dispatch(insertBeforeLast("App"));
+        navigation.navigate("App");
+    }
+
     const handleMovement = e => {
-        console.log(e);
+        if (e instanceof MouseEvent)
+            clientY = e.clientY;
+        else
+            clientY = e.touches[0].clientY;
+
+        if (firstPoint == 0)
+            firstPoint = clientY;
+
+        let newHeight = height - (clientY - firstPoint);
+        let newOpacity = newHeight / height;
+        container.current.style.height = newHeight + "px";
+        container.current.style.opacity = newOpacity;
     };
 
+    const stopMovement = () => {
+        let diff = (height - (clientY - firstPoint)) / height;
+        firstPoint = 0;
+        clientY = 0;
+        
+        if (diff < 0.75)
+            return goBack();
+
+        if (diff > 1.25 && !Music.isStreaming)
+            Cast.cast();
+
+        container.current.style.height = height + "px";
+    }
+
     const enableMovement = node => node.addEventListener("mousemove", handleMovement);
-    const disableMovement = node => node.removeEventListener("mousemove", handleMovement);
+    const disableMovement = node => {
+        if (!node)
+            node = background.current;
+        
+        node.removeEventListener("mousemove", handleMovement);
+    };
 
     useEffect(() => {
         container.current.style.pointerEvents = "none";
@@ -101,19 +137,30 @@ const PlayView = ({route, navigation}) => {
         for (let node of vertContainer.current.childNodes) {
             node.style.pointerEvents = "auto";
             node.addEventListener("touchmove", handleMovement);
+            node.addEventListener("touchend", stopMovement);
             node.addEventListener("mousedown", () => enableMovement(node));
-            node.addEventListener("mouseup", () => disableMovement(node));
+            node.addEventListener("mouseup", () => {
+                disableMovement(node);
+                stopMovement();
+            });
             node.addEventListener("mouseover", () => canvas.current.style.opacity = 0.3);
-            node.addEventListener("mouseleave", () => {
+            node.addEventListener("mouseout", () => {
                 canvas.current.style.opacity = 0.9;
                 disableMovement(node);
             });
         }
 
         background.current.addEventListener("touchmove", handleMovement);
+        background.current.addEventListener("touchend", stopMovement);
         background.current.addEventListener("mousedown", () => enableMovement(background.current));
-        background.current.addEventListener("mouseup", () => disableMovement(background.current));
-        background.current.addEventListener("mouseleave", () => disableMovement(background.current));
+        background.current.addEventListener("mouseout", () => disableMovement(background.current));
+        background.current.addEventListener("mouseup", () => {
+            disableMovement(background.current);
+            stopMovement();
+        });
+
+        document.addEventListener("mouseleave", stopMovement);
+        return () => document.removeEventListener("mouseleave", stopMovement);
     }, []);
 
     useEffect(() => {
@@ -276,7 +323,7 @@ const PlayView = ({route, navigation}) => {
 
     return <View
         ref={container}
-        style={{position: "fixed", height: height, width: "100%", bottom: 0}}
+        style={{position: "fixed", height: height, width: "100%", bottom: 0, overflow: "hidden"}}
     >
         <canvas id="canvas" ref={canvas}/>
         <div ref={background} id="background"/>
@@ -445,11 +492,7 @@ const PlayView = ({route, navigation}) => {
                         labelStyle={{marginHorizontal: 0}}
                         style={{borderRadius: 25, alignItems: "center", padding: 0, margin: 0, minWidth: 0}}
                         contentStyle={{alignItems: "center", width: 50, height: 50, minWidth: 0}}
-                        onPress={() => {
-                            if (!navigation.canGoBack())
-                                navigation.dispatch(insertBeforeLast("App"));
-                            navigation.navigate("App");
-                        }}
+                        onPress={goBack}
                     >
                         <MaterialIcons
                             style={{alignSelf: "center"}}
