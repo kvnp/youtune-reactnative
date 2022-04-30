@@ -45,6 +45,7 @@ const PlayView = ({route, navigation}) => {
     const { dark, colors } = useTheme();
 
     const [pointerDisabled, setPointerDisabled] = useState(false);
+    const transition = "height .25s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity .1s cubic-bezier(0.175, 0.885, 0.32, 1.275)";
     const canvas = useRef(null);
     const container = useRef(null);
     const vertContainer = useRef(null);
@@ -57,7 +58,7 @@ const PlayView = ({route, navigation}) => {
     const [isLiked, setLiked] = useState(null);
 
     const {id, playlistId, title, artist, artwork} = track;
-    
+
     const likeSong = like => {
         Downloads.likeTrack(id, like);
         setLiked(like);
@@ -87,6 +88,8 @@ const PlayView = ({route, navigation}) => {
     });
 
     const goBack = () => {
+        container.current.style.transition = transition;
+        container.current.style.height = "0px";
         if (!navigation.canGoBack())
             navigation.dispatch(insertBeforeLast("App"));
         navigation.navigate("App");
@@ -99,9 +102,9 @@ const PlayView = ({route, navigation}) => {
             firstPoint = value;
         clientY = value;
 
-        let newHeight = (window.innerHeight - (clientY - firstPoint)) + "px";
+        let newHeight = (window.innerHeight - (clientY - firstPoint));
         let newOpacity = newHeight / window.innerHeight;
-        container.current.style.height = newHeight;
+        container.current.style.height = newHeight + "px";
         container.current.style.opacity = newOpacity;
     };
 
@@ -116,16 +119,15 @@ const PlayView = ({route, navigation}) => {
     const stopMovement = () => {
         setPointerDisabled(false);
         let diff = (window.innerHeight - (clientY - firstPoint)) / window.innerHeight;
+        container.current.style.transition = transition;
         firstPoint = 0;
         clientY = 0;
-
         if (diff < 0.5)
             return goBack();
 
         if (diff > 1.25 && !Music.isStreaming)
             Cast.cast();
         
-        container.current.style.transition = "height 0.25s, opacity 0.25s";
         container.current.style.height = window.innerHeight + "px";
         container.current.style.opacity = 1;
     }
@@ -315,7 +317,7 @@ const PlayView = ({route, navigation}) => {
 
     return <View
         ref={container}
-        style={{pointerEvents: "none", position: "fixed", width: "100%", height: window.innerHeight, bottom: 0, overflow: "hidden"}}
+        style={{pointerEvents: "none", position: "fixed", width: "100%", height: window.innerHeight, bottom: 0, overflow: "hidden", transition: transition}}
     >
         <canvas style={{pointerEvents: "none"}} id="canvas" ref={canvas}/>
         <div style={{pointerEvents: "auto"}} ref={background} id="background"/>
