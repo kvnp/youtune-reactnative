@@ -109,7 +109,7 @@ const PlayView = ({route, navigation}) => {
         let diff = (height - (clientY - firstPoint)) / height;
         firstPoint = 0;
         clientY = 0;
-        
+
         if (diff < 0.75)
             return goBack();
 
@@ -117,6 +117,7 @@ const PlayView = ({route, navigation}) => {
             Cast.cast();
 
         container.current.style.height = height + "px";
+        container.current.style.opacity = 1;
     }
 
     const enableMovement = node => node.addEventListener("mousemove", handleMovement);
