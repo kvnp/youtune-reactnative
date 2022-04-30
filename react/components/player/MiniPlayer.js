@@ -11,7 +11,7 @@ import Cast from "../../services/music/Cast";
 import ScrollingText from "../shared/ScrollingText";
 import { showStreamModal } from "../modals/StreamModal";
 
-export default MiniPlayer = ({style, containerStyle, height}) => {
+export default MiniPlayer = ({style, containerStyle}) => {
     const navigation = useNavigation();
     const { colors } = useTheme();
 
@@ -77,12 +77,7 @@ export default MiniPlayer = ({style, containerStyle, height}) => {
     
     const { title, artist, artwork } = track;
 
-    return <View
-        style={[styles.main, {
-            height: height,
-            backgroundColor: colors.card
-        }, containerStyle]}
-    >
+    return <View style={[styles.main, {backgroundColor: colors.card}, containerStyle]}>
         <View style={[styles.main, {
             justifyContent: "space-evenly",
             width: "100%",

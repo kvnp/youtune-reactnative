@@ -22,6 +22,8 @@ const getTabOptions = title => {
 }
 
 const Nav = createMaterialTopTabNavigator();
+console.log(Nav.Navigator);
+
 const tabOptions = {
     lazy: false,
     optimizationsEnabled: true,
@@ -32,28 +34,58 @@ const tabOptions = {
     animationEnabled: true
 };
 
-const getHeight = state => [State.Stopped, State.None].includes(state) ? 0 : 50;
+const getHeight = state => [State.Stopped, State.None].includes(state) ? "0px" : "50px";
 
+var firstRoute;
+var fixedNavigation;
 export default Navigator = () => {
     const [marginBottom, setMarginBottom] = useState(getHeight(Music.state));
     const [headerTitle, setHeaderTitle] = useState(null);
+    const view = useRef(null);
+
+    useEffect(() => {
+        const navigator = view.current.childNodes[1].childNodes[0];
+        navigator.style.marginBottom = marginBottom;
+    }, [marginBottom]);
     
     useEffect(() => {
+        const navigator = view.current.childNodes[1].childNodes[0];
+        navigator.style.transition = "margin-bottom .25s";
+        
         const stateListener = Music.addListener(
             Music.EVENT_STATE_UPDATE,
-            state => setBottomMargin(getHeight(state))
+            state => setMarginBottom(getHeight(state))
         );
 
         return () => stateListener.remove();
     }, []);
 
-    return <>
+    return <View style={{flex: 1}} ref={view}>
         <Header style={headerStyle.headerPicture} title={headerTitle}/>
-        <Nav.Navigator tabBarPosition="bottom"
+        <Nav.Navigator
+            tabBarPosition="bottom"
+            overScrollMode="always"
             sceneAnimationEnabled={true} shifting={true} labeled={true}
-            sceneContainerStyle={{marginBottom: marginBottom}}
             screenOptions={{...tabOptions, ...navigationOptions}}
-            screenListeners={({route}) => setHeaderTitle(route.name)}
+            screenListeners={({route, navigation}) => {
+                if (!fixedNavigation) {
+                    if (firstRoute == undefined) {
+                        firstRoute = route.name;
+                        if (route.name == "Home")
+                            fixedNavigation = true;
+                    } else {
+                        if (route.name == "Home") {
+                            fixedNavigation = true;
+                            navigation.reset({
+                                index: 0,
+                                routes: [{name: "Home"}],
+                            });
+                        }
+                    }
+                }
+
+                setHeaderTitle(route.name);
+            }}
         >
             <Nav.Screen name="Home" component={HomeTab} options={getTabOptions("home")}/>
             <Nav.Screen name="Search" component={SearchTab} options={getTabOptions("search")}/>
@@ -61,8 +93,8 @@ export default Navigator = () => {
             <Nav.Screen name="Settings" component={SettingsTab} options={getTabOptions("settings")}/>
         </Nav.Navigator>
         <MiniPlayer
-            containerStyle={{position: "absolute", bottom: 48, width: "100%", height: marginBottom}}
+            containerStyle={{position: "absolute", bottom: 48, width: "100%", height: marginBottom, transition: "height .25s"}}
             style={{maxWidth: 800}}
         />
-    </>
+    </View>
 }
