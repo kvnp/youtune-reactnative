@@ -44,6 +44,7 @@ const PlayView = ({route, navigation}) => {
     const { height, width } = useWindowDimensions();
     const { dark, colors } = useTheme();
 
+    const [pointerDisabled, setPointerDisabled] = useState(false);
     const canvas = useRef(null);
     const container = useRef(null);
     const vertContainer = useRef(null);
@@ -91,6 +92,11 @@ const PlayView = ({route, navigation}) => {
     }
 
     const handleMovement = e => {
+        if (e.nativeEvent.target.getAttribute("role") == "slider")
+            return;
+
+        setPointerDisabled(true);
+
         if (e instanceof MouseEvent)
             clientY = e.clientY;
         else
@@ -106,6 +112,7 @@ const PlayView = ({route, navigation}) => {
     };
 
     const stopMovement = () => {
+        setPointerDisabled(false);
         let diff = (height - (clientY - firstPoint)) / height;
         firstPoint = 0;
         clientY = 0;
@@ -129,28 +136,6 @@ const PlayView = ({route, navigation}) => {
     };
 
     useEffect(() => {
-        container.current.style.pointerEvents = "none";
-        for (let node of container.current.childNodes) {
-            node.style.pointerEvents = "auto";
-        }
-
-        vertContainer.current.style.pointerEvents = "none";
-        for (let node of vertContainer.current.childNodes) {
-            node.style.pointerEvents = "auto";
-            node.addEventListener("touchmove", handleMovement);
-            node.addEventListener("touchend", stopMovement);
-            node.addEventListener("mousedown", () => enableMovement(node));
-            node.addEventListener("mouseup", () => {
-                disableMovement(node);
-                stopMovement();
-            });
-            node.addEventListener("mouseover", () => canvas.current.style.opacity = 0.3);
-            node.addEventListener("mouseout", () => {
-                canvas.current.style.opacity = 0.9;
-                disableMovement(node);
-            });
-        }
-
         background.current.addEventListener("touchmove", handleMovement);
         background.current.addEventListener("touchend", stopMovement);
         background.current.addEventListener("mousedown", () => enableMovement(background.current));
@@ -176,7 +161,7 @@ const PlayView = ({route, navigation}) => {
         container.current.style.backgroundColor = dark ? "black" : "white";
         canvasFillStyle = dark
             ? "rgba(0,0,0,0.2)" // Clears canvas before rendering bars (black with opacity 0.2)
-            : "rgba(255,255,255,0.2)"; 
+            : "rgba(255,255,255,0.2)";
     }, [dark]);
 
     useEffect(() => {
@@ -324,21 +309,21 @@ const PlayView = ({route, navigation}) => {
 
     return <View
         ref={container}
-        style={{position: "fixed", height: "100%", width: "100%", bottom: 0, overflow: "hidden"}}
+        style={{pointerEvents: "none", position: "fixed", height: "100%", width: "100%", bottom: 0, overflow: "hidden"}}
     >
-        <canvas id="canvas" ref={canvas}/>
-        <div ref={background} id="background"/>
-        <View ref={vertContainer} style={[stylesTop.vertContainer, {zIndex: 2, flexDirection: "column"}]}>
+        <canvas style={{pointerEvents: "none"}} id="canvas" ref={canvas}/>
+        <div style={{pointerEvents: "auto"}} ref={background} id="background"/>
+        <View ref={vertContainer} style={[stylesTop.vertContainer, {pointerEvents: "none", zIndex: 2, flexDirection: "column"}]}>
             <View style={[imageStyles.view, {height: height / 2.6}]}>
                 <Image resizeMode="contain" style={imageStyles.image} source={{uri: artwork}}/>
             </View>
 
-            <View style={[stylesBottom.container, {width: width - 50, height: height / 2.6}]}>
-                <View style={controlStyles.container}>
+            <View style={[stylesBottom.container, {pointerEvents: "none", width: width - 50, height: height / 2.6}]}>
+                <View style={[controlStyles.container, {pointerEvents: "none"}]}>
                     <Button
                         onPress={() => likeSong(false)}
                         labelStyle={{marginHorizontal: 0}}
-                        style={{borderRadius: 25, alignItems: "center", padding: 0, margin: 0, minWidth: 0}}
+                        style={{pointerEvents: pointerDisabled ? "none" : "auto", borderRadius: 25, alignItems: "center", padding: 0, margin: 0, minWidth: 0}}
                         contentStyle={{alignItems: "center", width: 50, height: 50, minWidth: 0}}
                     >
                         <MaterialIcons
@@ -370,7 +355,7 @@ const PlayView = ({route, navigation}) => {
                             <Text
                                 adjustsFontSizeToFit={true}
                                 numberOfLines={1}
-                                style={[stylesBottom.titleText, {color: colors.text}]}
+                                style={[stylesBottom.titleText, {pointerEvents: pointerDisabled ? "none" : "auto", color: colors.text}]}
                             >
                                 {title}
                             </Text>
@@ -380,7 +365,7 @@ const PlayView = ({route, navigation}) => {
                             <Text
                                 adjustsFontSizeToFit={true}
                                 numberOfLines={1}
-                                style={[stylesBottom.subtitleText, {color: colors.text}]}
+                                style={[stylesBottom.subtitleText, {pointerEvents: pointerDisabled ? "none" : "auto", color: colors.text}]}
                             >
                                 {artist}
                             </Text>
@@ -390,7 +375,7 @@ const PlayView = ({route, navigation}) => {
                     <Button
                         onPress={() => likeSong(true)}
                         labelStyle={{marginHorizontal: 0}}
-                        style={{borderRadius: 25, alignItems: "center", padding: 0, margin: 0, minWidth: 0}}
+                        style={{pointerEvents: pointerDisabled ? "none" : "auto", borderRadius: 25, alignItems: "center", padding: 0, margin: 0, minWidth: 0}}
                         contentStyle={{alignItems: "center", width: 50, height: 50, minWidth: 0}}
                     >
                         <MaterialIcons
@@ -410,21 +395,21 @@ const PlayView = ({route, navigation}) => {
                     </Button>
                 </View>
 
-                <View><SeekBar buffering={state}/></View>
+                <SeekBar buffering={state} style={{pointerEvents: pointerDisabled ? "none" : "auto"}}/>
 
-                <View style={[stylesBottom.buttonContainer, {overflow: "visible", alignSelf: "stretch", justifyContent: "space-between"}]}>
+                <View style={[stylesBottom.buttonContainer, {pointerEvents: "none", overflow: "visible", alignSelf: "stretch", justifyContent: "space-between"}]}>
                     <CastButton/>
 
                     <Button
                         labelStyle={{marginHorizontal: 0}}
-                        style={{borderRadius: 25, alignItems: "center", padding: 0, margin: 0, minWidth: 0}}
+                        style={{pointerEvents: pointerDisabled ? "none" : "auto", borderRadius: 25, alignItems: "center", padding: 0, margin: 0, minWidth: 0}}
                         contentStyle={{alignItems: "center", width: 50, height: 50, minWidth: 0}}
                         onPress={() => Music.skipPrevious()}
                     >
                         <MaterialIcons style={{alignSelf: "center"}} selectable={false} name="skip-previous" color={colors.text} size={40}/>
                     </Button>
 
-                    <View style={{alignSelf: "center", alignItems: "center", justifyContent: "center", backgroundColor: dark ? colors.card : colors.primary, width: 60, height: 60, borderRadius: 30}}>
+                    <View style={{pointerEvents: pointerDisabled ? "none" : "auto", alignSelf: "center", alignItems: "center", justifyContent: "center", backgroundColor: dark ? colors.card : colors.primary, width: 60, height: 60, borderRadius: 30}}>
                         {state == State.Buffering
                             ?   <ActivityIndicator
                                     style={{alignSelf: "center"}}
@@ -459,7 +444,7 @@ const PlayView = ({route, navigation}) => {
 
                     <Button
                         labelStyle={{marginHorizontal: 0}}
-                        style={{borderRadius: 25, alignItems: "center", padding: 0, margin: 0, minWidth: 0}}
+                        style={{pointerEvents: pointerDisabled ? "none" : "auto", borderRadius: 25, alignItems: "center", padding: 0, margin: 0, minWidth: 0}}
                         contentStyle={{alignItems: "center", width: 50, height: 50, minWidth: 0}}
                         onPress={() => Music.skipNext()}
                     >
@@ -473,7 +458,7 @@ const PlayView = ({route, navigation}) => {
                                 : false
                         }
                         labelStyle={{marginHorizontal: 0}}
-                        style={{borderRadius: 25, alignItems: "center", padding: 0, margin: 0, minWidth: 0}}
+                        style={{pointerEvents: pointerDisabled ? "none" : "auto", borderRadius: 25, alignItems: "center", padding: 0, margin: 0, minWidth: 0}}
                         contentStyle={{alignItems: "center", width: 50, height: 50, minWidth: 0}}
                         onPress={() => setRepeat(Music.cycleRepeatMode())}
                     >
@@ -489,10 +474,10 @@ const PlayView = ({route, navigation}) => {
                     </Button>
                 </View>
 
-                <View style={{justifyContent: "space-between", flexDirection: "row", paddingTop: 30}}>
+                <View style={{pointerEvents: "none", justifyContent: "space-between", flexDirection: "row", paddingTop: 30}}>
                     <Button
                         labelStyle={{marginHorizontal: 0}}
-                        style={{borderRadius: 25, alignItems: "center", padding: 0, margin: 0, minWidth: 0}}
+                        style={{pointerEvents: pointerDisabled ? "none" : "auto", borderRadius: 25, alignItems: "center", padding: 0, margin: 0, minWidth: 0}}
                         contentStyle={{alignItems: "center", width: 50, height: 50, minWidth: 0}}
                         onPress={goBack}
                     >
@@ -506,7 +491,7 @@ const PlayView = ({route, navigation}) => {
 
                     <Button
                         labelStyle={{marginHorizontal: 0}}
-                        style={[stylesTop.topThird, { borderRadius: 25, alignItems: "center", padding: 0, margin: 0, minWidth: 0}]}
+                        style={[stylesTop.topThird, {pointerEvents: pointerDisabled ? "none" : "auto", borderRadius: 25, alignItems: "center", padding: 0, margin: 0, minWidth: 0}]}
                         contentStyle={{alignItems: "center", width: 50, height: 50, minWidth: 0}}
                         onPress={() => showModal({
                             title: title,
@@ -533,7 +518,7 @@ const PlayView = ({route, navigation}) => {
             textColor={colors.text}
             playlist={Music.metadataList}
             track={Music.metadata}
-            style={{zIndex: 2}}
+            style={{zIndex: 2, pointerEvents: pointerDisabled ? "none" : "auto"}}
         />
     </View>
 }

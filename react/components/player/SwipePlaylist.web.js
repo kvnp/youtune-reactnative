@@ -17,7 +17,7 @@ import Downloads from "../../services/device/Downloads";
 import Music from "../../services/music/Music";
 
 var lastY;
-export default SwipePlaylist = ({playlist, track, style, backgroundColor, textColor}) => {
+export default SwipePlaylist = ({playlist, track, backgroundColor, textColor, style}) => {
     const { height } = Dimensions.get("window");
     const colors = useTheme();
     const panel = useRef(null);
@@ -25,18 +25,28 @@ export default SwipePlaylist = ({playlist, track, style, backgroundColor, textCo
     const draggableRange = { top: height - 50, bottom: 50 }
     const draggedValue = new Animated.Value(50);
 
-    useEffect(() => {
-        for (let e in style) panel.current._content.style[e] = style[e];
+    const handleMovement = e => {
+        let currentY = e.touches[0].clientY;
         let scroll = container.current._listRef._scrollRef;
-        scroll.addEventListener("touchmove", e => {
-            let currentY = e.touches[0].clientY;
-            if (scroll.scrollTop != 0) {
-                if (currentY > lastY) {
-                    e.stopPropagation();
-                }
+        if (scroll.scrollTop != 0) {
+            if (currentY > lastY) {
+                e.stopPropagation();
             }
-            lastY = currentY;
-        });
+        }
+        lastY = currentY;
+    }
+
+    useEffect(() => {
+        for (let i in style) {
+            panel.current._content.style[i] = style[i];
+            for (let node of panel.current._content.childNodes)
+                node.style[i] = style[i];
+        }
+    }, [style]);
+
+    useEffect(() => {
+        let scroll = container.current._listRef._scrollRef;
+        scroll.addEventListener("touchmove", handleMovement);
     }, []);
 
     return <SlidingUpPanel
@@ -44,7 +54,7 @@ export default SwipePlaylist = ({playlist, track, style, backgroundColor, textCo
         allowDragging={true}
         draggableRange={draggableRange}
         animatedValue={draggedValue}
-        snappingPoints={[51, height - 50]}
+        snappingPoints={[50, height - 50]}
         height={height}
         friction={0.5}
     >
