@@ -92,24 +92,26 @@ const PlayView = ({route, navigation}) => {
         navigation.navigate("App");
     }
 
-    const handleMovement = e => {
-        if (e.nativeEvent.target.getAttribute("role") == "slider")
-            return;
-
+    const handleMovement = value => {
+        container.current.style.transition = "";
         setPointerDisabled(true);
-        if (e instanceof MouseEvent)
-            clientY = e.clientY;
-        else
-            clientY = e.touches[0].clientY;
-
         if (firstPoint == 0)
-            firstPoint = clientY;
+            firstPoint = value;
+        clientY = value;
 
-        let newHeight = window.innerHeight - (clientY - firstPoint);
+        let newHeight = (window.innerHeight - (clientY - firstPoint)) + "px";
         let newOpacity = newHeight / window.innerHeight;
-        container.current.style.height = newHeight + "px";
+        container.current.style.height = newHeight;
         container.current.style.opacity = newOpacity;
     };
+
+    const handleTouch = e => handleMovement(e.touches[0].clientY);
+    const handleMouse = e => {
+        if (e.nativeEvent.target.getAttribute("role") == "slider")
+            return;
+        
+        handleMovement(e.clientY);
+    }
 
     const stopMovement = () => {
         setPointerDisabled(false);
@@ -117,24 +119,19 @@ const PlayView = ({route, navigation}) => {
         firstPoint = 0;
         clientY = 0;
 
-        if (diff < 0.75)
+        if (diff < 0.5)
             return goBack();
 
         if (diff > 1.25 && !Music.isStreaming)
             Cast.cast();
-
-        container.current.style.height = "100%";
+        
+        container.current.style.transition = "height 0.25s, opacity 0.25s";
+        container.current.style.height = window.innerHeight + "px";
         container.current.style.opacity = 1;
     }
 
-    const enableMovement = node => node.addEventListener("mousemove", handleMovement);
-    const disableMovement = node => {
-        if (!node)
-            node = background.current;
-        
-        node.removeEventListener("mousemove", handleMovement);
-    };
-
+    const enableMovement = () => background.current.addEventListener("mousemove", handleMouse);
+    const disableMovement = () => background.current.removeEventListener("mousemove", handleMouse);
     const darkenCanvas = () => canvas.current.style.opacity = .3;
     const restoreCanvas = () => canvas.current.style.opacity = .9;
 
@@ -144,14 +141,11 @@ const PlayView = ({route, navigation}) => {
         vertContainer.current.addEventListener("touchstart", darkenCanvas);
         vertContainer.current.addEventListener("touchend", restoreCanvas);
 
-        background.current.addEventListener("touchmove", handleMovement);
+        background.current.addEventListener("touchmove", handleTouch);
         background.current.addEventListener("touchend", stopMovement);
-        background.current.addEventListener("mousedown", () => enableMovement(background.current));
-        background.current.addEventListener("mouseout", () => disableMovement(background.current));
-        background.current.addEventListener("mouseup", () => {
-            disableMovement(background.current);
-            stopMovement();
-        });
+        background.current.addEventListener("mousedown", enableMovement);
+        background.current.addEventListener("mouseout", disableMovement);
+        background.current.addEventListener("mouseup", () => {disableMovement();stopMovement();});
 
         document.addEventListener("mouseleave", stopMovement);
         window.addEventListener("resize", updateDimensions);
@@ -321,7 +315,7 @@ const PlayView = ({route, navigation}) => {
 
     return <View
         ref={container}
-        style={{pointerEvents: "none", position: "fixed", height: "100%", width: "100%", bottom: 0, overflow: "hidden"}}
+        style={{pointerEvents: "none", position: "fixed", width: "100%", height: window.innerHeight, bottom: 0, overflow: "hidden"}}
     >
         <canvas style={{pointerEvents: "none"}} id="canvas" ref={canvas}/>
         <div style={{pointerEvents: "auto"}} ref={background} id="background"/>
