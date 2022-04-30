@@ -4,8 +4,7 @@ import {
     StyleSheet,
     Image,
     ActivityIndicator,
-    Text,
-    useWindowDimensions
+    Text
 } from "react-native";
 
 import { State } from 'react-native-track-player';
@@ -41,7 +40,8 @@ var canvasFillStyle = null;
 var firstPoint = 0;
 var clientY = 0;
 const PlayView = ({route, navigation}) => {
-    const { height, width } = useWindowDimensions();
+    const [dimensions, setDimensions] = useState({height: window.innerHeight, width: window.innerWidth});
+    const { height, width } = dimensions;
     const { dark, colors } = useTheme();
 
     const [pointerDisabled, setPointerDisabled] = useState(false);
@@ -63,6 +63,7 @@ const PlayView = ({route, navigation}) => {
         setLiked(like);
     }
 
+    const updateDimensions = () => setDimensions({height: window.innerHeight, width: window.innerWidth});
     const prepareCanvas = () => {
         canvas.current.width = width;
         canvas.current.height = height;
@@ -96,7 +97,6 @@ const PlayView = ({route, navigation}) => {
             return;
 
         setPointerDisabled(true);
-
         if (e instanceof MouseEvent)
             clientY = e.clientY;
         else
@@ -105,15 +105,15 @@ const PlayView = ({route, navigation}) => {
         if (firstPoint == 0)
             firstPoint = clientY;
 
-        let newHeight = height - (clientY - firstPoint);
-        let newOpacity = newHeight / height;
+        let newHeight = window.innerHeight - (clientY - firstPoint);
+        let newOpacity = newHeight / window.innerHeight;
         container.current.style.height = newHeight + "px";
         container.current.style.opacity = newOpacity;
     };
 
     const stopMovement = () => {
         setPointerDisabled(false);
-        let diff = (height - (clientY - firstPoint)) / height;
+        let diff = (window.innerHeight - (clientY - firstPoint)) / window.innerHeight;
         firstPoint = 0;
         clientY = 0;
 
@@ -135,7 +135,15 @@ const PlayView = ({route, navigation}) => {
         node.removeEventListener("mousemove", handleMovement);
     };
 
+    const darkenCanvas = () => canvas.current.style.opacity = .3;
+    const restoreCanvas = () => canvas.current.style.opacity = .9;
+
     useEffect(() => {
+        vertContainer.current.addEventListener("mouseover", darkenCanvas);
+        vertContainer.current.addEventListener("mouseleave", restoreCanvas);
+        vertContainer.current.addEventListener("touchstart", darkenCanvas);
+        vertContainer.current.addEventListener("touchend", restoreCanvas);
+
         background.current.addEventListener("touchmove", handleMovement);
         background.current.addEventListener("touchend", stopMovement);
         background.current.addEventListener("mousedown", () => enableMovement(background.current));
@@ -146,7 +154,11 @@ const PlayView = ({route, navigation}) => {
         });
 
         document.addEventListener("mouseleave", stopMovement);
-        return () => document.removeEventListener("mouseleave", stopMovement);
+        window.addEventListener("resize", updateDimensions);
+        return () => {
+            document.removeEventListener("mouseleave", stopMovement);
+            window.removeEventListener("resize", updateDimensions);
+        };
     }, []);
 
     useEffect(() => {
@@ -327,30 +339,12 @@ const PlayView = ({route, navigation}) => {
                         contentStyle={{alignItems: "center", width: 50, height: 50, minWidth: 0}}
                     >
                         <MaterialIcons
-                            style={{alignSelf: "center"}}
-                            selectable={false}
-                            name="thumb-down"
-                            size={30}
-                            color={
-                                isLiked == null
-                                    ? "dimgray"
-                                    : !isLiked
-                                        ? colors.text
-                                        : "dimgray"
-                            }
+                            name="thumb-down" size={30} style={{alignSelf: "center"}} selectable={false}
+                            color={isLiked == null ? "dimgray" : !isLiked ? colors.text : "dimgray"}
                         />
                     </Button>
                     
-                    <View
-                        style={[{
-                            flexGrow: 1,
-                            width: 1,
-                            paddingHorizontal: 5,
-                            alignItems: "center",
-                            userSelect: "text",
-                            overflow: "hidden"
-                        }]}
-                    >
+                    <View style={[{flexGrow: 1, width: 1, paddingHorizontal: 5, alignItems: "center", userSelect: "text", overflow: "hidden"}]}>
                         <ScrollingText>
                             <Text
                                 adjustsFontSizeToFit={true}
@@ -373,25 +367,11 @@ const PlayView = ({route, navigation}) => {
                     </View>
 
                     <Button
-                        onPress={() => likeSong(true)}
-                        labelStyle={{marginHorizontal: 0}}
+                        onPress={() => likeSong(true)} labelStyle={{marginHorizontal: 0}}
                         style={{pointerEvents: pointerDisabled ? "none" : "auto", borderRadius: 25, alignItems: "center", padding: 0, margin: 0, minWidth: 0}}
                         contentStyle={{alignItems: "center", width: 50, height: 50, minWidth: 0}}
                     >
-                        <MaterialIcons
-                            style={{alignSelf: "center"}}
-                            selectable={false}
-                            name="thumb-up"
-                            color={
-                                isLiked == null
-                                    ? "dimgray"
-                                    : isLiked
-                                        ? colors.text
-                                        : "dimgray"
-                            }
-
-                            size={30}
-                        />
+                        <MaterialIcons name="thumb-up" size={30} color={isLiked == null ? "dimgray" : isLiked ? colors.text : "dimgray"} style={{alignSelf: "center"}} selectable={false}/>
                     </Button>
                 </View>
 
@@ -399,7 +379,6 @@ const PlayView = ({route, navigation}) => {
 
                 <View style={[stylesBottom.buttonContainer, {pointerEvents: "none", overflow: "visible", alignSelf: "stretch", justifyContent: "space-between"}]}>
                     <CastButton/>
-
                     <Button
                         labelStyle={{marginHorizontal: 0}}
                         style={{pointerEvents: pointerDisabled ? "none" : "auto", borderRadius: 25, alignItems: "center", padding: 0, margin: 0, minWidth: 0}}
@@ -452,25 +431,13 @@ const PlayView = ({route, navigation}) => {
                     </Button>
 
                     <Button
-                        disabled={
-                            connected
-                                ? true
-                                : false
-                        }
+                        disabled={connected ? true : false}
                         labelStyle={{marginHorizontal: 0}}
                         style={{pointerEvents: pointerDisabled ? "none" : "auto", borderRadius: 25, alignItems: "center", padding: 0, margin: 0, minWidth: 0}}
                         contentStyle={{alignItems: "center", width: 50, height: 50, minWidth: 0}}
                         onPress={() => setRepeat(Music.cycleRepeatMode())}
                     >
-                        <MaterialIcons
-                            style={{alignSelf: "center"}}
-                            selectable={false}
-                            color={colors.text} size={30}
-                            name={!Music.isStreaming
-                                ? repeat
-                                : "repeat-one-on"
-                            }
-                        />
+                        <MaterialIcons name={!Music.isStreaming ? repeat : "repeat-one-on"} color={colors.text} size={30} style={{alignSelf: "center"}} selectable={false}/>
                     </Button>
                 </View>
 
