@@ -45,7 +45,7 @@ const PlayView = ({route, navigation}) => {
     const { dark, colors } = useTheme();
 
     const [pointerDisabled, setPointerDisabled] = useState(false);
-    const transition = "height .25s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity .1s cubic-bezier(0.175, 0.885, 0.32, 1.275)";
+    const transition = "height .4s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity .1s";
     const canvas = useRef(null);
     const container = useRef(null);
     const vertContainer = useRef(null);
@@ -138,6 +138,7 @@ const PlayView = ({route, navigation}) => {
     const restoreCanvas = () => canvas.current.style.opacity = .9;
 
     useEffect(() => {
+        container.current.style.height = window.innerHeight + "px";
         vertContainer.current.addEventListener("mouseover", darkenCanvas);
         vertContainer.current.addEventListener("mouseleave", restoreCanvas);
         vertContainer.current.addEventListener("touchstart", darkenCanvas);
@@ -317,7 +318,7 @@ const PlayView = ({route, navigation}) => {
 
     return <View
         ref={container}
-        style={{pointerEvents: "none", position: "fixed", width: "100%", height: window.innerHeight, bottom: 0, overflow: "hidden", transition: transition}}
+        style={{pointerEvents: "none", position: "fixed", width: "100%", height: "0px", bottom: 0, overflow: "hidden", transition: "height .25s ease-out, opacity .1s"}}
     >
         <canvas style={{pointerEvents: "none"}} id="canvas" ref={canvas}/>
         <div style={{pointerEvents: "auto"}} ref={background} id="background"/>
