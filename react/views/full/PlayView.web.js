@@ -88,6 +88,7 @@ const PlayView = ({route, navigation}) => {
     });
 
     const goBack = () => {
+        cancelAnimationFrame(playViewId);
         container.current.style.transition = transition;
         container.current.style.height = "0px";
         if (!navigation.canGoBack())
@@ -375,7 +376,7 @@ const PlayView = ({route, navigation}) => {
                 <SeekBar buffering={state} style={{pointerEvents: pointerDisabled ? "none" : "auto"}}/>
 
                 <View style={[stylesBottom.buttonContainer, {pointerEvents: "none", overflow: "visible", alignSelf: "stretch", justifyContent: "space-between"}]}>
-                    <CastButton/>
+                    <CastButton style={{pointerEvents: pointerDisabled ? "none" : "auto"}}/>
                     <Button
                         labelStyle={{marginHorizontal: 0}}
                         style={{pointerEvents: pointerDisabled ? "none" : "auto", borderRadius: 25, alignItems: "center", padding: 0, margin: 0, minWidth: 0}}

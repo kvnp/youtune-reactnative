@@ -22,8 +22,6 @@ const getTabOptions = title => {
 }
 
 const Nav = createMaterialTopTabNavigator();
-console.log(Nav.Navigator);
-
 const tabOptions = {
     lazy: false,
     optimizationsEnabled: true,
