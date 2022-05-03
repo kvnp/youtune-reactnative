@@ -7,11 +7,8 @@ const ScrollingText = ({children, style}) => {
     const viewRef = useRef(null);
 
     useEffect(() => {
-        viewRef.current.style.animationTimingFunction = "linear";
-        viewRef.current.style.animationDuration = "10s";
-        viewRef.current.style.transformOrigin = "0%";
-        viewRef.current.children[0].children[0].children[0]
-            .style.whiteSpace = "nowrap";
+        let textNode = viewRef.current.children[0].children[0].children[0];
+        textNode.style.whiteSpace = "nowrap";
     }, []);
 
     useEffect(() => {
@@ -21,19 +18,32 @@ const ScrollingText = ({children, style}) => {
             stopAnimation();
     }, [contentWidth, containerWidth]);
 
+    const cancel = () => {
+        for (let animation of viewRef.current.getAnimations())
+            animation.cancel();
+    }
+
     const startAnimation = () => {
-        viewRef.current.style.animationDelay = "2s";
-        viewRef.current.style.animationIterationCount = "1";
-        viewRef.current.style.animationName = children.props.children.replaceAll(" ", "_").replace(/[\W_]+/g,"-");
-        viewRef.current.onanimationend = e => {
-            viewRef.current.style.animationDelay = "0s";
-            viewRef.current.style.animationIterationCount = "infinite";
-            viewRef.current.style.animationName = children.props.children.replaceAll(" ", "_").replace(/[\W_]+/g,"-") + "_2";
-        }
+        viewRef.current.style.alignSelf = "flex-start";
+        cancel();
+
+        viewRef.current.animate(
+            [
+                {transform: `translateX(${containerWidth/contentWidth*100}%)`},
+                {transform: "translateX(-100%)"}
+            ],
+            {
+                duration: viewRef.current.innerText.length * 400,
+                iterations: Infinity,
+                delay: 2000,
+                iterationStart: (containerWidth/contentWidth) / (containerWidth/contentWidth + 1)
+            }
+        );
     }
 
     const stopAnimation = () => {
-        viewRef.current.style.animationName = "";
+        viewRef.current.style.alignSelf = "center";
+        cancel();
     }
 
     const areWidthsNotDefined = () => {
@@ -47,45 +57,18 @@ const ScrollingText = ({children, style}) => {
     }
 
     return <View
-        style={[
-            {overflow: "hidden", width: "100%"},
-            style
-        ]}
-        onLayout={
-            e => setContainerWidth(e.nativeEvent.layout.width)
-        }
-    > 
-        {
-            isOverflowing()
-                ? <style>
-                    {
-                        `@keyframes ${children.props.children.replaceAll(" ", "_").replace(/[\W_]+/g,"-")} { from {transform: translateX(0%)} to {transform: translateX(-100%)}}\n` +
-                        `@keyframes ${children.props.children.replaceAll(" ", "_").replace(/[\W_]+/g,"-")}_2 { from {transform: translateX(${containerWidth/contentWidth*100}%)} to {transform: translateX(-100%)}}`
-                    }
-                </style>
-
-                : null
-        }
-        
+        style={[{overflow: "hidden", width: "100%"}, style]}
+        onLayout={e => setContainerWidth(e.nativeEvent.layout.width)}
+    >
         <ScrollView
             ref={viewRef}
-            onContentSizeChange={
-                width => setContentWidth(width)
-            }
-
-            style={{
-                alignSelf: isOverflowing()
-                    ? "flex-start"
-                    : "center",
-            }}
+            onContentSizeChange={width => setContentWidth(width)}
         >
-            <View
-                style={{
-                    alignSelf: "center",
-                    justifyContent: "center",
-                    width: "auto"
-                }}
-            >
+            <View style={{
+                alignSelf: "center",
+                justifyContent: "center",
+                width: "auto"
+            }}>
                 {children}
             </View>
         </ScrollView>
