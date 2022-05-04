@@ -66,16 +66,17 @@ const PlayView = ({route, navigation}) => {
 
     const updateDimensions = () => setDimensions({height: window.innerHeight, width: window.innerWidth});
     const prepareCanvas = () => {
-        canvas.current.width = width;
-        canvas.current.height = height;
+        canvas.current.width = window.innerWidth;
+        canvas.current.height = window.innerHeight;
         if (dataArray) {
+            barWidth = (window.innerWidth / analyser.frequencyBinCount) * 13;
             bars = 0;
             canvasWidth = 0;
             while (canvasWidth <= canvas.current.width) {
                 if (bars >= dataArray.length)
                     break;
 
-                canvasWidth += barWidth + 10;
+                canvasWidth += barWidth + 5;
                 bars++;
             }
         }
@@ -129,7 +130,7 @@ const PlayView = ({route, navigation}) => {
         if (diff > 1.25 && !Music.isStreaming)
             Cast.cast();
         
-        container.current.style.height = window.innerHeight + "px";
+        container.current.style.height = "100%";
         container.current.style.opacity = 1;
     }
 
@@ -223,7 +224,6 @@ const PlayView = ({route, navigation}) => {
 
             dataArray = new Uint8Array(bufferLength); // Converts to 8-bit unsigned integer array
             // At this point dataArray is an array with length of bufferLength but no values
-            barWidth = (width / bufferLength) * 13;
             
             prepareCanvas();
             renderFrame();
