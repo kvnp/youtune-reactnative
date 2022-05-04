@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 import {
     View,
     StyleSheet,
@@ -10,7 +10,7 @@ import {
 
 import { State } from 'react-native-track-player';
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
-import { useFocusEffect, useTheme } from "@react-navigation/native";
+import { useTheme } from "@react-navigation/native";
 import { Button } from "react-native-paper";
 
 import Music from "../../services/music/Music";
@@ -22,7 +22,6 @@ import { showModal } from "../../components/modals/MoreModal";
 import ScrollingText from "../../components/shared/ScrollingText";
 import CastButton from "../../components/player/CastButton";
 import Cast from "../../services/music/Cast";
-import { insertBeforeLast } from "../../utils/Navigation";
 
 const PlayView = ({route, navigation}) => {
     const { height, width } = useWindowDimensions();
@@ -41,27 +40,26 @@ const PlayView = ({route, navigation}) => {
         setLiked(like);
     }
 
-    useFocusEffect(
-        useCallback(() => {
-            if (id == null)
-                return;
-
-            navigation.setOptions({title: title});
+    const updateParams = () => {
+        if (id) {
             navigation.setParams({v: id, list: playlistId});
             Downloads.isTrackLiked(id).then(like => setLiked(like));
-        }, [id])
-    );
-
-    useEffect(() => {
-        if (id != null) {
-            navigation.setOptions({title: title});
-            navigation.setParams({v: id, list: playlistId});
         }
 
-        Music.handlePlayback({
-            videoId: route.params.v,
-            playlistId: route.params.list
-        });
+        if (title)
+            navigation.setOptions({title: title});
+    }
+
+    useEffect(updateParams, [id, playlistId]);
+
+    useEffect(() => {
+        updateParams();
+        if (!title) {
+            Music.handlePlayback({
+                videoId: route.params.v,
+                playlistId: route.params.list
+            });
+        }
 
         const castListener = Cast.addListener(
             Cast.EVENT_CAST,
@@ -269,11 +267,7 @@ const PlayView = ({route, navigation}) => {
                         labelStyle={{marginHorizontal: 0}}
                         style={{borderRadius: 25, alignItems: "center", padding: 0, margin: 0, minWidth: 0}}
                         contentStyle={{alignItems: "center", width: 50, height: 50, minWidth: 0}}
-                        onPress={() => {
-                            if (!navigation.canGoBack())
-                                navigation.dispatch(insertBeforeLast("App"));
-                            navigation.navigate("App");
-                        }}
+                        onPress={() => navigation.navigate("App")}
                     >
                         <MaterialIcons
                             style={{alignSelf: "center"}}

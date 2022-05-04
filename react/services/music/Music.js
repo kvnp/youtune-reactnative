@@ -276,12 +276,12 @@ export default class Music {
     }
 
     static get metadata() {
-        if (Music.metadataList.length == 0)
-            if (!Music.transitionTrack || !Music.transitionTrack)
-                return {id: null, playlistId: null, title: null, artist: null, artwork: null, duration: 0};
-            else
+        if (Music.metadataList.length == 0) {
+            if (Music.transitionTrack)
                 return Music.transitionTrack;
-        else
+            else
+                return {id: null, playlistId: null, title: null, artist: null, artwork: null, duration: 0};
+        } else
             return Music.metadataList[Music.metadataIndex];
     }
 
@@ -351,10 +351,6 @@ export default class Music {
         Music.skipTo(Music.metadataIndex - 1);
     }
 
-    static setTransitionTrack(track) {
-        Music.transitionTrack = track;
-    }
-
     static getStream({videoId}) {
         if (Downloads.isTrackDownloaded(videoId))
             return Downloads.getStream(videoId);
@@ -369,17 +365,20 @@ export default class Music {
             return Media.getAudioInfo({videoId});
     }
 
-    static handlePlayback = async({videoId, playlistId}) => {
+    static handlePlayback = async(track) => {
+        Music.transitionTrack = track;
+        const { id, playlistId } = track;
+
         let queue = Music.metadataList;
         if (queue.length > 0) {
             let track = Music.metadata;
 
             if (playlistId == track.playlistId) {
-                if (track.id == videoId)
+                if (track.id == id)
                     return;
                 
                 for (let i = 0; i < queue.length; i++) {
-                    if (queue[i].id == videoId)
+                    if (queue[i].id == id)
                         return Music.skip(i);
                 }
             }
@@ -396,11 +395,11 @@ export default class Music {
                 local = true;
 
         if (local) {
-            Downloads.loadLocalPlaylist(playlistId, videoId)
+            Downloads.loadLocalPlaylist(playlistId, id)
                 .then(localPlaylist => Music.startPlaylist(localPlaylist))
                 .catch(_ => console.log(_));
         } else {
-            Media.getNextSongs({videoId, playlistId})
+            Media.getNextSongs({videoId: id, playlistId})
                 .then(resultPlaylist => Music.startPlaylist(resultPlaylist))
                 .catch(_ => console.log(_));
         }

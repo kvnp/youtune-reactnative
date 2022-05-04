@@ -61,14 +61,6 @@ export default MiniPlayer = ({style, containerStyle}) => {
     };
 
     const onOpen = () => {
-        Music.setTransitionTrack({
-            id: track.id,
-            playlistId: track.playlistId,
-            title: track.title,
-            artist: track.artist,
-            artwork: track.artwork
-        });
-
         navigation.navigate("Music", {
             v: track.id,
             list: track.playlistId

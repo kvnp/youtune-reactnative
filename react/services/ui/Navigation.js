@@ -26,7 +26,7 @@ export default class Navigation {
         const { browseId, playlistId, videoId } = media;
     
         if (videoId != undefined && playlistId != undefined) {
-            Music.setTransitionTrack({
+            Music.handlePlayback({
                 id: videoId,
                 playlistId: playlistId,
                 title: media.title,
@@ -40,7 +40,7 @@ export default class Navigation {
             return;
         } else if (videoId != undefined && browseId != undefined) {
             if (browseId.slice(0, 2) == "VL") {
-                Music.setTransitionTrack({
+                Music.handlePlayback({
                     id: videoId,
                     playlistId: browseId.slice(2),
                     title: media.title,
@@ -55,7 +55,7 @@ export default class Navigation {
             }
     
         } else if (videoId != undefined) {
-            Music.setTransitionTrack({
+            Music.handlePlayback({
                 id: videoId,
                 playlistId: undefined,
                 title: media.title,

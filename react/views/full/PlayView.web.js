@@ -83,10 +83,13 @@ const PlayView = ({route, navigation}) => {
     }
     useEffect(prepareCanvas, [width, height]);
 
-    const handlePlayback = () => Music.handlePlayback({
-        videoId: route.params.v,
-        playlistId: route.params.list
-    });
+    const handlePlayback = () => {
+        if (!title)
+            Music.handlePlayback({
+                id: route.params.v,
+                playlistId: route.params.list
+            });
+    }
 
     const goBack = () => {
         cancelAnimationFrame(playViewId);
@@ -344,21 +347,13 @@ const PlayView = ({route, navigation}) => {
                     
                     <View style={[{flexGrow: 1, width: 1, paddingHorizontal: 5, alignItems: "center", userSelect: "text", overflow: "hidden"}]}>
                         <ScrollingText>
-                            <Text
-                                adjustsFontSizeToFit={true}
-                                numberOfLines={1}
-                                style={[stylesBottom.titleText, {pointerEvents: pointerDisabled ? "none" : "auto", color: colors.text}]}
-                            >
+                            <Text numberOfLines={1} style={[stylesBottom.titleText, {pointerEvents: pointerDisabled ? "none" : "auto", color: colors.text}]}>
                                 {title}
                             </Text>
                         </ScrollingText>
                             
                         <ScrollingText>
-                            <Text
-                                adjustsFontSizeToFit={true}
-                                numberOfLines={1}
-                                style={[stylesBottom.subtitleText, {pointerEvents: pointerDisabled ? "none" : "auto", color: colors.text}]}
-                            >
+                            <Text numberOfLines={1} style={[stylesBottom.subtitleText, {pointerEvents: pointerDisabled ? "none" : "auto", color: colors.text}]}>
                                 {artist}
                             </Text>
                         </ScrollingText>
