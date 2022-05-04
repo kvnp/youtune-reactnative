@@ -2,7 +2,6 @@ import { useState, useEffect, useRef } from "react";
 import {
     View,
     StyleSheet,
-    Image,
     ActivityIndicator,
     Text
 } from "react-native";
@@ -46,6 +45,7 @@ const PlayView = ({route, navigation}) => {
 
     const [pointerDisabled, setPointerDisabled] = useState(false);
     const transition = "height .4s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity .1s";
+    const image = useRef(null);
     const canvas = useRef(null);
     const container = useRef(null);
     const vertContainer = useRef(null);
@@ -274,6 +274,10 @@ const PlayView = ({route, navigation}) => {
         }
     }, []);
 
+    useEffect(() => {
+        console.log(artwork);
+    }, [artwork]);
+
     const renderFrame = () => {
         playViewId = requestAnimationFrame(renderFrame); // Takes callback function to invoke before rendering
         analyser.getByteFrequencyData(dataArray); // Copies the frequency data into dataArray
@@ -328,7 +332,7 @@ const PlayView = ({route, navigation}) => {
         <div style={{pointerEvents: "auto"}} ref={background} id="background"/>
         <View ref={vertContainer} style={[stylesTop.vertContainer, {pointerEvents: "none", zIndex: 2, flexDirection: "column"}]}>
             <View style={[imageStyles.view, {height: height / 2.6}]}>
-                <Image resizeMode="contain" style={imageStyles.image} source={{uri: artwork}}/>
+                <img ref={image} style={imageStyles.image} src={artwork}/>
             </View>
 
             <View style={[stylesBottom.container, {pointerEvents: "none", width: width - 50, height: height / 2.6}]}>
