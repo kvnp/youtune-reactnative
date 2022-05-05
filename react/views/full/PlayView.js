@@ -33,7 +33,7 @@ const PlayView = ({route, navigation}) => {
     const [connected, setConnected] = useState(Music.isStreaming);
     const [isLiked, setLiked] = useState(null);
 
-    const {id, playlistId, title, artist, artwork, duration} = track;
+    const {id, playlistId, title, artist, artwork } = track;
     
     const likeSong = like => {
         Downloads.likeTrack(id, like);
@@ -140,21 +140,13 @@ const PlayView = ({route, navigation}) => {
                         }]}
                     >
                         <ScrollingText>
-                            <Text
-                                adjustsFontSizeToFit={true}
-                                numberOfLines={1}
-                                style={[stylesBottom.titleText, {color: colors.text}]}
-                            >
+                            <Text numberOfLines={1} style={[stylesBottom.titleText, {color: colors.text}]}>
                                 {title}
                             </Text>
                         </ScrollingText>
                             
                         <ScrollingText>
-                            <Text
-                                adjustsFontSizeToFit={true}
-                                numberOfLines={1}
-                                style={[stylesBottom.subtitleText, {color: colors.text}]}
-                            >
+                            <Text numberOfLines={1} style={[stylesBottom.subtitleText, {color: colors.text}]}>
                                 {artist}
                             </Text>
                         </ScrollingText>

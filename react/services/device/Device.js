@@ -63,6 +63,7 @@ export default class Device {
     };
 
     static #initializePlatform() {
+        console.log("moin");
         if (typeof process !== 'undefined')
             if (process?.versions)
                 if (process.versions.node)

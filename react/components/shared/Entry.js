@@ -64,7 +64,7 @@ export default Entry = ({ entry, navigation, index, forcedPlaylistId }) => {
         <Image 
             style={resultStyle.resultCover}
             progressiveRenderingEnabled={true}
-            source={{uri: thumbnail || artwork}}
+            source={{uri: view.thumbnail}}
         />
 
         <View style={resultStyle.resultColumnOne}>

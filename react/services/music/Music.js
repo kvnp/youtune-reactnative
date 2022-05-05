@@ -1,9 +1,9 @@
 import { DeviceEventEmitter } from 'react-native';
 import TrackPlayer, { Capability, RepeatMode, Event, State } from 'react-native-track-player';
 import Queue from 'queue-promise';
-import Media from '../api/Media';
 import Downloads from '../device/Downloads';
 import Cast from './Cast';
+import API from '../api/API';
 
 export default class Music {
     static #initialized;
@@ -208,8 +208,6 @@ export default class Music {
                     return;
 
                 Music.skip(trackIndex);
-                /*await TrackPlayer.skip(trackIndex);
-                TrackPlayer.play();*/
             });
 
             Cast.initialize();
@@ -276,12 +274,12 @@ export default class Music {
     }
 
     static get metadata() {
-        if (Music.metadataList.length == 0) {
+        if (Music.metadataList.length == 0)
             if (Music.transitionTrack)
                 return Music.transitionTrack;
             else
                 return {id: null, playlistId: null, title: null, artist: null, artwork: null, duration: 0};
-        } else
+        else
             return Music.metadataList[Music.metadataIndex];
     }
 
@@ -355,14 +353,14 @@ export default class Music {
         if (Downloads.isTrackDownloaded(videoId))
             return Downloads.getStream(videoId);
         else
-            return Media.getAudioStream({videoId});
+            return API.getAudioStream({videoId});
     }
 
     static getMetadata({videoId}) {
         if (Downloads.isTrackCached(videoId))
             return Downloads.getTrack(videoId);
         else
-            return Media.getAudioInfo({videoId});
+            return API.getAudioInfo({videoId});
     }
 
     static handlePlayback = async(track) => {
@@ -399,7 +397,7 @@ export default class Music {
                 .then(localPlaylist => Music.startPlaylist(localPlaylist))
                 .catch(_ => console.log(_));
         } else {
-            Media.getNextSongs({videoId: id, playlistId})
+            API.getNextSongs({videoId: id, playlistId})
                 .then(resultPlaylist => Music.startPlaylist(resultPlaylist))
                 .catch(_ => console.log(_));
         }

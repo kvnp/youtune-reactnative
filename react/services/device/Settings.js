@@ -1,5 +1,5 @@
 import { DeviceEventEmitter } from "react-native";
-import Media from "../api/Media";
+import API from "../api/API";
 import UI from "../ui/UI";
 import IO from "./IO";
 import Storage from "./storage/Storage";
@@ -101,7 +101,7 @@ export default class Settings {
                 this.#storeSetting("headerState");
 
             } else {
-                Media.getBlob({url: state.source.uri})
+                API.getBlob({url: state.source.uri})
                     .then(result => {
                         state.source.uri = result;
                         this.Values.headerState = state;

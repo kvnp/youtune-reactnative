@@ -45,7 +45,6 @@ const PlayView = ({route, navigation}) => {
 
     const [pointerDisabled, setPointerDisabled] = useState(false);
     const transition = "height .4s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity .1s";
-    const image = useRef(null);
     const canvas = useRef(null);
     const container = useRef(null);
     const vertContainer = useRef(null);
@@ -274,10 +273,6 @@ const PlayView = ({route, navigation}) => {
         }
     }, []);
 
-    useEffect(() => {
-        console.log(artwork);
-    }, [artwork]);
-
     const renderFrame = () => {
         playViewId = requestAnimationFrame(renderFrame); // Takes callback function to invoke before rendering
         analyser.getByteFrequencyData(dataArray); // Copies the frequency data into dataArray
@@ -331,9 +326,7 @@ const PlayView = ({route, navigation}) => {
         <canvas style={{pointerEvents: "none"}} id="canvas" ref={canvas}/>
         <div style={{pointerEvents: "auto"}} ref={background} id="background"/>
         <View ref={vertContainer} style={[stylesTop.vertContainer, {pointerEvents: "none", zIndex: 2, flexDirection: "column"}]}>
-            <View style={[imageStyles.view, {height: height / 2.6}]}>
-                <img ref={image} style={imageStyles.image} src={artwork}/>
-            </View>
+            <img style={{height: height / 2.6, ...imageStyles.view}} src={artwork}/>
 
             <View style={[stylesBottom.container, {pointerEvents: "none", width: width - 50, height: height / 2.6}]}>
                 <View style={[controlStyles.container, {pointerEvents: "none"}]}>

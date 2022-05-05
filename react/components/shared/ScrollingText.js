@@ -71,9 +71,7 @@ const ScrollingText = ({children, style}) => {
                 alignSelf: isOverflowing()
                     ? "flex-start"
                     : "center",
-                transform: [{
-                    translateX: scrollInterpolation
-                }]
+                transform: [{translateX: scrollInterpolation}]
             }}
         >
             <View

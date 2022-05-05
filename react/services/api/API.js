@@ -1,32 +1,34 @@
-import Device from "../device/Device";
+import Extractor from "./Extractor";
 import HTTP from "./HTTP";
+import IO from "../device/IO";
+import Device from "../device/Device";
+import UI from "../ui/UI";
 
 export default class API {
-    static RequestBody = class RequestBody {
-        static get WEB() {
-            return {
-                context: {
-                    client: {
-                        clientName: "WEB_REMIX",
-                        clientVersion: "1.20210630.00.00",
-                        //TODO implement disable/enable language settings
-                        gl: Device.Language.GL,
-                        hl: Device.Language.HL
-                    }
+    static initialData;
+    static Key = "AIzaSyC9XL3ZjWddXya6X74dJoCTL-WEYFDNX30";
+
+    static RequestBody = {
+        WEB: {
+            context: {
+                client: {
+                    clientName: "WEB_REMIX",
+                    clientVersion: "1.20210630.00.00",
+                    //TODO implement disable/enable language settings
+                    gl: Device.Language.GL,
+                    hl: Device.Language.HL
                 }
             }
-        }
-    
-        static get STREAM() {
-            return {
-                context: {
-                    client: {
-                        clientName: "ANDROID",
-                        clientVersion: "16.02",
-                        //TODO implement disable/enable language settings
-                        gl: Device.Language.GL,
-                        hl: Device.Language.HL
-                    }
+        },
+
+        STREAM: {
+            context: {
+                client: {
+                    clientName: "ANDROID",
+                    clientVersion: "16.02",
+                    //TODO implement disable/enable language settings
+                    gl: Device.Language.GL,
+                    hl: Device.Language.HL
                 }
             }
         }
@@ -77,114 +79,173 @@ export default class API {
     };
 
     static initialized = false;
-    static get Key() {
-        if (!this.initialized)
-            throw new Error("API needs to be initialized");
-
-        return this
-            .WEB_PLAYER_CONTEXT_CONFIGS
-            .WEB_PLAYER_CONTEXT_CONFIG_ID_MUSIC_WATCH
-            .innertubeApiKey;
-    }
-
-    static initialize(initialPath) {
+    static initialize() {
         return new Promise((resolve, reject) => {
             if (this.initialized)
-                return resolve(false);
+                return resolve(true);
 
-            if (!initialPath)
-                initialPath = "";
-
-            let url = API.URL.Main + initialPath;
-            let input = {
-                method: HTTP.Method.GET,
-                headers: HTTP.Headers.Simple
-            };
-            let type = HTTP.Type.Text;
-
-            HTTP.getResponse(url, input, type)
+            API.getBrowseData("FEmusic_home")
                 .then(response => {
-                    this.#populate(response);
+                    API.initialData = response;
+                    if (API.initialData.picture)
+                        UI.setHeader({url: API.initialData.picture});
+
                     this.initialized = true;
                     resolve(true);
-                })
-
-                .catch(reason => {
-                    reject(reason);
                 });
         });
     }
 
-    static #setMessage = msgs => this.MESSAGES = msgs;
+    static async getSearchResults(query, params) {
+        let requestBody = API.RequestBody.WEB;
+        requestBody.query = query;
+        requestBody.params = params;
 
-    static #populate(html) {
-        let ytcfg = {set: object => {
-            for (let key of Object.keys(object)) {
-                this[key] = object[key];
-                if (key == "YTMUSIC_INITIAL_DATA") {
-                    this[key].map((element, index) =>
-                        this[key][index].data = JSON.parse(element.data)
-                    );
-                }
-            }
-        }};
+        let url = API.URL.Search;
+        let type = HTTP.Type.Json;
+        let input = {
+            method: HTTP.Method.POST,
+            credentials: "omit",
+            headers: HTTP.Headers.Referer,
+            body: JSON.stringify(requestBody)
+        };
 
-        let initialData = [];
-        while (html.includes("<script")) {
-            html = html.slice(html.indexOf("<script"));
-
-            let part = html.slice(html.indexOf(">"), html.indexOf("</"));
-            while (part.includes("initialData.push(")) {
-                let dataOne = part.indexOf("initialData.push(");
-                let dataTwo = part.indexOf(");") + 2;
-                let slice = part.slice(dataOne, dataTwo);
-                eval(slice);
-                part = part.slice(dataTwo);
-            }
-
-            if (part.includes("ytcfg.set(")) {
-                let yOne = part.indexOf("ytcfg.set(") + 10;
-                part = part.slice(yOne);
-                let yTwo = part.indexOf("</");
-            
-                let slice = part.slice(0, yTwo).replace(",}", "}").replace(/\'/g, '"');
-                
-                if (slice.includes(");"))
-                    slice = slice.slice(0, slice.indexOf(");"));
-
-                try {
-                    if (slice[slice.length - 1] == ")")
-                        slice = slice.slice(0, slice.length - 1);
-
-                    if (slice.includes("initialData"))
-                        slice = slice.replace("initialData", JSON.stringify(initialData));
-                    
-                    ytcfg.set(JSON.parse(slice));
-                } catch (e) {
-                    console.log(e);
-                }
-            }
-            
-            if (part.includes("setMessage(")) {
-                part = part.slice(part.indexOf("setMessage(") + 11);
-                part = part.slice(0, part.indexOf(");"));
-                API.#setMessage(JSON.parse(part));
-            }
-
-            html = html.slice(html.indexOf("</"));
-        }
+        let response = await HTTP.getResponse(url, input, type);
+        return Extractor.digestResultResponse(response);
     }
 
-    static getInitialData() {
-        return new Promise(async(resolve, reject) => {
-            if (!API.initialized)
-                await API.initialize();
+    static async getSearchSuggestions(query) {
+        let requestBody = API.RequestBody.WEB;
+        requestBody.input = query;
 
-            for (let i = 0; i < API.YTMUSIC_INITIAL_DATA.length; i++) {
-                if ("/browse" == API.YTMUSIC_INITIAL_DATA[i].path) {
-                    resolve(API.YTMUSIC_INITIAL_DATA[i].data);
-                }
+        let url = API.URL.Suggestion;
+        let input = {
+            method: HTTP.Method.POST,
+            credentials: "omit",
+            headers: HTTP.Headers.Referer,
+            body: JSON.stringify(requestBody)
+        }
+        let type = HTTP.Type.Json;
+
+        let response = await HTTP.getResponse(url, input, type);
+
+        console.log(response);
+    }
+
+    static getBrowseData(browseId, continuation) {
+        return new Promise(async(resolve, reject) => {
+            if (browseId == undefined)
+                return resolve(null);
+
+            if (API.initialized && browseId == "FEmusic_home")
+                resolve(API.initialData);
+
+            //TODO implement continuation
+            let requestBody = API.RequestBody.WEB;
+            if (continuation && browseId == "FEmusic_home")
+                url = url + "&ctoken=" + continuation.continuation + 
+                            "&continuation=" + continuation.continuation +
+                            "&itct=" + continuation.itct +
+                            "&type=next"
+            else {
+                if (browseId.slice(0, 2) == "RD")
+                    browseId = "VL" + browseId;
+                
+                requestBody.browseId = browseId;
             }
-        })
+
+            let url = API.URL.Browse;
+            let type = HTTP.Type.Json;
+            let input = {
+                method: HTTP.Method.POST,
+                credentials: "omit",
+                headers: HTTP.Headers.Referer,
+                body: JSON.stringify(requestBody)
+            };
+
+            HTTP.getResponse(url, input, type)
+                .then(response => resolve(
+                    browseId == "FEmusic_home"
+                        ? Extractor.digestHomeResponse(response)
+                        : Extractor.digestBrowseResponse(response, browseId)
+                ))
+                .catch(reason => reject(reason));
+        });
+    }
+
+    static async getAudioInfo({videoId, playlistId, controllerCallback}) {
+        let requestBody = API.RequestBody.WEB;
+        requestBody.videoId = videoId;
+        requestBody.playlistId = playlistId;
+
+        let url = API.URL.Audio;
+        let type = HTTP.Type.Json;
+        let input = {
+            method: HTTP.Method.POST,
+            credentials: "omit",
+            headers: HTTP.Headers.Referer,
+            body: JSON.stringify(requestBody)
+        };
+
+
+        let response = await HTTP.getResponse(url, input, type, controllerCallback);
+        let audioInfo = Extractor.digestAudioInfoResponse(response);
+
+        return audioInfo;
+    }
+
+    static async getAudioStream({videoId, controllerCallback}) {
+        let requestBody = API.RequestBody.STREAM;
+        requestBody.videoId = videoId;
+
+        let url = API.URL.Stream;
+        let type = HTTP.Type.Json;
+        let input = {
+            method: HTTP.Method.POST,
+            credentials: "omit",
+            headers: HTTP.Headers.Referer,
+            body: JSON.stringify(requestBody)
+        };
+
+        let response = await HTTP.getResponse(url, input, type, controllerCallback);
+        let stream = Extractor.digestStreamResponse(response);
+        return stream;
+    }
+
+    static async getNextSongs({videoId, playlistId}) {
+        let requestBody = API.RequestBody.WEB;
+        requestBody.enablePersistentPlaylistPanel = true;
+        requestBody.isAudioOnly = true;
+        requestBody.videoId = videoId;
+        requestBody.playlistId = playlistId;
+
+        let url = API.URL.Next;
+        let type = HTTP.Type.Json;
+        let input = {
+            method: HTTP.Method.POST,
+            credentials: "omit",
+            headers: HTTP.Headers.Referer,
+            body: JSON.stringify(requestBody)
+        };
+        
+        let response = await HTTP.getResponse(url, input, type);
+        let playlist = Extractor.digestNextResponse(response);
+        
+        return playlist;
+    }
+
+    static async getBlob({url, controllerCallback}) {
+        if (IO.isBlob(url))
+            return url;
+
+        let type = HTTP.Type.Blob;
+        let input = {
+            method: HTTP.Method.GET,
+            credentials: "omit",
+            headers: HTTP.Headers.Referer
+        };
+        
+        let blob = await HTTP.getResponse(url, input, type, controllerCallback);
+        return blob;
     }
 }

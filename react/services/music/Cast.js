@@ -2,7 +2,7 @@ import { DeviceEventEmitter } from "react-native";
 import { State } from "react-native-track-player";
 import Playlist from "../../models/music/playlist";
 import Track from "../../models/music/track";
-import Media from "../api/Media";
+import API from "../api/API";
 import Music from "./Music";
 
 export default class Cast {
@@ -176,7 +176,7 @@ export default class Cast {
                 src = currentMetadata.url;
             } else {
                 try {
-                    Music.metadataList[i].url = await Media.getAudioStream({
+                    Music.metadataList[i].url = await API.getAudioStream({
                         videoId: currentMetadata.id
                     });
 
@@ -215,10 +215,10 @@ export default class Cast {
             currentTime = Music.position;
 
         if (media.artwork?.startsWith("blob") || !media.artwork)
-            media.artwork = (await Media.getAudioInfo({videoId: media.id})).artwork;
+            media.artwork = (await API.getAudioInfo({videoId: media.id})).artwork;
 
         if (media.url?.startsWith("blob") || !media.url)
-            media.url = await Media.getAudioStream({videoId: media.id});
+            media.url = await API.getAudioStream({videoId: media.id});
 
         let mediaInfo = new chrome.cast.media.MediaInfo(media.url, "audio/mp4");
         mediaInfo.metadata = new chrome.cast.media.MusicTrackMediaMetadata();

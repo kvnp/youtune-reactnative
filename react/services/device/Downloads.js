@@ -1,6 +1,6 @@
 import { DeviceEventEmitter } from "react-native";
 import Playlist from "../../models/music/playlist";
-import Media from "../api/Media";
+import API from "../api/API";
 import IO from "./IO";
 import Storage from "./storage/Storage";
 
@@ -114,8 +114,8 @@ export default class Downloads {
                 let includedBefore = true;
                 if (!this.#cachedTracks.includes(videoId)) {
                     includedBefore = false;
-                    let track = await Media.getAudioInfo({videoId: videoId, controllerCallback});
-                    track.artwork = await Media.getBlob({url: track.artwork, controllerCallback});
+                    let track = await API.getAudioInfo({videoId: videoId, controllerCallback});
+                    track.artwork = await API.getBlob({url: track.artwork, controllerCallback});
                     track.videoId = track.id;
                     delete track.id;
                     delete track.playable;
@@ -125,8 +125,8 @@ export default class Downloads {
                 }
 
                 if (!cacheOnly) {
-                    let url = await Media.getAudioStream({videoId: videoId, controllerCallback});
-                    let blob = await Media.getBlob({url: url, controllerCallback});
+                    let url = await API.getAudioStream({videoId: videoId, controllerCallback});
+                    let blob = await API.getBlob({url: url, controllerCallback});
 
                     i = this.#downloadQueue.findIndex(entry => videoId in entry);
                     this.#downloadQueue.splice(i, 1);

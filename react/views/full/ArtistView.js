@@ -11,7 +11,7 @@ import { useFocusEffect } from "@react-navigation/core";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import LinearGradient from "react-native-linear-gradient";
 
-import Media from "../../services/api/Media";
+import API from "../../services/api/API";
 import FlatShelves from "../../components/collections/FlatShelves";
 
 import { bottomBarStyle } from "../../styles/BottomBar";
@@ -28,7 +28,7 @@ export default ArtistView = ({ route, navigation }) => {
     useFocusEffect(
         useCallback(() => {
             navigation.setOptions({ title: "Loading" });
-            Media.getBrowseData(route.params.channelId)
+            API.getBrowseData(route.params.channelId)
                 .then(artist => {
                     setArtist(artist);
                     navigation.setOptions({ title: artist.header.title });

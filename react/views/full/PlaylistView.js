@@ -7,18 +7,16 @@ import {
 } from "react-native";
 import { useTheme, useFocusEffect } from "@react-navigation/native";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
-
-import Media from "../../services/api/Media";
-import {
-    bottomBarStyle,
-    bottomBarAlbumStyle
-} from "../../styles/BottomBar";
-import { rippleConfig } from "../../styles/Ripple";
-import Navigation from "../../services/ui/Navigation";
-import FlatEntries from "../../components/collections/FlatEntries";
 import { ActivityIndicator } from "react-native-paper";
+
+import API from "../../services/api/API";
+import Navigation from "../../services/ui/Navigation";
 import Downloads from "../../services/device/Downloads";
+
+import FlatEntries from "../../components/collections/FlatEntries";
 import { insertBeforeLast } from "../../utils/Navigation";
+import { bottomBarStyle,bottomBarAlbumStyle } from "../../styles/BottomBar";
+import { rippleConfig } from "../../styles/Ripple";
 
 export default PlaylistView = ({ route, navigation }) => {
     const {colors} = useTheme();
@@ -36,7 +34,7 @@ export default PlaylistView = ({ route, navigation }) => {
 
             if (playlist == null || !idFits) {
                 if (!route.params.list.startsWith("LOCAL")) {
-                    Media.getBrowseData(route.params.list)
+                    API.getBrowseData(route.params.list)
                         .then(playlist => {
                             navigation.setOptions({ title: playlist.title });
                             navigation.setParams({ list: playlist.playlistId});

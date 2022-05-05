@@ -1,7 +1,6 @@
-import Device from "../Device";
-
 export default class Storage {
     static #Provider = (() => {
+        const Device = require("../Device");
         if (Device.Platform == "web")
             return require("./provider/IndexedDBProvider").default;
         else if (Device.Platform == "node")

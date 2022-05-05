@@ -11,14 +11,13 @@ import { FlatList } from 'react-native-gesture-handler';
 import { useTheme } from '@react-navigation/native';
 import { Button } from 'react-native-paper';
 
-import Media from '../../services/api/Media';
+import API from '../../services/api/API';
 import Shelf from '../../components/shared/Shelf';
 import { shelvesStyle } from '../../styles/Shelves';
 import { preResultHomeStyle } from '../../styles/Home';
 
 export default HomeTab = ({navigation}) => {
     const [shelves, setShelves] = useState([]);
-    const [continuation, setContinuation] = useState(null);
     const [loading, setLoading] = useState(false);
     const { colors } = useTheme();
     const [homeText, setHomeText] = useState(
@@ -33,14 +32,14 @@ export default HomeTab = ({navigation}) => {
     }, []);
 
     const startRefresh = () => {
-        Media.getBrowseData("FEmusic_home", continuation)
-            .then(result => {
-                setShelves(result.shelves);
+        API.initialize()
+            .then(() => {
+                setShelves(API.initialData.shelves);
                 setLoading(false);
             })
             .catch(() => {
                 setLoading(false);
-            })
+            });
     }
 
     return <FlatList

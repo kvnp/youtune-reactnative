@@ -15,7 +15,7 @@ import { useTheme, useNavigation, useRoute } from '@react-navigation/native';
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import { Button } from 'react-native-paper';
 
-import Media from '../../services/api/Media';
+import API from '../../services/api/API';
 import Entry from '../../components/shared/Entry';
 import { shelvesStyle } from '../../styles/Shelves';
 import { rippleConfig } from '../../styles/Ripple';
@@ -56,7 +56,7 @@ export default SearchTab = () => {
         if (query.length > 0) {
             setLoading(true);
 
-            Media.getSearchResults(query, params)
+            API.getSearchResults(query, params)
                 .then(data => {
                     if (data.suggestionOption == suggestion)
                         data.suggestionOption = null;
