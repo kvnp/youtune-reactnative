@@ -1,5 +1,4 @@
 export default function digestHomeResponse(json) {
-    console.log(json);
     let tabRenderer = json.contents.singleColumnBrowseResultsRenderer.tabs[0].tabRenderer;
     
     let sectionList = null;

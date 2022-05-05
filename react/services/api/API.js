@@ -1,36 +1,33 @@
 import Extractor from "./Extractor";
+import Device from "../device/Device";
+import Settings from "../device/Settings";
 import HTTP from "./HTTP";
 import IO from "../device/IO";
-import Device from "../device/Device";
 import UI from "../ui/UI";
 
 export default class API {
-    static initialData;
-    static Key = "AIzaSyC9XL3ZjWddXya6X74dJoCTL-WEYFDNX30";
-
-    static RequestBody = {
-        WEB: {
-            context: {
-                client: {
-                    clientName: "WEB_REMIX",
-                    clientVersion: "1.20210630.00.00",
-                    //TODO implement disable/enable language settings
-                    gl: Device.Language.GL,
-                    hl: Device.Language.HL
+    static RequestBody = class RequestBody {
+        static #BASE(client, version) {
+            return {
+                context: {
+                    client: {
+                        clientName: client,
+                        clientVersion: version,
+                        ...(Settings.Values.transmitLanguage
+                            ? {gl: Device.Language.GL, hl: Device.Language.HL}
+                            : undefined
+                        )
+                    }
                 }
-            }
-        },
+            };
+        }
 
-        STREAM: {
-            context: {
-                client: {
-                    clientName: "ANDROID",
-                    clientVersion: "16.02",
-                    //TODO implement disable/enable language settings
-                    gl: Device.Language.GL,
-                    hl: Device.Language.HL
-                }
-            }
+        static get WEB() {
+            return this.#BASE("WEB_REMIX", "1.20210630.00.00");
+        }
+
+        static get STREAM() {
+            return this.#BASE("ANDROID", "16.02");
         }
     }
     
@@ -39,7 +36,7 @@ export default class API {
         static #Gapis = "https://youtubei.googleapis.com"
     
         static #Endpoint = "/youtubei/v1/";
-        static #Parameter = "?alt=json&key="
+        static #Parameter = "?alt=json&key=AIzaSyC9XL3ZjWddXya6X74dJoCTL-WEYFDNX30"
     
         static #Search = "search";
         static #Suggestion = "get_search_suggestions";
@@ -47,37 +44,15 @@ export default class API {
         static #Next = "next";
         static #Audio = "player";
     
-        static get Search() {
-            return this.Main + this.#Endpoint +
-                this.#Search + this.#Parameter + API.Key
-        }
-    
-        static get Suggestion() {
-            return this.Main + this.#Endpoint +
-                this.#Suggestion + this.#Parameter + API.Key
-        }
-    
-        static get Browse() {
-            return this.Main + this.#Endpoint +
-                this.#Browse + this.#Parameter + API.Key
-        }
-    
-        static get Next() {
-            return this.Main + this.#Endpoint +
-                this.#Next + this.#Parameter + API.Key
-        }
-    
-        static get Audio() {
-            return this.Main + this.#Endpoint +
-                this.#Audio + this.#Parameter + API.Key
-        }
-    
-        static get Stream() {
-            return this.#Gapis + this.#Endpoint +
-                this.#Audio + this.#Parameter + API.Key
-        }
+        static Search = this.Main + this.#Endpoint + this.#Search + this.#Parameter;
+        static Suggestion = this.Main + this.#Endpoint + this.#Suggestion + this.#Parameter;
+        static Browse = this.Main + this.#Endpoint + this.#Browse + this.#Parameter;
+        static Next = this.Main + this.#Endpoint + this.#Next + this.#Parameter;
+        static Audio = this.Main + this.#Endpoint + this.#Audio + this.#Parameter;
+        static Stream = this.#Gapis + this.#Endpoint + this.#Audio + this.#Parameter;
     };
 
+    static initialData;
     static initialized = false;
     static initialize() {
         return new Promise((resolve, reject) => {
