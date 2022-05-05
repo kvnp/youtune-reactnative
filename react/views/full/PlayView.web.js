@@ -142,7 +142,7 @@ const PlayView = ({route, navigation}) => {
     const restoreCanvas = () => canvas.current.style.opacity = .9;
 
     useEffect(() => {
-        container.current.style.height = window.innerHeight + "px";
+        container.current.style.height = "100%";
         vertContainer.current.addEventListener("mouseover", darkenCanvas);
         vertContainer.current.addEventListener("mouseleave", restoreCanvas);
         vertContainer.current.addEventListener("touchstart", darkenCanvas);
@@ -481,15 +481,6 @@ const PlayView = ({route, navigation}) => {
 }
 
 export default PlayView;
-
-const stylesRest = StyleSheet.create({
-    container: {
-        borderTopRightRadius: 15,
-        borderTopLeftRadius: 15,
-        position: "fixed",
-        bottom: 0
-    },
-});
 
 const stylesBottom = StyleSheet.create({
     container: {
