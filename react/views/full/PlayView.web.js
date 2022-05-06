@@ -140,7 +140,6 @@ const PlayView = ({route, navigation}) => {
         imageX = 0;
         imageY = 0;
         passMovement = false;
-        horizontalLocked = false;
         if (diff < 0.5)
             return goBack();
 
@@ -153,6 +152,7 @@ const PlayView = ({route, navigation}) => {
             else
                 Music.skipPrevious()
         }
+        horizontalLocked = false;
         
         container.current.style.height = "100%";
         image.current.style.transform = "translateX(0px)";
