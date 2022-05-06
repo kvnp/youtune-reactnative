@@ -38,10 +38,18 @@ var canvasFillStyle = null;
 
 var firstPoint = 0;
 var clientY = 0;
+
+var firstImageX = 0;
+var firstImageY = 0;
+var imageX = 0;
+var imageY = 0;
+var passMovement = false;
+var horizontalLocked = false;
 const PlayView = ({route, navigation}) => {
     const [dimensions, setDimensions] = useState({height: window.innerHeight, width: window.innerWidth});
     const { height, width } = dimensions;
     const { dark, colors } = useTheme();
+    const image = useRef(null);
 
     const [pointerDisabled, setPointerDisabled] = useState(false);
     const transition = "height .4s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity .1s";
@@ -126,14 +134,79 @@ const PlayView = ({route, navigation}) => {
         container.current.style.transition = transition;
         firstPoint = 0;
         clientY = 0;
+
+        firstImageX = 0;
+        firstImageY = 0;
+        imageX = 0;
+        imageY = 0;
+        passMovement = false;
+        horizontalLocked = false;
         if (diff < 0.5)
             return goBack();
 
         if (diff > 1.25 && !Music.isStreaming)
             Cast.cast();
+
+        if (image.current.style.opacity <= 0.5) {
+            if (image.current.style.transform.slice(11, -3)[0] == "-")
+                Music.skipNext()
+            else
+                Music.skipPrevious()
+        }
         
         container.current.style.height = "100%";
+        image.current.style.transform = "translateX(0px)";
+        image.current.style.opacity = 1;
         container.current.style.opacity = 1;
+    }
+
+    const handleImage = e => {
+        let iX;
+        let iY;
+        if (e instanceof TouchEvent) {
+            iX = e.touches[0].clientX;
+            iY = e.touches[0].clientY;
+        } else {
+            iX = e.clientX;
+            iY = e.clientY;
+        }
+
+        if (passMovement) {
+            if (horizontalLocked)
+                moveImage(iX);
+            else
+                handleMovement(iY);
+            return;
+        }
+
+        if (!firstImageX) {
+            firstImageX = iX;
+            firstImageY = iY;
+        }
+
+        imageX = iX;
+        imageY = iY;
+
+        let xMovement = firstImageX - imageX;
+        let yMovement = firstImageY - imageY;
+        if (Math.abs(xMovement) >= 5) {
+            passMovement = true;
+            horizontalLocked = true;
+            return;
+        }
+
+        if (Math.abs(yMovement) >= 5) {
+            passMovement = true;
+            horizontalLocked = false;
+        }
+    }
+
+    const moveImage = value => {
+        let newTranslate = value - firstImageX;
+        let newOpacity = (image.current.width - Math.abs(newTranslate))/image.current.width;
+        image.current.style.transform = "translateX(" + newTranslate + "px)";
+        image.current.style.opacity = newOpacity;
+
     }
 
     const enableMovement = () => background.current.addEventListener("mousemove", handleMouse);
@@ -153,6 +226,10 @@ const PlayView = ({route, navigation}) => {
         background.current.addEventListener("mousedown", enableMovement);
         background.current.addEventListener("mouseout", disableMovement);
         background.current.addEventListener("mouseup", () => {disableMovement();stopMovement();});
+
+        //image.current.addEventListener("mousemove", handleImage);
+        image.current.addEventListener("touchmove", handleImage);
+        image.current.addEventListener("touchend", stopMovement);
 
         document.addEventListener("mouseleave", stopMovement);
         window.addEventListener("resize", updateDimensions);
@@ -326,7 +403,7 @@ const PlayView = ({route, navigation}) => {
         <canvas style={{pointerEvents: "none"}} id="canvas" ref={canvas}/>
         <div style={{pointerEvents: "auto"}} ref={background} id="background"/>
         <View ref={vertContainer} style={[stylesTop.vertContainer, {pointerEvents: "none", zIndex: 2, flexDirection: "column"}]}>
-            <img style={{height: height / 2.6, ...imageStyles.view}} src={artwork}/>
+            <img ref={image} style={{height: height / 2.6, pointerEvents: "auto", ...imageStyles.view}} src={artwork}/>
 
             <View style={[stylesBottom.container, {pointerEvents: "none", width: width - 50, height: height / 2.6}]}>
                 <View style={[controlStyles.container, {pointerEvents: "none"}]}>
