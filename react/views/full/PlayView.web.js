@@ -147,7 +147,7 @@ const PlayView = ({route, navigation}) => {
         if (diff > 1.25 && !Music.isStreaming)
             Cast.cast();
 
-        if (image.current.style.opacity <= 0.5) {
+        if (horizontalLocked) {
             if (image.current.style.transform.slice(11, -3)[0] == "-")
                 Music.skipNext()
             else
