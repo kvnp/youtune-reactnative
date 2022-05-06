@@ -147,7 +147,7 @@ const PlayView = ({route, navigation}) => {
             Cast.cast();
 
         if (horizontalLocked) {
-            if (image.current.style.transform.slice(11, -3)[0] == "-")
+            if (image.current.style.transform[11] == "-")
                 Music.skipNext()
             else
                 Music.skipPrevious()
@@ -209,6 +209,8 @@ const PlayView = ({route, navigation}) => {
 
     }
 
+    const enableImage = () => image.current.addEventListener("mousemove", handleImage);;
+    const disableImage = () => image.current.removeEventListener("mousemove", handleImage);;
     const enableMovement = () => background.current.addEventListener("mousemove", handleMouse);
     const disableMovement = () => background.current.removeEventListener("mousemove", handleMouse);
     const darkenCanvas = () => canvas.current.style.opacity = .3;
@@ -225,11 +227,13 @@ const PlayView = ({route, navigation}) => {
         background.current.addEventListener("touchend", stopMovement);
         background.current.addEventListener("mousedown", enableMovement);
         background.current.addEventListener("mouseout", disableMovement);
-        background.current.addEventListener("mouseup", () => {disableMovement();stopMovement();});
+        background.current.addEventListener("mouseup", () => {disableMovement();stopMovement()});
 
-        //image.current.addEventListener("mousemove", handleImage);
         image.current.addEventListener("touchmove", handleImage);
         image.current.addEventListener("touchend", stopMovement);
+        image.current.addEventListener("mousedown", enableImage);
+        image.current.addEventListener("mouseout", disableImage);
+        image.current.addEventListener("mouseup", () => {disableImage();stopMovement()});
 
         document.addEventListener("mouseleave", stopMovement);
         window.addEventListener("resize", updateDimensions);
@@ -403,7 +407,7 @@ const PlayView = ({route, navigation}) => {
         <canvas style={{pointerEvents: "none"}} id="canvas" ref={canvas}/>
         <div style={{pointerEvents: "auto"}} ref={background} id="background"/>
         <View ref={vertContainer} style={[stylesTop.vertContainer, {pointerEvents: "none", zIndex: 2, flexDirection: "column"}]}>
-            <img ref={image} style={{height: height / 2.6, pointerEvents: "auto", ...imageStyles.view}} src={artwork}/>
+            <img ref={image} draggable="false" style={{height: height / 2.6, pointerEvents: "auto", ...imageStyles.view}} src={artwork}/>
 
             <View style={[stylesBottom.container, {pointerEvents: "none", width: width - 50, height: height / 2.6}]}>
                 <View style={[controlStyles.container, {pointerEvents: "none"}]}>
