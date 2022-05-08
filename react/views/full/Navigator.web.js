@@ -58,6 +58,18 @@ export default Navigator = () => {
         return () => stateListener.remove();
     }, []);
 
+    const moveMargin = px => {
+        const navigator = view.current.childNodes[1].childNodes[0];
+        navigator.style.transition = "";
+        navigator.style.marginBottom = px;
+    };
+
+    const resetMargin = () => {
+        const navigator = view.current.childNodes[1].childNodes[0];
+        navigator.style.transition = "margin-bottom .25s";
+        navigator.style.marginBottom = getHeight(Music.state);
+    }
+
     return <View style={{flex: 1}} ref={view}>
         <Header style={headerStyle.headerPicture} title={headerTitle}/>
         <Nav.Navigator
@@ -91,8 +103,10 @@ export default Navigator = () => {
             <Nav.Screen name="Settings" component={SettingsTab} options={getTabOptions("settings")}/>
         </Nav.Navigator>
         <MiniPlayer
-            containerStyle={{position: "absolute", bottom: 48, width: "100%", height: marginBottom, transition: "height .25s"}}
+            containerStyle={{position: "absolute", bottom: 48, width: "100%", height: marginBottom}}
             style={{maxWidth: 800}}
+            moveMargin={moveMargin}
+            resetMargin={resetMargin}
         />
     </View>
 }
