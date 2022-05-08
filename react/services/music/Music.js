@@ -45,6 +45,9 @@ export default class Music {
                     , 500);
                 }
 
+                if (!Music.metadata.id)
+                    return;
+                
                 Music.state = params.state;
                 Music.#emitter.emit(Music.EVENT_STATE_UPDATE, params.state);
             });
@@ -68,6 +71,8 @@ export default class Music {
                                 resolve(track);
                             });
                         });
+                    } else {
+                        Music.play();
                     }
                 }
             });
@@ -148,15 +153,18 @@ export default class Music {
             TrackPlayer.pause();
     }
 
-    static reset = () => {
+    static reset = async() => {
         if (!Music.isStreaming)
-            TrackPlayer.reset();
+            await TrackPlayer.reset();
 
-        Music.state = State.None;
-        Music.#emitter.emit(Music.EVENT_STATE_UPDATE, State.None);
+        Music.transitionTrack = undefined;
         Music.metadataList = [];
         Music.metadataIndex = 0;
         Music.position = 0;
+
+        Music.state = State.None;
+        Music.#emitter.emit(Music.EVENT_METADATA_UPDATE, Music.metadata);
+        Music.#emitter.emit(Music.EVENT_STATE_UPDATE, State.None);
     }
 
     static seekTo = position => {
@@ -186,7 +194,7 @@ export default class Music {
 
             Music.#queue.on("reject", error => console.log(error));
             Music.#queue.on("resolve", async(track) => {
-                if (!Music.metadataList?.length)
+                if (!Music.metadataList?.length || Music.state == State.None)
                     return;
 
                 let trackIndex = -1;
@@ -383,8 +391,9 @@ export default class Music {
 
             Music.reset();
         }
-
+        
         Music.state = State.Buffering;
+        Music.#emitter.emit(Music.EVENT_METADATA_UPDATE, Music.transitionTrack);
         Music.#emitter.emit(Music.EVENT_STATE_UPDATE, State.Buffering);
 
         let local = false;

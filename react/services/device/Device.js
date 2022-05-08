@@ -2,9 +2,13 @@ export default class Device {
     static Language;
     static Platform = (() => {
         let platform;
-        if (process?.versions.node)
-            platform = "node";
-        else
+        if (process?.versions) {
+            if (process.versions?.node) {
+                platform = "node";
+            }
+        }
+        
+        if (!platform)
             platform = require("react-native")["Platform"].OS;
 
         let deviceLanguage;
