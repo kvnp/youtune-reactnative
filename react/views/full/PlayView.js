@@ -183,10 +183,10 @@ const PlayView = ({route, navigation}) => {
                     <Button
                         labelStyle={{marginHorizontal: 0}}
                         style={{borderRadius: 25, alignItems: "center", padding: 0, margin: 0, minWidth: 0}}
-                        contentStyle={{alignItems: "center", width: 50, height: 50, minWidth: 0}}
+                        contentStyle={{alignItems: "center", width: 60, height: 60, minWidth: 0}}
                         onPress={() => Music.skipPrevious()}
                     >
-                        <MaterialIcons style={{alignSelf: "center"}} selectable={false} name="skip-previous" color={colors.text} size={40}/>
+                        <MaterialIcons style={{textAlign: "center", alignContent: "center", alignSelf: "center", textAlignVertical: "center", justifyContent: "center", alignItems: "center"}} selectable={false} name="skip-previous" color={colors.text} size={40}/>
                     </Button>
 
                     <View style={{alignSelf: "center", alignItems: "center", justifyContent: "center", backgroundColor: dark ? colors.card : colors.primary, width: 60, height: 60, borderRadius: 30}}>
@@ -225,10 +225,10 @@ const PlayView = ({route, navigation}) => {
                     <Button
                         labelStyle={{marginHorizontal: 0}}
                         style={{borderRadius: 25, alignItems: "center", padding: 0, margin: 0, minWidth: 0}}
-                        contentStyle={{alignItems: "center", width: 50, height: 50, minWidth: 0}}
+                        contentStyle={{alignItems: "center", width: 60, height: 60, minWidth: 0}}
                         onPress={() => Music.skipNext()}
                     >
-                        <MaterialIcons style={{alignSelf: "center"}} selectable={false} name="skip-next" color={colors.text} size={40}/>
+                        <MaterialIcons style={{alignSelf: "center", justifyContent: "center", alignItems: "center", textAlignVertical: "center"}} selectable={false} name="skip-next" color={colors.text} size={40}/>
                     </Button>
 
                     <Button
