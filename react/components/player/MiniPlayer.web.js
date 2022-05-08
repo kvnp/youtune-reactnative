@@ -46,11 +46,12 @@ export default MiniPlayer = ({style, containerStyle, moveMargin, resetMargin}) =
     };
 
     const resetMove = () => {
+        disableMouse();
         firstY = 0;
 
         let thisHeight = Number(container.current.style.height.slice(0, -2));
-        if (thisHeight <= 5)
-            Music.reset();
+        if (thisHeight <= 10)
+            onStop();
         else if (thisHeight >= 100)
             navigation.navigate("Music");
 
@@ -63,12 +64,20 @@ export default MiniPlayer = ({style, containerStyle, moveMargin, resetMargin}) =
         currentHeight.current = Number(containerStyle.height.slice(0, -2));
     }, [containerStyle]);
 
-    const enableMouse = () => container.current.addEventListener("mousemove", handleMove);
-    const disableMouse = () => container.current.removeEventsListener("mousemove", handleMove);
+    const enableMouse = () => {
+        container.current.style.pointerEvents = "auto";
+        container.current.parentElement.style.pointerEvents = "none";
+        container.current.addEventListener("mousemove", handleMove);
+    }
+    const disableMouse = () => {
+        container.current.style.pointerEvents = "";
+        container.current.parentElement.style.pointerEvents = "";
+        container.current.removeEventListener("mousemove", handleMove);
+    }
 
     useEffect(() => {
         container.current.addEventListener("mousedown", enableMouse);
-        container.current.addEventListener("mouseup", () => {disableMouse();resetMove()});
+        container.current.addEventListener("mouseup", resetMove);
         container.current.addEventListener("touchmove", handleMove);
         container.current.addEventListener("touchend", resetMove);
 
@@ -87,7 +96,9 @@ export default MiniPlayer = ({style, containerStyle, moveMargin, resetMargin}) =
             pos => setPosition(pos)
         );
 
+        document.addEventListener("mouseleave", resetMove);
         return () => {
+            document.removeEventListener("mouseleave", resetMove);
             stateListener.remove();
             metadataListener.remove();
             positionListener.remove();
