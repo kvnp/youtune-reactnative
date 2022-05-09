@@ -153,19 +153,20 @@ export default class Music {
             TrackPlayer.pause();
     }
 
-    static reset = async(resetTransition) => {
+    static reset = async(dontResetTransition) => {
         if (!Music.isStreaming)
             await TrackPlayer.reset();
 
-        if (resetTransition)
-            Music.transitionTrack = undefined;
         Music.metadataList = [];
         Music.metadataIndex = 0;
         Music.position = 0;
 
         Music.state = State.None;
-        Music.#emitter.emit(Music.EVENT_METADATA_UPDATE, Music.metadata);
         Music.#emitter.emit(Music.EVENT_STATE_UPDATE, State.None);
+        if (!dontResetTransition) {
+            Music.transitionTrack = undefined;
+            Music.#emitter.emit(Music.EVENT_METADATA_UPDATE, Music.metadata);
+        }
     }
 
     static seekTo = position => {
@@ -390,7 +391,7 @@ export default class Music {
                 }
             }
 
-            Music.reset(false);
+            Music.reset(true);
         }
         
         Music.state = State.Buffering;
