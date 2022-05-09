@@ -153,11 +153,12 @@ export default class Music {
             TrackPlayer.pause();
     }
 
-    static reset = async() => {
+    static reset = async(resetTransition) => {
         if (!Music.isStreaming)
             await TrackPlayer.reset();
 
-        Music.transitionTrack = undefined;
+        if (resetTransition)
+            Music.transitionTrack = undefined;
         Music.metadataList = [];
         Music.metadataIndex = 0;
         Music.position = 0;
@@ -389,7 +390,7 @@ export default class Music {
                 }
             }
 
-            Music.reset();
+            Music.reset(false);
         }
         
         Music.state = State.Buffering;
