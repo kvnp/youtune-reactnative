@@ -26,7 +26,7 @@
         "lint": "npx eslint ."
     },
     "dependencies": {
-        "@react-native-async-storage/async-storage": "^1.17.3",
+        "@react-native-async-storage/async-storage": "^1.17.4",
         "@react-native-community/slider": "^4.2.2",
         "@react-native-masked-view/masked-view": "^0.2.6",
         "@react-navigation/material-top-tabs": "^6.2.1",
@@ -36,7 +36,7 @@
         "queue-promise": "^2.2.1",
         "react": "^18.1.0",
         "react-dom": "^18.1.0",
-        "react-native": "0.68.1",
+        "react-native": "0.68.2",
         "react-native-gesture-handler": "^1.10.3",
         "react-native-linear-gradient": "github:react-native-linear-gradient/react-native-linear-gradient",
         "react-native-pager-view": "^5.4.15",
@@ -47,7 +47,7 @@
         "react-native-tab-view": "^3.1.1",
         "react-native-track-player": "github:kvnp/react-native-track-player",
         "react-native-vector-icons": "^9.1.0",
-        "react-native-web": "^0.0.0-b2a3e86d",
+        "react-native-web": "0.0.0-b2a3e86d",
         "react-native-web-linear-gradient": "^1.1.2",
         "react-native-windows": "0.68.0",
         "rn-sliding-up-panel": "^2.4.5"
@@ -71,7 +71,7 @@
         "jest": "^28.1.0",
         "metro-config": "^0.70.3",
         "metro-react-native-babel-preset": "^0.70.3",
-        "react-native-codegen": "^0.0.16",
+        "react-native-codegen": "^0.70.0",
         "react-style-proptype": "^3.2.2",
         "react-test-renderer": "^18.1.0",
         "run-script-os": "^1.1.6",
