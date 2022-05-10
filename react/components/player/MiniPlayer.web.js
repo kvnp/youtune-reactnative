@@ -140,7 +140,7 @@ export default MiniPlayer = ({style, containerStyle, moveMargin, resetMargin}) =
             </View>
             <View style={styles.container}>
                 <div style={styles.image}>
-                    <img src={artwork} loading="lazy" style={{width: "100%", height: "auto"}}></img>
+                    <img src={artwork} loading="lazy" onLoad={e => e.target.style.opacity = 1} style={{width: "100%", height: "100%", objectFit: "contain", backgroundColor: "gray", opacity: 0, transition: "opacity .4s ease-in"}}></img>
                 </div>
 
                 <TouchableRipple
@@ -264,8 +264,9 @@ const styles = StyleSheet.create({
 
     image: {
         width: 50,
+        height: 50,
         alignSelf: "stretch",
-        backgroundColor: "gray",
+        paddingRight: 10
     },
 
     textContainer: {

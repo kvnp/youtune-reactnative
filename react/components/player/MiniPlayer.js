@@ -202,6 +202,7 @@ const styles = StyleSheet.create({
 
     image: {
         width: 50,
+        height: 50,
         alignSelf: "stretch",
         backgroundColor: "gray",
     },

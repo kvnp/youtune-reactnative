@@ -55,7 +55,7 @@ export default Entry = ({ entry, navigation, index, forcedPlaylistId }) => {
         }
 
         <div style={resultStyle.resultCover}>
-            <img src={view.thumbnail} loading="lazy" onLoad={e => e.target.style.opacity = 1} style={{width: "100%", height: "auto", opacity: 0, transition: "opacity .4s ease-in"}}></img>
+            <img src={view.thumbnail} loading="lazy" onLoad={e => e.target.style.opacity = 1} style={{width: "100%", height: "100%", objectFit: "cover", opacity: 0, transition: "opacity .4s ease-in"}}></img>
         </div>
         
         <View style={resultStyle.resultColumnOne}>
