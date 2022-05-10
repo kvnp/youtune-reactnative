@@ -1,10 +1,4 @@
-import { PureComponent } from 'react';
-
-import {
-    Text,
-    View
-} from "react-native";
-
+import { Text, View } from "react-native";
 import { resultHomeStyle } from '../../styles/Home';
 import { descriptionStyle } from '../../styles/Description';
 import FlatAlbums from '../collections/FlatAlbums';

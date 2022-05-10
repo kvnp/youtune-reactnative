@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from "react";
-import { StyleSheet, View, Image, Text } from "react-native";
+import { StyleSheet, View, Text } from "react-native";
 
 import { TouchableRipple} from "react-native-paper";
 import { useNavigation, useTheme } from "@react-navigation/native";
@@ -40,7 +40,7 @@ export default MiniPlayer = ({style, containerStyle, moveMargin, resetMargin}) =
         let newHeight = firstY - y + currentHeight.current;
         let newHeightPx = newHeight + "px";
         if (newHeight >= 0 && newHeight <= 50)
-            moveMargin(newHeightPx)
+            moveMargin(newHeightPx);
 
         container.current.style.height = newHeightPx;
     };
@@ -55,7 +55,6 @@ export default MiniPlayer = ({style, containerStyle, moveMargin, resetMargin}) =
         else if (thisHeight >= 100)
             navigation.navigate("Music");
 
-        container.current.style.transition = "height .25s";
         container.current.style.height = currentHeight.current + "px";
         resetMargin();
     };
@@ -107,6 +106,7 @@ export default MiniPlayer = ({style, containerStyle, moveMargin, resetMargin}) =
 
     const onNext = () => Music.skipNext();
     const onStop = () => {
+        container.current.style.transition = "height .25s";
         if (Music.isStreaming)
             Cast.reset();
         else
@@ -139,7 +139,10 @@ export default MiniPlayer = ({style, containerStyle, moveMargin, resetMargin}) =
                 <View style={{width: remainingWidth, backgroundColor: colors.card}}></View>
             </View>
             <View style={styles.container}>
-                <Image source={{uri: artwork}} style={styles.image}/>
+                <div style={styles.image}>
+                    <img src={artwork} loading="lazy" style={{width: "100%", height: "auto"}}></img>
+                </div>
+
                 <TouchableRipple
                     borderless={true}
                     rippleColor={colors.primary}

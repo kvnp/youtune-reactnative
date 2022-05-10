@@ -96,7 +96,8 @@ export const resultStyle = StyleSheet.create({
 
     resultCover: {
         width: 70,
-        height: 70
+        height: 70,
+        backgroundColor: "gray"
     },
 
     resultColumnOne: {

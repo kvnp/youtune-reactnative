@@ -1,6 +1,5 @@
 import { useRef, useEffect } from "react";
 import {
-    Image,
     View,
     Text,
     StyleSheet,
@@ -110,7 +109,10 @@ export default SwipePlaylist = ({playlist, track, backgroundColor, textColor, st
                                 : <Text style={{width: 30, textAlign: "center", fontSize: 15, color: textColor}}>{index + 1}</Text>
                             }
 
-                            <Image style={{height: 50, width: 50, marginRight: 10}} source={{uri: item.artwork}}/>
+                            <div style={{height: 50, width: 50, marginRight: 10, backgroundColor: "gray"}}>
+                                <img onLoad={e => e.target.style.opacity = 1} src={item.artwork} loading="lazy" style={{width: "100%", height: "auto", opacity: 0, transition: "opacity .4s ease-in"}}></img>
+                            </div>
+                            
 
                             <View style={{width: 0, flexGrow: 1, flex: 1}}>
                                 <Text style={{color: textColor}} numberOfLines={2}>{item.title}</Text>

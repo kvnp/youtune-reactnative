@@ -14,22 +14,17 @@ export default Header = ({style, title}) => {
     const image = useRef(null);
     
     useEffect(() => {
-        image.current.onload = e => image.current.style.opacity = 1;
-        const headerListener = UI.addListener(
-            UI.EVENT_HEADER,
-            state => setState({source: {uri: state?.source.uri}})
-        );
-
+        const headerListener = UI.addListener(UI.EVENT_HEADER, state => setState({source: {uri: state?.source.uri}}));
         return () => headerListener.remove();
     }, []);
 
     useEffect(() => {
         image.current.style.opacity = 0;
-        image.current.src = header.source.uri;
+        setTimeout(() => image.current.src = header.source.uri, 400);
     }, [header]);
 
     return <div ref={container} style={{display: "flex", ...headerStyle.container, ...style}}>
-        <img ref={image} style={{objectFit: "cover", height: "inherit", width: "inherit", position: "absolute", opacity: 0, transition: "opacity .4s ease-in"}}></img>
+        <img ref={image} loading="lazy" onLoad={e => e.target.style.opacity = 1} style={{objectFit: "cover", height: "inherit", width: "inherit", position: "absolute", opacity: 0, transition: "opacity .4s ease-in"}}></img>
         <Text style={{color: colors.text, backgroundImage: dark ? gradientColorsDark : gradientColors, ...headerStyle.text, display: "flex", height: "inherit", width: "inherit", alignItems: "center", justifyContent: "center", position: "absolute"}}>
             {title}
         </Text>
