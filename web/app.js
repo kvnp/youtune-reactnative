@@ -8,14 +8,7 @@ const app = express();
 const html = fs.readFileSync("web/public/index.html").toString();
 const headIndex = html.indexOf("<head>") + 6;
 
-app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, 'public')));
-
-app.get('/', function(req, res, next) {
-    res.render('index');
-});
-
 app.get("/watch/", function(req, res, next) {
     const v = req.query.v;
     const url = "https://music.youtube.com/watch?v=" + v;
@@ -91,5 +84,9 @@ app.use('/proxy', createProxyMiddleware({
         "User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:79.0) Gecko/20100101 Firefox/79.0"
     }
 }));
+
+app.get('*', function(req, res, next) {
+    res.sendFile(path.join(__dirname, '/public/index.html'));
+});
 
 module.exports = app;
