@@ -138,14 +138,21 @@ export default function digestResultResponse(json) {
                                 entry.type = "Album";
                             else if (type == "MUSIC_PAGE_TYPE_PLAYLIST")
                                 entry.type = "Playlist";
-
-                            let playNavigationEndpoint = responsiveMusicItem.overlay.musicItemThumbnailOverlayRenderer.content.musicPlayButtonRenderer.playNavigationEndpoint;
-
-                            if (playNavigationEndpoint?.watchPlaylistEndpoint)
-                                entry.playlistId = playNavigationEndpoint.watchPlaylistEndpoint.playlistId;
-                            else
-                                entry.playlistId = playNavigationEndpoint.watchEndpoint.playlistId;
                             
+                            
+                            if (responsiveMusicItem.hasOwnProperty("overlay")) {
+                                let playNavigationEndpoint = responsiveMusicItem
+                                    .overlay
+                                    .musicItemThumbnailOverlayRenderer
+                                    .content
+                                    .musicPlayButtonRenderer
+                                    .playNavigationEndpoint;
+
+                                if (playNavigationEndpoint.hasOwnProperty("watchPlaylistEndpoint"))
+                                    entry.playlistId = playNavigationEndpoint.watchPlaylistEndpoint.playlistId;
+                                else
+                                    entry.playlistId = playNavigationEndpoint.watchEndpoint.playlistId;
+                            }
                         }
 
                         entry.browseId = responsiveMusicItem.navigationEndpoint.browseEndpoint.browseId;
