@@ -1,11 +1,14 @@
+import { useEffect, useRef } from "react";
 import { View, Text } from "react-native";
 import { useTheme } from '@react-navigation/native';
 import { TouchableRipple } from 'react-native-paper';
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 
+import Navigation from '../../services/ui/Navigation';
+import Downloads from "../../services/device/Downloads";
+
 import { resultStyle } from '../../styles/Search';
 import { showModal } from '../modals/MoreModal';
-import Navigation from '../../services/ui/Navigation';
 
 export default Entry = ({ entry, navigation, index, forcedPlaylistId }) => {
     const { title, subtitle, artist, thumbnail, artwork,
@@ -23,6 +26,13 @@ export default Entry = ({ entry, navigation, index, forcedPlaylistId }) => {
     };
 
     const { colors } = useTheme();
+    const isDownloaded = useRef(false);
+
+    useEffect(() => {
+        if (view.playlistId)
+            if (!view.playlistId.includes("LOCAL"))
+                isDownloaded.current = Downloads.isTrackDownloaded(view.videoId);
+    }, []);
 
     return <TouchableRipple
         borderless={true}
@@ -54,12 +64,17 @@ export default Entry = ({ entry, navigation, index, forcedPlaylistId }) => {
                 : null
         }
 
-        <div style={resultStyle.resultCover}>
+        <div style={{...resultStyle.resultCover, display: "flex", justifyContent: "end"}}>
             <img src={view.thumbnail} loading="lazy" onLoad={e => e.target.style.opacity = 1} style={{width: "100%", height: "100%", objectFit: "cover", opacity: 0, transition: "opacity .4s ease-in"}}></img>
+            {
+                isDownloaded.current
+                    ? <MaterialIcons style={{position: "absolute", background: "radial-gradient(green,transparent)"}} name="file-download-done" color="white" size={24}/>
+                    : undefined
+            }
         </div>
         
         <View style={resultStyle.resultColumnOne}>
-            <Text numberOfLines={1} style={[resultStyle.resultText, {color: colors.text}]}>{title}</Text>
+            <Text numberOfLines={1} style={[resultStyle.resultText, {color: colors.text}]}>{view.title}</Text>
             <Text numberOfLines={1} style={[resultStyle.resultText, {color: colors.text}]}>{view.subtitle}</Text>
         </View>
 
