@@ -7,8 +7,26 @@ import API from '../api/API';
 
 export default class Music {
     static #initialized;
-    static state = State.None;
-    static position = 0;
+    static playbackState = State.None;
+    static set state(value) {
+        this.playbackState = value;
+        this.#emitter.emit(this.EVENT_STATE_UPDATE, this.state);
+    }
+
+    static get state() {
+        return this.playbackState;
+    }
+
+    static playbackPosition = 0;
+    static set position(value) {
+        this.playbackPosition = value;
+        this.#emitter.emit(this.EVENT_POSITION_UPDATE, this.position);
+    }
+
+    static get position() {
+        return this.playbackPosition;
+    }
+
     static #positionInterval = null;
     static #positionListener = null;
     static isStreaming = false;
@@ -16,11 +34,45 @@ export default class Music {
     static repeatMode = RepeatMode.Off;
     static repeatModeString = "repeat";
     static metadataList = [];
-    static metadataIndex = null;
+    static metadataIndex = 0;
+    static set index(value) {
+        this.metadataIndex = value;
+        this.#emitter.emit(this.EVENT_METADATA_UPDATE, this.metadata);
+    }
+
+    static get index() {
+        return this.metadataIndex;
+    }
+
     static playlistId = null;
     static trackUrlLoaded = [];
 
     static transitionTrack;
+    static set transition(value) {
+        this.transitionTrack = value;
+        if (value)
+            this.#emitter.emit(this.EVENT_METADATA_UPDATE, value);
+    }
+
+    static get transition() {
+        return this.transitionTrack;
+    }
+
+    static get metadata() {
+        console.log({
+            list: Music.metadataList,
+            transition: Music.transition ? true : false,
+            index: this.index
+        });
+        if (Music.metadataList.length == 0)
+            if (Music.transition)
+                return Music.transition;
+            else
+                return {id: null, playlistId: null, title: null, artist: null, artwork: null, duration: 0};
+        else
+            return Music.metadataList[Music.index];
+    }
+
     static wasPlayingBeforeSkip = false;
 
     static #emitter = DeviceEventEmitter;
@@ -38,28 +90,26 @@ export default class Music {
 
                 if (params.state != State.Playing) {
                     clearInterval(Music.#positionInterval);
-                    TrackPlayer.getPosition().then(Music.#updatePosition);
+                    TrackPlayer.getPosition().then(position => Music.position = position);
                 } else if (params.state != Music.state) {
                     Music.#positionInterval = setInterval(async() =>
-                        Music.#updatePosition(await TrackPlayer.getPosition())
+                        Music.position = await TrackPlayer.getPosition()
                     , 500);
                 }
-
+                
                 if (!Music.metadata.id)
                     return;
                 
                 Music.state = params.state;
-                Music.#emitter.emit(Music.EVENT_STATE_UPDATE, params.state);
             });
     
             TrackPlayer.addEventListener(Event.PlaybackTrackChanged, params => {
                 if (Music.isStreaming)
                     return;
 
-                if (Music.metadataIndex != params.nextTrack) {
-                    Music.metadataIndex = params.nextTrack;
-                    Music.#emitter.emit(Music.EVENT_METADATA_UPDATE, Music.metadata);
-                    Music.#updatePosition(0);
+                if (Music.index != params.nextTrack) {
+                    Music.index = params.nextTrack;
+                    Music.position = 0;
                 }
 
                 if (params.nextTrack < Music.metadataList.length - 1 && params.nextTrack >= 0) {
@@ -158,33 +208,25 @@ export default class Music {
             await TrackPlayer.reset();
 
         Music.metadataList = [];
-        Music.metadataIndex = 0;
+        Music.index = 0;
         Music.position = 0;
 
         Music.state = State.None;
-        Music.#emitter.emit(Music.EVENT_STATE_UPDATE, State.None);
-        if (!dontResetTransition) {
-            Music.transitionTrack = undefined;
-            Music.#emitter.emit(Music.EVENT_METADATA_UPDATE, Music.metadata);
-        }
+        if (!dontResetTransition)
+            Music.transition = undefined;
     }
 
     static seekTo = position => {
-        Music.#updatePosition(position);
+        Music.position = position;
         if (Music.isStreaming)
             Cast.seekTo(position);
         else {
             TrackPlayer.seekTo(position);
             clearInterval(Music.#positionInterval);
             Music.#positionInterval = setInterval(async() =>
-                Music.#updatePosition(await TrackPlayer.getPosition())
+                Music.position = await TrackPlayer.getPosition()
             , 500);
         }
-    }
-
-    static #updatePosition = pos => {
-        this.position = pos;
-        Music.#emitter.emit(this.EVENT_POSITION_UPDATE, pos);
     }
 
     static initialize = () => {
@@ -230,7 +272,7 @@ export default class Music {
 
                         Music.#positionListener = Cast.addListener(
                             Cast.EVENT_POSITION,
-                            pos => Music.#updatePosition(pos)
+                            pos => Music.position = pos
                         );
                     }
                 } else {
@@ -242,14 +284,13 @@ export default class Music {
                     if (Music.metadataList.length > 0)
                         Music.startPlaylist({
                             list: Music.metadataList,
-                            index: Music.metadataIndex
+                            index: Music.index
                         }, Music.position);
                 }
             });
 
             Cast.addListener(Cast.EVENT_PLAYERSTATE, e => {
-                this.state = e;
-                Music.#emitter.emit(this.EVENT_STATE_UPDATE, e);
+                Music.state = e;
             });
 
             Music.#initialized = true;
@@ -279,20 +320,6 @@ export default class Music {
         return Music.repeatModeString;
     }
 
-    static get index() {
-        return Music.metadataIndex;
-    }
-
-    static get metadata() {
-        if (Music.metadataList.length == 0)
-            if (Music.transitionTrack)
-                return Music.transitionTrack;
-            else
-                return {id: null, playlistId: null, title: null, artist: null, artwork: null, duration: 0};
-        else
-            return Music.metadataList[Music.metadataIndex];
-    }
-
     static skipTo(index) {
         if (index == null || Music.metadataList == null)
             return;
@@ -314,7 +341,7 @@ export default class Music {
         
         forward = forward != undefined
             ? forward
-            : index > Music.metadataIndex;
+            : index > Music.index;
         //let playing = Music.state == State.Playing;
         //TrackPlayer.pause();
         let seek = !forward && Music.position >= 10;
@@ -324,14 +351,14 @@ export default class Music {
         else
             Music.skip(index);
         
-        if (Music.trackUrlLoaded[Music.metadataIndex]) {
+        if (Music.trackUrlLoaded[Music.index]) {
             if (!seek)
                 Music.skip(index);
         } else {
             if (!Music.isStreaming)
                 Music.#queue.enqueue(() => {
                     return new Promise(async(resolve, reject) => {
-                        let track = Music.metadataList[Music.metadataIndex];
+                        let track = Music.metadataList[Music.index];
                         track.url = await Music.getStream({videoId: track.id});
                         resolve(track);
                     });
@@ -343,20 +370,19 @@ export default class Music {
 
     static skip(index) {
         if (Music.isStreaming) {
-            Music.metadataIndex = index;
+            Music.index = index;
             Cast.cast();
         } else {
             TrackPlayer.skip(index);
         }
-        Music.#emitter.emit(Music.EVENT_METADATA_UPDATE, Music.metadata);
     }
     
     static skipNext() {
-        Music.skipTo(Music.metadataIndex + 1);
+        Music.skipTo(Music.index + 1);
     }
 
     static skipPrevious() {
-        Music.skipTo(Music.metadataIndex - 1);
+        Music.skipTo(Music.index - 1);
     }
 
     static getStream({videoId}) {
@@ -374,7 +400,7 @@ export default class Music {
     }
 
     static handlePlayback = async(track) => {
-        Music.transitionTrack = track;
+        Music.transition = track;
         const { id, playlistId } = track;
 
         let queue = Music.metadataList;
@@ -395,8 +421,6 @@ export default class Music {
         }
         
         Music.state = State.Buffering;
-        Music.#emitter.emit(Music.EVENT_METADATA_UPDATE, Music.transitionTrack);
-        Music.#emitter.emit(Music.EVENT_STATE_UPDATE, State.Buffering);
 
         let local = false;
         if (typeof playlistId == "string")
@@ -420,7 +444,7 @@ export default class Music {
 
         for (let i = 0; i < playlist.list.length; i++) {
             if (i == playlist.index)
-                Music.metadataIndex = i;
+                Music.index = i;
 
             if (i == playlist.index || i == playlist.index + 1) {
                 if (Downloads.isTrackDownloaded(playlist.list[i].id) || !playlist.list[i].duration) {
@@ -439,7 +463,7 @@ export default class Music {
 
         if (!Music.isStreaming) {
             await TrackPlayer.add(playlist.list);
-            await TrackPlayer.skip(Music.metadataIndex);
+            await TrackPlayer.skip(Music.index);
             if (position)
                 await TrackPlayer.seekTo(position);
 
@@ -447,8 +471,6 @@ export default class Music {
         } else {
             Cast.cast();
         }
-        
-        Music.#emitter.emit(Music.EVENT_METADATA_UPDATE, Music.metadata);
     }
 }
 
