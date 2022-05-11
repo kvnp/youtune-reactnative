@@ -6,7 +6,6 @@ import Cast from './Cast';
 import API from '../api/API';
 
 export default class Music {
-    static #initialized;
     static playbackState = State.None;
     static set state(value) {
         this.playbackState = value;
@@ -32,7 +31,15 @@ export default class Music {
     static isStreaming = false;
 
     static repeatMode = RepeatMode.Off;
-    static repeatModeString = "repeat";
+    static get repeatModeString() {
+        if (this.repeatMode == RepeatMode.Off)
+            return "repeat";
+        else if (this.repeatMode == RepeatMode.Queue)
+            return "repeat-on";
+        else
+            return "repeat-one-on";
+    }
+
     static metadataList = [];
     static metadataIndex = 0;
     static set index(value) {
@@ -59,11 +66,6 @@ export default class Music {
     }
 
     static get metadata() {
-        console.log({
-            list: Music.metadataList,
-            transition: Music.transition ? true : false,
-            index: this.index
-        });
         if (Music.metadataList.length == 0)
             if (Music.transition)
                 return Music.transition;
@@ -293,28 +295,17 @@ export default class Music {
                 Music.state = e;
             });
 
-            Music.#initialized = true;
             resolve();
         });
     }
 
     static cycleRepeatMode = () => {
-        if (!Music.#initialized)
-            return reject("Music needs to be initialized by calling initialize()");
-
-        switch (Music.repeatMode) {
-            case RepeatMode.Off:
-                Music.repeatMode = RepeatMode.Queue;
-                Music.repeatModeString = "repeat-on";
-                break;
-            case RepeatMode.Queue:
-                Music.repeatMode = RepeatMode.Track;
-                Music.repeatModeString = "repeat-one-on";
-                break;
-            case RepeatMode.Track:
-                Music.repeatMode = RepeatMode.Off;
-                Music.repeatModeString = "repeat";
-        }
+        if (Music.repeatMode == RepeatMode.Off)
+            Music.repeatMode = RepeatMode.Queue;
+        else if (Music.repeatMode == RepeatMode.Queue)
+            Music.repeatMode = RepeatMode.Track;
+        else if (Music.repeatMode == RepeatMode.Track)
+            Music.repeatMode = RepeatMode.Off;
         
         TrackPlayer.setRepeatMode(Music.repeatMode);
         return Music.repeatModeString;
@@ -342,18 +333,12 @@ export default class Music {
         forward = forward != undefined
             ? forward
             : index > Music.index;
-        //let playing = Music.state == State.Playing;
-        //TrackPlayer.pause();
-        let seek = !forward && Music.position >= 10;
 
-        if (seek)
-            Music.seekTo(0)
-        else
-            Music.skip(index);
+        if (!forward && Music.position >= 10)
+            return Music.seekTo(0)
         
         if (Music.trackUrlLoaded[Music.index]) {
-            if (!seek)
-                Music.skip(index);
+            Music.skip(index);
         } else {
             if (!Music.isStreaming)
                 Music.#queue.enqueue(() => {
