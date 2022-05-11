@@ -132,10 +132,12 @@ function getArtist(json) {
         artist.header.title += titleList[ttl].text;
     }
 
-    let subList = json.header.musicImmersiveHeaderRenderer.subscriptionButton.subscribeButtonRenderer.subscriberCountText.runs;
-    for (let sl = 0; sl < subList.length; sl++) {
-        artist.header.subscriptions += subList[sl].text;
-    }
+    let subButton = json.header.musicImmersiveHeaderRenderer.subscriptionButton.subscribeButtonRenderer;
+
+    if (subButton.hasOwnProperty("subscriberCountText"))
+        for (let sl = 0; sl < subButton.subscriberCountText.runs.length; sl++) {
+            artist.header.subscriptions += subButton.subscriberCountText.runs[sl].text;
+        }
 
     artist.header.thumbnail = json.header.musicImmersiveHeaderRenderer.thumbnail?.musicThumbnailRenderer.thumbnail.thumbnails[0].url;
     let tabList = json.contents.singleColumnBrowseResultsRenderer.tabs;
