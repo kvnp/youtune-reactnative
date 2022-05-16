@@ -31,8 +31,9 @@ var analyser;
 var playViewId;
 var barHeight;
 var barWidth;
+var startX = 0;
 var x = 0;
-var bars = 0; // Set total number of bars you want per frame
+var bars = 0;
 var canvasWidth = 0;
 var canvasFillStyle = null;
 
@@ -45,14 +46,15 @@ var imageX = 0;
 var imageY = 0;
 var passMovement = false;
 var horizontalLocked = false;
-const PlayView = ({route, navigation}) => {
+export default PlayView = ({route, navigation}) => {
     const [dimensions, setDimensions] = useState({height: window.innerHeight, width: window.innerWidth});
     const { height, width } = dimensions;
     const { dark, colors } = useTheme();
     const image = useRef(null);
 
     const [pointerDisabled, setPointerDisabled] = useState(false);
-    const transition = "height .4s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity .1s";
+    const heightTransition = "height .4s cubic-bezier(.175, .885, .32, 1.275), opacity .1s";
+    const imageTransition = "transform .4s cubic-bezier(.175, .885, .32, 1.275)";
     const canvas = useRef(null);
     const container = useRef(null);
     const vertContainer = useRef(null);
@@ -83,9 +85,10 @@ const PlayView = ({route, navigation}) => {
                 if (bars >= dataArray.length)
                     break;
 
-                canvasWidth += barWidth + 5;
+                canvasWidth += barWidth + 10;
                 bars++;
             }
+            startX = (canvas.current.width - canvasWidth)/2;
         }
     }
     useEffect(prepareCanvas, [width, height]);
@@ -100,7 +103,7 @@ const PlayView = ({route, navigation}) => {
 
     const goBack = () => {
         cancelAnimationFrame(playViewId);
-        container.current.style.transition = transition;
+        container.current.style.transition = heightTransition;
         container.current.style.height = "0px";
         if (!navigation.canGoBack())
             navigation.dispatch(insertBeforeLast("App"));
@@ -131,7 +134,7 @@ const PlayView = ({route, navigation}) => {
     const stopMovement = () => {
         setPointerDisabled(false);
         let diff = (window.innerHeight - (clientY - firstPoint)) / window.innerHeight;
-        container.current.style.transition = transition;
+        container.current.style.transition = heightTransition;
         firstPoint = 0;
         clientY = 0;
 
@@ -140,19 +143,27 @@ const PlayView = ({route, navigation}) => {
         imageX = 0;
         imageY = 0;
         passMovement = false;
-        if (diff < 0.5)
+        if (diff < .5)
             return goBack();
 
         if (diff > 1.25 && !Music.isStreaming)
             Cast.cast();
 
         if (horizontalLocked) {
-            if (image.current.style.transform[11] == "-")
-                Music.skipNext()
-            else
-                Music.skipPrevious()
+            if (image.current.style.opacity <= .5) {
+                image.current.style.transition = imageTransition;
+                image.current.ontransitionend = e => image.current.style.transition = "";
+                let firstLetter = image.current.style.transform[11];
+                let newTranslate = -Number(image.current.style.transform.slice(11, -3));
+                image.current.style.transform = "translateX(" + newTranslate + "px)";
+                if (firstLetter == "-")
+                    Music.skipNext();
+                else
+                    Music.skipPrevious();
+            }
+
+            horizontalLocked = false;
         }
-        horizontalLocked = false;
         
         container.current.style.height = "100%";
         image.current.style.transform = "translateX(0px)";
@@ -189,13 +200,14 @@ const PlayView = ({route, navigation}) => {
 
         let xMovement = firstImageX - imageX;
         let yMovement = firstImageY - imageY;
-        if (Math.abs(xMovement) >= 5) {
+
+        if (Math.abs(xMovement) >= 10) {
             passMovement = true;
             horizontalLocked = true;
             return;
         }
 
-        if (Math.abs(yMovement) >= 5) {
+        if (Math.abs(yMovement) >= 10) {
             passMovement = true;
             horizontalLocked = false;
         }
@@ -206,7 +218,6 @@ const PlayView = ({route, navigation}) => {
         let newOpacity = (image.current.width - Math.abs(newTranslate))/image.current.width;
         image.current.style.transform = "translateX(" + newTranslate + "px)";
         image.current.style.opacity = newOpacity;
-
     }
 
     const enableImage = () => image.current.addEventListener("mousemove", handleImage);;
@@ -253,9 +264,7 @@ const PlayView = ({route, navigation}) => {
 
     useEffect(() => {
         container.current.style.backgroundColor = dark ? "black" : "white";
-        canvasFillStyle = dark
-            ? "rgba(0,0,0,0.2)" // Clears canvas before rendering bars (black with opacity 0.2)
-            : "rgba(255,255,255,0.2)";
+        canvasFillStyle = dark ? "rgba(0,0,0,.2)" : "rgba(255,255,255,.2)";
     }, [dark]);
 
     useEffect(() => {
@@ -265,48 +274,18 @@ const PlayView = ({route, navigation}) => {
 
             ctx = canvas.current.getContext("2d");
             if (!Music.audioContext) {
-                Music.audioContext = new AudioContext(); // (Interface) Audio-processing graph
+                Music.audioContext = new AudioContext();
                 if (!audio) audio = document.getElementsByTagName("audio")[0];
-                let src = Music.audioContext.createMediaElementSource(audio); // Give the audio context an audio source,
-                // to which can then be played and manipulated
-                analyser = Music.audioContext.createAnalyser(); // Create an analyser for the audio context
+                let src = Music.audioContext.createMediaElementSource(audio);
+                analyser = Music.audioContext.createAnalyser();
 
-                src.connect(analyser); // Connects the audio context source to the analyser
-                analyser.connect(Music.audioContext.destination); // End destination of an audio graph in a given context
-                // Sends sound to the speakers or headphones
+                src.connect(analyser);
+                analyser.connect(Music.audioContext.destination);
             }
 
-            /////////////// ANALYSER FFTSIZE ////////////////////////
-            // analyser.fftSize = 32;
-            // analyser.fftSize = 64;
-            // analyser.fftSize = 128;
-            // analyser.fftSize = 256;
-            // analyser.fftSize = 512;
-            // analyser.fftSize = 1024;
-            // analyser.fftSize = 2048;
-            // analyser.fftSize = 4096;
-            // analyser.fftSize = 8192;
             analyser.fftSize = 16384;
-            // analyser.fftSize = 32768;
-
-            // (FFT) is an algorithm that samples a signal over a period of time
-            // and divides it into its frequency components (single sinusoidal oscillations).
-            // It separates the mixed signals and shows what frequency is a violent vibration.
-
-            // (FFTSize) represents the window size in samples that is used when performing a FFT
-
-            // Lower the size, the less bars (but wider in size)
-            ///////////////////////////////////////////////////////////
-
-            const bufferLength = analyser.frequencyBinCount; // (read-only property)
-            // Unsigned integer, half of fftSize (so in this case, bufferLength = 8192)
-            // Equates to number of data values you have to play with for the visualization
-
-            // The FFT size defines the number of bins used for dividing the window into equal strips, or bins.
-            // Hence, a bin is a spectrum sample, and defines the frequency resolution of the window.
-
-            dataArray = new Uint8Array(bufferLength); // Converts to 8-bit unsigned integer array
-            // At this point dataArray is an array with length of bufferLength but no values
+            const bufferLength = analyser.frequencyBinCount;
+            dataArray = new Uint8Array(bufferLength);
             
             prepareCanvas();
             renderFrame();
@@ -355,48 +334,40 @@ const PlayView = ({route, navigation}) => {
     }, []);
 
     const renderFrame = () => {
-        playViewId = requestAnimationFrame(renderFrame); // Takes callback function to invoke before rendering
-        analyser.getByteFrequencyData(dataArray); // Copies the frequency data into dataArray
-        // Results in a normalized array of values between 0 and 255
-        // Before this step, dataArray's values are all zeros (but with length of 8192)
-
-        ctx.fillStyle = canvasFillStyle; // Clears canvas before rendering bars (black with opacity 0.2)
-        ctx.fillRect(0, 0, canvas.current.width, canvas.current.height); // Fade effect, set opacity to 1 for sharper rendering of bars
+        playViewId = requestAnimationFrame(renderFrame);
+        analyser.getByteFrequencyData(dataArray);
+        ctx.fillStyle = canvasFillStyle;
+        ctx.fillRect(0, 0, canvas.current.width, canvas.current.height);
 
         let r, g, b;
-        x = (canvas.current.width - canvasWidth)/2;
+        x = startX;
         for (let i = 0; i < bars; i++) {
-            barHeight = (dataArray[i] * 2.5);
-    
-            if (dataArray[i] > 210) { // pink
-                r = 250
-                g = 0
-                b = 255
-            } else if (dataArray[i] > 200) { // yellow
-                r = 250
-                g = 255
-                b = 0
-            } else if (dataArray[i] > 190) { // yellow/green
-                r = 204
-                g = 255
-                b = 0
-            } else if (dataArray[i] > 180) { // blue/green
-                r = 0
-                g = 219
-                b = 131
-            } else { // light blue
-                r = 0
-                g = 199
-                b = 255
+            barHeight = dataArray[i] * 2.5;
+            if (dataArray[i] > 210) {
+                r = 250;
+                g = 0;
+                b = 255;
+            } else if (dataArray[i] > 200) {
+                r = 250;
+                g = 255;
+                b = 0;
+            } else if (dataArray[i] > 190) {
+                r = 204;
+                g = 255;
+                b = 0;
+            } else if (dataArray[i] > 180) {
+                r = 0;
+                g = 219;
+                b = 131;
+            } else {
+                r = 0;
+                g = 199;
+                b = 255;
             }
     
             ctx.fillStyle = `rgb(${r},${g},${b})`;
             ctx.fillRect(x, (canvas.current.height - barHeight), barWidth, barHeight);
-            // (x, y, i, j)
-            // (x, y) Represents start point
-            // (i, j) Represents end point
-    
-            x += barWidth + 10 // Gives 10px space between each bar
+            x += barWidth + 10;
         }
     }
 
@@ -407,7 +378,9 @@ const PlayView = ({route, navigation}) => {
         <canvas style={{pointerEvents: "none"}} id="canvas" ref={canvas}/>
         <div style={{pointerEvents: "auto"}} ref={background} id="background"/>
         <View ref={vertContainer} style={[stylesTop.vertContainer, {pointerEvents: "none", zIndex: 2, flexDirection: "column"}]}>
-            <img ref={image} draggable="false" style={{height: height / 2.6, pointerEvents: "auto", ...imageStyles.view}} src={artwork}/>
+            <View style={[imageStyles.view, {height: height / 2.6}]}>
+                <img ref={image} draggable="false" style={{width: height / 2.6, pointerEvents: "auto", ...imageStyles.image}} src={artwork}/>
+            </View>
 
             <View style={[stylesBottom.container, {pointerEvents: "none", width: width - 50, height: height / 2.6}]}>
                 <View style={[controlStyles.container, {pointerEvents: "none"}]}>
@@ -454,7 +427,7 @@ const PlayView = ({route, navigation}) => {
                         labelStyle={{marginHorizontal: 0}}
                         style={{pointerEvents: pointerDisabled ? "none" : "auto", borderRadius: 25, alignItems: "center", padding: 0, margin: 0, minWidth: 0}}
                         contentStyle={{alignItems: "center", width: 50, height: 50, minWidth: 0}}
-                        onPress={() => Music.skipPrevious()}
+                        onPress={Music.skipPrevious}
                     >
                         <MaterialIcons style={{alignSelf: "center"}} selectable={false} name="skip-previous" color={colors.text} size={40}/>
                     </Button>
@@ -496,7 +469,7 @@ const PlayView = ({route, navigation}) => {
                         labelStyle={{marginHorizontal: 0}}
                         style={{pointerEvents: pointerDisabled ? "none" : "auto", borderRadius: 25, alignItems: "center", padding: 0, margin: 0, minWidth: 0}}
                         contentStyle={{alignItems: "center", width: 50, height: 50, minWidth: 0}}
-                        onPress={() => Music.skipNext()}
+                        onPress={Music.skipNext}
                     >
                         <MaterialIcons style={{alignSelf: "center"}} selectable={false} name="skip-next" color={colors.text} size={40}/>
                     </Button>
@@ -561,8 +534,6 @@ const PlayView = ({route, navigation}) => {
     </View>
 }
 
-export default PlayView;
-
 const stylesBottom = StyleSheet.create({
     container: {
         alignSelf: "center",
@@ -598,7 +569,7 @@ const stylesBottom = StyleSheet.create({
 const imageStyles = StyleSheet.create({
     view: {
         alignSelf: "center",
-        width: "100%",
+        width: "auto",
         maxWidth: 400
     },
 
