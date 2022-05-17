@@ -45,7 +45,7 @@ export default Playlist = ({ playlist, navigation, style, onPress }) => {
                 placeholder
                     ? <Text style={[playlistStyle.cover, {color: colors.text, textAlign: "center", fontSize: 100}]}>{placeholder}</Text>
                     : <div style={playlistStyle.cover}>
-                        <img src={thumbnail} loading="lazy" onLoad={e => e.target.style.opacity = 1} style={{width: "100%", height: "auto", opacity: 0, transition: "opacity .4s ease-in"}}></img>
+                        <img src={thumbnail} draggable="false" loading="lazy" onLoad={e => e.target.style.opacity = 1} style={{objectFit: "cover", width: "100%", height: "100%", opacity: 0, transition: "opacity .4s ease-in"}}></img>
                     </div>
             }
             

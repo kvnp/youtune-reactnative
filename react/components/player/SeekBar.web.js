@@ -3,7 +3,6 @@ import { View, Text, StyleSheet, Platform } from 'react-native';
 
 import { useTheme } from '@react-navigation/native';
 import Slider from '@react-native-community/slider';
-import { State } from 'react-native-track-player';
 import Music from '../../services/music/Music';
 
 function pad(n, width, z = 0) {
@@ -28,11 +27,9 @@ export default SeekBar = ({style, buffering}) => {
         cache: 0
     });
 
-    const realPosition = buffering == State.Buffering
-        ? 0
-        : state.isSliding != true
-            ? position
-            : state.cache
+    const realPosition = state.isSliding != true
+        ? position
+        : state.cache
 
     const elapsed = minutesAndSeconds(realPosition);
     const remaining = minutesAndSeconds(duration - realPosition);
