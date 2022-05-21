@@ -12,21 +12,22 @@ import {
 } from "react-native";
 
 import { TouchableRipple } from "react-native-paper";
-import TrackPlayer, { State } from 'react-native-track-player';
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import { useTheme } from "@react-navigation/native";
 
 import Navigation from "../../services/ui/Navigation";
-import Music from "../../services/music/Music";
 import Downloads from "../../services/device/Downloads";
 import ScrollingText from "../shared/ScrollingText";
 import { appColor } from "../../styles/App";
+import Music from "../../services/music/Music";
 
-export var showModal = null;
-var dlListener = null;
-var lkListener = null;
+export var showModal;
+var dlListener;
+var lkListener;
+var trListener;
 
 export default MoreModal = ({navigation}) => {
+    const { colors } = useTheme();
     const [content, setContent] = useState({
         title: null,
         subtitle: null,
@@ -37,19 +38,16 @@ export default MoreModal = ({navigation}) => {
         type: null,
         liked: null,
         visible: false,
-        playing: false,
         downloading: false,
         downloaded: false,
         queue: 0
     });
 
-    const {dark, colors} = useTheme();
-
     const {
         title, subtitle, thumbnail,
         videoId, browseId, playlistId,
-        type, liked, visible, playing,
-        downloading, downloaded, queue
+        type, liked, visible, downloading,
+        downloaded, queue
     } = content;
 
     useEffect(() => {
@@ -57,29 +55,39 @@ export default MoreModal = ({navigation}) => {
             dlListener = Downloads.addListener(
                 Downloads.EVENT_DOWNLOAD,
                 () => {
-                    if (visible) {
+                    if (visible)
                         setContent({
                             ...content,
                             downloading: Downloads.isTrackDownloading(videoId),
                             downloaded: Downloads.isTrackDownloaded(videoId),
                             queue: Downloads.getDownloadingLength()
                         });
-                    }
-                });
+                }
+            );
 
             lkListener = Downloads.addListener(
                 Downloads.EVENT_LIKE,
                 like => {
-                    if (visible) {
+                    if (visible)
+                        setContent({...content, liked: like});
+                }
+            );
+
+            trListener = Music.addListener(
+                Music.EVENT_METADATA_UPDATE,
+                track => {
+                    if (track.id == videoId)
                         setContent({
-                            ...content,
-                            liked: like
+                            videoId: track.id, playlistId: track.playlistId, title: track.title, subtitle: track.artist, thumbnail: track.artwork,
+                            visible, downloaded, downloading, queue, type
                         });
-                    }
-                });
+                }
+            )
+
         } else if (dlListener != null) {
             dlListener.remove();
             lkListener.remove();
+            trListener.remove();
         }
     }, [visible]);
 
@@ -140,17 +148,9 @@ export default MoreModal = ({navigation}) => {
             }
         }
 
-        let isPlaying = false;
-        if (Music.metadata.id == info.videoId) {
-            if (Music.state == State.Playing) {
-                isPlaying = true;
-            }
-        }
-
         setContent({
             ...info,
             type: type,
-            playing: isPlaying,
             liked: liked,
             downloading: Downloads.isTrackDownloading(info.videoId),
             downloaded: Downloads.isTrackDownloaded(info.videoId),
@@ -279,59 +279,46 @@ export default MoreModal = ({navigation}) => {
                                     size={25}
                                     style={{marginLeft: 70}}
                                 />
-                                <Text style={{paddingLeft: 20,color: colors.text}}>Start radio</Text>
+                                <Text style={{paddingLeft: 20, color: colors.text}}>Start radio</Text>
                             </>
                         </TouchableRipple>
                     </View>
 
                     : undefined
                 }
-                <View style={{backgroundColor: colors.card}}>
-                <TouchableRipple
-                    borderless={true}
-                    rippleColor={colors.primary}
-                    style={{
-                        borderRadius: 5,
-                        height: 50,
-                        alignItems: "center",
-                        flexDirection: "row"
-                    }}
-                    onPress={() => {
-                        if (playing)
-                            TrackPlayer.pause();
-                        else {
-                            if (Music.metadata.id == videoId)
-                                TrackPlayer.play();
-                            else
-                                Navigation.handleMedia(content, false, navigation);
-                        }
 
-                        setContent(content => ({
-                            ...content,
-                            playing: !playing,
-                            visible: false
-                        }));
-                    }}
-                >
-                    {type == "Song"
-                        ? playing
-                            ? <>
-                                <MaterialIcons style={{marginLeft: 70}} name="pause" color={colors.text} size={25}/>
-                                <Text style={{paddingLeft: 20, color: colors.text}}>Pause</Text>
+                {
+                    type == "Song"
+                    ? <View style={{backgroundColor: colors.card}}>
+                        <TouchableRipple
+                            borderless={true}
+                            rippleColor={colors.primary}
+                            style={{
+                                borderRadius: 5,
+                                height: 50,
+                                alignItems: "center",
+                                flexDirection: "row"
+                            }}
+                            
+                            onPress={() => {
+                                console.log("hey");
+                            }}
+                        >
+                            <>
+                                <MaterialIcons
+                                    name="queue-music"
+                                    color={colors.text}
+                                    size={25}
+                                    style={{marginLeft: 70}}
+                                />
+                                <Text style={{paddingLeft: 20, color: colors.text}}>Add to queue</Text>
                             </>
+                        </TouchableRipple>
+                    </View>
 
-                            : <>
-                                <MaterialIcons style={{marginLeft: 70}} name="play-arrow" color={colors.text} size={25}/>
-                                <Text style={{paddingLeft: 20, color: colors.text}}>Play</Text>
-                            </>
-                        
-                        : <>
-                            <MaterialIcons style={{marginLeft: 70}} name="launch" color={colors.text} size={25}/>
-                            <Text style={{paddingLeft: 20, color: colors.text}}>Open</Text>
-                        </>
-                    }
-                </TouchableRipple>
-                </View>
+                    : undefined
+                }
+
                 {
                     videoId
                         ? <View style={{backgroundColor: colors.card}}>
