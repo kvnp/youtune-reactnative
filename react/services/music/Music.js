@@ -384,25 +384,27 @@ export default class Music {
             return API.getAudioInfo({videoId});
     }
 
-    static handlePlayback = async(track) => {
+    static handlePlayback = async(track, forced) => {
         Music.transition = track;
         const { id, playlistId } = track;
 
         let queue = Music.metadataList;
-        if (queue.length > 0) {
-            let track = Music.metadata;
+        if (forced) {
+            if (queue.length > 0) {
+                let track = Music.metadata;
 
-            if (playlistId == track.playlistId) {
-                if (track.id == id)
-                    return;
-                
-                for (let i = 0; i < queue.length; i++) {
-                    if (queue[i].id == id)
-                        return Music.skip(i);
+                if (playlistId == track.playlistId) {
+                    if (track.id == id)
+                        return;
+                    
+                    for (let i = 0; i < queue.length; i++) {
+                        if (queue[i].id == id)
+                            return Music.skip(i);
+                    }
                 }
-            }
 
-            Music.reset(true);
+                Music.reset(true);
+            }
         }
         
         Music.state = State.Buffering;

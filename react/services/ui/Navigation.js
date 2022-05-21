@@ -22,7 +22,7 @@ export default class Navigation {
         this.#navigate("Artist", {channelId: browseId}, navigation);
     }
 
-    static handleMedia(media, navigation) {
+    static handleMedia(media, forced, navigation) {
         const { browseId, playlistId, videoId } = media;
     
         if (videoId != undefined && playlistId != undefined) {
@@ -34,10 +34,9 @@ export default class Navigation {
                     ? media.subtitle?.split("•")[1].trim()
                     : media.subtitle,
                 artwork: media.thumbnail
-            });
+            }, forced);
     
-            this.#navigate("Music", {v: videoId, list: playlistId}, navigation);
-            return;
+            return this.#navigate("Music", {v: videoId, list: playlistId}, navigation);
         } else if (videoId != undefined && browseId != undefined) {
             if (browseId.slice(0, 2) == "VL") {
                 Music.handlePlayback({
@@ -48,10 +47,9 @@ export default class Navigation {
                         ? media.subtitle.split("•")[1].trim()
                         : media.subtitle,
                     artwork: media.thumbnail
-                });
+                }, forced);
     
-                this.#navigate("Music", {v: videoId, list: browseId.slice(2)}, navigation);
-                return;
+                return this.#navigate("Music", {v: videoId, list: browseId.slice(2)}, navigation);
             }
     
         } else if (videoId != undefined) {
@@ -63,25 +61,20 @@ export default class Navigation {
                     ? media.subtitle.split("•")[1].trim()
                     : media.subtitle,
                 artwork: media.thumbnail
-            });
+            }, forced);
     
-            this.#navigate("Music", {v: videoId}, navigation);
-            return;
+            return this.#navigate("Music", {v: videoId}, navigation);
         }
     
         if (browseId != undefined) {
-            if (browseId.slice(0, 2) == "UC") {
-                this.#showArtist(browseId, navigation);
-                return;
-            } else {
-                this.#showPlaylist(browseId, navigation);
-                return;
-            }
+            if (browseId.slice(0, 2) == "UC")
+                return this.#showArtist(browseId, navigation);
+            else
+                return this.#showPlaylist(browseId, navigation);
         }
     
         if (playlistId != undefined) {
-            this.#showPlaylist(playlistId, navigation);
-            return;
+            return this.#showPlaylist(playlistId, navigation);
         }
     }
 

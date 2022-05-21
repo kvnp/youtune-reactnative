@@ -35,7 +35,7 @@ export default Playlist = ({ playlist, navigation, style, onPress }) => {
                             title: title,
                             thumbnail: thumbnail
                         }
-                        Navigation.handleMedia(view, navigation);
+                        Navigation.handleMedia(view, false, navigation);
                     }
             }
             style={[style, playlistStyle.container]}

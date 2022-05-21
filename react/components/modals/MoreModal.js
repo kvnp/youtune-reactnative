@@ -269,7 +269,7 @@ export default MoreModal = ({navigation}) => {
                                     videoId: videoId,
                                     browseId: browseId,
                                     playlistId: playlistId,
-                                }, navigation);
+                                }, true, navigation);
                             }}
                         >
                             <>
@@ -300,11 +300,10 @@ export default MoreModal = ({navigation}) => {
                         if (playing)
                             TrackPlayer.pause();
                         else {
-                            if (Music.metadata.id == videoId) {
+                            if (Music.metadata.id == videoId)
                                 TrackPlayer.play();
-                            } else {
-                                Navigation.handleMedia(content, navigation);
-                            }
+                            else
+                                Navigation.handleMedia(content, false, navigation);
                         }
 
                         setContent(content => ({

@@ -34,7 +34,7 @@ export default Entry = ({ entry, navigation, index, forcedPlaylistId }) => {
     return <TouchableRipple
         borderless={true}
         rippleColor={colors.primary}
-        onPress={() => Navigation.handleMedia(view, navigation)}
+        onPress={() => Navigation.handleMedia(view, false, navigation)}
         onLongPress={() => showModal(view)}
 
         style={{
