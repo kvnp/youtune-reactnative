@@ -403,11 +403,11 @@ export default class Music {
                     }
                 }
 
-                Music.reset(true);
+                Music.reset(true).then(() => Music.state = State.Buffering);
             }
-        }
+        } else
+            Music.state = State.Buffering;
         
-        Music.state = State.Buffering;
 
         let local = false;
         if (typeof playlistId == "string")
