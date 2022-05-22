@@ -47,7 +47,6 @@ var passMovement = false;
 var horizontalLocked = false;
 
 var imageWorker = new Worker(new URL("../../services/web/image/worker.js", import.meta.url));
-var backgroundColor = null;
 var imgColors = null;
 
 export default PlayView = ({route, navigation}) => {
@@ -55,7 +54,7 @@ export default PlayView = ({route, navigation}) => {
     const { height, width } = dimensions;
     const { dark, colors } = useTheme();
     const image = useRef(null);
-    const [imageColors, setImageColors] = useState(imageColors);
+    const [imageColors, setImageColors] = useState(imgColors);
     const fontColor = imageColors ? imageColors.fontHex : colors.text;
     const buttonColor = imageColors ? imageColors.buttonHex : colors.card;
     const thumbColor = imageColors ? imageColors.thumbHex : colors.primary;
@@ -243,8 +242,7 @@ export default PlayView = ({route, navigation}) => {
     useEffect(() => {
         container.current.style.height = "100%";
         background.current.style.transition = "background-color .4s";
-        background.current.style.backgroundColor = imageColors ? imageColors.imageHex : backgroundColor;
-
+        background.current.style.backgroundColor = imageColors ? imageColors.imageHex : dark ? "black" : "white";
         vertContainer.current.addEventListener("mouseover", darkenCanvas);
         vertContainer.current.addEventListener("mouseleave", restoreCanvas);
         vertContainer.current.addEventListener("touchstart", darkenCanvas);
@@ -281,10 +279,6 @@ export default PlayView = ({route, navigation}) => {
             Downloads.isTrackLiked(id).then(like => setLiked(like));
         }
     }, [id, playlistId]);
-
-    useEffect(() => {
-        backgroundColor = dark ? "black" : "white";
-    }, [dark]);
 
     useEffect(() => {
         Settings.waitForInitialization().then(e => {
@@ -336,14 +330,7 @@ export default PlayView = ({route, navigation}) => {
 
         const metadataListener = Music.addListener(
             Music.EVENT_METADATA_UPDATE,
-            metadata => {
-                setTrack(metadata);
-                imageWorker.postMessage({
-                    url: metadata.artwork,
-                    width: image.current.naturalWidth,
-                    height: image.current.naturalHeight
-                });
-            }
+            metadata => setTrack(metadata)
         );
 
         const listListener = Music.addListener(
@@ -370,6 +357,15 @@ export default PlayView = ({route, navigation}) => {
             lkListener.remove();
         }
     }, []);
+
+    useEffect(() => {
+        console.log(track);
+        imageWorker.postMessage({
+            url: image.current.src,
+            width: image.current.naturalWidth,
+            height: image.current.naturalHeight
+        });
+    }, [track]);
 
     const renderFrame = () => {
         playViewId = requestAnimationFrame(renderFrame);
