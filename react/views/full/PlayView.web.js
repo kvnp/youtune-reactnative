@@ -95,20 +95,24 @@ export default PlayView = ({route, navigation}) => {
     useEffect(prepareCanvas, [width, height]);
 
     const handlePlayback = () => {
-        if (!title)
+        if (!title) {
+            setState(State.Buffering);
             Music.handlePlayback({
                 id: route.params.v,
                 playlistId: route.params.list
             });
+        }
     }
 
     const goBack = () => {
         cancelAnimationFrame(playViewId);
         container.current.style.transition = heightTransition;
         container.current.style.height = "0px";
-        if (!navigation.canGoBack())
-            navigation.dispatch(insertBeforeLast("App"));
-        navigation.navigate("App");
+        container.current.ontransitionend = () => {
+            if (!navigation.canGoBack())
+                navigation.dispatch(insertBeforeLast("App"));
+            navigation.navigate("App");
+        }
     }
 
     const handleMovement = value => {
@@ -384,7 +388,7 @@ export default PlayView = ({route, navigation}) => {
 
     return <View
         ref={container}
-        style={{pointerEvents: "none", position: "fixed", width: "100%", height: "0px", bottom: 0, overflow: "hidden", transition: "height .25s ease-out, opacity .1s"}}
+        style={{pointerEvents: "none", position: "fixed", width: "100%", height: "0px", bottom: 0, overflow: "hidden", transition: "height .4s, opacity .1s"}}
     >
         <canvas style={{pointerEvents: "none"}} id="canvas" ref={canvas}/>
         <div style={{pointerEvents: "auto"}} ref={background} id="background"/>

@@ -59,6 +59,7 @@ const PlayView = ({route, navigation}) => {
     useEffect(() => {
         updateParams();
         if (!title) {
+            setState(State.Buffering);
             Music.handlePlayback({
                 videoId: route.params.v,
                 playlistId: route.params.list
