@@ -123,11 +123,10 @@ export default class Music {
                 }
 
                 if (params.nextTrack < Music.list.length && params.nextTrack >= 0) {
-                    if (!Music.trackUrlLoaded[params.nextTrack]) {
+                    if (!Music.trackUrlLoaded[params.nextTrack])
                         Music.enqueue(params.nextTrack);
-                    } else {
+                    else
                         Music.play();
-                    }
                 }
 
                 for (let i = params.nextTrack + 1; i < params.nextTrack + 2; i++) {
@@ -228,17 +227,19 @@ export default class Music {
     static reset(dontResetTransition) {
         return new Promise((resolve, reject) => {
             if (!Music.isStreaming)
-                resolve(TrackPlayer.reset());
+                TrackPlayer.reset();
+
+            Music.#queue.clear();
+            if (dontResetTransition)
+                Music.state = State.Buffering;
+            else {
+                Music.state = State.None;
+                Music.transition = undefined;
+            }
 
             Music.list = [];
             Music.index = 0;
             Music.position = 0;
-            Music.#queue.clear();
-
-            if (!dontResetTransition) {
-                Music.state = State.None;
-                Music.transition = undefined;
-            } else Music.state = State.Buffering;
             resolve();
         });
     }
@@ -435,7 +436,6 @@ export default class Music {
     static async handlePlayback(track, forced) {
         Music.transition = track;
         const { id, playlistId } = track;
-
         let queue = Music.list;
 
         if (forced)
@@ -471,8 +471,8 @@ export default class Music {
     }
 
     static async startPlaylist(playlist, position) {
-        Music.list = playlist.list;
         Music.trackUrlLoaded = Array(playlist.list.length).fill(false);
+        Music.list = playlist.list;
 
         for (let i = 0; i < playlist.list.length; i++) {
             if (i == playlist.index)
@@ -481,8 +481,15 @@ export default class Music {
             if (i == playlist.index || i == playlist.index + 1) {
                 if (Downloads.isTrackDownloaded(playlist.list[i].id) || !playlist.list[i].duration) {
                     playlist.list[i] = await Music.getMetadata({videoId: playlist.list[i].id});
-                    playlist.list[i].id = playlist.list[i].videoId;
-                    playlist.list[i].videoId = undefined;
+                    Music.list[i] = playlist.list[i];
+                    if (playlist.list[i].videoId) {
+                        playlist.list[i].id = playlist.list[i].videoId;
+                        playlist.list[i].videoId = undefined;
+                    } else {
+                        delete playlist.list[i].playable;
+                        Music.list[i] = playlist.list[i];
+                        Music.index = i;
+                    }
                 }
 
                 playlist.list[i].url = await Music.getStream({videoId: playlist.list[i].id});
@@ -495,7 +502,7 @@ export default class Music {
 
         if (!Music.isStreaming) {
             await TrackPlayer.add(playlist.list);
-            await TrackPlayer.skip(Music.index);
+            await TrackPlayer.skip(playlist.index);
             if (position)
                 await TrackPlayer.seekTo(position);
 

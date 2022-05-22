@@ -149,7 +149,7 @@ export default class API {
     }
 
     static async getAudioInfo({videoId, playlistId, controllerCallback}) {
-        if (videoId?.includes("&"))
+        if (videoId.includes("&"))
             videoId = videoId.slice(0, videoId.indexOf("&"));
         let requestBody = API.RequestBody.WEB;
         requestBody.videoId = videoId;
@@ -164,15 +164,13 @@ export default class API {
             body: JSON.stringify(requestBody)
         };
 
-
         let response = await HTTP.getResponse(url, input, type, controllerCallback);
         let audioInfo = Extractor.digestAudioInfoResponse(response);
-
         return audioInfo;
     }
 
     static async getAudioStream({videoId, controllerCallback}) {
-        if (videoId?.includes("&"))
+        if (videoId.includes("&"))
             videoId = videoId.slice(0, videoId.indexOf("&"));
         let requestBody = API.RequestBody.STREAM;
         requestBody.videoId = videoId;
@@ -192,6 +190,9 @@ export default class API {
     }
 
     static async getNextSongs({videoId, playlistId}) {
+        if (videoId.includes("&"))
+            videoId = videoId.slice(0, videoId.indexOf("&"));
+
         let requestBody = API.RequestBody.WEB;
         requestBody.enablePersistentPlaylistPanel = true;
         requestBody.isAudioOnly = true;
