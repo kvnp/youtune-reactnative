@@ -300,8 +300,10 @@ export default MoreModal = ({navigation}) => {
                                 flexDirection: "row"
                             }}
                             
-                            onPress={() => {
-                                console.log("hey");
+                            onPress={async() => {
+                                let nextIndex = Music.metadataIndex + 1;
+                                let metadata = await Music.getMetadata({videoId});
+                                Music.add(metadata, nextIndex);
                             }}
                         >
                             <>

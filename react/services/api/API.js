@@ -149,6 +149,8 @@ export default class API {
     }
 
     static async getAudioInfo({videoId, playlistId, controllerCallback}) {
+        if (videoId.includes("&"))
+            videoId = videoId.slice(0, videoId.indexOf("&"));
         let requestBody = API.RequestBody.WEB;
         requestBody.videoId = videoId;
         requestBody.playlistId = playlistId;
@@ -170,6 +172,8 @@ export default class API {
     }
 
     static async getAudioStream({videoId, controllerCallback}) {
+        if (videoId.includes("&"))
+            videoId = videoId.slice(0, videoId.indexOf("&"));
         let requestBody = API.RequestBody.STREAM;
         requestBody.videoId = videoId;
 

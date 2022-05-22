@@ -55,6 +55,9 @@ export default class Downloads {
             if (!this.initialized)
                 await Downloads.waitForInitialization();
 
+            if (videoId.includes("&"))
+                videoId = videoId.slice(0, videoId.indexOf("&"));
+            
             try {
                 await Storage.deleteItem("Downloads", videoId);
                 let index = this.#downloadedTracks.indexOf(videoId);
@@ -75,6 +78,9 @@ export default class Downloads {
     }
 
     static downloadTrack(videoId, cacheOnly) {
+        if (videoId.includes("&"))
+            videoId = videoId.slice(0, videoId.indexOf("&"));
+
         return new Promise(async(resolve, reject) => {
             if (!this.initialized)
                 await Downloads.waitForInitialization();
@@ -155,6 +161,9 @@ export default class Downloads {
 
     static likeTrack(videoId, like) {
         return new Promise(async(resolve, reject) => {
+            if (videoId.includes("&"))
+                videoId = videoId.slice(0, videoId.indexOf("&"));
+
             let prevState = await Storage.getItem("Likes", videoId);
             console.log({previousState: prevState});
             let deleting = false;
@@ -210,6 +219,9 @@ export default class Downloads {
             if (!this.initialized)
                 await Downloads.waitForInitialization();
 
+            if (videoId.includes("&"))
+                videoId = videoId.slice(0, videoId.indexOf("&"));
+
             let index = this.#downloadQueue.findIndex(entry => videoId in entry);
             if (index > -1) {
                 let abortController = this.#downloadQueue[index][videoId];
@@ -227,10 +239,16 @@ export default class Downloads {
         if (!this.initialized || !videoId)
             return null;
 
+        if (videoId.includes("&"))
+            videoId = videoId.slice(0, videoId.indexOf("&"));
+
         return this.#downloadedTracks.includes(videoId);
     }
 
     static isTrackCached(videoId) {
+        if (videoId.includes("&"))
+            videoId = videoId.slice(0, videoId.indexOf("&"));
+
         if (!this.initialized || !videoId)
             return null;
 
@@ -238,6 +256,9 @@ export default class Downloads {
     }
 
     static isTrackLikedSync(videoId) {
+        if (videoId.includes("&"))
+            videoId = videoId.slice(0, videoId.indexOf("&"));
+
         if (!videoId || !this.#likedTracks.includes(videoId))
             return null;
         else if (this.#likedTracks.includes(videoId))
@@ -249,6 +270,9 @@ export default class Downloads {
             if (!this.initialized)
                 await Downloads.waitForInitialization();
             
+            if (videoId.includes("&"))
+                videoId = videoId.slice(0, videoId.indexOf("&"));
+
             let sync = Downloads.isTrackLikedSync(videoId);
             if (typeof sync != "undefined")
                 resolve(sync);
@@ -262,6 +286,9 @@ export default class Downloads {
         if (!this.initialized || !videoId)
             return null;
         
+        if (videoId.includes("&"))
+            videoId = videoId.slice(0, videoId.indexOf("&"));
+
         let index = this.#downloadQueue.findIndex(entry => videoId in entry);  
         return index > -1;
     }
@@ -277,6 +304,9 @@ export default class Downloads {
         return new Promise(async(resolve, reject) => {
             if (!this.initialized)
                 await Downloads.waitForInitialization();
+
+            if (videoId.includes("&"))
+                videoId = videoId.slice(0, videoId.indexOf("&"));
 
             if (!this.#cachedTracks.includes(videoId))
                 return resolve(null);

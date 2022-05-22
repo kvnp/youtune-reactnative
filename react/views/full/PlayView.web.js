@@ -62,6 +62,7 @@ export default PlayView = ({route, navigation}) => {
 
     const [state, setState] = useState(Music.state);
     const [track, setTrack] = useState(Music.metadata);
+    const [list, setList] = useState(Music.list);
     const [repeat, setRepeat] = useState(Music.repeatModeString);
     const [connected, setConnected] = useState(Music.isStreaming);
     const [isLiked, setLiked] = useState(null);
@@ -257,7 +258,11 @@ export default PlayView = ({route, navigation}) => {
     useEffect(() => {
         if (id != null) {
             navigation.setOptions({title: title});
-            navigation.setParams({v: id, list: playlistId});
+            let object = id.includes("&")
+                ? {v: id.slice(0, id.indexOf("&")), list: playlistId}
+                : {v: id, list: playlistId};
+
+            navigation.setParams(object);
             Downloads.isTrackLiked(id).then(like => setLiked(like));
         }
     }, [id, playlistId]);
@@ -317,7 +322,12 @@ export default PlayView = ({route, navigation}) => {
 
         const metadataListener = Music.addListener(
             Music.EVENT_METADATA_UPDATE,
-            () => setTrack(Music.metadata)
+            metadata => setTrack(metadata)
+        );
+
+        const listListener = Music.addListener(
+            Music.EVENT_QUEUE_UPDATE,
+            list => setList(list)
         );
 
         const lkListener = Downloads.addListener(
@@ -329,6 +339,7 @@ export default PlayView = ({route, navigation}) => {
             castListener.remove();
             stateListener.remove();
             metadataListener.remove();
+            listListener.remove();
             lkListener.remove();
         }
     }, []);
@@ -527,8 +538,8 @@ export default PlayView = ({route, navigation}) => {
             minimumHeight={50}
             backgroundColor={dark ? colors.card : colors.primary}
             textColor={colors.text}
-            playlist={Music.metadataList}
-            track={Music.metadata}
+            playlist={list}
+            track={track}
             style={{zIndex: 2, pointerEvents: pointerDisabled ? "none" : "auto"}}
         />
     </View>
