@@ -60,6 +60,7 @@ export default class Settings {
     static Values = {
         transmitLanguage: false,
         proxyYTM: false,
+        proxyYTMM: false,
         safetyMode: true,
         darkMode: true,
         headerState: null,
@@ -77,6 +78,13 @@ export default class Settings {
         if (boolean != this.Values.proxyYTM) {
             this.Values.proxyYTM = boolean;
             this.#storeSetting("proxyYTM");
+        }
+    }
+
+    static enableProxyM(boolean) {
+        if (boolean != this.Values.proxyYTMM) {
+            this.Values.proxyYTMM = boolean;
+            this.#storeSetting("proxyYTMM");
         }
     }
     

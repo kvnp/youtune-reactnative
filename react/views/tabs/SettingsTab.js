@@ -23,6 +23,7 @@ export default SettingsTab = () => {
     const [initialized, setInitialized] = useState(Settings.initialized);
     const [transmitLanguage, setTransmitLanguage] = useState(Settings.Values.transmitLanguage);
     const [proxyYTM, setProxyYTM] = useState(Settings.Values.proxyYTM);
+    const [proxyYTMM, setProxyYTMM] = useState(Settings.Values.proxyYTMM);
     const [safetyMode, setSafetyMode] = useState(Settings.Values.safetyMode);
     const [darkMode, setDarkMode] = useState(Settings.Values.darkMode);
     const [visualizer, setVisualizer] = useState(Settings.Values.visualizer);
@@ -35,6 +36,7 @@ export default SettingsTab = () => {
                 if (!initialized) setInitialized(true);
                 setTransmitLanguage(values.transmitLanguage);
                 setProxyYTM(values.proxyYTM);
+                setProxyYTMM(values.proxyYTMM);
                 setSafetyMode(values.safetyMode);
                 setDarkMode(values.darkMode);
                 setVisualizer(values.visualizer);
@@ -62,6 +64,11 @@ export default SettingsTab = () => {
         Settings.enableProxy(boolean);
     };
 
+    const toggleProxyM = boolean => {
+        setProxyYTMM(boolean);
+        Settings.enableProxyM(boolean);
+    };
+
     const toggleSafetyMode = boolean => {
         setSafetyMode(boolean);
         Settings.enableSafetyMode(boolean);
@@ -75,6 +82,7 @@ export default SettingsTab = () => {
     const toggleAudioVisualizer = boolean => {
         setVisualizer(boolean);
         Settings.enableAudioVisualizer(boolean);
+        if (boolean) toggleProxyM(boolean);
     }
 
     const drawItem = ({item}) => {
@@ -194,6 +202,14 @@ export default SettingsTab = () => {
             state: darkMode,
             function: toggleDarkMode,
             switch: true
+        },
+
+        {
+            icon: "public",
+            description: "Proxy tracks over " + host,
+            state: proxyYTMM,
+            function: toggleProxyM,
+            switch: true,
         },
 
         {
