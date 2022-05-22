@@ -17,6 +17,10 @@ const minutesAndSeconds = position => ([
     pad( ~~(position % 60), 2),
 ]);
 
+var slider;
+var leftBar;
+var rightBar;
+var thumb;
 export default SeekBar = ({style}) => {
     const { colors } = useTheme();
     const { duration } = Music.metadata;
@@ -36,9 +40,10 @@ export default SeekBar = ({style}) => {
     const container = useRef(null);
 
     useEffect(() => {
-        let slider = container.current.childNodes[0];
-        let leftBar = slider.childNodes[0];
-        let rightBar = slider.childNodes[2];
+        slider = container.current.childNodes[0];
+        leftBar = slider.childNodes[0];
+        rightBar = slider.childNodes[2];
+
         leftBar.style.height = "5px";
         rightBar.style.height = "5px";
 
@@ -48,9 +53,11 @@ export default SeekBar = ({style}) => {
         rightBar.style.borderRadius = "";
         rightBar.style.borderBottomRightRadius = "5px";
         rightBar.style.borderTopRightRadius = "5px";
-        leftBar.style.transition = "height .3s";
-        rightBar.style.transition = "height .3s";
-        let thumb = slider.childNodes[1];
+
+        leftBar.style.transition = "height .3s, flex-grow .3s";
+        rightBar.style.transition = "height .3s, flex-grow .3s";
+
+        thumb = slider.childNodes[1];
         thumb.style.transition = "width .3s";
 
         const enter = () => {
@@ -75,7 +82,12 @@ export default SeekBar = ({style}) => {
         setWidth("100%");
         const listener = Music.addListener(
             Music.EVENT_POSITION_UPDATE,
-            pos => setPosition(pos)
+            pos => {
+                if (state.isSliding)
+                    return;
+                
+                setPosition(pos);
+            }
         );
 
         return () => listener.remove();
@@ -84,6 +96,8 @@ export default SeekBar = ({style}) => {
     return <View ref={container} style={[styles.container, style]}>
         <Slider
             onSlidingComplete={position => {
+                leftBar.style.transition = "height .3s, flex-grow .3s";
+                rightBar.style.transition = "height .3s, flex-grow .3s";
                 Music.seekTo(position);
                 setState({
                     isSliding: false,
@@ -101,6 +115,8 @@ export default SeekBar = ({style}) => {
             }}
             
             onSlidingStart={currentPosition => {
+                leftBar.style.transition = "height .3s";
+                rightBar.style.transition = "height .3s";
                 setState({
                     isSliding: true,
                     cache: currentPosition
