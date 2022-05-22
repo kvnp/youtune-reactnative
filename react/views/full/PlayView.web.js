@@ -48,28 +48,17 @@ var horizontalLocked = false;
 
 var imageWorker = new Worker(new URL("../../services/web/image/worker.js", import.meta.url));
 var backgroundColor = null;
-var imageHex = null;
-var imageRGB = null;
-var imageButtonHex = null;
+var imgColors = null;
 
 export default PlayView = ({route, navigation}) => {
     const [dimensions, setDimensions] = useState({height: window.innerHeight, width: window.innerWidth});
     const { height, width } = dimensions;
     const { dark, colors } = useTheme();
-    const [fontColor, setFontColor] = useState(
-        imageHex
-            ? (imageRGB[0]*0.299 + imageRGB[1]*0.587 + imageRGB[2]*0.114) > 186
-                ? "#000000"
-                : "#ffffff"
-            : colors.text
-    );
-    const [buttonColor, setButtonColor] = useState(
-        imageHex
-            ? imageButtonHex
-            : colors.card
-    );
-
     const image = useRef(null);
+    const [imageColors, setImageColors] = useState(imageColors);
+    const fontColor = imageColors ? imageColors.fontHex : colors.text;
+    const buttonColor = imageColors ? imageColors.buttonHex : colors.card;
+    const thumbColor = imageColors ? imageColors.thumbHex : colors.primary;
 
     const [pointerDisabled, setPointerDisabled] = useState(false);
     const heightTransition = "height .4s cubic-bezier(.175, .885, .32, 1.275), opacity .1s";
@@ -254,7 +243,7 @@ export default PlayView = ({route, navigation}) => {
     useEffect(() => {
         container.current.style.height = "100%";
         background.current.style.transition = "background-color .4s";
-        background.current.style.backgroundColor = imageHex ? imageHex : backgroundColor;
+        background.current.style.backgroundColor = imageColors ? imageColors.imageHex : backgroundColor;
 
         vertContainer.current.addEventListener("mouseover", darkenCanvas);
         vertContainer.current.addEventListener("mouseleave", restoreCanvas);
@@ -348,8 +337,12 @@ export default PlayView = ({route, navigation}) => {
         const metadataListener = Music.addListener(
             Music.EVENT_METADATA_UPDATE,
             metadata => {
-                imageWorker.postMessage({url: metadata.artwork});
                 setTrack(metadata);
+                imageWorker.postMessage({
+                    url: metadata.artwork,
+                    width: image.current.naturalWidth,
+                    height: image.current.naturalHeight
+                });
             }
         );
 
@@ -364,16 +357,9 @@ export default PlayView = ({route, navigation}) => {
         );
 
         imageWorker.onmessage = event => {
-            imageRGB = event.data.rgb;
-            imageHex = event.data.hex;
-            imageButtonHex = event.data.buttonHex;
-            background.current.style.backgroundColor = imageHex;
-            setButtonColor(imageButtonHex);
-            setFontColor(
-                (imageRGB[0]*0.299 + imageRGB[1]*0.587 + imageRGB[2]*0.114) > 186
-                    ? "#000000"
-                    : "#ffffff"
-            );
+            background.current.style.backgroundColor = event.data.imageHex;
+            imgColors = event.data;
+            setImageColors(event.data);
         };
 
         return () => {
@@ -470,7 +456,7 @@ export default PlayView = ({route, navigation}) => {
                     </Button>
                 </View>
 
-                <SeekBar buffering={state} thumbColor={buttonColor} style={{pointerEvents: pointerDisabled ? "none" : "auto"}}/>
+                <SeekBar buffering={state} buttonColor={buttonColor} thumbColor={thumbColor} fontColor={fontColor} style={{pointerEvents: pointerDisabled ? "none" : "auto"}}/>
 
                 <View style={[stylesBottom.buttonContainer, {pointerEvents: "none", overflow: "visible", alignSelf: "stretch", justifyContent: "space-between"}]}>
                     <CastButton style={{pointerEvents: pointerDisabled ? "none" : "auto", fontColor: fontColor}}/>

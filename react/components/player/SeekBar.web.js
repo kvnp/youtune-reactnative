@@ -21,8 +21,7 @@ var slider;
 var leftBar;
 var rightBar;
 var thumb;
-export default SeekBar = ({style, thumbColor}) => {
-    const { colors } = useTheme();
+export default SeekBar = ({style, thumbColor, fontColor, buttonColor}) => {
     const { duration } = Music.metadata;
     const [width, setWidth] = useState("99.99%");
     const [position, setPosition] = useState(Music.position);
@@ -125,19 +124,19 @@ export default SeekBar = ({style, thumbColor}) => {
             
             value={realPosition}
             maximumValue={duration}
-            minimumTrackTintColor={colors.text}
-            maximumTrackTintColor={colors.card}
+            minimumTrackTintColor={fontColor}
+            maximumTrackTintColor={buttonColor}
             thumbTintColor={thumbColor}
-            thumbStyle={{color: thumbColor ? thumbColor : colors.primary}}
+            thumbStyle={{color: thumbColor}}
             style={{width: width}}
         />
 
         <View style={{ flexDirection: 'row', paddingRight: 15, paddingLeft: 15 }}>
-            <Text style={[styles.text, {color: colors.text}]}>
+            <Text style={[styles.text, {color: fontColor}]}>
                 {elapsed[0] + ':' + elapsed[1]}
             </Text>
             <View style={{ flex: 1 }} />
-            <Text style={[styles.text, {textAlign: 'right', color: colors.text}]}>
+            <Text style={[styles.text, {textAlign: 'right', color: fontColor}]}>
                 {'-' + remaining[0] + ':' + remaining[1]}
             </Text>
         </View>
