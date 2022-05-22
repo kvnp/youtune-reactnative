@@ -213,17 +213,20 @@ export default class Music {
             TrackPlayer.pause();
     }
 
-    static reset = async(dontResetTransition) => {
-        if (!Music.isStreaming)
-            await TrackPlayer.reset();
+    static reset = dontResetTransition => {
+        return new Promise((resolve, reject) => {
+            if (!Music.isStreaming)
+                resolve(TrackPlayer.reset());
 
-        Music.list = [];
-        Music.index = 0;
-        Music.position = 0;
+            Music.list = [];
+            Music.index = 0;
+            Music.position = 0;
 
-        Music.state = State.None;
-        if (!dontResetTransition)
-            Music.transition = undefined;
+            Music.state = State.None;
+            if (!dontResetTransition)
+                Music.transition = undefined;
+            resolve();
+        });
     }
 
     static seekTo = position => {
@@ -436,7 +439,11 @@ export default class Music {
         const { id, playlistId } = track;
 
         let queue = Music.list;
+
         if (forced) {
+            Music.state = State.Buffering;
+            Music.reset(true);
+        } else {
             if (queue.length > 0) {
                 let track = Music.metadata;
 
@@ -450,11 +457,10 @@ export default class Music {
                     }
                 }
 
-                Music.reset(true).then(() => Music.state = State.Buffering);
+                Music.state = State.Buffering;
+                Music.reset(true);
             }
-        } else
-            Music.state = State.Buffering;
-        
+        }
 
         let local = false;
         if (typeof playlistId == "string")
