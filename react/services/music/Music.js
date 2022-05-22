@@ -75,7 +75,7 @@ export default class Music {
     static get metadata() {
         if (Music.list.length == 0)
             if (Music.transition)
-                return Music.transition;
+                return {...Music.transition, duration: 0};
             else
                 return {id: null, playlistId: null, title: null, artist: null, artwork: null, duration: 0};
         else
@@ -92,7 +92,7 @@ export default class Music {
 
     static audioContext;
 
-    static TrackPlayerTaskProvider = () => {
+    static TrackPlayerTaskProvider() {
         return async function() {
             TrackPlayer.addEventListener(Event.PlaybackState, params => {
                 if (Music.isStreaming)
@@ -122,18 +122,20 @@ export default class Music {
                     Music.position = 0;
                 }
 
-                if (params.nextTrack < Music.list.length - 1 && params.nextTrack >= 0) {
+                if (params.nextTrack < Music.list.length && params.nextTrack >= 0) {
                     if (!Music.trackUrlLoaded[params.nextTrack]) {
-                        Music.#queue.enqueue(() => {
-                            return new Promise(async(resolve, reject) => {
-                                let track = Music.list[params.nextTrack];
-                                track.url = await Music.getStream({videoId: track.id});
-                                resolve(track);
-                            });
-                        });
+                        Music.enqueue(params.nextTrack);
                     } else {
                         Music.play();
                     }
+                }
+
+                for (let i = params.nextTrack + 1; i < params.nextTrack + 2; i++) {
+                    if (i >= Music.list.length)
+                        break;
+                    
+                    if (!Music.trackUrlLoaded[i])
+                        Music.enqueue(i);
                 }
             });
     
@@ -143,8 +145,8 @@ export default class Music {
             });
     
             TrackPlayer.addEventListener(Event.PlaybackError, params => {
-                //console.log(Event.PlaybackError);
-                //console.log(params);
+                console.log(Event.PlaybackError);
+                console.log(params);
                 /*TrackPlayer.seekTo(0).then(() => {
                     TrackPlayer.play();
                 });*/
@@ -196,7 +198,7 @@ export default class Music {
         return Music.#emitter.addListener(event, listener);
     }
 
-    static play = () => {
+    static play() {
         if (Music.isStreaming)
             Cast.play();
         else {
@@ -206,14 +208,24 @@ export default class Music {
         }
     }
 
-    static pause = () => {
+    static enqueue(index) {
+        Music.#queue.enqueue(() => {
+            return new Promise(async(resolve, reject) => {
+                let track = Music.list[index];
+                track.url = await Music.getStream({videoId: track.id});
+                resolve(track);
+            });
+        });
+    }
+
+    static pause() {
         if (Music.isStreaming)
             Cast.pause();
         else
             TrackPlayer.pause();
     }
 
-    static reset = dontResetTransition => {
+    static reset(dontResetTransition) {
         return new Promise((resolve, reject) => {
             if (!Music.isStreaming)
                 resolve(TrackPlayer.reset());
@@ -221,15 +233,17 @@ export default class Music {
             Music.list = [];
             Music.index = 0;
             Music.position = 0;
+            Music.#queue.clear();
 
-            Music.state = State.None;
-            if (!dontResetTransition)
+            if (!dontResetTransition) {
+                Music.state = State.None;
                 Music.transition = undefined;
+            } else Music.state = State.Buffering;
             resolve();
         });
     }
 
-    static seekTo = position => {
+    static seekTo(position) {
         Music.position = position;
         if (Music.isStreaming)
             Cast.seekTo(position);
@@ -242,7 +256,7 @@ export default class Music {
         }
     }
 
-    static initialize = () => {
+    static initialize() {
         return new Promise(async(resolve, reject) => {
             TrackPlayer.registerPlaybackService(Music.TrackPlayerTaskProvider);
             await TrackPlayer.setupPlayer({});
@@ -268,11 +282,8 @@ export default class Music {
                 await TrackPlayer.remove(trackIndex);
                 await TrackPlayer.add(track, trackIndex);
                 Music.trackUrlLoaded[trackIndex] = true;
-
-                if (Music.metadata.id != track.id)
-                    return;
-
-                Music.skip(trackIndex);
+                if (Music.index == trackIndex)
+                    Music.skip(trackIndex);
             });
 
             Cast.initialize();
@@ -310,7 +321,7 @@ export default class Music {
         });
     }
 
-    static add = async(track, trackIndex) => {
+    static async add(track, trackIndex) {
         return new Promise((resolve, reject) => {
             TrackPlayer.add(track, trackIndex).then(() => {
                 track.id = track.id + "&" + queueAddCounter++;
@@ -331,7 +342,7 @@ export default class Music {
         });
     };
 
-    static remove = trackIndex => {
+    static remove(trackIndex) {
         return new Promise((resolve, reject) => {
             TrackPlayer.remove(trackIndex).then(() => {
                 Music.list = [
@@ -349,7 +360,7 @@ export default class Music {
         });
     };
 
-    static cycleRepeatMode = () => {
+    static cycleRepeatMode() {
         if (Music.repeatMode == RepeatMode.Off)
             Music.repeatMode = RepeatMode.Queue;
         else if (Music.repeatMode == RepeatMode.Queue)
@@ -387,17 +398,11 @@ export default class Music {
         if (!forward && Music.position >= 10)
             return Music.seekTo(0)
         
-        if (Music.trackUrlLoaded[Music.index]) {
+        if (Music.trackUrlLoaded[Music.index])
             Music.skip(index);
-        } else {
+        else {
             if (!Music.isStreaming)
-                Music.#queue.enqueue(() => {
-                    return new Promise(async(resolve, reject) => {
-                        let track = Music.list[Music.index];
-                        track.url = await Music.getStream({videoId: track.id});
-                        resolve(track);
-                    });
-                });
+                Music.enqueue(Music.index);
             else
                 Music.skip(index);
         }
@@ -407,18 +412,11 @@ export default class Music {
         if (Music.isStreaming) {
             Music.index = index;
             Cast.cast();
-        } else {
-            TrackPlayer.skip(index);
-        }
+        } else TrackPlayer.skip(index);
     }
     
-    static skipNext() {
-        Music.skipTo(Music.index + 1);
-    }
-
-    static skipPrevious() {
-        Music.skipTo(Music.index - 1);
-    }
+    static skipNext() {Music.skipTo(Music.index + 1)}
+    static skipPrevious() {Music.skipTo(Music.index - 1)}
 
     static getStream({videoId}) {
         if (Downloads.isTrackDownloaded(videoId))
@@ -434,16 +432,15 @@ export default class Music {
             return API.getAudioInfo({videoId});
     }
 
-    static handlePlayback = async(track, forced) => {
+    static async handlePlayback(track, forced) {
         Music.transition = track;
         const { id, playlistId } = track;
 
         let queue = Music.list;
 
-        if (forced) {
-            Music.state = State.Buffering;
+        if (forced)
             Music.reset(true);
-        } else {
+        else
             if (queue.length > 0) {
                 let track = Music.metadata;
 
@@ -456,26 +453,21 @@ export default class Music {
                             return Music.skip(i);
                     }
                 }
-
-                Music.state = State.Buffering;
+                
                 Music.reset(true);
             }
-        }
 
         let local = false;
         if (typeof playlistId == "string")
             if (playlistId.startsWith("LOCAL"))
                 local = true;
 
-        if (local) {
-            Downloads.loadLocalPlaylist(playlistId, id)
-                .then(localPlaylist => Music.startPlaylist(localPlaylist))
-                .catch(_ => console.log(_));
-        } else {
-            API.getNextSongs({videoId: id, playlistId})
-                .then(resultPlaylist => Music.startPlaylist(resultPlaylist))
-                .catch(_ => console.log(_));
-        }
+        if (local) Downloads.loadLocalPlaylist(playlistId, id)
+            .then(localPlaylist => Music.startPlaylist(localPlaylist))
+            .catch(_ => console.log(_));
+        else API.getNextSongs({videoId: id, playlistId})
+            .then(resultPlaylist => Music.startPlaylist(resultPlaylist))
+            .catch(_ => console.log(_));
     }
 
     static async startPlaylist(playlist, position) {
@@ -508,9 +500,7 @@ export default class Music {
                 await TrackPlayer.seekTo(position);
 
             Music.play();
-        } else {
-            Cast.cast();
-        }
+        } else Cast.cast();
     }
 }
 
