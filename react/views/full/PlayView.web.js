@@ -35,7 +35,6 @@ var startX = 0;
 var x = 0;
 var bars = 0;
 var canvasWidth = 0;
-var canvasFillStyle = null;
 
 var firstPoint = 0;
 var clientY = 0;
@@ -46,6 +45,11 @@ var imageX = 0;
 var imageY = 0;
 var passMovement = false;
 var horizontalLocked = false;
+
+var imageWorker = new Worker(new URL("../../services/web/image/worker.js", import.meta.url));
+var backgroundColor = null;
+var imageColor = null;
+
 export default PlayView = ({route, navigation}) => {
     const [dimensions, setDimensions] = useState({height: window.innerHeight, width: window.innerWidth});
     const { height, width } = dimensions;
@@ -234,6 +238,7 @@ export default PlayView = ({route, navigation}) => {
 
     useEffect(() => {
         container.current.style.height = "100%";
+        container.current.style.transition = "background-color .4s";
         vertContainer.current.addEventListener("mouseover", darkenCanvas);
         vertContainer.current.addEventListener("mouseleave", restoreCanvas);
         vertContainer.current.addEventListener("touchstart", darkenCanvas);
@@ -244,6 +249,7 @@ export default PlayView = ({route, navigation}) => {
         background.current.addEventListener("mousedown", enableMovement);
         background.current.addEventListener("mouseout", disableMovement);
         background.current.addEventListener("mouseup", () => {disableMovement();stopMovement()});
+        background.current.style.backgroundColor = imageColor ? imageColor : backgroundColor;
 
         image.current.addEventListener("touchmove", handleImage);
         image.current.addEventListener("touchend", stopMovement);
@@ -272,8 +278,7 @@ export default PlayView = ({route, navigation}) => {
     }, [id, playlistId]);
 
     useEffect(() => {
-        container.current.style.backgroundColor = dark ? "black" : "white";
-        canvasFillStyle = dark ? "rgba(0,0,0,.2)" : "rgba(255,255,255,.2)";
+        backgroundColor = dark ? "black" : "white";
     }, [dark]);
 
     useEffect(() => {
@@ -326,7 +331,10 @@ export default PlayView = ({route, navigation}) => {
 
         const metadataListener = Music.addListener(
             Music.EVENT_METADATA_UPDATE,
-            metadata => setTrack(metadata)
+            metadata => {
+                imageWorker.postMessage({url: metadata.artwork});
+                setTrack(metadata);
+            }
         );
 
         const listListener = Music.addListener(
@@ -337,7 +345,14 @@ export default PlayView = ({route, navigation}) => {
         const lkListener = Downloads.addListener(
             Downloads.EVENT_LIKE,
             like => setLiked(like)
-        )
+        );
+
+        imageWorker.onmessage = event => {
+            console.log(event.data);
+            let rgb = event.data.rgb;
+            imageColor = event.data.hex;
+            background.current.style.backgroundColor = imageColor;
+        };
 
         return () => {
             castListener.remove();
@@ -351,8 +366,7 @@ export default PlayView = ({route, navigation}) => {
     const renderFrame = () => {
         playViewId = requestAnimationFrame(renderFrame);
         analyser.getByteFrequencyData(dataArray);
-        ctx.fillStyle = canvasFillStyle;
-        ctx.fillRect(0, 0, canvas.current.width, canvas.current.height);
+        ctx.clearRect(0, 0, canvas.current.width, canvas.current.height);
 
         let r, g, b;
         x = startX;
