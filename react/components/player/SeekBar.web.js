@@ -21,7 +21,7 @@ var slider;
 var leftBar;
 var rightBar;
 var thumb;
-export default SeekBar = ({style}) => {
+export default SeekBar = ({style, thumbColor}) => {
     const { colors } = useTheme();
     const { duration } = Music.metadata;
     const [width, setWidth] = useState("99.99%");
@@ -127,8 +127,8 @@ export default SeekBar = ({style}) => {
             maximumValue={duration}
             minimumTrackTintColor={colors.text}
             maximumTrackTintColor={colors.card}
-            thumbTintColor={colors.primary}
-            thumbStyle={{color: colors.primary}}
+            thumbTintColor={thumbColor}
+            thumbStyle={{color: thumbColor ? thumbColor : colors.primary}}
             style={{width: width}}
         />
 

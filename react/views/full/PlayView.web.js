@@ -48,12 +48,27 @@ var horizontalLocked = false;
 
 var imageWorker = new Worker(new URL("../../services/web/image/worker.js", import.meta.url));
 var backgroundColor = null;
-var imageColor = null;
+var imageHex = null;
+var imageRGB = null;
+var imageButtonHex = null;
 
 export default PlayView = ({route, navigation}) => {
     const [dimensions, setDimensions] = useState({height: window.innerHeight, width: window.innerWidth});
     const { height, width } = dimensions;
     const { dark, colors } = useTheme();
+    const [fontColor, setFontColor] = useState(
+        imageHex
+            ? (imageRGB[0]*0.299 + imageRGB[1]*0.587 + imageRGB[2]*0.114) > 186
+                ? "#000000"
+                : "#ffffff"
+            : colors.text
+    );
+    const [buttonColor, setButtonColor] = useState(
+        imageHex
+            ? imageButtonHex
+            : colors.card
+    );
+
     const image = useRef(null);
 
     const [pointerDisabled, setPointerDisabled] = useState(false);
@@ -238,7 +253,9 @@ export default PlayView = ({route, navigation}) => {
 
     useEffect(() => {
         container.current.style.height = "100%";
-        container.current.style.transition = "background-color .4s";
+        background.current.style.transition = "background-color .4s";
+        background.current.style.backgroundColor = imageHex ? imageHex : backgroundColor;
+
         vertContainer.current.addEventListener("mouseover", darkenCanvas);
         vertContainer.current.addEventListener("mouseleave", restoreCanvas);
         vertContainer.current.addEventListener("touchstart", darkenCanvas);
@@ -249,7 +266,6 @@ export default PlayView = ({route, navigation}) => {
         background.current.addEventListener("mousedown", enableMovement);
         background.current.addEventListener("mouseout", disableMovement);
         background.current.addEventListener("mouseup", () => {disableMovement();stopMovement()});
-        background.current.style.backgroundColor = imageColor ? imageColor : backgroundColor;
 
         image.current.addEventListener("touchmove", handleImage);
         image.current.addEventListener("touchend", stopMovement);
@@ -348,10 +364,16 @@ export default PlayView = ({route, navigation}) => {
         );
 
         imageWorker.onmessage = event => {
-            console.log(event.data);
-            let rgb = event.data.rgb;
-            imageColor = event.data.hex;
-            background.current.style.backgroundColor = imageColor;
+            imageRGB = event.data.rgb;
+            imageHex = event.data.hex;
+            imageButtonHex = event.data.buttonHex;
+            background.current.style.backgroundColor = imageHex;
+            setButtonColor(imageButtonHex);
+            setFontColor(
+                (imageRGB[0]*0.299 + imageRGB[1]*0.587 + imageRGB[2]*0.114) > 186
+                    ? "#000000"
+                    : "#ffffff"
+            );
         };
 
         return () => {
@@ -421,19 +443,19 @@ export default PlayView = ({route, navigation}) => {
                     >
                         <MaterialIcons
                             name="thumb-down" size={30} style={{alignSelf: "center"}} selectable={false}
-                            color={isLiked == null ? "dimgray" : !isLiked ? colors.text : "dimgray"}
+                            color={isLiked == null ? "dimgray" : !isLiked ? fontColor : "dimgray"}
                         />
                     </Button>
                     
                     <View style={[{flexGrow: 1, width: 1, paddingHorizontal: 5, alignItems: "center", userSelect: "text", overflow: "hidden"}]}>
                         <ScrollingText>
-                            <Text numberOfLines={1} style={[stylesBottom.titleText, {pointerEvents: pointerDisabled ? "none" : "auto", color: colors.text}]}>
+                            <Text numberOfLines={1} style={[stylesBottom.titleText, {pointerEvents: pointerDisabled ? "none" : "auto", color: fontColor}]}>
                                 {title}
                             </Text>
                         </ScrollingText>
                             
                         <ScrollingText>
-                            <Text numberOfLines={1} style={[stylesBottom.subtitleText, {pointerEvents: pointerDisabled ? "none" : "auto", color: colors.text}]}>
+                            <Text numberOfLines={1} style={[stylesBottom.subtitleText, {pointerEvents: pointerDisabled ? "none" : "auto", color: fontColor}]}>
                                 {artist}
                             </Text>
                         </ScrollingText>
@@ -444,28 +466,28 @@ export default PlayView = ({route, navigation}) => {
                         style={{pointerEvents: pointerDisabled ? "none" : "auto", borderRadius: 25, alignItems: "center", padding: 0, margin: 0, minWidth: 0}}
                         contentStyle={{alignItems: "center", width: 50, height: 50, minWidth: 0}}
                     >
-                        <MaterialIcons name="thumb-up" size={30} color={isLiked == null ? "dimgray" : isLiked ? colors.text : "dimgray"} style={{alignSelf: "center"}} selectable={false}/>
+                        <MaterialIcons name="thumb-up" size={30} color={isLiked == null ? "dimgray" : isLiked ? fontColor : "dimgray"} style={{alignSelf: "center"}} selectable={false}/>
                     </Button>
                 </View>
 
-                <SeekBar buffering={state} style={{pointerEvents: pointerDisabled ? "none" : "auto"}}/>
+                <SeekBar buffering={state} thumbColor={buttonColor} style={{pointerEvents: pointerDisabled ? "none" : "auto"}}/>
 
                 <View style={[stylesBottom.buttonContainer, {pointerEvents: "none", overflow: "visible", alignSelf: "stretch", justifyContent: "space-between"}]}>
-                    <CastButton style={{pointerEvents: pointerDisabled ? "none" : "auto"}}/>
+                    <CastButton style={{pointerEvents: pointerDisabled ? "none" : "auto", fontColor: fontColor}}/>
                     <Button
                         labelStyle={{marginHorizontal: 0}}
                         style={{pointerEvents: pointerDisabled ? "none" : "auto", borderRadius: 25, alignItems: "center", padding: 0, margin: 0, minWidth: 0}}
                         contentStyle={{alignItems: "center", width: 50, height: 50, minWidth: 0}}
                         onPress={Music.skipPrevious}
                     >
-                        <MaterialIcons style={{alignSelf: "center"}} selectable={false} name="skip-previous" color={colors.text} size={40}/>
+                        <MaterialIcons style={{alignSelf: "center"}} selectable={false} name="skip-previous" color={fontColor} size={40}/>
                     </Button>
 
-                    <View style={{pointerEvents: pointerDisabled ? "none" : "auto", alignSelf: "center", alignItems: "center", justifyContent: "center", backgroundColor: dark ? colors.card : colors.primary, width: 60, height: 60, borderRadius: 30}}>
+                    <View style={{pointerEvents: pointerDisabled ? "none" : "auto", alignSelf: "center", alignItems: "center", justifyContent: "center", backgroundColor: buttonColor, width: 60, height: 60, borderRadius: 30}}>
                         {state == State.Buffering
                             ?   <ActivityIndicator
                                     style={{alignSelf: "center"}}
-                                    color={colors.text}
+                                    color={fontColor}
                                     size="large"
                                 />
 
@@ -481,7 +503,7 @@ export default PlayView = ({route, navigation}) => {
                                 >
                                     <MaterialIcons
                                         style={{alignSelf: "center"}}
-                                        color={colors.text}
+                                        color={fontColor}
                                         size={40}
                                         selectable={false}
                                         name={
@@ -500,7 +522,7 @@ export default PlayView = ({route, navigation}) => {
                         contentStyle={{alignItems: "center", width: 50, height: 50, minWidth: 0}}
                         onPress={Music.skipNext}
                     >
-                        <MaterialIcons style={{alignSelf: "center"}} selectable={false} name="skip-next" color={colors.text} size={40}/>
+                        <MaterialIcons style={{alignSelf: "center"}} selectable={false} name="skip-next" color={fontColor} size={40}/>
                     </Button>
 
                     <Button
@@ -510,7 +532,7 @@ export default PlayView = ({route, navigation}) => {
                         contentStyle={{alignItems: "center", width: 50, height: 50, minWidth: 0}}
                         onPress={() => setRepeat(Music.cycleRepeatMode())}
                     >
-                        <MaterialIcons name={!Music.isStreaming ? repeat : "repeat-one-on"} color={colors.text} size={30} style={{alignSelf: "center"}} selectable={false}/>
+                        <MaterialIcons name={!Music.isStreaming ? repeat : "repeat-one-on"} color={fontColor} size={30} style={{alignSelf: "center"}} selectable={false}/>
                     </Button>
                 </View>
 
@@ -525,7 +547,7 @@ export default PlayView = ({route, navigation}) => {
                             style={{alignSelf: "center"}}
                             selectable={false}
                             name="keyboard-arrow-down"
-                            color={colors.text} size={30}
+                            color={fontColor} size={30}
                         />
                     </Button>
 
@@ -544,7 +566,7 @@ export default PlayView = ({route, navigation}) => {
                             style={{alignSelf: "center"}}
                             selectable={false}
                             name="more-vert"
-                            color={colors.text}
+                            color={fontColor}
                             size={30}
                         />
                     </Button>
@@ -554,8 +576,8 @@ export default PlayView = ({route, navigation}) => {
 
         <SwipePlaylist
             minimumHeight={50}
-            backgroundColor={dark ? colors.card : colors.primary}
-            textColor={colors.text}
+            backgroundColor={buttonColor}
+            textColor={fontColor}
             playlist={list}
             track={track}
             style={{zIndex: 2, pointerEvents: pointerDisabled ? "none" : "auto"}}

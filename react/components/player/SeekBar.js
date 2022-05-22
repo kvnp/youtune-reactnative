@@ -17,7 +17,7 @@ const minutesAndSeconds = position => ([
     pad( ~~(position % 60), 2),
 ]);
 
-export default SeekBar = ({style, buffering}) => {
+export default SeekBar = ({style}) => {
     const { colors } = useTheme();
     const { duration } = Music.metadata;
     const [position, setPosition] = useState(Music.position);

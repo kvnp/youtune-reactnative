@@ -34,9 +34,15 @@ export default CastButton = ({style}) => {
         <MaterialIcons
             name={state.connected ? "cast-connected" : "cast"}
             style={{alignSelf: "center"}}
-            selectable={false} 
-            color={state.connecting ? "blue" : colors.text}
+            selectable={false}
             size={30}
+            color={
+                state.connecting
+                    ? "blue"
+                    : style.fontColor
+                        ? style.fontColor
+                        : colors.text
+            }
         />
     </Button>
 }
