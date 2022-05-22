@@ -11,7 +11,7 @@ import {
     Platform
 } from "react-native";
 
-import { TouchableRipple } from "react-native-paper";
+import { Title, TouchableRipple } from "react-native-paper";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import { useTheme } from "@react-navigation/native";
 
@@ -90,25 +90,6 @@ export default MoreModal = ({navigation}) => {
             trListener.remove();
         }
     }, [visible]);
-
-    const onShare = async(type, url, message) => {
-        try {
-            const title = "YouTune - " + type;
-            Share.share({
-                title: title,
-                url: url,
-                message: message + ":\n" + url
-            }, {
-                dialogTitle: title
-            }).then(event => {
-                console.log(event);
-                setContent({...content, visible: false});
-            });
-
-        } catch (error) {
-            alert(error.message);
-        }
-    };
 
     const like = bool => {
         Downloads.likeTrack(videoId, bool);
@@ -425,17 +406,31 @@ export default MoreModal = ({navigation}) => {
                         let file;
                         let message;
                         if (type == "Song") {
-                            message = title + " - " + subtitle;
+                            message = subtitle + " - " + title;
                             file = "watch?v=" + videoId;
                         } else if (type == "Playlist") {
-                            message = title + " - " + subtitle;
+                            message = title;
                             file = "playlist?list=" + playlistId;
                         } else {
-                            message = title + " - " + type;
+                            message = title;
                             file = "channel/" + browseId;
                         }
 
-                        onShare(type, window.location.origin + "/" + file, message);
+                        try {
+                            Share.share({
+                                title: message,
+                                url: window.location.origin + "/" + file,
+                                message: message + ":\n" + window.location.origin + "/" + file
+                            }, {
+                                dialogTitle: title
+                            }).then(event => {
+                                console.log(event);
+                                setContent({...content, visible: false});
+                            });
+
+                        } catch (error) {
+                            alert(error.message);
+                        }
                     }}
                 >
                     <>
