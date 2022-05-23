@@ -1,14 +1,6 @@
 export default class IndexedDBProvider {
     static initialize() {
         return new Promise((resolve, reject) => {
-            // In der folgenden Zeile sollten Sie die Präfixe einfügen, die Sie testen wollen.
-            window.indexedDB = window.indexedDB || window.mozIndexedDB || window.webkitIndexedDB || window.msIndexedDB;
-            // Verwenden Sie "var indexedDB = ..." NICHT außerhalb einer Funktion.
-            // Ferner benötigen Sie evtl. Referenzen zu einigen window.IDB* Objekten:
-            window.IDBTransaction = window.IDBTransaction || window.webkitIDBTransaction || window.msIDBTransaction;
-            window.IDBKeyRange = window.IDBKeyRange || window.webkitIDBKeyRange || window.msIDBKeyRange;
-            // (Mozilla hat diese Objekte nie mit Präfixen versehen, also brauchen wir kein window.mozIDB*)
-
             if (IDBTransaction != undefined) {
                 if (IDBTransaction.READ_WRITE != undefined) {
                     this.#read_write = IDBTransaction.READ_WRITE;

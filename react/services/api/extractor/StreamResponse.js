@@ -1,7 +1,3 @@
-import Device from "../../device/Device";
-import Settings from "../../device/Settings";
-import HTTP from "../HTTP";
-
 export default function digestStreamResponse(parse) {
     let current = {
         audioQuality: null,
@@ -27,15 +23,11 @@ export default function digestStreamResponse(parse) {
                     audioQuality = 1;
             }
             
-            if (audioQuality > current.audioQuality) {
-                let url = Settings.Values.proxyYTMM && Device.Platform == "web"
-                    ? HTTP.getProxyUrl(formats[i].url)
-                    : formats[i].url;
+            if (audioQuality > current.audioQuality)
                 current = {
                     audioQuality: audioQuality,
-                    url: url
+                    url: formats[i].url
                 };
-            }
 
             if (audioQuality == 3)
                 break;

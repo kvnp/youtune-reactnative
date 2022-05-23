@@ -186,7 +186,9 @@ export default class API {
 
         let response = await HTTP.getResponse(url, input, type, controllerCallback);
         let stream = Extractor.digestStreamResponse(response);
-        return stream;
+        return Settings.Values.proxyYTMM && Device.Platform == "web"
+            ? HTTP.getProxyUrl(stream)
+            : stream;
     }
 
     static async getNextSongs({videoId, playlistId}) {

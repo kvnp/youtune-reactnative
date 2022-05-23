@@ -8,7 +8,7 @@ export default class Downloads {
     static #downloadedTracks = [];
     static #cachedTracks = [];
     static #likedTracks = [];
-    static #downloadQueue = [];
+    static #downloadQueue = {};
     static initialized = false;
 
     static #emitter = DeviceEventEmitter;
@@ -81,81 +81,39 @@ export default class Downloads {
         if (videoId.includes("&"))
             videoId = videoId.slice(0, videoId.indexOf("&"));
 
+        if (this.#downloadQueue[videoId])
+            return;
+
+        let worker = new Worker(new URL("../../services/web/download/worker.js", import.meta.url));
+        this.#downloadQueue[videoId] = {worker, speed: "0Kb/s", progress: 0};
+        this.#emitter.emit(this.EVENT_DOWNLOAD, videoId);
+        worker.onmessage = e => {
+            this.#downloadQueue[videoId].speed = e.data.speed;
+            this.#downloadQueue[videoId].progress = e.data.progress;
+            if (e.data.completed) {
+                delete this.#downloadQueue[videoId];
+                this.#downloadedTracks.push(videoId);
+            }
+            this.#emitter.emit(this.EVENT_DOWNLOAD, videoId);
+        };
+        worker.postMessage({videoId, cacheOnly});
+    }
+
+    static cancelDownload(videoId) {
         return new Promise(async(resolve, reject) => {
             if (!this.initialized)
                 await Downloads.waitForInitialization();
 
-            if (videoId == undefined || videoId == null)
-                return reject("no id");
+            if (videoId.includes("&"))
+                videoId = videoId.slice(0, videoId.indexOf("&"));
 
-            let i;
-            if (!cacheOnly) {
-                i = this.#downloadedTracks.findIndex(entry => videoId == entry);
-                if (i > -1) return reject("already downloaded");
-
-                i = this.#downloadQueue.findIndex(entry => videoId in entry);
-                if (i > -1) return reject("still downloading");
-            } else {
-                i = this.#cachedTracks.indexOf(videoId);
-                if (i > -1) return reject("already cached");
+            let worker = this.#downloadQueue[videoId];
+            if (worker) {
+                worker.terminate();
+                delete this.#downloadQueue[videoId];
+                this.#emitter.emit(this.EVENT_DOWNLOAD, true);
             }
-            
-            let controllerCallback = controller => {
-                let index = this.#downloadQueue.findIndex(entry => videoId in entry);
-                if (!cacheOnly) {
-                    if (index > -1)
-                        this.#downloadQueue[index][videoId] = controller;
-                    else {
-                        this.#downloadQueue.push({[videoId] : controller});
-                        this.#emitter.emit(this.EVENT_DOWNLOAD, true);
-                    }
-
-                    controller.signal.onabort = () => {
-                        reject("download aborted: " + videoId);
-                    };
-                }
-            }
-            
-            try {
-                let includedBefore = true;
-                if (!this.#cachedTracks.includes(videoId)) {
-                    includedBefore = false;
-                    let track = await API.getAudioInfo({videoId: videoId, controllerCallback});
-                    track.artwork = await API.getBlob({url: track.artwork, controllerCallback});
-                    track.videoId = track.id;
-                    delete track.id;
-                    delete track.playable;
-                    
-                    await Storage.setItem("Tracks", track);
-                    this.#cachedTracks.push(videoId);
-                }
-
-                if (!cacheOnly) {
-                    let url = await API.getAudioStream({videoId: videoId, controllerCallback});
-                    let blob = await API.getBlob({url: url, controllerCallback});
-
-                    i = this.#downloadQueue.findIndex(entry => videoId in entry);
-                    this.#downloadQueue.splice(i, 1);
-                    if (["audio", "video"].includes(blob.type.split("/")[0])) {
-                        await Storage.setItem("Downloads", {
-                            videoId: videoId,
-                            url: blob
-                        });
-                        
-                        this.#downloadedTracks.push(videoId);
-                    } else if (!includedBefore) {
-                        await Storage.deleteItem("Tracks", videoId)
-                        i = this.#cachedTracks.findIndex(entry => videoId in entry);
-                        this.#cachedTracks.splice(i, 1);
-                    }
-                    
-                    this.#emitter.emit(this.EVENT_DOWNLOAD, true);
-                }
-                
-                resolve(videoId);
-            } catch (e) {
-                console.log(e);
-            }
+            resolve();
         });
     }
 
@@ -204,34 +162,13 @@ export default class Downloads {
             if (!deleting && like && !this.isTrackCached(videoId)) {
                 
                 
-                    
+                
             } else if ((!like || deleting) && index > -1) {
                 
             }
 
             this.#emitter.emit(this.EVENT_LIKE, deleting ? null : like);
             return resolve(videoId);
-        });
-    }
-
-    static cancelDownload(videoId) {
-        return new Promise(async(resolve, reject) => {
-            if (!this.initialized)
-                await Downloads.waitForInitialization();
-
-            if (videoId.includes("&"))
-                videoId = videoId.slice(0, videoId.indexOf("&"));
-
-            let index = this.#downloadQueue.findIndex(entry => videoId in entry);
-            if (index > -1) {
-                let abortController = this.#downloadQueue[index][videoId];
-                abortController.abort();
-                this.#downloadQueue.splice(index, 1);
-                this.#emitter.emit(this.EVENT_DOWNLOAD, true);
-                resolve(videoId);
-            } else {
-                reject(videoId);
-            }
         });
     }
 
@@ -289,15 +226,26 @@ export default class Downloads {
         if (videoId.includes("&"))
             videoId = videoId.slice(0, videoId.indexOf("&"));
 
-        let index = this.#downloadQueue.findIndex(entry => videoId in entry);  
-        return index > -1;
+        let worker = this.#downloadQueue[videoId];
+        return worker ? true: false;
     }
 
     static getDownloadingLength() {
         if (!this.initialized)
             return 0;
         
-        return this.#downloadQueue.length;
+        return Object.keys(this.#downloadQueue).length;
+    }
+
+    static getDownloadInfo(videoId) {
+        if (this.#downloadQueue[videoId]) return {
+            progress: this.#downloadQueue[videoId].progress,
+            speed: this.#downloadQueue[videoId].speed
+        }
+        else return {
+            progress: 0,
+            speed: "0 Kb/s"
+        }
     }
 
     static getTrack(videoId) {

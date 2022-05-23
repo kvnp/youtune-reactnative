@@ -2,9 +2,11 @@ export default class Device {
     static Language;
     static Platform = (() => {
         let platform;
-        if (process?.versions) {
-            if (process.versions?.node) {
-                platform = "node";
+        if (typeof process !== "undefined") {
+            if (process?.versions) {
+                if (process.versions?.node) {
+                    platform = "node";
+                }
             }
         }
         

@@ -40,14 +40,15 @@ export default MoreModal = ({navigation}) => {
         visible: false,
         downloading: false,
         downloaded: false,
-        queue: 0
+        queue: 0,
+        info: {progress: 0, speed: "0 Kb/s"}
     });
 
     const {
         title, subtitle, thumbnail,
         videoId, browseId, playlistId,
         type, liked, visible, downloading,
-        downloaded, queue
+        downloaded, queue, info
     } = content;
 
     useEffect(() => {
@@ -60,7 +61,8 @@ export default MoreModal = ({navigation}) => {
                             ...content,
                             downloading: Downloads.isTrackDownloading(videoId),
                             downloaded: Downloads.isTrackDownloaded(videoId),
-                            queue: Downloads.getDownloadingLength()
+                            queue: Downloads.getDownloadingLength(),
+                            info: Downloads.getDownloadInfo(videoId)
                         });
                 }
             );
@@ -344,10 +346,7 @@ export default MoreModal = ({navigation}) => {
                             <Text style={{paddingLeft: 20, color: colors.text}}>
                                 {
                                     downloading
-                                        ? "Downloading" + (queue > 0
-                                            ? " (" + queue + " in queue)"
-                                            : "")
-    
+                                        ? "Downloading... " + Math.floor(info.progress * 100) + "% " +  info.speed
                                         : downloaded
                                             ? "Delete" + (queue > 0
                                                 ? " (" + queue + " in queue)"

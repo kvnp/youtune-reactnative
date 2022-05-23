@@ -45,6 +45,9 @@ export default class HTTP {
         if (!url.startsWith("http"))
             return url;
 
+        if (typeof window === "undefined")
+            window = self;
+
         if (url.includes(window.location.hostname))
             return url;
 
