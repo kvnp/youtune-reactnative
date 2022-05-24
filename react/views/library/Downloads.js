@@ -38,7 +38,10 @@ export default Downloads = ({ navigation }) => {
         loadEntries();
         let dlListener = Service.addListener(
             Service.EVENT_DOWNLOAD,
-            () => loadEntries()
+            () => {
+                if (!Service.getDownloadsLength() != entries.length)
+                    loadEntries();
+            }
         );
 
         return () => dlListener.remove()
