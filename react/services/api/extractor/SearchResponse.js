@@ -11,12 +11,13 @@ export default function digestResultResponse(json) {
     if (sectionList[0]?.itemSectionRenderer) {
         let itemSection = sectionList[0].itemSectionRenderer.contents[0];
         
-        if (itemSection?.messageRenderer) {
+        /*if (itemSection?.messageRenderer) {
             let message = itemSection.messageRenderer.text.runs[0].text;
             final.reason = message;
             return final;
 
-        } else if (itemSection?.didYouMeanRenderer) {
+        } else*/
+        if (itemSection?.didYouMeanRenderer) {
             final.suggestionOption = {correctedList: [], endpoints: {text: "", query: ""}};
             let renderer = itemSection.didYouMeanRenderer;
 
