@@ -12,6 +12,7 @@ export default class Downloads {
 
     static #emitter = DeviceEventEmitter;
     static EVENT_INITIALIZE = "event-initialize";
+    static EVENT_PROGRESS = "event-progress";
     static EVENT_DOWNLOAD = "event-download";
     static EVENT_LIKE = "event-like";
 
@@ -67,7 +68,7 @@ export default class Downloads {
                         this.#cachedTracks.splice(index, 1);
                 }
                 
-                this.#emitter.emit(this.EVENT_DOWNLOAD, true);
+                this.#emitter.emit(this.EVENT_PROGRESS, true);
                 resolve();
             } catch (e) {
                 console.log(e);
@@ -81,7 +82,7 @@ export default class Downloads {
 
         let worker = new Worker(new URL("../../services/web/download/worker.js", import.meta.url));
         this.#downloadQueue[videoId] = {worker, speed: "0Kb/s", progress: 0};
-        this.#emitter.emit(this.EVENT_DOWNLOAD, videoId);
+        this.#emitter.emit(this.EVENT_PROGRESS, videoId);
         worker.onmessage = e => {
             if (e.data.message == "track")
                 Storage.setItem("Tracks", e.data.payload);
@@ -93,8 +94,9 @@ export default class Downloads {
                 if (e.data.payload.completed) {
                     delete this.#downloadQueue[videoId];
                     this.#downloadedTracks.push(videoId);
+                    this.#emitter.emit(this.EVENT_DOWNLOAD, true);
                 }
-                this.#emitter.emit(this.EVENT_DOWNLOAD, videoId);
+                this.#emitter.emit(this.EVENT_PROGRESS, videoId);
             }
         };
         worker.postMessage({videoId, cacheOnly});
@@ -109,7 +111,7 @@ export default class Downloads {
                 let worker = this.#downloadQueue[videoId].worker;
                 worker.terminate();
                 delete this.#downloadQueue[videoId];
-                this.#emitter.emit(this.EVENT_DOWNLOAD, true);
+                this.#emitter.emit(this.EVENT_PROGRESS, true);
             }
             resolve();
         });

@@ -54,7 +54,7 @@ export default MoreModal = ({navigation}) => {
     useEffect(() => {
         if (visible) {
             dlListener = Downloads.addListener(
-                Downloads.EVENT_DOWNLOAD,
+                Downloads.EVENT_PROGRESS,
                 () => {
                     if (visible) {
                         setContent({
