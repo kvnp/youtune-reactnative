@@ -1,6 +1,5 @@
 import { DeviceEventEmitter } from "react-native";
 import Playlist from "../../models/music/playlist";
-import API from "../api/API";
 import IO from "./IO";
 import Storage from "./storage/Storage";
 
@@ -81,20 +80,28 @@ export default class Downloads {
         if (videoId.includes("&"))
             videoId = videoId.slice(0, videoId.indexOf("&"));
 
-        if (this.#downloadQueue[videoId])
+        if (videoId in this.#downloadQueue)
             return;
 
         let worker = new Worker(new URL("../../services/web/download/worker.js", import.meta.url));
         this.#downloadQueue[videoId] = {worker, speed: "0Kb/s", progress: 0};
         this.#emitter.emit(this.EVENT_DOWNLOAD, videoId);
         worker.onmessage = e => {
-            this.#downloadQueue[videoId].speed = e.data.speed;
-            this.#downloadQueue[videoId].progress = e.data.progress;
-            if (e.data.completed) {
-                delete this.#downloadQueue[videoId];
-                this.#downloadedTracks.push(videoId);
+            if (e.data.message == "track") {
+                console.log("adding track");
+                Storage.setItem("Tracks", e.data.payload);
+            } else if (e.data.message == "download") {
+                console.log(e.data.payload);
+                Storage.setItem("Downloads", e.data.payload);
+            } else {
+                this.#downloadQueue[videoId].speed = e.data.payload.speed;
+                this.#downloadQueue[videoId].progress = e.data.payload.progress;
+                if (e.data.completed) {
+                    delete this.#downloadQueue[videoId];
+                    this.#downloadedTracks.push(videoId);
+                }
+                this.#emitter.emit(this.EVENT_DOWNLOAD, videoId);
             }
-            this.#emitter.emit(this.EVENT_DOWNLOAD, videoId);
         };
         worker.postMessage({videoId, cacheOnly});
     }
@@ -107,8 +114,8 @@ export default class Downloads {
             if (videoId.includes("&"))
                 videoId = videoId.slice(0, videoId.indexOf("&"));
 
-            let worker = this.#downloadQueue[videoId];
-            if (worker) {
+            if (videoId in this.#downloadQueue) {
+                let worker = this.#downloadQueue[videoId].worker;
                 worker.terminate();
                 delete this.#downloadQueue[videoId];
                 this.#emitter.emit(this.EVENT_DOWNLOAD, true);
@@ -226,8 +233,7 @@ export default class Downloads {
         if (videoId.includes("&"))
             videoId = videoId.slice(0, videoId.indexOf("&"));
 
-        let worker = this.#downloadQueue[videoId];
-        return worker ? true: false;
+        return videoId in this.#downloadQueue;
     }
 
     static getDownloadingLength() {
@@ -238,14 +244,16 @@ export default class Downloads {
     }
 
     static getDownloadInfo(videoId) {
-        if (this.#downloadQueue[videoId]) return {
-            progress: this.#downloadQueue[videoId].progress,
-            speed: this.#downloadQueue[videoId].speed
-        }
-        else return {
-            progress: 0,
-            speed: "0 Kb/s"
-        }
+        if (videoId in this.#downloadQueue)
+            return {
+                progress: this.#downloadQueue[videoId].progress,
+                speed: this.#downloadQueue[videoId].speed
+            }
+        else
+            return {
+                progress: 0,
+                speed: "0 Kb/s"
+            }
     }
 
     static getTrack(videoId) {
