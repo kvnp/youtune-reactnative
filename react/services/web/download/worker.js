@@ -11,12 +11,11 @@ function getSpeed(startTime, endTime, downloadSize) {
 
 async function downloadTrack(videoId, cacheOnly) {
     let url = self.location.protocol + "//" + self.location.host + "/proxy" + "/youtubei/v1/player?alt=json&key=AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8";
-    let requestBody = {context: {client: {
-        clientName: "ANDROID",
-        clientVersion: "16.02"
-    }}, videoId};
     let input = {
-        body: JSON.stringify(requestBody),
+        body: JSON.stringify({context: {client: {
+            clientName: "ANDROID_MUSIC",
+            clientVersion: "4.57"
+        }}, videoId}),
         method: "POST",
         credentials: "omit",
         headers: {
@@ -28,7 +27,9 @@ async function downloadTrack(videoId, cacheOnly) {
     const trackFetch = await fetch(url, input);
     const trackResponse = await trackFetch.json();
     let track = getAudioInfo(trackResponse);
+    console.log(track.artwork);
     track.artwork = self.location.protocol + "//" + self.location.host + "/proxy/lh3/" + track.artwork.split("/").slice(3).join("/");
+    console.log(track.artwork);
 
     input = {
         method: "GET",
