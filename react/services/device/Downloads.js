@@ -214,6 +214,13 @@ export default class Downloads {
         return Object.keys(this.#downloadQueue).length;
     }
 
+    static getDownloadsLength() {
+        if (!this.initialized)
+            return 0;
+        
+        return this.#downloadedTracks.length;
+    }
+
     static getDownloadInfo(videoId) {
         if (videoId in this.#downloadQueue)
             return {
