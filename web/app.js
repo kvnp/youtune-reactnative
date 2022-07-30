@@ -24,7 +24,7 @@ app.get("/watch/", function(req, res, next) {
     });
 });
 
-app.get("/lyrics/", function(req, res, next) {
+app.get("/proxy/lyrics/", function(req, res, next) {
     getLyrics(req.query.q).then(lyrics => res.send({lyrics: lyrics.split("<br>")}));
 });
 
