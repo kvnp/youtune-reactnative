@@ -119,7 +119,7 @@ export default class API {
                 resolve(API.initialData);
 
             //TODO implement continuation
-            let requestBody = API.RequestBody.BODY;
+            let requestBody = API.RequestBody.WEB;
             if (continuation && browseId == "FEmusic_home")
                 url = url + "&ctoken=" + continuation.continuation + 
                             "&continuation=" + continuation.continuation +
