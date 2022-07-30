@@ -2,7 +2,7 @@ const express = require('express');
 const path = require('path');
 const fs = require("fs");
 const { createProxyMiddleware } = require('http-proxy-middleware');
-const getTags = require("./request");
+const { getTags, getLyrics } = require("./request");
 const app = express();
 
 const html = fs.readFileSync("web/public/index.html").toString();
@@ -22,6 +22,10 @@ app.get("/watch/", function(req, res, next) {
         <meta property="og:image" content="${image}">`;
         res.send(html.substring(0, headIndex) + tags + html.substring(headIndex));
     });
+});
+
+app.get("/lyrics/", function(req, res, next) {
+    getLyrics(req.query.q).then(lyrics => res.send({lyrics: lyrics.split("<br>")}));
 });
 
 app.get("/playlist/", function(req, res, next) {

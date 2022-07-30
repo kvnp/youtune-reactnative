@@ -33,6 +33,7 @@
         "@react-navigation/native": "^6.0.11",
         "@react-navigation/stack": "^6.2.2",
         "express": "^4.18.1",
+        "jsdom": "^20.0.0",
         "queue-promise": "^2.2.1",
         "react": "^18.2.0",
         "react-dom": "^18.2.0",

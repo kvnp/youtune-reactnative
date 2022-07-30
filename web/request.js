@@ -1,4 +1,5 @@
 const https = require('https');
+const jsdom = require("jsdom");
 
 function get(url) {
     return new Promise((resolve, reject) => {
@@ -15,7 +16,6 @@ function get(url) {
 function getTags(url) {
     return new Promise(async(resolve, reject) => {
         let html = await get(url);
-
         let title = null;
         let description = null;
         let image = null;
@@ -32,4 +32,33 @@ function getTags(url) {
     });
 }
 
-module.exports = getTags;
+function getLyrics(search) {
+    return new Promise(async(resolve, reject) => {
+        const apiUrl = "https://genius.com/api/search/multi?q=" + search;
+        const searchResponse = JSON.parse(await get(apiUrl));
+        for (let e of searchResponse.response.sections) {
+            if (e.type == "top_hit") {
+                const lyricsUrl = "https://genius.com" + e.hits[0].result.path;
+                const lyricsHtml = await get(lyricsUrl);
+                const dom = new jsdom.JSDOM(lyricsHtml);
+                let lyricsRoot = dom.window.document.getElementById("lyrics-root");
+                let excludeList = lyricsRoot.querySelectorAll('[data-exclude-from-selection="true"]');
+                for (let exclusion of excludeList) {
+                    exclusion.remove();
+                }
+
+                let lyricsContainerList = lyricsRoot.querySelectorAll('[data-lyrics-container="true"]');
+                let finalHtml = [];
+                for (let container of lyricsContainerList) {
+                    finalHtml.push(container.innerHTML);
+                }
+
+                return resolve(finalHtml.join(""));
+            }
+        }
+        
+    });
+}
+
+module.exports.getTags = getTags;
+module.exports.getLyrics = getLyrics;
