@@ -19,6 +19,19 @@ export default class API {
                 }
             }
         }
+
+        static WEB = {
+            context: {
+                client: {
+                    clientName: "WEB_REMIX",
+                    clientVersion: "0.1",
+                    ...(Settings.Values.transmitLanguage
+                        ? {gl: Device.Language.GL, hl: Device.Language.HL}
+                        : undefined
+                    )
+                }
+            }
+        }
     }
     
     static URL = class URL {
@@ -62,7 +75,7 @@ export default class API {
     }
 
     static async getSearchResults(query, params) {
-        let requestBody = API.RequestBody.BODY;
+        let requestBody = API.RequestBody.WEB;
         requestBody.query = query;
         requestBody.params = params;
 
