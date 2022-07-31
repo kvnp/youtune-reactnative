@@ -28,7 +28,7 @@ var trListener;
 
 export default MoreModal = ({navigation}) => {
     const { colors } = useTheme();
-    const [content, setContent] = useState({
+    const [ content, setContent ] = useState({
         title: null,
         subtitle: null,
         thumbnail: null,
@@ -54,9 +54,9 @@ export default MoreModal = ({navigation}) => {
     useEffect(() => {
         if (visible) {
             dlListener = Downloads.addListener(
-                Downloads.EVENT_DOWNLOAD,
+                Downloads.EVENT_PROGRESS,
                 () => {
-                    if (visible)
+                    if (visible) {
                         setContent({
                             ...content,
                             downloading: Downloads.isTrackDownloading(videoId),
@@ -64,6 +64,8 @@ export default MoreModal = ({navigation}) => {
                             queue: Downloads.getDownloadingLength(),
                             info: Downloads.getDownloadInfo(videoId)
                         });
+                    }
+                        
                 }
             );
 
@@ -80,8 +82,14 @@ export default MoreModal = ({navigation}) => {
                 track => {
                     if (track.id == videoId)
                         setContent({
-                            videoId: track.id, playlistId: track.playlistId, title: track.title, subtitle: track.artist, thumbnail: track.artwork,
-                            visible, downloaded, downloading, queue, type
+                            ...content,
+                            videoId: track.id,
+                            playlistId: track.playlistId,
+                            title: track.title,
+                            subtitle: track.artist,
+                            thumbnail: track.artwork,
+                            visible, downloaded,
+                            downloading, queue, type
                         });
                 }
             )
@@ -99,45 +107,33 @@ export default MoreModal = ({navigation}) => {
     }
 
     const refresh = (type, id) => {
-        return new Promise(async(resolve) => {
-            let liked = null;
-            if (type == "Song")
-                liked = await Downloads.isTrackLiked(id);
+        let liked = null;
+        if (type == "Song")
+            liked = Downloads.isTrackLikedSync(id);
 
-            resolve(liked);
-        });
+        return liked;
     };
 
-    showModal = async(info) => {
-        let type;
-        let liked;
-
-        if (info.videoId != null) {
-            type = "Song";
-            liked = await refresh(type, info.videoId);
-        } else if (info.playlistId != null || info.browseId != null) {
-            if (info.browseId != null) {
-                if (info.browseId.slice(0, 2) == "UC") {
-                    type = "Artist";
-                    liked = await refresh(type, info.browseId);
-    
-                } else {
-                    type = "Playlist";
-                    liked = await refresh(type, info.playlistId);
-                }
-            } else {
-                type = "Playlist";
-                liked = await refresh(type, info.playlistId);
-            }
+    showModal = e => {
+        if (e.videoId != null) {
+            e.type = "Song";
+            e.info = Downloads.getDownloadInfo(e.videoId);
+            e.downloading = Downloads.isTrackDownloading(e.videoId);
+            e.downloaded = Downloads.isTrackDownloaded(e.videoId);
+            e.queue = Downloads.getDownloadingLength();
+        } else if (e.playlistId != null || e.browseId != null) {
+            if (e.browseId != null) {
+                if (e.browseId.slice(0, 2) == "UC")
+                    e.type = "Artist";
+                else 
+                    e.type = "Playlist";
+            } else
+                e.type = "Playlist";
         }
-
+        
+        e.liked = refresh(e.type, e.playlistId);
         setContent({
-            ...info,
-            type: type,
-            liked: liked,
-            downloading: Downloads.isTrackDownloading(info.videoId),
-            downloaded: Downloads.isTrackDownloaded(info.videoId),
-            queue: Downloads.getDownloadingLength(),
+            ...e,
             visible: true
         });
     };

@@ -18,19 +18,20 @@ import Entry from "../../components/shared/Entry";
 import { shelvesStyle } from '../../styles/Shelves';
 
 export default Downloads = ({ navigation }) => {
-    const [state, setState] = useState({entries: [], loading: false});
-    const {entries, loading} = state;
+    const [entries, setEntries] = useState([]);
+    const [loading, setLoading] = useState(false);
     const {colors} = useTheme();
 
     const loadEntries = async() => {
         if (!loading) {
-            setState({...state, loading: true});
+            setLoading(true);
             if (!Service.initialized) {
                 await Service.waitForInitialization();
             }
 
-            let local = await Service.loadLocalPlaylist("LOCAL_DOWNLOADS")
-            setState({entries: local.list, loading: false});
+            let local = await Service.loadLocalPlaylist("LOCAL_DOWNLOADS");
+            setEntries(local.list);
+            setLoading(false);
         }
     }
 
@@ -38,10 +39,7 @@ export default Downloads = ({ navigation }) => {
         loadEntries();
         let dlListener = Service.addListener(
             Service.EVENT_DOWNLOAD,
-            () => {
-                if (!Service.getDownloadsLength() != entries.length)
-                    loadEntries();
-            }
+            () => loadEntries()
         );
 
         return () => dlListener.remove()

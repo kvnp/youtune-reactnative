@@ -2,7 +2,7 @@ const express = require('express');
 const path = require('path');
 const fs = require("fs");
 const { createProxyMiddleware } = require('http-proxy-middleware');
-const getTags = require("./request");
+const { getTags, getLyrics } = require("./request");
 const app = express();
 
 const html = fs.readFileSync("web/public/index.html").toString();
@@ -24,6 +24,10 @@ app.get("/watch/", function(req, res, next) {
     });
 });
 
+app.get("/lyrics/", function(req, res, next) {
+    getLyrics(req.query.q).then(lyrics => res.send({lyrics: lyrics.split("<br>")}));
+});
+
 app.get("/playlist/", function(req, res, next) {
     const list = req.query.list;
     const url = "https://music.youtube.com/playlist?list=" + list;
@@ -39,14 +43,12 @@ app.get("/playlist/", function(req, res, next) {
 app.use('/proxy/videoplayback', createProxyMiddleware({
     target: "https://redirector.googlevideo.com",
     changeOrigin: true,
+    secure: false,
     followRedirects: true,
-    pathRewrite: {'^/proxy' : ''},
-
     headers: {
-        "Referer": "https://www.youtube.com",
-        "Origin": "https://www.youtube.com",
-        "User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:79.0) Gecko/20100101 Firefox/79.0"
-    }
+        "Connection": "Keep-Alive"
+    },
+    pathRewrite: {'^/proxy' : ''}
 }));
 
 app.use('/proxy/lh3', createProxyMiddleware({

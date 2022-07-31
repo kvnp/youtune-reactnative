@@ -7,27 +7,30 @@ import UI from "../ui/UI";
 
 export default class API {
     static RequestBody = class RequestBody {
-        static #BASE(client, version) {
-            return {
-                context: {
-                    client: {
-                        clientName: client,
-                        clientVersion: version,
-                        ...(Settings.Values.transmitLanguage
-                            ? {gl: Device.Language.GL, hl: Device.Language.HL}
-                            : undefined
-                        )
-                    }
+        static BODY = {
+            context: {
+                client: {
+                    clientName: "ANDROID_MUSIC",
+                    clientVersion: "4.57",
+                    ...(Settings.Values.transmitLanguage
+                        ? {gl: Device.Language.GL, hl: Device.Language.HL}
+                        : undefined
+                    )
                 }
-            };
+            }
         }
 
-        static get WEB() {
-            return this.#BASE("WEB_REMIX", "1.20210630.00.00");
-        }
-
-        static get STREAM() {
-            return this.#BASE("ANDROID", "16.02");
+        static WEB = {
+            context: {
+                client: {
+                    clientName: "WEB_REMIX",
+                    clientVersion: "0.1",
+                    ...(Settings.Values.transmitLanguage
+                        ? {gl: Device.Language.GL, hl: Device.Language.HL}
+                        : undefined
+                    )
+                }
+            }
         }
     }
     
@@ -90,7 +93,7 @@ export default class API {
     }
 
     static async getSearchSuggestions(query) {
-        let requestBody = API.RequestBody.WEB;
+        let requestBody = API.RequestBody.BODY;
         requestBody.input = query;
 
         let url = API.URL.Suggestion;
@@ -149,9 +152,7 @@ export default class API {
     }
 
     static async getAudioInfo({videoId, playlistId, controllerCallback}) {
-        if (videoId.includes("&"))
-            videoId = videoId.slice(0, videoId.indexOf("&"));
-        let requestBody = API.RequestBody.WEB;
+        let requestBody = API.RequestBody.BODY;
         requestBody.videoId = videoId;
         requestBody.playlistId = playlistId;
 
@@ -170,9 +171,7 @@ export default class API {
     }
 
     static async getAudioStream({videoId, controllerCallback}) {
-        if (videoId.includes("&"))
-            videoId = videoId.slice(0, videoId.indexOf("&"));
-        let requestBody = API.RequestBody.STREAM;
+        let requestBody = API.RequestBody.BODY;
         requestBody.videoId = videoId;
 
         let url = API.URL.Stream;
@@ -192,10 +191,7 @@ export default class API {
     }
 
     static async getNextSongs({videoId, playlistId}) {
-        if (videoId.includes("&"))
-            videoId = videoId.slice(0, videoId.indexOf("&"));
-
-        let requestBody = API.RequestBody.WEB;
+        let requestBody = API.RequestBody.BODY;
         requestBody.enablePersistentPlaylistPanel = true;
         requestBody.isAudioOnly = true;
         requestBody.videoId = videoId;

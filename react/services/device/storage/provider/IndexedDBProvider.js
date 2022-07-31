@@ -1,17 +1,15 @@
 export default class IndexedDBProvider {
+    static #DB_NAME = "youtune-storage";
+    static #read_write = "readwrite";
+    static #read_only = "readonly";
+    static #db;
+
+    static get #initialized() {
+        return this.#db !== undefined
+    }
+
     static initialize() {
         return new Promise((resolve, reject) => {
-            if (IDBTransaction != undefined) {
-                if (IDBTransaction.READ_WRITE != undefined) {
-                    this.#read_write = IDBTransaction.READ_WRITE;
-                }
-
-                if (IDBTransaction.READ_ONLY != undefined) {
-                    this.#read_only = IDBTransaction.READ_ONLY;
-                }
-            }
-
-            console.log("openDb ...");
             var req = indexedDB.open(this.#DB_NAME, 1);
 
             req.onupgradeneeded = evt => {
@@ -41,9 +39,6 @@ export default class IndexedDBProvider {
             };
 
             req.onsuccess = function(evt) {
-                // Better use "this" than "req" to get the result to avoid problems with
-                // garbage collection.
-                // db = req.result;
                 resolve(this.result);
             };
 
@@ -53,15 +48,6 @@ export default class IndexedDBProvider {
             };
         });
     }
-
-    static get #initialized() {
-        return this.#db !== undefined
-    }
-
-    static #DB_NAME = "youtune-storage";
-    static #read_write = "readwrite";
-    static #read_only = "readonly";
-    static #db;
 
     static getItem(storeName, key) {
         return new Promise(async(resolve, reject) => {
@@ -98,7 +84,6 @@ export default class IndexedDBProvider {
             } catch (_) {
                 this.#db = await this.initialize();
             }
-            
         });
     }
 
@@ -129,7 +114,7 @@ export default class IndexedDBProvider {
             
             try {
                 this.#db
-                    .transaction(storeName, this.#read_only)
+                    .transaction(storeName, IDBTransaction.READ_ONLY)
                     .objectStore(storeName)
                     .getAllKeys()
                     .onsuccess = function(event) {
