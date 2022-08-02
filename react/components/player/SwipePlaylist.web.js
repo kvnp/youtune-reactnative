@@ -14,6 +14,7 @@ import SlidingUpPanel from 'rn-sliding-up-panel';
 
 import Downloads from "../../services/device/Downloads";
 import Music from "../../services/music/Music";
+import SwipeLyrics from "./SwipeLyrics";
 
 var lastY;
 export default SwipePlaylist = ({playlist, track, backgroundColor, textColor, style}) => {
@@ -44,6 +45,10 @@ export default SwipePlaylist = ({playlist, track, backgroundColor, textColor, st
     }, [style]);
 
     useEffect(() => {
+        container.current._listRef._scrollRef.style.flexFlow = "column-reverse";
+        container.current._listRef._scrollRef.style.paddingBottom = "60px";
+        
+
         let scroll = container.current._listRef._scrollRef;
         scroll.addEventListener("touchmove", handleMovement);
     }, []);
@@ -157,6 +162,11 @@ export default SwipePlaylist = ({playlist, track, backgroundColor, textColor, st
                             </>
                     </TouchableRipple>
                 }
+            />
+            <SwipeLyrics
+                style={style}
+                textColor={textColor}
+                backgroundColor={backgroundColor}
             />
         </View>
     </SlidingUpPanel>
