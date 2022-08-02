@@ -36,7 +36,7 @@ export default class API {
     
     static URL = class URL {
         static Main = "https://music.youtube.com";
-        static #Gapis = "https://youtubei.googleapis.com"
+        static #Gapis = "https://youtubei.googleapis.com";
     
         static #Endpoint = "/youtubei/v1/";
         static #Parameter = "?alt=json&key=AIzaSyC9XL3ZjWddXya6X74dJoCTL-WEYFDNX30"
@@ -225,5 +225,28 @@ export default class API {
         
         let blob = await HTTP.getResponse(url, input, type, controllerCallback);
         return blob;
+    }
+
+    static async getLyrics({track}) {
+        let artist = track.artist;
+        let title = track.title;
+        if (artist.includes("("))
+            artist = artist.substring(0, artist.indexOf("(")).trim();
+
+        if (title.includes("("))
+            title = title.substring(0, title.indexOf("(")).trim();
+
+        artist = artist.replaceAll(" & ", "+").replaceAll(" ", "+");
+        title = title.replaceAll(" & ", "+").replaceAll(" ", "+");
+        let requestParams = title + "+" + artist;
+        
+        let url = window.location.origin + "/lyrics?q=" + requestParams;
+        let type = HTTP.Type.Json;
+        let input = {
+            method: HTTP.Method.GET,
+            credentials: "omit",
+        };
+
+        return HTTP.getResponse(url, input, type);
     }
 }

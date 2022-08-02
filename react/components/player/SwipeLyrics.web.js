@@ -10,6 +10,7 @@ import { useTheme } from "@react-navigation/native";
 import { TouchableRipple } from "react-native-paper";
 import SlidingUpPanel from 'rn-sliding-up-panel';
 import { ScrollView } from "react-native-gesture-handler";
+import API from "../../services/api/API";
 
 var lastY;
 export default SwipeLyrics = ({playlist, track, backgroundColor, textColor, style}) => {
@@ -40,73 +41,20 @@ export default SwipeLyrics = ({playlist, track, backgroundColor, textColor, styl
     }, [style]);
 
     useEffect(() => {
-        let test = [
-            "[Intro]",
-            "(Mmm, yeah)",
-            "",
-            "[Verse 1]",
-            "One more day and I might just give in, mmm, yeah",
-            "For heaven's sake you know my limits",
-            "Did I say too much?",
-            "You test me, you lead me on",
-            "Did I say enough?",
-            "I'm tongue-tied and the moment's gone",
-            "[Chorus]",
-            "I wasn't looking but I've found a light in you",
-            "If I'm not careful I might slip and fall through",
-            "Would you come get me if I ended up loving you",
-            "Could I be falling for free?",
-            "I wasn't looking but I've found a light in you",
-            "If I'm not careful I might slip and fall through",
-            "Wish I could mention it's the elephant in the room",
-            "He's only got eyes for me",
-            "",
-            "[Drop]",
-            "",
-            "[Post-Chorus]",
-            "You got me stuck like glue, oh, oh",
-            "Stuck like glue, oh, oh",
-            "I wasn't looking but I've found a light in you",
-            "If I'm not careful, I might slip and fall through",
-            "Stuck like glue, oh, oh, mmm",
-            "",
-            "[Verse 2]",
-            "I love the way you say my name with your mouth, mmm yeah",
-            "It feels so strange I cannot go without",
-            "Happens all the time",
-            "You test me, you lead me on",
-            "Should I speak my mind?",
-            "I'm tongue-tied and the moment's gone (The moment's gone)",
-            "[Bridge]",
-            "(Ooh, ooh)",
-            "",
-            "[Chorus]",
-            "I wasn't looking but I've found a light in you",
-            "If I'm not careful I might slip and fall through",
-            "Would you come get me if I ended up loving you",
-            "Could I be falling for free? (Oh yeah)",
-            "I wasn't looking but I've found a light in you",
-            "If I'm not careful I might slip and fall through",
-            "Wish I could mention it's the elephant in the room",
-            "He's only got eyes for me",
-            "",
-            "[Drop]",
-            "",
-            "[Post-Chorus]",
-            "You got me stuck like glue, oh, oh (Oh)",
-            "Stuck like glue, oh, oh (Oh, oh woah)",
-            "I wasn't looking but I've found a light in you (Yeah)",
-            "If I'm not careful I might slip and fall through",
-            "Stuck like glue, oh, oh",
-            "Did I say too much?",
-            "You test me, you lead me on",
-            "Did I say enough?",
-            "I'm tongue-tied and the moment's gone (Ooh yeah)",
-            "[Outro]",
-            "(Ooh, ooh)",
-            "You got me stuck like glue"
-        ];
+        if (!track)
+            return;
 
+        container.current.innerHtml = "";
+        API.getLyrics({track})
+            .then(response => {
+                for (let s of response.lyrics) {
+                    container.current.insertAdjacentText('beforeend', s);
+                    container.current.insertAdjacentHTML('beforeend', "<br>");
+                }
+            });
+    }, [track]);
+
+    useEffect(() => {
         let scroll = container.current;
         scroll.addEventListener("touchmove", handleMovement);
         scroll.style.alignItems = "center";
@@ -115,11 +63,7 @@ export default SwipeLyrics = ({playlist, track, backgroundColor, textColor, styl
         scroll.style.paddingLeft = "5%";
         scroll.style.paddingRight = "5%";
         
-        for (let s of test) {
-            console.log(s);
-            scroll.insertAdjacentText('beforeend', s);
-            scroll.insertAdjacentHTML('beforeend', "<br>");
-        }
+        
     }, []);
 
     return <SlidingUpPanel

@@ -48,7 +48,6 @@ export default SwipePlaylist = ({playlist, track, backgroundColor, textColor, st
         container.current._listRef._scrollRef.style.flexFlow = "column-reverse";
         container.current._listRef._scrollRef.style.paddingBottom = "60px";
         
-
         let scroll = container.current._listRef._scrollRef;
         scroll.addEventListener("touchmove", handleMovement);
     }, []);
@@ -167,6 +166,7 @@ export default SwipePlaylist = ({playlist, track, backgroundColor, textColor, st
                 style={style}
                 textColor={textColor}
                 backgroundColor={backgroundColor}
+                track={track}
             />
         </View>
     </SlidingUpPanel>
