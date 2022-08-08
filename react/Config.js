@@ -131,10 +131,9 @@ export const linking = {
 export const getTheme = isDark => {
     return isDark
         ? {
-            ...PaperTheme,
             ...DarkTheme,
+            ...PaperTheme,
             colors: {
-                ...PaperTheme.colors,
                 ...DarkTheme.colors,
                 onSurface: DarkTheme.colors.border
             },
@@ -143,10 +142,9 @@ export const getTheme = isDark => {
         }
 
         : {
-            ...PaperTheme,
             ...DefaultTheme,
+            ...PaperTheme,
             colors: {
-                ...PaperTheme.colors,
                 ...DefaultTheme.colors,
                 onSurface: DarkTheme.colors.border
             },

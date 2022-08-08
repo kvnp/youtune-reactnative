@@ -423,7 +423,10 @@ export default PlayView = ({route, navigation}) => {
                         contentStyle={{alignItems: "center", width: 50, height: 50, minWidth: 0}}
                     >
                         <MaterialIcons
-                            name="thumb-down" size={30} style={{alignSelf: "center"}} selectable={false}
+                            name="thumb-down"
+                            size={30}
+                            style={{lineHeight: 30}}
+                            selectable={false}
                             color={isLiked == null ? "dimgray" : !isLiked ? fontColor : "dimgray"}
                         />
                     </Button>
@@ -447,7 +450,13 @@ export default PlayView = ({route, navigation}) => {
                         style={{pointerEvents: pointerDisabled ? "none" : "auto", borderRadius: 25, alignItems: "center", padding: 0, margin: 0, minWidth: 0}}
                         contentStyle={{alignItems: "center", width: 50, height: 50, minWidth: 0}}
                     >
-                        <MaterialIcons name="thumb-up" size={30} color={isLiked == null ? "dimgray" : isLiked ? fontColor : "dimgray"} style={{alignSelf: "center"}} selectable={false}/>
+                        <MaterialIcons
+                            name="thumb-up"
+                            size={30}
+                            style={{lineHeight: 30}}
+                            color={isLiked == null ? "dimgray" : isLiked ? fontColor : "dimgray"}
+                            selectable={false}
+                        />
                     </Button>
                 </View>
 
@@ -461,7 +470,13 @@ export default PlayView = ({route, navigation}) => {
                         contentStyle={{alignItems: "center", width: 50, height: 50, minWidth: 0}}
                         onPress={Music.skipPrevious}
                     >
-                        <MaterialIcons style={{alignSelf: "center"}} selectable={false} name="skip-previous" color={fontColor} size={40}/>
+                        <MaterialIcons
+                            selectable={false}
+                            name="skip-previous"
+                            color={fontColor}
+                            size={40}
+                            style={{lineHeight: 40}}
+                        />
                     </Button>
 
                     <View style={{pointerEvents: pointerDisabled ? "none" : "auto", alignSelf: "center", alignItems: "center", justifyContent: "center", backgroundColor: buttonColor, width: 60, height: 60, borderRadius: 30}}>
@@ -483,9 +498,9 @@ export default PlayView = ({route, navigation}) => {
                                     }
                                 >
                                     <MaterialIcons
-                                        style={{alignSelf: "center"}}
                                         color={fontColor}
                                         size={40}
+                                        style={{lineHeight: 40}}
                                         selectable={false}
                                         name={
                                             state == State.Playing
@@ -503,7 +518,13 @@ export default PlayView = ({route, navigation}) => {
                         contentStyle={{alignItems: "center", width: 50, height: 50, minWidth: 0}}
                         onPress={Music.skipNext}
                     >
-                        <MaterialIcons style={{alignSelf: "center"}} selectable={false} name="skip-next" color={fontColor} size={40}/>
+                        <MaterialIcons
+                            selectable={false}
+                            name="skip-next"
+                            color={fontColor}
+                            size={40}
+                            style={{lineHeight: 40}}
+                        />
                     </Button>
 
                     <Button
@@ -513,7 +534,13 @@ export default PlayView = ({route, navigation}) => {
                         contentStyle={{alignItems: "center", width: 50, height: 50, minWidth: 0}}
                         onPress={() => setRepeat(Music.cycleRepeatMode())}
                     >
-                        <MaterialIcons name={!Music.isStreaming ? repeat : "repeat-one-on"} color={fontColor} size={30} style={{alignSelf: "center"}} selectable={false}/>
+                        <MaterialIcons
+                            name={!Music.isStreaming ? repeat : "repeat-one-on"}
+                            color={fontColor}
+                            style={{lineHeight: 30}}
+                            size={30}
+                            selectable={false}
+                        />
                     </Button>
                 </View>
 
@@ -525,10 +552,11 @@ export default PlayView = ({route, navigation}) => {
                         onPress={goBack}
                     >
                         <MaterialIcons
-                            style={{alignSelf: "center"}}
                             selectable={false}
                             name="keyboard-arrow-down"
-                            color={fontColor} size={30}
+                            color={fontColor}
+                            size={30}
+                            style={{lineHeight: 30}}
                         />
                     </Button>
 
@@ -544,8 +572,8 @@ export default PlayView = ({route, navigation}) => {
                         })}
                     >
                         <MaterialIcons
-                            style={{alignSelf: "center"}}
                             selectable={false}
+                            style={{lineHeight: 30}}
                             name="more-vert"
                             color={fontColor}
                             size={30}
