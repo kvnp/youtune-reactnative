@@ -92,7 +92,7 @@ export default class HTTP {
                                 resolve(response.blob());
                             else
                                 resolve(response.text());
-                        } else attempt();
+                        } //else attempt();
                     })
 
                     .catch(reason => {
