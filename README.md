@@ -1,20 +1,39 @@
-Youtube Music client for Android, iOS and Web built with React Native that allows you to listen to music from Youtube. You can download songs and listen to them while being offline.
+# YouTune
+
+A Youtube Music client for Android, iOS and Web built with React Native that allows you to listen to music from Youtube. (WIP)
 
 ![alt text](youtune.jpg)
 
-How to run:
+## Motivation
 
-`npm install`
+This project came about in order to satiate my interests in PWAs and Cross-Platform apps. I also don't like how every serious service that serves music online requires an account in order to get an individual experience. Youtune is a sandbox for me to gather experience in these topics.
 
-In order to run the web version type:
+## Progress
 
-`npm run web`
+I'm currently focused on getting Youtune to work reliably for web. Expect the app for other platforms not to work.  
+Notable features are:
 
-Even though YouTune acts as a PWA you need to keep the proxy running when interacting with Youtube due to CORS. Youtune itself and already downloaded songs will work fine. You can also use the example nginx config for self-hosting Youtune. Run the following command to build your own distribution of Youtune:
+- Display search results/artist pages/album pages/Lyrics
+- Music playback with Media Session API
+- Swiping gestures to open/close playback screen and skip songs
+- Parallel downloads
+- Cache first
+- Color based on album cover
+- Audio visualizer
+- Chromecast support
 
-`npm run dist`
+## Current goals
 
-Expect the Android and iOS versions to not work for now as I'm more focused on getting the web version to work reliably. You can test these using the following commands:
+After implementing a lot of features simply working with vanilla Javascript became very restricting. I want to move the entire project to Typescript to make the code easier to work with and the behavior of future additions more predictable.
 
-`npm run ios`
-`npm run android`
+## Usage
+
+Clone project with
+
+    git clone https://github.com/youtune-reactnative
+
+(WIP)
+
+## FAQ
+
+(WIP)
