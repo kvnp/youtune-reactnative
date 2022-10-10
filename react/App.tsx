@@ -10,7 +10,7 @@ import Navigator from "./views/full/Navigator";
 import CaptchaView from "./views/full/CaptchaView";
 
 import { getTheme, linking } from "./Config";
-import { getIcon } from "./utils/Icon";
+import { getIcon } from "./components/shared/Icon";
 import UpdateBar from "./components/shared/UpdateBar";
 import MoreModal from "./components/modals/MoreModal";
 import StreamModal from "./components/modals/StreamModal";
@@ -26,7 +26,7 @@ export const navigationOptions = {
 
 const Stack = createStackNavigator();
 
-const App = () => {
+export default function App() {
     const [dark, setDark] = useState(Settings.Values.darkMode);
     const theme = getTheme(dark);
     const navigationRef = useRef(null);
@@ -63,5 +63,3 @@ const App = () => {
         </NavigationContainer>
     </Provider>;
 }
-
-export default App;

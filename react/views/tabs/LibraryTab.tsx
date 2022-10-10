@@ -5,7 +5,7 @@ import Playlists from '../library/Playlists';
 import Albums from '../library/Albums';
 import Artists from '../library/Artists';
 import Downloads from '../library/Downloads';
-import { getIcon } from '../../utils/Icon';
+import { getIcon } from '../../components/shared/Icon';
 
 const Tab = createMaterialTopTabNavigator();
 const tabOptions = {};
