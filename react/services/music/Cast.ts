@@ -1,7 +1,7 @@
 import { DeviceEventEmitter } from "react-native";
 import { State } from "react-native-track-player";
-import Playlist from "../../models/music/playlist";
-import Track from "../../models/music/track";
+import Playlist from "../../model/music/playlist";
+import Track from "../../model/music/track";
 import API from "../api/API";
 import Music from "./Music";
 

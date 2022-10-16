@@ -1,9 +1,18 @@
 export default class Track {
-    constructor(videoId, playlistId, title, artist, artwork, duration) {
+    id: string;
+    playlistId: string;
+    title: string;
+    url: string = "";
+    artist: string;
+    artwork: string;
+    duration: any;
+    isLiked: boolean;
+    isDisliked: boolean;
+
+    constructor(videoId: string, playlistId: string, title: string, artist: string, artwork: string, duration: string) {
         this.id = videoId;
         this.playlistId = playlistId;
         this.title = title;
-        this.url;
         this.artist = artist;
         this.artwork = artwork;
         this.duration = duration;
@@ -11,6 +20,8 @@ export default class Track {
         this.isLiked = false;
         this.isDisliked = false;
     }
+
+    
 }
 
 //https://react-native-track-player.js.org/documentation/#track-object

@@ -1,5 +1,26 @@
-function getPlaylist(json) {
-    let browse = {playlistId: "", title: "", subtitle: "", secondSubtitle: "", description: "", thumbnail: null, entries: []};
+type Browse = {
+    playlistId: string,
+    title: string,
+    subtitle: string,
+    secondSubtitle: string,
+    description: string,
+    thumbnail: string | undefined,
+    entries: BrowseEntry[]
+};
+
+type BrowseEntry = {
+    videoId: string | undefined,
+    browseId: string | undefined,
+    playlistId: string,
+    title: string,
+    subtitle: string,
+    thumbnail: string | undefined,
+    secondTitle: string | undefined,
+    secondSubtitle: string | undefined
+};
+
+function getPlaylist(json: BrowseResponse) {
+    let browse: Browse = {playlistId: "", title: "", subtitle: "", secondSubtitle: "", description: "", thumbnail: undefined, entries: []};
 
     let musicHeader = json.header.musicDetailHeaderRenderer;
 
@@ -52,7 +73,7 @@ function getPlaylist(json) {
                 let songLengthlist = responsiveMusicItem.fixedColumns[0].musicResponsiveListItemFixedColumnRenderer.text.runs;
                 let songThumbnaillist = responsiveMusicItem.thumbnail?.musicThumbnailRenderer.thumbnail.thumbnails;
 
-                let entry = {title: "", subtitle: "", secondTitle: "", secondSubtitle: "",  videoId: null, playlistId: null, thumbnail: null};
+                let entry: BrowseEntry = {title: "", subtitle: "", secondTitle: "", secondSubtitle: "", videoId: "", playlistId: "", thumbnail: undefined, browseId: undefined};
 
                 for (let stl = 0; stl < songTitlelist.length; stl++) {
                     entry.title += songTitlelist[stl].text;
@@ -116,8 +137,113 @@ function getPlaylist(json) {
     return browse;
 }
 
-function getArtist(json) {
-    let artist = {
+type BrowseResponse = {
+    header: {
+        musicDetailHeaderRenderer: {
+            title: {runs: Array<{ text: string }>};
+            subtitle: {runs: Array<{ text: string }>};
+            description: {runs: Array<{ text: string }>} | undefined;
+            secondSubtitle: {runs: Array<{ text: string }>};
+
+            thumbnail: { croppedSquareThumbnailRenderer: { thumbnail: { thumbnails: Array<{url: string}> }; }; };
+        },
+        musicImmersiveHeaderRenderer: {
+            title: {runs: Array<{text: string}>},
+            subscriptionButton: {
+                subscribeButtonRenderer: {subscriberCountText: {runs: Array<{text: string}>} | undefined},
+                test: {}
+            },
+            thumbnail: {musicThumbnailRenderer: {thumbnail: {thumbnails: Array<{url: string}>}}}
+        }
+    };
+
+    contents: {singleColumnBrowseResultsRenderer: {tabs: [{
+        tabRenderer: {content: {sectionListRenderer: {
+            contents: [{
+                musicPlaylistShelfRenderer: ShelfRenderer,
+                musicShelfRenderer: ShelfRenderer,
+                musicCarouselShelfRenderer: ShelfRenderer,
+                musicDescriptionShelfRenderer: ShelfRenderer | undefined
+            }],
+        }}}
+    }]} };
+
+    microformat: {microformatDataRenderer: {urlCanonical: string}};
+};
+
+type ShelfRenderer = {
+    playlistId: string,
+    contents: Array<{
+        musicResponsiveListItemRenderer: {
+            flexColumns: [
+                {musicResponsiveListItemFlexColumnRenderer: {text: {runs: Array<{ text: string }>}}},
+                {musicResponsiveListItemFlexColumnRenderer: {text: {runs: Array<{ text: string }>}}},
+                {musicResponsiveListItemFlexColumnRenderer: {text: {runs: Array<{ text: string }>}}} | undefined,
+                {musicResponsiveListItemFlexColumnRenderer: {text: {runs: Array<{ text: string }>}}} | undefined,
+            ],
+
+            fixedColumns: [{musicResponsiveListItemFixedColumnRenderer: {text: {runs: Array<{ text: string }>}}}],
+            thumbnail: {musicThumbnailRenderer: {thumbnail: {thumbnails: Array<{url: string}> }}},
+            menu: {menuRenderer: {items: Array<{
+                menuNavigationItemRenderer: {
+                    navigationEndpoint: {
+                        watchEndpoint: {videoId: string, playlistId: string}
+                    } | undefined
+                } | undefined,
+            }>}},
+
+            overlay: {
+                musicItemThumbnailOverlayRenderer: {content: {musicPlayButtonRenderer: {playNavigationEndpoint: {watchEndpoint: {
+                    videoId: string,
+                    playlistId: string
+                }}}}}
+            }
+        },
+        musicTwoRowItemRenderer: {
+            title: {runs: Array<{text: string}>},
+            subtitle: {runs: Array<{text: string}>},
+            thumbnailRenderer: {musicThumbnailRenderer: {thumbnail: {thumbnails: Array<{url: string}>}}} | undefined,
+            navigationEndpoint: {
+                browseEndpoint: {browseId: string} | undefined,
+                watchEndpoint: {videoId: string, playlistId: string} | undefined
+            }
+        }
+    }>,
+
+    title: {runs: Array<{text: string}>}
+    header: {
+        musicCarouselShelfBasicHeaderRenderer: {title: {runs: Array<{text: string}>}},
+        runs: Array<{text: string}>
+    },
+    subheader: {runs: Array<{text: string}>} | undefined,
+    description: {runs: Array<{text: string}>}
+}
+
+type Artist = {
+    header: {
+        title: string,
+        subscriptions: string,
+        thumbnail: string
+    },
+    
+    shelves: Shelf[]
+}
+
+type Shelf = {
+    title: string,
+    subtitle: string,
+    type: string,
+    entries: BrowseEntry[] | undefined,
+
+    albums: Array<{
+
+    }> | undefined,
+
+    description: string | undefined
+}
+
+function getArtist(json: BrowseResponse) {
+    let artist: Artist = {
         header: {
             title: "",
             subscriptions: "",
@@ -134,7 +260,7 @@ function getArtist(json) {
 
     let subButton = json.header.musicImmersiveHeaderRenderer.subscriptionButton.subscribeButtonRenderer;
 
-    if (subButton.hasOwnProperty("subscriberCountText"))
+    if (subButton.subscriberCountText != undefined)
         for (let sl = 0; sl < subButton.subscriberCountText.runs.length; sl++) {
             artist.header.subscriptions += subButton.subscriberCountText.runs[sl].text;
         }
@@ -147,7 +273,7 @@ function getArtist(json) {
         for (let ctl = 0; ctl < contentList.length; ctl++) {
             let shelfEntry = contentList[ctl];
 
-            let shelf = {title: "", subtitle: "", type: ""};
+            let shelf: Shelf = {title: "", subtitle: "", type: "", entries: undefined, albums: undefined, description: undefined};
             if (shelfEntry?.musicShelfRenderer) {
                 shelf.type = "Songs";
                 shelf.entries = [];
@@ -163,13 +289,15 @@ function getArtist(json) {
                 for (let sgl = 0; sgl < songList.length; sgl++) {
                     let songObject = songList[sgl].musicResponsiveListItemRenderer;
 
-                    let entry = {
+                    let entry: BrowseEntry = {
                         title: "",
                         subtitle: "",
                         secondTitle: "",
                         secondSubtitle: "",
-                        thumbnail: "",
-                        videoId: ""
+                        videoId: "",
+                        playlistId: "",
+                        thumbnail: undefined,
+                        browseId: undefined
                     };
 
                     entry.thumbnail = songObject.thumbnail?.musicThumbnailRenderer.thumbnail.thumbnails[0].url;
@@ -181,23 +309,25 @@ function getArtist(json) {
                     entry.videoId = videoId;
 
                     let flexColumnList = songObject.flexColumns;
-                    for (let sfcl = 0; sfcl < flexColumnList.length; sfcl++) {
-                        let flexColumn = flexColumnList[sfcl].musicResponsiveListItemFlexColumnRenderer;
+                    for (let [index, container] of flexColumnList.entries()) {
+                        let flexColumn = container?.musicResponsiveListItemFlexColumnRenderer;
+                        if (flexColumn != undefined) {
+                            let flexTextList = flexColumn.text.runs;
 
-                        let flexTextList = flexColumn.text.runs;
+                            let text = ""
+                            for (let fttt = 0; fttt < flexTextList.length; fttt++)
+                                text += flexTextList[fttt].text;
 
-                        let text = ""
-                        for (let fttt = 0; fttt < flexTextList.length; fttt++)
-                            text += flexTextList[fttt].text;
-
-                        if (sfcl == 0)
-                            entry.title = text; 
-                        else if (sfcl == 1)
-                            entry.subtitle = text;
-                        else if (sfcl == 2)
-                            entry.secondTitle = text;
-                        else if (sfcl == 3)
-                            entry.secondSubtitle = text;
+                            if (index == 0)
+                                entry.title = text;
+                            else if (index == 1)
+                                entry.subtitle = text;
+                            else if (index == 2)
+                                entry.secondTitle = text;
+                            else if (index == 3)
+                                entry.secondSubtitle = text;
+                        }
+                        
                     }
 
                     shelf.entries.push(entry);
@@ -216,7 +346,7 @@ function getArtist(json) {
 
                 let shelfContents = playlistShelf.contents;
                 for (let psfc = 0; psfc < shelfContents.length; psfc++) {
-                    let album = {title: "", subtitle: "", thumbnail: ""};
+                    let album: BrowseEntry = {title: "", subtitle: "", thumbnail: "", videoId: undefined, playlistId: "", secondTitle: undefined, secondSubtitle: undefined, browseId: undefined};
 
                     let music = shelfContents[psfc].musicTwoRowItemRenderer;
 
@@ -296,7 +426,7 @@ function getArtist(json) {
     return artist;
 }
 
-export default function digestBrowseResponse(json, browseId) {
+export default function digestBrowseResponse(json: BrowseResponse, browseId: string) {
     if (browseId.slice(0, 2) === "UC")
         return getArtist(json);
     else

@@ -1,5 +1,5 @@
 import { DeviceEventEmitter } from "react-native";
-import Playlist from "../../models/music/playlist";
+import Playlist from "../../model/music/playlist";
 import IO from "./IO";
 import Storage from "./storage/Storage";
 

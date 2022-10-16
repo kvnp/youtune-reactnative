@@ -1,6 +1,6 @@
 import Music from "../../music/Music";
-import Playlist from "../../../models/music/playlist";
-import Track from "../../../models/music/track";
+import Playlist from "../../../model/music/playlist";
+import Track from "../../../model/music/track";
 import { textToSec } from "../../../utils/Time";
 
 export default function digestNextResults(json) {
