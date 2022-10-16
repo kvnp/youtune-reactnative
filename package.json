@@ -43,7 +43,7 @@
         "react-native-gesture-handler": "^1.10.3",
         "react-native-linear-gradient": "github:react-native-linear-gradient/react-native-linear-gradient",
         "react-native-pager-view": "^6.0.1",
-        "react-native-paper": "^5.0.0-rc.6",
+        "react-native-paper": "^5.0.0-rc.3",
         "react-native-reanimated": "^2.10.0",
         "react-native-safe-area-context": "^4.4.1",
         "react-native-screens": "^3.18.0",
