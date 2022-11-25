@@ -27,7 +27,10 @@ async function downloadTrack(videoId, cacheOnly) {
     const trackFetch = await fetch(url, input);
     const trackResponse = await trackFetch.json();
     let track = getAudioInfo(trackResponse);
-    track.artwork = self.location.protocol + "//" + self.location.host + "/proxy/lh3/" + track.artwork.split("/").slice(3).join("/");
+
+    let split = track.artwork.split("/");
+    let proxy = split[3] == "vi" ? "/proxy/" : "/proxy/lh3/";
+    track.artwork = self.location.protocol + "//" + self.location.host + proxy + split.slice(3).join("/");
 
     input = {
         method: "GET",
