@@ -22,19 +22,7 @@ import SwipePlaylist from "../../components/player/SwipePlaylist";
 import { showModal } from "../../components/modals/MoreModal";
 import ScrollingText from "../../components/shared/ScrollingText";
 import CastButton from "../../components/player/CastButton";
-
-// Audio visualizer from https://github.com/gg-1414/music-visualizer
-var audio;
-var ctx;
-var dataArray;
-var analyser;
-var playViewId;
-var barHeight;
-var barWidth;
-var startX = 0;
-var x = 0;
-var bars = 0;
-var canvasWidth = 0;
+import MusicVisualizerCanvas from "../../components/player/MusicVisualizerCanvas";
 
 var firstPoint = 0;
 var clientY = 0;
@@ -82,24 +70,6 @@ export default PlayView = ({route, navigation}) => {
     }
 
     const updateDimensions = () => setDimensions({height: window.innerHeight, width: window.innerWidth});
-    const prepareCanvas = () => {
-        canvas.current.width = window.innerWidth;
-        canvas.current.height = window.innerHeight;
-        if (dataArray) {
-            barWidth = (window.innerWidth / analyser.frequencyBinCount) * 13;
-            bars = 0;
-            canvasWidth = 0;
-            while (canvasWidth <= canvas.current.width) {
-                if (bars >= dataArray.length)
-                    break;
-
-                canvasWidth += barWidth + 10;
-                bars++;
-            }
-            startX = (canvas.current.width - canvasWidth)/2;
-        }
-    }
-    useEffect(prepareCanvas, [width, height]);
 
     const handlePlayback = () => {
         if (!title) {
@@ -112,7 +82,6 @@ export default PlayView = ({route, navigation}) => {
     }
 
     const goBack = () => {
-        cancelAnimationFrame(playViewId);
         container.current.style.transition = heightTransition;
         container.current.style.height = "0px";
         container.current.ontransitionend = () => {
@@ -281,33 +250,6 @@ export default PlayView = ({route, navigation}) => {
     }, [id, playlistId]);
 
     useEffect(() => {
-        Settings.waitForInitialization().then(e => {
-            if (!Settings.Values.visualizer)
-                return;
-
-            ctx = canvas.current.getContext("2d");
-            if (!Music.audioContext) {
-                Music.audioContext = new AudioContext();
-                if (!audio) audio = document.getElementsByTagName("audio")[0];
-                let src = Music.audioContext.createMediaElementSource(audio);
-                analyser = Music.audioContext.createAnalyser();
-
-                src.connect(analyser);
-                analyser.connect(Music.audioContext.destination);
-            }
-
-            analyser.fftSize = 16384;
-            const bufferLength = analyser.frequencyBinCount;
-            dataArray = new Uint8Array(bufferLength);
-            
-            prepareCanvas();
-            renderFrame();
-        });
-
-        return () => cancelAnimationFrame(playViewId);
-    }, []);
-
-    useEffect(() => {
         if (Settings.initialized)
             handlePlayback();
         else
@@ -366,48 +308,11 @@ export default PlayView = ({route, navigation}) => {
         });
     }, [track]);
 
-    const renderFrame = () => {
-        playViewId = requestAnimationFrame(renderFrame);
-        analyser.getByteFrequencyData(dataArray);
-        ctx.clearRect(0, 0, canvas.current.width, canvas.current.height);
-
-        let r, g, b;
-        x = startX;
-        for (let i = 0; i < bars; i++) {
-            barHeight = dataArray[i] * 2.5;
-            if (dataArray[i] > 210) {
-                r = 250;
-                g = 0;
-                b = 255;
-            } else if (dataArray[i] > 200) {
-                r = 250;
-                g = 255;
-                b = 0;
-            } else if (dataArray[i] > 190) {
-                r = 204;
-                g = 255;
-                b = 0;
-            } else if (dataArray[i] > 180) {
-                r = 0;
-                g = 219;
-                b = 131;
-            } else {
-                r = 0;
-                g = 199;
-                b = 255;
-            }
-    
-            ctx.fillStyle = `rgb(${r},${g},${b})`;
-            ctx.fillRect(x, (canvas.current.height - barHeight), barWidth, barHeight);
-            x += barWidth + 10;
-        }
-    }
-
     return <View
         ref={container}
         style={{pointerEvents: "none", position: "fixed", width: "100%", height: "0px", bottom: 0, overflow: "hidden", transition: "height .4s, opacity .1s"}}
     >
-        <canvas style={{pointerEvents: "none", mixBlendMode: "difference"}} id="canvas" ref={canvas}/>
+        <MusicVisualizerCanvas/>
         <div style={{pointerEvents: "auto"}} ref={background} id="background"/>
         <View ref={vertContainer} style={[stylesTop.vertContainer, {pointerEvents: "none", zIndex: 2, flexDirection: "column"}]}>
             <View style={[imageStyles.view, {height: height / 2.6}]}>
