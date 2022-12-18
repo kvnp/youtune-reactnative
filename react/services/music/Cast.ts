@@ -5,9 +5,12 @@ import Track from "../../model/music/track";
 import API from "../api/API";
 import Music from "./Music";
 
+/// <reference types="chrome"/>
+/// <reference types="cast"/>
+
 export default class Cast {
-    static player = null;
-    static controller = null;
+    static player: cast.framework.RemotePlayer;
+    static controller: cast.framework.RemotePlayerController;
     static initialized = false;
     static sessionId = null;
 
@@ -19,12 +22,13 @@ export default class Cast {
     static EVENT_PLAYERSTATE = "event-cast-playerstate";
     static EVENT_VOLUME = "event-cast-volume";
 
-    static addListener(event, listener) {
+    static addListener(event: string, listener: (data: any) => void) {
         try {
             return this.#emitter.addListener(event, listener);
         } finally {
             if (event == this.EVENT_CAST) {
                 let castState = "NOT_CONNECTED";
+                
                 if (window?.cast) {
                     castState = !window.chrome.cast
                         ? "NOT_CONNECTED"
@@ -39,17 +43,17 @@ export default class Cast {
         }
     }
 
-    static async #getSession(requestSession) {
+    static async #getSession(requestSession: boolean) {
         let sessionIsNew = false;
         let session = cast.framework.CastContext.getInstance().getCurrentSession();
         if (!session && requestSession) {
             await cast.framework.CastContext.getInstance().requestSession();
             sessionIsNew = true;
             session = cast.framework.CastContext.getInstance().getCurrentSession();
-            session.addEventListener("VOLUME_CHANGED", e => {
-                console.log(e);
-                this.#emitter.emit(this.EVENT_VOLUME, e.value);
-            });
+            if (session) session.addEventListener(
+                cast.framework.SessionEventType.VOLUME_CHANGED,
+                (e: cast.framework.VolumeEventData) => this.#emitter.emit(this.EVENT_VOLUME, e.volume)
+            );      
         }
 
         return {
@@ -71,7 +75,7 @@ export default class Cast {
                 instance.setOptions({
                     receiverApplicationId: chrome.cast.media.DEFAULT_MEDIA_RECEIVER_APP_ID,
                     autoJoinPolicy: chrome.cast.AutoJoinPolicy.ORIGIN_SCOPED,
-                    resumeSavedSessions: true
+                    resumeSavedSession: true
                 });
 
                 instance.addEventListener(
@@ -91,15 +95,9 @@ export default class Cast {
                 Cast.controller.addEventListener(
                     cast.framework.RemotePlayerEventType.MEDIA_INFO_CHANGED,
                     e => {
-                        console.log(e);
                         if (Music.metadata.id != e.value?.metadata.songName && e.value)
                             this.restoreMediaInfo();
                     }
-                );
-
-                Cast.controller.addEventListener(
-                    cast.framework.RemotePlayerEventType.QUEUE_INFO_CHANGED,
-                    e => console.log(e)
                 );
 
                 Cast.controller.addEventListener(
@@ -228,21 +226,19 @@ export default class Cast {
         mediaInfo.metadata.artist = media.artist;
         let request = new chrome.cast.media.LoadRequest(mediaInfo);
         request.currentTime = currentTime;
-        request.queueData = new chrome.cast.media.QueueData();
-        request.queueData.repeatMode = chrome.cast.media.RepeatMode.SINGLE;
+        /*request.queueData = new chrome.cast.media.QueueData();
+        request.queueData.repeatMode = chrome.cast.media.RepeatMode.SINGLE;*/
         
-        try {
-            await session.loadMedia(request);
-        } catch (e) {
-            throw e;
+        if (session) {
+            session.loadMedia(request);
         }
     }
 
-    static async seekTo(position) {
+    static async seekTo(position: number) {
         let {session} = await Cast.#getSession(false);
         if (session)
             session.sendMessage("urn:x-cast:com.google.cast.media", {
-                mediaSessionId: session.getMediaSession().mediaSessionId,
+                mediaSessionId: session.getMediaSession()?.mediaSessionId,
                 requestId: 1,
                 type: "SEEK",
                 currentTime: position
@@ -284,9 +280,10 @@ export default class Cast {
     }
 
     static disconnect() {
-        let session = cast.framework.CastContext.getInstance().getCurrentSession();
+        let instance = cast.framework.CastContext.getInstance();
+        let session = instance.getCurrentSession();
         if (!session)
-            instance.endCurrentSession();
+            instance.endCurrentSession(true);
         else
             session.endSession(true);
     }
