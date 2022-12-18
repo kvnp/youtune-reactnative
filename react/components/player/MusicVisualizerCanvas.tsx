@@ -15,7 +15,7 @@ var x = 0;
 var bars = 0;
 var canvasWidth = 0;
 
-function MusicVisualizerCanvas({}) {
+function MusicVisualizerCanvas({canvasRef}) {
     const [dimensions, setDimensions] = useState({
         height: window.innerHeight,
         width: window.innerWidth
@@ -115,11 +115,22 @@ function MusicVisualizerCanvas({}) {
     }
 
     return <canvas
-        id="canvas"
-        ref={canvas}
+        ref={ref => {
+            canvas.current = ref;
+            canvasRef.current = ref;
+        }}
+        
         style={{
             pointerEvents: "none",
-            mixBlendMode: "difference"
+            mixBlendMode: "difference",
+            position: "absolute",
+            left: 0,
+            top: 0,
+            width: "100%",
+            height: "100%",
+            opacity: 0.9,
+            transition: "opacity .5s ease-in-out",
+            zIndex: 2
         }}
     />;
 }
