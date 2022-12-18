@@ -312,7 +312,7 @@ export default PlayView = ({route, navigation}) => {
         ref={container}
         style={{pointerEvents: "none", position: "fixed", width: "100%", height: "0px", bottom: 0, overflow: "hidden", transition: "height .4s, opacity .1s"}}
     >
-        <MusicVisualizerCanvas/>
+        <MusicVisualizerCanvas canvasRef={canvas}/>
         <div style={{pointerEvents: "auto"}} ref={background} id="background"/>
         <View ref={vertContainer} style={[stylesTop.vertContainer, {pointerEvents: "none", zIndex: 2, flexDirection: "column"}]}>
             <View style={[imageStyles.view, {height: height / 2.6}]}>
