@@ -45,7 +45,7 @@ export default class UI {
         Settings.setHeaderState(UI.Header);
     }
 
-    static addListener(event, listener) {
+    static addListener(event: string, listener: (data: any) => void): EmitterSubscription {
         return UI.#emitter.addListener(event, listener);
     }
 }

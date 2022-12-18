@@ -1,4 +1,4 @@
-export function decodeNestedURI(nestedURI) {
+export function decodeNestedURI(nestedURI: string): string {
     let oldURI = nestedURI;
     let newURI = null;
     let tries = 0;

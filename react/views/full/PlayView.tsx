@@ -34,27 +34,27 @@ const PlayView = ({route, navigation}) => {
     const [connected, setConnected] = useState(Music.isStreaming);
     const [isLiked, setLiked] = useState(null);
 
-    const {id, playlistId, title, artist, artwork } = track;
+    const {videoId, playlistId, title, artist, artwork } = track;
     
     const likeSong = like => {
-        Downloads.likeTrack(id, like);
+        Downloads.likeTrack(videoId, like);
         setLiked(like);
     }
 
     const updateParams = () => {
-        if (id) {
-            if (id.includes("&"))
-                navigation.setParams({v: id, list: playlistId});
+        if (videoId) {
+            if (videoId.includes("&"))
+                navigation.setParams({v: videoId, list: playlistId});
             else
-                navigation.setParams({v: id.slice(0, id.indexOf("&")), list: playlistId});
-            Downloads.isTrackLiked(id).then(like => setLiked(like));
+                navigation.setParams({v: videoId.slice(0, videoId.indexOf("&")), list: playlistId});
+            Downloads.isTrackLiked(videoId).then(like => setLiked(like));
         }
 
         if (title)
             navigation.setOptions({title: title});
     }
 
-    useEffect(updateParams, [id, playlistId]);
+    useEffect(updateParams, [videoId, playlistId]);
 
     useEffect(() => {
         updateParams();
@@ -285,7 +285,7 @@ const PlayView = ({route, navigation}) => {
                             title: title,
                             subtitle: artist,
                             thumbnail: artwork,
-                            videoId: id
+                            videoId: videoId
                         })}
                     >
                         <MaterialIcons

@@ -1,13 +1,15 @@
-import { DeviceEventEmitter } from "react-native";
+import { DeviceEventEmitter, EmitterSubscription } from "react-native";
 import Playlist from "../../model/music/playlist";
 import IO from "./IO";
 import Storage from "./storage/Storage";
+import Track from "../../model/music/track";
+import API from "../api/API";
 
 export default class Downloads {
-    static #downloadedTracks = [];
-    static #cachedTracks = [];
-    static #likedTracks = [];
-    static #downloadQueue = {};
+    static #downloadedTracks: Array<string> = [];
+    static #cachedTracks: Array<string> = [];
+    static #likedTracks: Array<string> = [];
+    static #downloadQueue = Object.create(null);
     static initialized = false;
 
     static #emitter = DeviceEventEmitter;
@@ -16,7 +18,7 @@ export default class Downloads {
     static EVENT_DOWNLOAD = "event-download";
     static EVENT_LIKE = "event-like";
 
-    static addListener(event, listener) {
+    static addListener(event: string, listener: (data: any) => void): EmitterSubscription {
         return this.#emitter.addListener(event, listener);
     }
 
@@ -38,19 +40,19 @@ export default class Downloads {
     static waitForInitialization() {
         return new Promise((resolve, reject) => {
             if (this.initialized)
-                return resolve();
+                return resolve(null);
 
             let eventListener = this.addListener(
                 this.EVENT_INITIALIZE,
                 () => {
-                    resolve();
+                    resolve(null);
                     eventListener.remove();
                 }
             );
         });
     }
 
-    static deleteDownload(videoId) {
+    static deleteDownload(videoId: string) {
         return new Promise(async(resolve, reject) => {
             if (!this.initialized)
                 await Downloads.waitForInitialization();
@@ -69,14 +71,14 @@ export default class Downloads {
                 }
                 
                 this.#emitter.emit(this.EVENT_PROGRESS, true);
-                resolve();
+                resolve(null);
             } catch (e) {
                 console.log(e);
             }
         });
     }
 
-    static downloadTrack(videoId, cacheOnly) {
+    static downloadTrack(videoId: string, cacheOnly: boolean) {
         if (videoId in this.#downloadQueue)
             return;
 
@@ -102,7 +104,7 @@ export default class Downloads {
         worker.postMessage({videoId, cacheOnly});
     }
 
-    static cancelDownload(videoId) {
+    static cancelDownload(videoId: string) {
         return new Promise(async(resolve, reject) => {
             if (!this.initialized)
                 await Downloads.waitForInitialization();
@@ -113,11 +115,11 @@ export default class Downloads {
                 delete this.#downloadQueue[videoId];
                 this.#emitter.emit(this.EVENT_PROGRESS, true);
             }
-            resolve();
+            resolve(null);
         });
     }
 
-    static likeTrack(videoId, like) {
+    static likeTrack(videoId: string, like: boolean) {
         return new Promise(async(resolve, reject) => {
             let prevState = await Storage.getItem("Likes", videoId);
             console.log({previousState: prevState});
@@ -128,17 +130,17 @@ export default class Downloads {
             console.log({deleting: deleting});
 
             if (deleting) {
-                console.log({m: "deleting", id: videoId});
+                console.log({m: "deleting", videoId});
                 await Storage.deleteItem("Likes", videoId);
             } else {
                 let index = this.#likedTracks.indexOf(videoId);
                 if (like) {
-                    console.log({m: "liking", id: videoId});
+                    console.log({m: "liking", videoId});
                     await Downloads.downloadTrack(videoId, true);
                     if (index == -1)
                         this.#likedTracks.push(videoId);
                 } else {
-                    console.log({m: "disliking", id: videoId});
+                    console.log({m: "disliking", videoId});
 
                     if (index == -1)
                         this.#likedTracks.splice(index, 1);
@@ -167,34 +169,37 @@ export default class Downloads {
         });
     }
 
-    static isTrackDownloaded(videoId) {
+    static isTrackDownloaded(videoId: string): boolean | null {
         if (!this.initialized || !videoId)
             return null;
         
         return this.#downloadedTracks.includes(videoId);
     }
 
-    static isTrackCached(videoId) {
+    static isTrackCached(videoId: string): boolean | null {
         if (!this.initialized || !videoId)
             return null;
 
         return this.#cachedTracks.includes(videoId);
     }
 
-    static isTrackLikedSync(videoId) {
-        if (!videoId || !this.#likedTracks.includes(videoId))
+    static isTrackLikedSync(videoId: string): boolean | null {
+        if (!videoId)
             return null;
-        else if (this.#likedTracks.includes(videoId))
+        
+        if (this.#likedTracks.includes(videoId))
             return true;
+        else
+            return false;
     }
 
-    static isTrackLiked(videoId) {
+    static isTrackLiked(videoId: string): Promise<boolean> {
         return new Promise(async(resolve, reject) => {
             if (!this.initialized)
                 await Downloads.waitForInitialization();
 
             let sync = Downloads.isTrackLikedSync(videoId);
-            if (typeof sync != "undefined")
+            if (sync)
                 resolve(sync);
             
             let object = await Storage.getItem("Likes", videoId);
@@ -202,28 +207,28 @@ export default class Downloads {
         });
     }
 
-    static isTrackDownloading(videoId) {
+    static isTrackDownloading(videoId: string): boolean | null {
         if (!this.initialized || !videoId)
             return null;
 
         return videoId in this.#downloadQueue;
     }
 
-    static getDownloadingLength() {
+    static getDownloadingLength(): number {
         if (!this.initialized)
             return 0;
         
         return Object.keys(this.#downloadQueue).length;
     }
 
-    static getDownloadsLength() {
+    static getDownloadsLength(): number {
         if (!this.initialized)
             return 0;
         
         return this.#downloadedTracks.length;
     }
 
-    static getDownloadInfo(videoId) {
+    static getDownloadInfo(videoId: string): {progress: number, speed: string} {
         if (videoId in this.#downloadQueue)
             return {
                 progress: this.#downloadQueue[videoId].progress,
@@ -233,7 +238,7 @@ export default class Downloads {
             return {progress: 0, speed: "0 Kb/s"}
     }
 
-    static getTrack(videoId) {
+    static getTrack(videoId: string): Promise<Track | null> {
         return new Promise(async(resolve, reject) => {
             if (!this.initialized)
                 await Downloads.waitForInitialization();
@@ -241,13 +246,13 @@ export default class Downloads {
             if (!this.#cachedTracks.includes(videoId))
                 return resolve(null);
             
-            let track = await Storage.getItem("Tracks", videoId);
+            let track: Track = await Storage.getItem("Tracks", videoId);
             track.artwork = IO.getBlobAsURL(track.artwork);
             resolve(track);
         });
     }
 
-    static getStream(videoId) {
+    static getStream(videoId: string): Promise<string | null> {
         return new Promise(async(resolve, reject) => {
             if (!this.initialized)
                 await Downloads.waitForInitialization();
@@ -261,7 +266,7 @@ export default class Downloads {
         });
     }
 
-    static getDownload(videoId) {
+    static getDownload(videoId: string): Promise<string | null> {
         return new Promise(async(resolve, reject) => {
             if (!this.initialized)
                 await Downloads.waitForInitialization();
@@ -274,7 +279,7 @@ export default class Downloads {
         });
     }
 
-    static loadLocalPlaylist(playlistId, videoId) {
+    static getPlaylist(playlistId: string, videoId: string): Promise<Playlist | null> {
         return new Promise(async(resolve, reject) => {
             if (!this.initialized)
                 await Downloads.waitForInitialization();
@@ -282,32 +287,44 @@ export default class Downloads {
             let localPlaylist = new Playlist();
             localPlaylist.playlistId = playlistId;
             localPlaylist.subtitle = "Playlist • Local";
-            let list;
+            let idList;
             
             if (playlistId == "LOCAL_DOWNLOADS") {
-                list = this.#downloadedTracks;
+                idList = this.#downloadedTracks;
                 localPlaylist.title = "Downloads";
             } else if (playlistId == "LOCAL_LIKES") {
-                list = this.#likedTracks;
+                idList = this.#likedTracks;
                 localPlaylist.title = "Liked Songs";
-            } else {
-                // list = await Downloads.getPlaylist(playlistId)
             }
+            
+            if (idList)
+                for (let i = 0; i < idList.length; i++) {
+                    let currentVideoId = idList[i];
+                    let track = await this.getTrack(currentVideoId);
+                    
+                    if (track) {
+                        track.playlistId = playlistId;
 
-            for (let i = 0; i < list.length; i++) {
-                let id = list[i];
-                let local = await this.getTrack(id);
-                local.id = local.videoId;
-                local.playlistId = playlistId;
-                delete local.videoId;
-                localPlaylist.list.push(local);
+                        if (currentVideoId == videoId)
+                            localPlaylist.index = i;
+                    } else {
+                        let audioInfo = await API.getAudioInfo({videoId: currentVideoId});
+                        track = new Track(
+                            audioInfo.videoId,
+                            audioInfo.channelId,
+                            null,
+                            audioInfo.title,
+                            audioInfo.artist,
+                            audioInfo.artwork,
+                            audioInfo.duration
+                        );
+                        track.url = await API.getAudioStream({videoId: currentVideoId});
+                    }
+                    
+                    localPlaylist.list.push(track);
+                }
 
-                if (id == videoId)
-                    localPlaylist.index = i;
-            }
-
-            localPlaylist.secondSubtitle = localPlaylist.list.length
-                + (localPlaylist.list.length != 1 ? " titles" : " title");
+            localPlaylist.secondSubtitle = localPlaylist.list.length + (localPlaylist.list.length != 1 ? " titles" : " title");
             resolve(localPlaylist);
         });
     }

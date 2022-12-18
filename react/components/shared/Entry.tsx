@@ -16,13 +16,13 @@ import Navigation from '../../services/ui/Navigation';
 
 export default Entry = ({ entry, navigation, index, forcedPlaylistId }) => {
     const { title, subtitle, artist, thumbnail, artwork,
-            videoId, id, browseId, playlistId } = entry;
+            videoId, browseId, playlistId } = entry;
 
     const view = {
         title: title,
         subtitle: subtitle || artist,
         thumbnail: thumbnail || artwork,
-        videoId: videoId || id,
+        videoId: videoId,
         browseId: browseId,
         playlistId: forcedPlaylistId
             ? forcedPlaylistId

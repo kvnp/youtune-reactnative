@@ -1,7 +1,6 @@
 import { useEffect, useState, useRef } from 'react';
 import { View, Text, StyleSheet, Platform } from 'react-native';
 
-import { useTheme } from '@react-navigation/native';
 import Slider from '@react-native-community/slider';
 import Music from '../../services/music/Music';
 
@@ -18,12 +17,11 @@ const minutesAndSeconds = position => ([
 ]);
 
 var slider;
-var leftBar;
-var rightBar;
-var thumb;
+var leftBar: HTMLElement;
+var rightBar: HTMLElement;
+var thumb: HTMLElement;
 export default SeekBar = ({style, thumbColor, fontColor, buttonColor}) => {
     const { duration } = Music.metadata;
-    const [width, setWidth] = useState("99.99%");
     const [position, setPosition] = useState(Music.position);
     const [state, setState] = useState({
         isSliding: false,
@@ -71,14 +69,13 @@ export default SeekBar = ({style, thumbColor, fontColor, buttonColor}) => {
             rightBar.style.height = "5px";
         };
 
-        container.current.onmouseenter = () => enter();
-        container.current.ontouchstart = () => enter();
-        container.current.onmouseleave = () => leave();
-        container.current.ontouchend = () => leave();
+        container.current.onmouseenter = enter;
+        container.current.ontouchstart = enter;
+        container.current.onmouseleave = leave;
+        container.current.ontouchend = leave;
     }, []);
 
     useEffect(() => {
-        setWidth("100%");
         const listener = Music.addListener(
             Music.EVENT_POSITION_UPDATE,
             pos => {
@@ -94,7 +91,7 @@ export default SeekBar = ({style, thumbColor, fontColor, buttonColor}) => {
 
     return <View ref={container} style={[styles.container, style]}>
         <Slider
-            onSlidingComplete={position => {
+            onSlidingComplete={(position: number) => {
                 leftBar.style.transition = "height .3s, flex-grow .3s";
                 rightBar.style.transition = "height .3s, flex-grow .3s";
                 Music.seekTo(position);
@@ -104,7 +101,7 @@ export default SeekBar = ({style, thumbColor, fontColor, buttonColor}) => {
                 });
             }}
 
-            onValueChange={value => {
+            onValueChange={(value: number) => {
                 if (state.isSliding) {
                     setState({
                         isSliding: true,
@@ -113,7 +110,7 @@ export default SeekBar = ({style, thumbColor, fontColor, buttonColor}) => {
                 }
             }}
             
-            onSlidingStart={currentPosition => {
+            onSlidingStart={(currentPosition: number) => {
                 leftBar.style.transition = "height .3s";
                 rightBar.style.transition = "height .3s";
                 setState({
@@ -128,7 +125,6 @@ export default SeekBar = ({style, thumbColor, fontColor, buttonColor}) => {
             maximumTrackTintColor={buttonColor}
             thumbTintColor={thumbColor}
             thumbStyle={{color: thumbColor}}
-            style={{width: width}}
         />
 
         <View style={{ flexDirection: 'row', paddingRight: 15, paddingLeft: 15 }}>

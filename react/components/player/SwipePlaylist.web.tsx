@@ -90,7 +90,7 @@ export default SwipePlaylist = ({playlist, track, backgroundColor, textColor, st
                 contentContainerStyle={stylesRest.playlistContainer}
 
                 data={playlist}
-                keyExtractor={item => item.id}
+                keyExtractor={item => item.videoId }
                 renderItem={
                     ({item, index}) => <TouchableRipple 
                         rippleColor={colors.primary}
@@ -106,7 +106,7 @@ export default SwipePlaylist = ({playlist, track, backgroundColor, textColor, st
                             <>
                             {
                             track != null
-                                ? track.id == item.id
+                                ? track.videoId == item.videoId 
                                     ? <MaterialIcons style={{width: 30, textAlign: "center", textAlignVertical: "center"}} name="play-arrow" color={textColor} size={20}/>
                                     : <Text style={{width: 30, textAlign: "center", fontSize: 15, color: textColor}}>{index + 1}</Text>
 
@@ -125,7 +125,7 @@ export default SwipePlaylist = ({playlist, track, backgroundColor, textColor, st
 
                             {
                                 item != null
-                                ? Downloads.isTrackDownloaded(item.id)
+                                ? Downloads.isTrackDownloaded(item.videoId )
                                     ? <MaterialIcons
                                         style={{
                                             width: 30,
@@ -143,7 +143,7 @@ export default SwipePlaylist = ({playlist, track, backgroundColor, textColor, st
 
                             {
                                 item != null
-                                ? Downloads.isTrackLikedSync(item.id)
+                                ? Downloads.isTrackLikedSync(item.videoId )
                                     ? <MaterialIcons
                                         style={{
                                             width: 30,

@@ -17,7 +17,7 @@ export default function digestNextResults(json) {
             let currentVideoId = json.currentVideoEndpoint.watchEndpoint.videoId;
             
             for (let i = 0; i < playlist.list.length; i++) {
-                if (playlist.list[i].id == currentVideoId) {
+                if (playlist.list[i].videoId == currentVideoId) {
                     playlist.index = i;
                     return playlist;
                 }
@@ -35,14 +35,14 @@ export default function digestNextResults(json) {
             let artist = null;
             let duration = 0;
 
-            if (Music.transitionTrack?.id == videoId) {
+            if (Music.transitionTrack?.videoId == videoId) {
                 artwork = json.playerOverlays.playerOverlayRenderer.browserMediaSession.browserMediaSessionRenderer.thumbnailDetails.thumbnails[3].url;
                 playlistId = Music.transitionTrack.playlistId;
                 title = Music.transitionTrack.title;
                 artist = Music.transitionTrack.artist;
             }
 
-            playlist.list.push(new Track(videoId, playlistId, title, artist, artwork, duration));
+            playlist.list.push(new Track(videoId, null, playlistId, title, artist, artwork, duration));
             return playlist;
         }
     }
@@ -74,7 +74,7 @@ export default function digestNextResults(json) {
         let artwork = thumbnailList[thumbnailList.length - 1].url;
         let duration = textToSec(panelRenderer.lengthText.runs[0].text);
 
-        let track = new Track(videoId, playlistId, title, artist, artwork, duration);
+        let track = new Track(videoId, null, playlistId, title, artist, artwork, duration);
         playlist.list.push(track);
     }
 

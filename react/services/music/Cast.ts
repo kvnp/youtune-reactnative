@@ -1,4 +1,4 @@
-import { DeviceEventEmitter } from "react-native";
+import { DeviceEventEmitter, EmitterSubscription } from "react-native";
 import { State } from "react-native-track-player";
 import Playlist from "../../model/music/playlist";
 import Track from "../../model/music/track";
@@ -22,7 +22,7 @@ export default class Cast {
     static EVENT_PLAYERSTATE = "event-cast-playerstate";
     static EVENT_VOLUME = "event-cast-volume";
 
-    static addListener(event: string, listener: (data: any) => void) {
+    static addListener(event: string, listener: (data: any) => void): EmitterSubscription {
         try {
             return this.#emitter.addListener(event, listener);
         } finally {
@@ -95,7 +95,7 @@ export default class Cast {
                 Cast.controller.addEventListener(
                     cast.framework.RemotePlayerEventType.MEDIA_INFO_CHANGED,
                     e => {
-                        if (Music.metadata.id != e.value?.metadata.songName && e.value)
+                        if (Music.metadata.videoId != e.value?.metadata.songName && e.value)
                             this.restoreMediaInfo();
                     }
                 );
@@ -145,7 +145,7 @@ export default class Cast {
         let playlist = new Playlist();
         playlist.index = 0;
         playlist.list.push(new Track(
-            metadata.songName, "CAST", metadata.title,
+            metadata.songName, null, "CAST", metadata.title,
             metadata.artist, metadata.images[0].url,
             media.media.duration
         ));
@@ -175,7 +175,7 @@ export default class Cast {
             } else {
                 try {
                     Music.metadataList[i].url = await API.getAudioStream({
-                        videoId: currentMetadata.id
+                        videoId: currentMetadata.videoId 
                     });
 
                     src = Music.metadataList[i].url;
@@ -202,8 +202,8 @@ export default class Cast {
         let media = Music.metadata;
         let info = Cast.getMediaInfo();
         if (info) {
-            let currentId = info.playlist.list[info.playlist.index].id;
-            if (currentId == media.id)
+            let currentId = info.playlist.list[info.playlist.index].videoId ;
+            if (currentId == media.videoId )
                 return;
         }
 
@@ -213,15 +213,15 @@ export default class Cast {
             currentTime = Music.position;
 
         if (media.artwork?.startsWith("blob") || !media.artwork)
-            media.artwork = (await API.getAudioInfo({videoId: media.id})).artwork;
+            media.artwork = (await API.getAudioInfo({videoId: media.videoId })).artwork;
 
         if (media.url?.startsWith("blob") || !media.url)
-            media.url = await API.getAudioStream({videoId: media.id});
+            media.url = await API.getAudioStream({videoId: media.videoId });
 
         let mediaInfo = new chrome.cast.media.MediaInfo(media.url, "audio/mp4");
         mediaInfo.metadata = new chrome.cast.media.MusicTrackMediaMetadata();
         mediaInfo.metadata.images = [new chrome.cast.Image(media.artwork)];
-        mediaInfo.metadata.songName = media.id;
+        mediaInfo.metadata.songName = media.videoId ;
         mediaInfo.metadata.title = media.title;
         mediaInfo.metadata.artist = media.artist;
         let request = new chrome.cast.media.LoadRequest(mediaInfo);

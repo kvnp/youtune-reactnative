@@ -39,8 +39,6 @@ async function downloadTrack(videoId, cacheOnly) {
     };
     const artworkResponse = await fetch(track.artwork, input);
     track.artwork = await artworkResponse.blob();
-    track.videoId = track.id;
-    delete track.id;
     delete track.playable;
     self.postMessage({message: "track", payload: track});
 

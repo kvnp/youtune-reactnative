@@ -11,7 +11,7 @@ import {
     Platform
 } from "react-native";
 
-import { Title, TouchableRipple } from "react-native-paper";
+import { TouchableRipple } from "react-native-paper";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import { useTheme } from "@react-navigation/native";
 
@@ -80,10 +80,10 @@ export default MoreModal = ({navigation}) => {
             trListener = Music.addListener(
                 Music.EVENT_METADATA_UPDATE,
                 track => {
-                    if (track.id == videoId)
+                    if (track.videoId == videoId)
                         setContent({
                             ...content,
-                            videoId: track.id,
+                            videoId: track.videoId,
                             playlistId: track.playlistId,
                             title: track.title,
                             subtitle: track.artist,
@@ -106,10 +106,10 @@ export default MoreModal = ({navigation}) => {
         setContent({...content, liked: bool});
     }
 
-    const refresh = (type, id) => {
+    const refresh = (type, videoId) => {
         let liked = null;
         if (type == "Song")
-            liked = Downloads.isTrackLikedSync(id);
+            liked = Downloads.isTrackLikedSync(videoId);
 
         return liked;
     };

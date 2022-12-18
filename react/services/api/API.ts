@@ -7,7 +7,7 @@ import UI from "../ui/UI";
 
 export default class API {
     static RequestBody = class RequestBody {
-        static BODY = {
+        static BODY: Body = {
             context: {
                 client: {
                     clientName: "ANDROID_MUSIC",
@@ -151,7 +151,7 @@ export default class API {
         });
     }
 
-    static async getAudioInfo({videoId, playlistId, controllerCallback}) {
+    static async getAudioInfo({videoId, playlistId = undefined, controllerCallback = undefined}: {videoId: string, playlistId: string | undefined, controllerCallback: AbortController | undefined}) {
         let requestBody = API.RequestBody.BODY;
         requestBody.videoId = videoId;
         requestBody.playlistId = playlistId;
@@ -170,7 +170,7 @@ export default class API {
         return audioInfo;
     }
 
-    static async getAudioStream({videoId, controllerCallback}) {
+    static async getAudioStream({videoId, controllerCallback = undefined}: {videoId: string, controllerCallback: AbortController | undefined}) {
         let requestBody = API.RequestBody.BODY;
         requestBody.videoId = videoId;
 
@@ -185,7 +185,7 @@ export default class API {
 
         let response = await HTTP.getResponse(url, input, type, controllerCallback);
         let stream = Extractor.digestStreamResponse(response);
-        return Settings.Values.proxyYTMM && Device.Platform == "web"
+        return Settings.Values.proxyYTMM || Device.Platform == "web"
             ? HTTP.getProxyUrl(stream)
             : stream;
     }
@@ -250,3 +250,14 @@ export default class API {
         return HTTP.getResponse(url, input, type);
     }
 }
+
+// type Body = {
+//     context: {
+//         client: {
+//             clientName: string,
+//             clientVersion: string,
+//             gl: undefined | string,
+//             hl: undefined | string
+//         }
+//     }
+// }

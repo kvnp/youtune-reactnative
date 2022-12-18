@@ -29,7 +29,7 @@ export default Downloads = ({ navigation }) => {
                 await Service.waitForInitialization();
             }
 
-            let local = await Service.loadLocalPlaylist("LOCAL_DOWNLOADS");
+            let local = await Service.getPlaylist("LOCAL_DOWNLOADS");
             setEntries(local.list);
             setLoading(false);
         }
@@ -61,9 +61,9 @@ export default Downloads = ({ navigation }) => {
             entries.length != 0 ? {flex: "none"} : undefined
         ]}
     >
-        {entries.map(track => <Entry key={track.id}
+        {entries.map(track => <Entry key={track.videoId}
             entry={{title: track.title, subtitle: track.artist,
-                thumbnail: track.artwork, videoId: track.id,
+                thumbnail: track.artwork, videoId: track.videoId,
                 playlistId: track.playlistId}}
             navigation={navigation}
         />)}

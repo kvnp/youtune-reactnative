@@ -1,7 +1,7 @@
 export default function digestAudioInfoResponse(response) {
     return {
         playable: response.playabilityStatus.status,
-        id: response.videoDetails.videoId,
+        videoId: response.videoDetails.videoId,
         channelId: response.videoDetails.channelId,
         title: response.videoDetails.title,
         artist: response.videoDetails.author.split(" - Topic")[0],

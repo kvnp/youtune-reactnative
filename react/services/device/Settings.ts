@@ -43,7 +43,7 @@ export default class Settings {
     static EVENT_SETTINGS = "event-settings-values";
     static EVENT_INITIALIZE = "event-settings-initialize";
 
-    static addListener(event, listener) {
+    static addListener(event: string, listener: (data: any) => void): EmitterSubscription {
         return this.#emitter.addListener(event, listener);
     }
 

@@ -1,7 +1,9 @@
+import Playlist from "../../model/music/playlist";
+import Track from "../../model/music/track";
 import Music from "../music/Music";
 
 export default class Navigation {
-    static transitionPlaylist = {};
+    static transitionPlaylist: Playlist = Object.create({});
 
     static #navigate(goal, params, navigation) {
         if (goal == "Artist" || goal == "Playlist")
@@ -26,42 +28,45 @@ export default class Navigation {
         const { browseId, playlistId, videoId } = media;
     
         if (videoId != undefined && playlistId != undefined) {
-            Music.handlePlayback({
-                id: videoId,
-                playlistId: playlistId,
-                title: media.title,
-                artist: media.subtitle?.includes("•")
-                    ? media.subtitle?.split("•")[1].trim()
-                    : media.subtitle,
-                artwork: media.thumbnail
-            }, forced);
+            Music.handlePlayback(
+                new Track(
+                    videoId, null, playlistId, media.title,
+                    media.subtitle?.includes("•")
+                        ? media.subtitle?.split("•")[1].trim()
+                        : media.subtitle,
+                    media.thumbnail
+                ),
+                forced
+            );
     
             return this.#navigate("Music", {v: videoId, list: playlistId}, navigation);
         } else if (videoId != undefined && browseId != undefined) {
             if (browseId.slice(0, 2) == "VL") {
-                Music.handlePlayback({
-                    id: videoId,
-                    playlistId: browseId.slice(2),
-                    title: media.title,
-                    artist: media.subtitle.includes("•")
-                        ? media.subtitle.split("•")[1].trim()
-                        : media.subtitle,
-                    artwork: media.thumbnail
-                }, forced);
+                Music.handlePlayback(
+                    new Track(
+                        videoId, null, browseId.slice(2), media.title,
+                        media.subtitle.includes("•")
+                            ? media.subtitle.split("•")[1].trim()
+                            : media.subtitle,
+                        media.thumbnail
+                    ),
+                    forced
+                );
     
                 return this.#navigate("Music", {v: videoId, list: browseId.slice(2)}, navigation);
             }
     
         } else if (videoId != undefined) {
-            Music.handlePlayback({
-                id: videoId,
-                playlistId: undefined,
-                title: media.title,
-                artist: media.subtitle.includes("•")
-                    ? media.subtitle.split("•")[1].trim()
-                    : media.subtitle,
-                artwork: media.thumbnail
-            }, forced);
+            Music.handlePlayback(
+                new Track(
+                    videoId, null, null, media.title,
+                    media.subtitle.includes("•")
+                        ? media.subtitle.split("•")[1].trim()
+                        : media.subtitle,
+                    media.thumbnail
+                ),
+                forced
+            );
     
             return this.#navigate("Music", {v: videoId}, navigation);
         }

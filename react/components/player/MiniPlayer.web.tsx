@@ -121,7 +121,7 @@ export default MiniPlayer = ({style, containerStyle, moveMargin, resetMargin}) =
 
     const onOpen = () => {
         navigation.navigate("Music", {
-            v: track.id,
+            v: track.videoId,
             list: track.playlistId
         });
     };

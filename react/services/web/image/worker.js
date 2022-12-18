@@ -10,15 +10,6 @@ function post(rgb) {
     self.postMessage({rgb, imageHex, buttonHex, fontHex, thumbHex});
 }
 
-self.onmessage = ({data: {url, width, height}}) => {
-    if (!url)
-        return;
-    
-    if (!width)
-        width = 400;
-
-    if (!height)
-        height = 400;
-
-    ColorThief.getColorNoCanvas(url, width, height, 1, post);
+self.onmessage = ({data: {pixels, width, height}}) => {
+    ColorThief.getColorNoCanvas(new Uint8Array(pixels), width, height, 10, post);
 };

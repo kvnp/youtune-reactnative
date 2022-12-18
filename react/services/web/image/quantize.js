@@ -102,35 +102,33 @@ var MMCQ = (function() {
     }
     
     // 3d color space box
-    function VBox(r1, r2, g1, g2, b1, b2, histo) {
-        var vbox = this;
-        vbox.r1 = r1;
-        vbox.r2 = r2;
-        vbox.g1 = g1;
-        vbox.g2 = g2;
-        vbox.b1 = b1;
-        vbox.b2 = b2;
-        vbox.histo = histo;
-    }
-    VBox.prototype = {
-        volume: function(force) {
+    class VBox {
+        constructor(r1, r2, g1, g2, b1, b2, histo) {
+            var vbox = this;
+            vbox.r1 = r1;
+            vbox.r2 = r2;
+            vbox.g1 = g1;
+            vbox.g2 = g2;
+            vbox.b1 = b1;
+            vbox.b2 = b2;
+            vbox.histo = histo;
+        }
+        volume(force) {
             var vbox = this;
             if (!vbox._volume || force) {
                 vbox._volume = ((vbox.r2 - vbox.r1 + 1) * (vbox.g2 - vbox.g1 + 1) * (vbox.b2 - vbox.b1 + 1));
             }
             return vbox._volume;
-        },
-        count: function(force) {
-            var vbox = this,
-                histo = vbox.histo;
+        }
+        count(force) {
+            var vbox = this, histo = vbox.histo;
             if (!vbox._count_set || force) {
-                var npix = 0,
-                    i, j, k;
+                var npix = 0, i, j, k;
                 for (i = vbox.r1; i <= vbox.r2; i++) {
                     for (j = vbox.g1; j <= vbox.g2; j++) {
                         for (k = vbox.b1; k <= vbox.b2; k++) {
-                             index = getColorIndex(i,j,k);
-                             npix += (histo[index] || 0);
+                            index = getColorIndex(i, j, k);
+                            npix += (histo[index] || 0);
                         }
                     }
                 }
@@ -138,38 +136,31 @@ var MMCQ = (function() {
                 vbox._count_set = true;
             }
             return vbox._count;
-        },
-        copy: function() {
+        }
+        copy() {
             var vbox = this;
             return new VBox(vbox.r1, vbox.r2, vbox.g1, vbox.g2, vbox.b1, vbox.b2, vbox.histo);
-        },
-        avg: function(force) {
-            var vbox = this,
-                histo = vbox.histo;
+        }
+        avg(force) {
+            var vbox = this, histo = vbox.histo;
             if (!vbox._avg || force) {
-                var ntot = 0,
-                    mult = 1 << (8 - sigbits),
-                    rsum = 0,
-                    gsum = 0,
-                    bsum = 0,
-                    hval,
-                    i, j, k, histoindex;
+                var ntot = 0, mult = 1 << (8 - sigbits), rsum = 0, gsum = 0, bsum = 0, hval, i, j, k, histoindex;
                 for (i = vbox.r1; i <= vbox.r2; i++) {
                     for (j = vbox.g1; j <= vbox.g2; j++) {
                         for (k = vbox.b1; k <= vbox.b2; k++) {
-                             histoindex = getColorIndex(i,j,k);
-                             hval = histo[histoindex] || 0;
-                             ntot += hval;
-                             rsum += (hval * (i + 0.5) * mult);
-                             gsum += (hval * (j + 0.5) * mult);
-                             bsum += (hval * (k + 0.5) * mult);
+                            histoindex = getColorIndex(i, j, k);
+                            hval = histo[histoindex] || 0;
+                            ntot += hval;
+                            rsum += (hval * (i + 0.5) * mult);
+                            gsum += (hval * (j + 0.5) * mult);
+                            bsum += (hval * (k + 0.5) * mult);
                         }
                     }
                 }
                 if (ntot) {
-                    vbox._avg = [~~(rsum/ntot), ~~(gsum/ntot), ~~(bsum/ntot)];
+                    vbox._avg = [~~(rsum / ntot), ~~(gsum / ntot), ~~(bsum / ntot)];
                 } else {
-//                    console.log('empty box');
+                    //                    console.log('empty box');
                     vbox._avg = [
                         ~~(mult * (vbox.r1 + vbox.r2 + 1) / 2),
                         ~~(mult * (vbox.g1 + vbox.g2 + 1) / 2),
@@ -178,53 +169,51 @@ var MMCQ = (function() {
                 }
             }
             return vbox._avg;
-        },
-        contains: function(pixel) {
-            var vbox = this,
-                rval = pixel[0] >> rshift;
-                gval = pixel[1] >> rshift;
-                bval = pixel[2] >> rshift;
-            return (rval >= vbox.r1 && rval <= vbox.r2 &&
-                    gval >= vbox.g1 && rval <= vbox.g2 &&
-                    bval >= vbox.b1 && rval <= vbox.b2);
         }
-    };
+        contains(pixel) {
+            var vbox = this, rval = pixel[0] >> rshift;
+            gval = pixel[1] >> rshift;
+            bval = pixel[2] >> rshift;
+            return (rval >= vbox.r1 && rval <= vbox.r2 &&
+                gval >= vbox.g1 && rval <= vbox.g2 &&
+                bval >= vbox.b1 && rval <= vbox.b2);
+        }
+    }
     
     // Color map
-    function CMap() {
-        this.vboxes = new PQueue(function(a,b) { 
-            return pv.naturalOrder(
-                a.vbox.count()*a.vbox.volume(), 
-                b.vbox.count()*b.vbox.volume()
-            ) 
-        });;
-    }
-    CMap.prototype = {
-        push: function(vbox) {
+    class CMap {
+        constructor() {
+            this.vboxes = new PQueue(function (a, b) {
+                return pv.naturalOrder(
+                    a.vbox.count() * a.vbox.volume(),
+                    b.vbox.count() * b.vbox.volume()
+                );
+            });;
+        }
+        push(vbox) {
             this.vboxes.push({
                 vbox: vbox,
                 color: vbox.avg()
             });
-        },
-        palette: function() {
-            return this.vboxes.map(function(vb) { return vb.color });
-        },
-        size: function() {
+        }
+        palette() {
+            return this.vboxes.map(function (vb) { return vb.color; });
+        }
+        size() {
             return this.vboxes.size();
-        },
-        map: function(color) {
+        }
+        map(color) {
             var vboxes = this.vboxes;
-            for (var i=0; i<vboxes.size(); i++) {
+            for (var i = 0; i < vboxes.size(); i++) {
                 if (vboxes.peek(i).vbox.contains(color)) {
                     return vboxes.peek(i).color;
                 }
             }
             return this.nearest(color);
-        },
-        nearest: function(color) {
-            var vboxes = this.vboxes,
-                d1, d2, pColor;
-            for (var i=0; i<vboxes.size(); i++) {
+        }
+        nearest(color) {
+            var vboxes = this.vboxes, d1, d2, pColor;
+            for (var i = 0; i < vboxes.size(); i++) {
                 d2 = Math.sqrt(
                     Math.pow(color[0] - vboxes.peek(i).color[0], 2) +
                     Math.pow(color[1] - vboxes.peek(i).color[1], 2) +
@@ -236,24 +225,23 @@ var MMCQ = (function() {
                 }
             }
             return pColor;
-        },
-        forcebw: function() {
+        }
+        forcebw() {
             // XXX: won't  work yet
             var vboxes = this.vboxes;
-            vboxes.sort(function(a,b) { return pv.naturalOrder(pv.sum(a.color), pv.sum(b.color) )});
-            
+            vboxes.sort(function (a, b) { return pv.naturalOrder(pv.sum(a.color), pv.sum(b.color)); });
+
             // force darkest color to black if everything < 5
             var lowest = vboxes[0].color;
             if (lowest[0] < 5 && lowest[1] < 5 && lowest[2] < 5)
-                vboxes[0].color = [0,0,0];
-            
+                vboxes[0].color = [0, 0, 0];
+
             // force lightest color to white if everything > 251
-            var idx = vboxes.length-1,
-                highest = vboxes[idx].color;
+            var idx = vboxes.length - 1, highest = vboxes[idx].color;
             if (highest[0] > 251 && highest[1] > 251 && highest[2] > 251)
-                vboxes[idx].color = [255,255,255];
+                vboxes[idx].color = [255, 255, 255];
         }
-    };
+    }
     
     // histo (1-d array, giving the number of pixels in
     // each quantized region of color space), or null on error

@@ -10,19 +10,19 @@ export default class Storage {
             return require("./provider/AsyncStorageProvider").default;
     })();
 
-    static setItem(storeName, data) {
+    static setItem(storeName: string, data: object): void {
         return this.#Provider.setItem(storeName, data);
     }
 
-    static getItem(storeName, key) {
+    static getItem(storeName: string, key: string) {
         return this.#Provider.getItem(storeName, key);
     }
 
-    static deleteItem(storeName, key) {
+    static deleteItem(storeName: string, key: string): void {
         return this.#Provider.deleteItem(storeName, key);
     }
 
-    static getAllKeys(storeName) {
+    static getAllKeys(storeName: string): Array<string> {
         return this.#Provider.getAllKeys(storeName);
     }
 }

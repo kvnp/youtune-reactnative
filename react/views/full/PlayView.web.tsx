@@ -41,7 +41,7 @@ export default PlayView = ({route, navigation}) => {
     const [dimensions, setDimensions] = useState({height: window.innerHeight, width: window.innerWidth});
     const { height, width } = dimensions;
     const { dark, colors } = useTheme();
-    const image = useRef(null);
+    const image = useRef<HTMLCanvasElement>(null);
     const [imageColors, setImageColors] = useState(imgColors);
     const fontColor = imageColors ? imageColors.fontHex : colors.text;
     const buttonColor = imageColors ? imageColors.buttonHex : colors.card;
@@ -62,10 +62,10 @@ export default PlayView = ({route, navigation}) => {
     const [connected, setConnected] = useState(Music.isStreaming);
     const [isLiked, setLiked] = useState(null);
 
-    const {id, playlistId, title, artist, artwork} = track;
+    const {videoId, playlistId, title, artist, artwork} = track;
 
     const likeSong = like => {
-        Downloads.likeTrack(id, like);
+        Downloads.likeTrack(videoId, like);
         setLiked(like);
     }
 
@@ -75,7 +75,7 @@ export default PlayView = ({route, navigation}) => {
         if (!title) {
             setState(State.Buffering);
             Music.handlePlayback({
-                id: route.params.v,
+                videoId: route.params.v,
                 playlistId: route.params.list
             });
         }
@@ -238,16 +238,16 @@ export default PlayView = ({route, navigation}) => {
     }, []);
 
     useEffect(() => {
-        if (id != null) {
+        if (videoId != null) {
             navigation.setOptions({title: title});
-            let object = id.includes("&")
-                ? {v: id.slice(0, id.indexOf("&")), list: playlistId}
-                : {v: id, list: playlistId};
+            let object = videoId.includes("&")
+                ? {v: videoId.slice(0, videoId.indexOf("&")), list: playlistId}
+                : {v: videoId, list: playlistId};
 
             navigation.setParams(object);
-            Downloads.isTrackLiked(id).then(like => setLiked(like));
+            Downloads.isTrackLiked(videoId).then(like => setLiked(like));
         }
-    }, [id, playlistId]);
+    }, [videoId, playlistId]);
 
     useEffect(() => {
         if (Settings.initialized)
@@ -301,12 +301,33 @@ export default PlayView = ({route, navigation}) => {
     }, []);
 
     useEffect(() => {
-        imageWorker.postMessage({
-            url: image.current.src,
-            width: image.current.naturalWidth,
-            height: image.current.naturalHeight
-        });
-    }, [track]);
+        if (artwork && image.current) {
+            let img = new Image();
+            img.crossOrigin = "Anonymous";
+            img.onload = function() {
+                let ctx = image.current.getContext("2d");
+
+                var hRatio = image.current.width / img.width;
+                var vRatio = image.current.height / img.height;
+                var ratio  = Math.min(hRatio, vRatio);
+                var centerShift_x = (image.current.width - img.width*ratio) / 2;
+                var centerShift_y = (image.current.height - img.height*ratio) / 2;  
+                ctx.clearRect(0, 0, image.current.width, image.current.height);
+                ctx.drawImage(
+                    img, 0, 0, img.width, img.height,
+                    centerShift_x,centerShift_y,img.width*ratio, img.height*ratio
+                );
+
+                let pixels = ctx.getImageData(0, 0, image.current.width, image.current.height);
+                imageWorker.postMessage({
+                    pixels: pixels.data.buffer,
+                    width: image.current.width,
+                    height: image.current.height
+                }, [pixels.data.buffer]);
+            };
+            img.src = artwork;
+        }
+    }, [artwork]);
 
     return <View
         ref={container}
@@ -316,7 +337,7 @@ export default PlayView = ({route, navigation}) => {
         <div style={{pointerEvents: "auto"}} ref={background} id="background"/>
         <View ref={vertContainer} style={[stylesTop.vertContainer, {pointerEvents: "none", zIndex: 2, flexDirection: "column"}]}>
             <View style={[imageStyles.view, {height: height / 2.6}]}>
-                <img ref={image} draggable="false" style={{width: height / 2.6, pointerEvents: "auto", ...imageStyles.image}} src={artwork}/>
+                <canvas ref={image} draggable="false" height={height / 2.6} width={height / 2.6} style={{width: height / 2.6, pointerEvents: "auto", ...imageStyles.image}}/>
             </View>
 
             <View style={[stylesBottom.container, {pointerEvents: "none", width: width - 50, height: height / 2.6}]}>
@@ -473,7 +494,7 @@ export default PlayView = ({route, navigation}) => {
                             title: title,
                             subtitle: artist,
                             thumbnail: artwork,
-                            videoId: id
+                            videoId: videoId
                         })}
                     >
                         <MaterialIcons
