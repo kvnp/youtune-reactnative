@@ -1,17 +1,17 @@
 import { useEffect, useState, useRef } from 'react';
-import { View, Text, StyleSheet, Platform } from 'react-native';
+import { View, Text, StyleSheet, TextStyle } from 'react-native';
 
 import Slider from '@react-native-community/slider';
 import Music from '../../services/music/Music';
 
-function pad(n, width, z = 0) {
-    n = n + '';
-    return n.length >= width
-        ? n
-        : new Array(width - n.length + 1).join(z) + n;
+function pad(n: number, width: number, z = '0') {
+    let s = n + '';
+    return s.length >= width
+        ? s
+        : new Array(width - s.length + 1).join(z) + n;
 }
 
-const minutesAndSeconds = position => ([
+const minutesAndSeconds = (position: number) => ([
     pad( ~~(position / 60), 2),
     pad( ~~(position % 60), 2),
 ]);
@@ -20,9 +20,12 @@ var slider;
 var leftBar: HTMLElement;
 var rightBar: HTMLElement;
 var thumb: HTMLElement;
-export default SeekBar = ({style, thumbColor, fontColor, buttonColor}) => {
+
+const SeekBar = ({style, thumbColor, fontColor, buttonColor}: {style: CSSStyleDeclaration, thumbColor: string, fontColor: string, buttonColor: string}) => {
     const { duration } = Music.metadata;
     const [position, setPosition] = useState(Music.position);
+    const [sliderStyle, setSliderStyle] = useState({trackHeight: 5, thumbWidth: 20, thumbMargin: 0, thumbBorderRadius: 10});
+
     const [state, setState] = useState({
         isSliding: false,
         cache: 0
@@ -34,40 +37,38 @@ export default SeekBar = ({style, thumbColor, fontColor, buttonColor}) => {
 
     const elapsed = minutesAndSeconds(realPosition);
     const remaining = minutesAndSeconds(duration - realPosition);
-    const container = useRef(null);
+    const container = useRef<HTMLElement>(null);
 
     useEffect(() => {
-        slider = container.current.childNodes[0];
-        leftBar = slider.childNodes[0];
-        rightBar = slider.childNodes[2];
+        if (container.current == null)
+            return;
 
-        leftBar.style.height = "5px";
-        rightBar.style.height = "5px";
+        slider = container.current.childNodes[0];
+        leftBar = slider.childNodes[0] as HTMLElement;
+        rightBar = slider.childNodes[2] as HTMLElement;
+        thumb = slider.childNodes[1] as HTMLElement;
 
         leftBar.style.borderRadius = "";
-        leftBar.style.borderBottomLeftRadius = "5px";
-        leftBar.style.borderTopLeftRadius = "5px";
+        leftBar.style.borderBottomRightRadius = "0px";
+        leftBar.style.borderTopRightRadius = "0px";
         rightBar.style.borderRadius = "";
-        rightBar.style.borderBottomRightRadius = "5px";
-        rightBar.style.borderTopRightRadius = "5px";
+        rightBar.style.borderBottomLeftRadius = "0px";
+        rightBar.style.borderTopLeftRadius = "0px";
 
-        leftBar.style.transition = "height .3s, flex-grow .3s";
-        rightBar.style.transition = "height .3s, flex-grow .3s";
 
-        thumb = slider.childNodes[1];
-        thumb.style.transition = "width .3s";
+        leftBar.style.transition = "height .3s, border-radius .3s, flex-grow .3s";
+        rightBar.style.transition = "height .3s, border-radius .3s, flex-grow .3s";
+        thumb.style.transition = "width .3s, border-radius .3s";
 
-        const enter = () => {
-            thumb.style.width = "0px";
-            leftBar.style.height = "15px";
-            rightBar.style.height = "15px";
+        const enter = (e: TouchEvent | MouseEvent) => {
+            setSliderStyle({trackHeight: 20, thumbWidth: 8, thumbMargin: -8, thumbBorderRadius: 0});
+            e.preventDefault();
         };
-    
-        const leave = () => {
-            thumb.style.width = "20px";
-            leftBar.style.height = "5px";
-            rightBar.style.height = "5px";
-        };
+
+        const leave = (e: TouchEvent | MouseEvent) => {
+            setSliderStyle({trackHeight: 5, thumbWidth: 20, thumbMargin: 0, thumbBorderRadius: 10});
+            e.preventDefault();
+        }
 
         container.current.onmouseenter = enter;
         container.current.ontouchstart = enter;
@@ -88,10 +89,11 @@ export default SeekBar = ({style, thumbColor, fontColor, buttonColor}) => {
 
         return () => listener.remove();
     }, []);
-
+    
+    //@ts-ignore
     return <View ref={container} style={[styles.container, style]}>
         <Slider
-            onSlidingComplete={(position: number) => {
+            onSlidingComplete={position => {
                 leftBar.style.transition = "height .3s, flex-grow .3s";
                 rightBar.style.transition = "height .3s, flex-grow .3s";
                 Music.seekTo(position);
@@ -101,7 +103,7 @@ export default SeekBar = ({style, thumbColor, fontColor, buttonColor}) => {
                 });
             }}
 
-            onValueChange={(value: number) => {
+            onValueChange={value => {
                 if (state.isSliding) {
                     setState({
                         isSliding: true,
@@ -110,7 +112,7 @@ export default SeekBar = ({style, thumbColor, fontColor, buttonColor}) => {
                 }
             }}
             
-            onSlidingStart={(currentPosition: number) => {
+            onSlidingStart={currentPosition => {
                 leftBar.style.transition = "height .3s";
                 rightBar.style.transition = "height .3s";
                 setState({
@@ -124,15 +126,24 @@ export default SeekBar = ({style, thumbColor, fontColor, buttonColor}) => {
             minimumTrackTintColor={fontColor}
             maximumTrackTintColor={buttonColor}
             thumbTintColor={thumbColor}
-            thumbStyle={{color: thumbColor}}
+
+            //@ts-ignore
+            trackHeight={sliderStyle.trackHeight}
+            thumbStyle={{
+                color: thumbColor,
+                width: sliderStyle.thumbWidth,
+                marginLeft: sliderStyle.thumbMargin,
+                marginRight: sliderStyle.thumbMargin,
+                borderRadius: sliderStyle.thumbBorderRadius
+            }}
         />
 
         <View style={{ flexDirection: 'row', paddingRight: 15, paddingLeft: 15 }}>
-            <Text style={[styles.text, {color: fontColor}]}>
+            <Text style={[styles.text, {color: fontColor} as TextStyle]}>
                 {elapsed[0] + ':' + elapsed[1]}
             </Text>
             <View style={{ flex: 1 }} />
-            <Text style={[styles.text, {textAlign: 'right', color: fontColor}]}>
+            <Text style={[styles.text, {textAlign: 'right', color: fontColor} as TextStyle]}>
                 {'-' + remaining[0] + ':' + remaining[1]}
             </Text>
         </View>
@@ -140,28 +151,13 @@ export default SeekBar = ({style, thumbColor, fontColor, buttonColor}) => {
 };
 
 const styles = StyleSheet.create({
-    slider: {
-        marginTop: -12
-    },
-
-    container: {
-        paddingTop: 16
-    },
-
-    track: {
-        borderRadius: 1
-    },
-
-    text: Platform.OS == 'ios'
-    ? {
-        fontSize: 12,
-        textAlign: 'center',
-        marginLeft: -14,
-        marginRight: -14
-    }
-
-    : {
+    slider: {marginTop: -12},
+    container: {paddingTop: 16},
+    track: {borderRadius: 1},
+    text: {
         fontSize: 13,
         textAlign: 'center'
     }
 });
+
+export default SeekBar;
