@@ -123,6 +123,34 @@ module.exports = () => ({
         port: process.env.PORT || 8080,
 
         proxy: {
+            '/proxy/watch': {
+                target: wwwYoutube,
+                changeOrigin: true,
+                secure: false,
+                followRedirects: true,
+                pathRewrite: {'^/proxy' : ''},
+
+                headers: {
+                    "Referer": wwwYoutube,
+                    "Origin": wwwYoutube,
+                    "User-Agent": userAgent
+                }
+            },
+
+            '/proxy/s': {
+                target: wwwYoutube,
+                changeOrigin: true,
+                secure: false,
+                followRedirects: true,
+                pathRewrite: {'^/proxy' : ''},
+
+                headers: {
+                    "Referer": wwwYoutube,
+                    "Origin": wwwYoutube,
+                    "User-Agent": userAgent
+                }
+            },
+
             '/proxy/videoplayback': {
                 target: videoYoutube,
                 changeOrigin: true,
