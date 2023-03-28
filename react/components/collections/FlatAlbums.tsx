@@ -1,4 +1,4 @@
-import { FlatList } from 'react-native-gesture-handler';
+import { FlatList } from 'react-native';
 
 import Playlist from '../shared/Playlist';
 import { albumStyle } from '../../styles/Home';

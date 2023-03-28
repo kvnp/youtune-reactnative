@@ -1,4 +1,4 @@
-import { FlatList } from "react-native-gesture-handler";
+import { FlatList } from "react-native";
 import { shelvesStyle } from "../../styles/Shelves";
 import Shelf from '../shared/Shelf';
 

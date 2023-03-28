@@ -4,12 +4,12 @@ import {
     Text,
     StyleSheet,
     Dimensions,
-    Animated
+    Animated,
+    ScrollView
 } from "react-native";
 import { useTheme } from "@react-navigation/native";
 import { TouchableRipple } from "react-native-paper";
 import SlidingUpPanel from 'rn-sliding-up-panel';
-import { ScrollView } from "react-native-gesture-handler";
 import API from "../../services/api/API";
 
 var lastY;

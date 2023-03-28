@@ -5,9 +5,9 @@ import {
     Pressable,
     View,
     ActivityIndicator,
-    Platform
+    Platform,
+    FlatList
 } from 'react-native';
-import { FlatList } from 'react-native-gesture-handler';
 import { useTheme } from '@react-navigation/native';
 import { Button } from 'react-native-paper';
 

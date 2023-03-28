@@ -1,4 +1,3 @@
-import 'react-native-gesture-handler';
 import { AppRegistry } from 'react-native'
 import iconFont from 'react-native-vector-icons/Fonts/MaterialIcons.ttf';
 

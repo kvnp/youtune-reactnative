@@ -5,9 +5,9 @@ import {
     Text,
     StyleSheet,
     Dimensions,
-    Animated
+    Animated,
+    FlatList
 } from "react-native";
-import { FlatList } from "react-native-gesture-handler";
 import { useTheme } from "@react-navigation/native";
 import { TouchableRipple } from "react-native-paper";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";

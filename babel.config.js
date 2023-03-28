@@ -4,11 +4,6 @@ module.exports = {
     ],
     plugins: [
         "react-native-paper/babel",
-        [
-            'react-native-reanimated/plugin', {
-                relativeSourceLocation: true,
-            },
-        ],
         "@babel/plugin-transform-flow-strip-types",
         ["@babel/plugin-proposal-private-methods", {loose: true}],
         ["@babel/plugin-transform-react-jsx", {runtime: "automatic"}],
