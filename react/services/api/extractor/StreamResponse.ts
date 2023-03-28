@@ -1,7 +1,8 @@
 export default function digestStreamResponse(parse) {
     let current = {
         audioQuality: null,
-        url: null
+        url: null,
+        mimeType: null
     };
 
     let formats = parse.streamingData.adaptiveFormats
@@ -26,7 +27,8 @@ export default function digestStreamResponse(parse) {
             if (audioQuality > current.audioQuality)
                 current = {
                     audioQuality: audioQuality,
-                    url: formats[i].url
+                    url: formats[i].url,
+                    mimeType: formats[i].mimeType
                 };
 
             if (audioQuality == 3)
@@ -34,5 +36,5 @@ export default function digestStreamResponse(parse) {
         }
     }
 
-    return current.url;
+    return current;
 }

@@ -106,7 +106,7 @@ export default class Music {
                     , 500);
                 }
                 
-                if (!Music.metadata.videoId )
+                if (!Music.metadata.videoId)
                     return;
                 
                 Music.state = params.state;
@@ -211,7 +211,9 @@ export default class Music {
         Music.#queue.enqueue(() => {
             return new Promise(async(resolve, reject) => {
                 let track = Music.list[index];
-                track.url = await Music.getStream({videoId: track.videoId});
+                let content = await Music.getStream({videoId: track.videoId})
+                track.url = content.url;
+                track.contentType = content.mimeType;
                 resolve(track);
             });
         });
@@ -463,10 +465,18 @@ export default class Music {
                 local = true;
 
         if (local) Downloads.getPlaylist(playlistId, videoId)
-            .then(localPlaylist => Music.startPlaylist(localPlaylist))
+            .then(localPlaylist => {
+                if (localPlaylist != null)
+                    Music.startPlaylist(localPlaylist, 0);
+                else
+                    //TODO handle null
+                    return;
+            })
             .catch(_ => console.log(_));
         else API.getNextSongs({videoId, playlistId})
-            .then(resultPlaylist => Music.startPlaylist(resultPlaylist))
+            .then(resultPlaylist => {
+                Music.startPlaylist(resultPlaylist, 0);
+            })
             .catch(_ => console.log(_));
     }
 
@@ -490,8 +500,11 @@ export default class Music {
                     }
                 }
 
-                playlist.list[i].url = await Music.getStream({videoId: playlist.list[i].videoId });
+                let content = await Music.getStream({videoId: playlist.list[i].videoId });
+                playlist.list[i].url = content.url;
+                playlist.list[i].contentType = content.mimeType;
                 Music.trackUrlLoaded[i] = true;
+                console.log(playlist.list[i]);
             }
 
             if (i == playlist.index + 1)

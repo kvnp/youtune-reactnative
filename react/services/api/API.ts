@@ -184,10 +184,11 @@ export default class API {
         };
 
         let response = await HTTP.getResponse(url, input, type, controllerCallback);
-        let stream = Extractor.digestStreamResponse(response);
-        return Settings.Values.proxyYTMM || Device.Platform == "web"
-            ? HTTP.getProxyUrl(stream)
-            : stream;
+        let trackContent = Extractor.digestStreamResponse(response);
+        if (Settings.Values.proxyYTMM || Device.Platform == "web")
+            trackContent.url = HTTP.getProxyUrl(trackContent.url)
+        
+        return trackContent;
     }
 
     static async getNextSongs({videoId, playlistId}) {

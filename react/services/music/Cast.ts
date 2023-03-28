@@ -216,7 +216,7 @@ export default class Cast {
             media.artwork = (await API.getAudioInfo({videoId: media.videoId })).artwork;
 
         if (media.url?.startsWith("blob") || !media.url)
-            media.url = await API.getAudioStream({videoId: media.videoId });
+            media.url = (await API.getAudioStream({videoId: media.videoId })).url;
 
         let mediaInfo = new chrome.cast.media.MediaInfo(media.url, "audio/mp4");
         mediaInfo.metadata = new chrome.cast.media.MusicTrackMediaMetadata();

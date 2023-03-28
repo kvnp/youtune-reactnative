@@ -252,7 +252,7 @@ export default class Downloads {
         });
     }
 
-    static getStream(videoId: string): Promise<string | null> {
+    static getStream(videoId: string): Promise<{url: string, mimeType: string, audioQuality: number} | null> {
         return new Promise(async(resolve, reject) => {
             if (!this.initialized)
                 await Downloads.waitForInitialization();
@@ -261,8 +261,10 @@ export default class Downloads {
                 return resolve(null);
 
             let object = await Storage.getItem("Downloads", videoId);
-            let url = IO.getBlobAsURL(object.url);
-            resolve(url);
+            resolve({
+                ...object,
+                url: IO.getBlobAsURL(object.url)
+            });
         });
     }
 
@@ -279,7 +281,7 @@ export default class Downloads {
         });
     }
 
-    static getPlaylist(playlistId: string, videoId: string): Promise<Playlist | null> {
+    static getPlaylist(playlistId: string, videoId: string): Promise<Playlist | null>  {
         return new Promise(async(resolve, reject) => {
             if (!this.initialized)
                 await Downloads.waitForInitialization();
@@ -318,7 +320,9 @@ export default class Downloads {
                             audioInfo.artwork,
                             audioInfo.duration
                         );
-                        track.url = await API.getAudioStream({videoId: currentVideoId});
+                        let trackContent = await API.getAudioStream({videoId: currentVideoId})
+                        track.url = trackContent.url;
+                        track.contentType = trackContent.mimeType;
                     }
                     
                     localPlaylist.list.push(track);
