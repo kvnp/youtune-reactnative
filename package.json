@@ -69,7 +69,7 @@
         "babel-plugin-react-native-web": "^0.18.9",
         "babel-plugin-transform-react-remove-prop-types": "^0.4.24",
         "babel-plugin-transform-remove-console": "^6.9.4",
-        "css-minimizer-webpack-plugin": "^4.2.2",
+        "css-minimizer-webpack-plugin": "^5.0.0",
         "eslint": "^8.25.0",
         "file-loader": "^6.2.0",
         "html-webpack-plugin": "^5.5.0",
