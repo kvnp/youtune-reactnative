@@ -41,7 +41,7 @@ export default class HTTP {
         }
     }
 
-    static getProxyUrl(url) {
+    static getProxyUrl(url: string) {
         if (!url.startsWith("http"))
             return url;
 

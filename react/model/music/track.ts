@@ -1,3 +1,6 @@
+import HTTP from "../../services/api/HTTP";
+import Device from "../../services/device/Device";
+
 export default class Track {
     videoId: string;
     channelId: string | null;
@@ -13,6 +16,10 @@ export default class Track {
     constructor(videoId: string = "", channelId: string | null = "", playlistId: string | null = "", title: string = "", artist: string = "", artwork: string = "", duration: string | number = 0) {
         if (typeof duration == "string") {
             duration = Number.parseInt(duration);
+        }
+
+        if (artwork != "" && Device.Platform == "web" && new URL(artwork).hostname == "i.ytimg.com") {
+            artwork = HTTP.getProxyUrl(artwork);
         }
 
         this.videoId = videoId;
