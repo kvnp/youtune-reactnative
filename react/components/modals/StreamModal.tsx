@@ -9,7 +9,7 @@ import {
 } from "react-native";
 
 import { useTheme } from "@react-navigation/native";
-import Slider from "@react-native-community/slider";
+import { Slider } from '@miblanchard/react-native-slider';
 import { Button } from "react-native-paper";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 
