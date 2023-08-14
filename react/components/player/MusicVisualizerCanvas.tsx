@@ -15,13 +15,13 @@ var x = 0;
 var bars = 0;
 var canvasWidth = 0;
 
-function MusicVisualizerCanvas({canvasRef}) {
+function MusicVisualizerCanvas({canvasRef}: {canvasRef: React.MutableRefObject<HTMLCanvasElement>}) {
     const [dimensions, setDimensions] = useState({
         height: window.innerHeight,
         width: window.innerWidth
     });
     const { height, width } = dimensions;
-    const canvas = useRef<HTMLCanvasElement>(null);
+    const canvas = useRef<HTMLCanvasElement>();
 
     const updateDimensions = () => setDimensions({height: window.innerHeight, width: window.innerWidth});
 
@@ -48,8 +48,11 @@ function MusicVisualizerCanvas({canvasRef}) {
 
     useEffect(() => {
         window.addEventListener("resize", updateDimensions);
-        Settings.waitForInitialization().then(e => {
+        Settings.waitForInitialization().then(_ => {
             if (!Settings.Values.visualizer)
+                return;
+
+            if (!canvas.current)
                 return;
 
             ctx = canvas.current.getContext("2d");
@@ -78,6 +81,9 @@ function MusicVisualizerCanvas({canvasRef}) {
     }, []);
 
     const renderFrame = () => {
+        if (!canvas.current)
+            return;
+
         playViewId = requestAnimationFrame(renderFrame);
         analyser.getByteFrequencyData(dataArray);
         ctx.clearRect(0, 0, canvas.current.width, canvas.current.height);
@@ -115,7 +121,7 @@ function MusicVisualizerCanvas({canvasRef}) {
     }
 
     return <canvas
-        ref={ref => {
+        ref={(ref: HTMLCanvasElement) => {
             canvas.current = ref;
             canvasRef.current = ref;
         }}

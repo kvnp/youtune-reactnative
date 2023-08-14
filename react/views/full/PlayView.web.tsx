@@ -60,16 +60,20 @@ export default PlayView = ({route, navigation}) => {
     const [list, setList] = useState(Music.list);
     const [repeat, setRepeat] = useState(Music.repeatModeString);
     const [connected, setConnected] = useState(Music.isStreaming);
-    const [isLiked, setLiked] = useState(null);
+    const [isLiked, setLiked] = useState<boolean | null>(null);
 
     const {videoId, playlistId, title, artist, artwork} = track;
 
-    const likeSong = like => {
+
+    const likeSong = (like: boolean | null) => {
         Downloads.likeTrack(videoId, like);
         setLiked(like);
     }
 
-    const updateDimensions = () => setDimensions({height: window.innerHeight, width: window.innerWidth});
+    const updateDimensions = () => {
+        setDimensions({height: window.innerHeight, width: window.innerWidth});
+        drawImage();
+    }
 
     const handlePlayback = () => {
         if (!title) {
@@ -300,34 +304,53 @@ export default PlayView = ({route, navigation}) => {
         }
     }, []);
 
+    const drawImage = () => {
+        image.current.style.width = height / 2.6 + "px";
+        image.current.width = height / 2.6;
+        image.current.height = height / 2.6;
+
+        const ctx = image.current.getContext("2d");
+        const img = tempImg.current;
+
+        var hRatio = image.current.width / img.width;
+        var vRatio = image.current.height / img.height;
+        var ratio  = Math.min(hRatio, vRatio);
+        var centerShift_x = (image.current.width - img.width*ratio) / 2;
+        var centerShift_y = (image.current.height - img.height*ratio) / 2;  
+        ctx.clearRect(0, 0, image.current.width, image.current.height);
+        ctx.drawImage(
+            img, 0, 0, img.width, img.height,
+            centerShift_x,centerShift_y,img.width*ratio, img.height*ratio
+        );
+
+        let pixels = ctx.getImageData(0, 0, image.current.width, image.current.height, {willReadFrequently: true});
+        imageWorker.postMessage({
+            pixels: pixels.data.buffer,
+            width: image.current.width,
+            height: image.current.height
+        }, [pixels.data.buffer]);
+    };
+
+    
+    const tempImg = useRef<HTMLImageElement>(new Image());
+    
+    useEffect(() => {
+        tempImg.current.crossOrigin = "Anonymous";
+        tempImg.current.onload = drawImage;
+    }, []);
+
+
     useEffect(() => {
         if (artwork && image.current) {
-            let img = new Image();
-            img.crossOrigin = "Anonymous";
-            img.onload = function() {
-                let ctx = image.current.getContext("2d");
-
-                var hRatio = image.current.width / img.width;
-                var vRatio = image.current.height / img.height;
-                var ratio  = Math.min(hRatio, vRatio);
-                var centerShift_x = (image.current.width - img.width*ratio) / 2;
-                var centerShift_y = (image.current.height - img.height*ratio) / 2;  
-                ctx.clearRect(0, 0, image.current.width, image.current.height);
-                ctx.drawImage(
-                    img, 0, 0, img.width, img.height,
-                    centerShift_x,centerShift_y,img.width*ratio, img.height*ratio
-                );
-
-                let pixels = ctx.getImageData(0, 0, image.current.width, image.current.height);
-                imageWorker.postMessage({
-                    pixels: pixels.data.buffer,
-                    width: image.current.width,
-                    height: image.current.height
-                }, [pixels.data.buffer]);
-            };
-            img.src = artwork;
+            tempImg.current.src = artwork;
         }
     }, [artwork]);
+
+
+    useEffect(() => {
+        image.current?.addEventListener("load", () => {console.log("load")});
+        image.current?.addEventListener("error", () => {console.log("error")});
+    }, []);
 
     return <View
         ref={container}
@@ -337,7 +360,14 @@ export default PlayView = ({route, navigation}) => {
         <div style={{pointerEvents: "auto"}} ref={background} id="background"/>
         <View ref={vertContainer} style={[stylesTop.vertContainer, {pointerEvents: "none", zIndex: 2, flexDirection: "column"}]}>
             <View style={[imageStyles.view, {height: height / 2.6}]}>
-                <canvas ref={image} draggable="false" height={height / 2.6} width={height / 2.6} style={{width: height / 2.6, pointerEvents: "auto", ...imageStyles.image}}/>
+                <canvas
+                    ref={image}
+                    draggable="false"
+                    style={{
+                        pointerEvents: "auto",
+                        ...imageStyles.image
+                    }}
+                />
             </View>
 
             <View style={[stylesBottom.container, {pointerEvents: "none", width: width - 50, height: height / 2.6}]}>
@@ -351,7 +381,7 @@ export default PlayView = ({route, navigation}) => {
                         <MaterialIcons
                             name="thumb-down"
                             size={30}
-                            style={{lineHeight: 30}}
+                            style={{textAlignVertical: "center", lineHeight: 30}}
                             selectable={false}
                             color={isLiked == null ? "dimgray" : !isLiked ? fontColor : "dimgray"}
                         />
@@ -379,17 +409,30 @@ export default PlayView = ({route, navigation}) => {
                         <MaterialIcons
                             name="thumb-up"
                             size={30}
-                            style={{lineHeight: 30}}
+                            style={{textAlignVertical: "center", lineHeight: 30}}
                             color={isLiked == null ? "dimgray" : isLiked ? fontColor : "dimgray"}
                             selectable={false}
                         />
                     </Button>
                 </View>
 
-                <SeekBar buffering={state} buttonColor={buttonColor} thumbColor={thumbColor} fontColor={fontColor} style={{pointerEvents: pointerDisabled ? "none" : "auto"}}/>
+                <SeekBar
+                    buffering={state}
+                    buttonColor={buttonColor}
+                    thumbColor={thumbColor}
+                    fontColor={fontColor}
+                    style={{pointerEvents: pointerDisabled ? "none" : "auto"}}
+                />
 
                 <View style={[stylesBottom.buttonContainer, {pointerEvents: "none", overflow: "visible", alignSelf: "stretch", justifyContent: "space-between"}]}>
-                    <CastButton style={{pointerEvents: pointerDisabled ? "none" : "auto", fontColor: fontColor}}/>
+                    <CastButton
+                        labelStyle={{marginHorizontal: 0}}
+                        style={{pointerEvents: pointerDisabled ? "none" : "auto", borderRadius: 25, alignItems: "center", padding: 0, margin: 0, minWidth: 0}}
+                        contentStyle={{alignItems: "center", width: 50, height: 50, minWidth: 0}}
+                        iconStyle={{textAlignVertical: "center", lineHeight: 30}}
+                        color={fontColor}
+                    />
+
                     <Button
                         labelStyle={{marginHorizontal: 0}}
                         style={{pointerEvents: pointerDisabled ? "none" : "auto", borderRadius: 25, alignItems: "center", padding: 0, margin: 0, minWidth: 0}}
@@ -401,7 +444,7 @@ export default PlayView = ({route, navigation}) => {
                             name="skip-previous"
                             color={fontColor}
                             size={40}
-                            style={{lineHeight: 40}}
+                            style={{textAlignVertical: "center"}}
                         />
                     </Button>
 
@@ -426,7 +469,7 @@ export default PlayView = ({route, navigation}) => {
                                     <MaterialIcons
                                         color={fontColor}
                                         size={40}
-                                        style={{lineHeight: 40}}
+                                        style={{textAlignVertical: "center"}}
                                         selectable={false}
                                         name={
                                             state == State.Playing
@@ -449,7 +492,7 @@ export default PlayView = ({route, navigation}) => {
                             name="skip-next"
                             color={fontColor}
                             size={40}
-                            style={{lineHeight: 40}}
+                            style={{textAlignVertical: "center"}}
                         />
                     </Button>
 
@@ -463,7 +506,7 @@ export default PlayView = ({route, navigation}) => {
                         <MaterialIcons
                             name={!Music.isStreaming ? repeat : "repeat-one-on"}
                             color={fontColor}
-                            style={{lineHeight: 30}}
+                            style={{textAlignVertical: "center"}}
                             size={30}
                             selectable={false}
                         />
@@ -482,7 +525,7 @@ export default PlayView = ({route, navigation}) => {
                             name="keyboard-arrow-down"
                             color={fontColor}
                             size={30}
-                            style={{lineHeight: 30}}
+                            style={{textAlignVertical: "center"}}
                         />
                     </Button>
 
@@ -499,7 +542,7 @@ export default PlayView = ({route, navigation}) => {
                     >
                         <MaterialIcons
                             selectable={false}
-                            style={{lineHeight: 30}}
+                            style={{textAlignVertical: "center"}}
                             name="more-vert"
                             color={fontColor}
                             size={30}
