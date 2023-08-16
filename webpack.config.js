@@ -5,7 +5,7 @@ const WebpackPwaManifest = require('webpack-pwa-manifest');
 const { GenerateSW } = require('workbox-webpack-plugin');
 const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
 
-const userAgent = "Mozilla/5.0 (X11; Linux x86_64; rv:79.0) Gecko/20100101 Firefox/79.0";
+const userAgent = "Mozilla/5.0 (X11; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/116.0";
 const musicYoutube = "https://music.youtube.com";
 const wwwYoutube = "https://www.youtube.com";
 const imgYoutube = "https://i.ytimg.com";
@@ -161,7 +161,8 @@ module.exports = () => ({
                 headers: {
                     "Referer": wwwYoutube,
                     "Origin": wwwYoutube,
-                    "User-Agent": userAgent
+                    "User-Agent": userAgent,
+                    "Connection": "Keep-Alive"
                 }
             },
 
