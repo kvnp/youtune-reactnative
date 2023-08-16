@@ -4,6 +4,7 @@ import { useTheme } from '@react-navigation/native';
 import { TouchableRipple } from 'react-native-paper';
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 
+import HTTP from "../../services/api/HTTP";
 import Navigation from '../../services/ui/Navigation';
 import Downloads from "../../services/device/Downloads";
 
@@ -65,7 +66,18 @@ export default Entry = ({ entry, navigation, index, forcedPlaylistId }) => {
         }
 
         <div style={{...resultStyle.resultCover, display: "flex", justifyContent: "end"}}>
-            <img src={view.thumbnail} draggable="false" loading="lazy" onLoad={e => e.target.style.opacity = 1} style={{width: "100%", height: "100%", objectFit: "cover", opacity: 0, transition: "opacity .4s ease-in"}}></img>
+            <img
+                src={view.thumbnail}
+                draggable="false"
+                loading="lazy"
+                onLoad={e => e.target.style.opacity = 1}
+                onError={(e) => {
+                    let self: JSX.IntrinsicElements["img"] = e.target;
+                    self.src = HTTP.getProxyUrl(view.thumbnail);
+                }}
+                style={{width: "100%", height: "100%", objectFit: "cover", opacity: 0, transition: "opacity .4s ease-in"}}
+            >
+            </img>
             {
                 isDownloaded.current
                     ? <MaterialIcons style={{position: "absolute", background: "radial-gradient(green,transparent)"}} name="file-download-done" color="white" size={24}/>

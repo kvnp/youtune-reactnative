@@ -15,6 +15,7 @@ import Music from "../../services/music/Music";
 import Downloads from "../../services/device/Downloads";
 import Settings from "../../services/device/Settings";
 import Cast from "../../services/music/Cast";
+import HTTP from "../../services/api/HTTP";
 
 import { insertBeforeLast } from "../../utils/Navigation";
 import SeekBar from "../../components/player/SeekBar";
@@ -309,7 +310,7 @@ export default PlayView = ({route, navigation}) => {
         image.current.width = height / 2.6;
         image.current.height = height / 2.6;
 
-        const ctx = image.current.getContext("2d");
+        const ctx = image.current.getContext("2d", {willReadFrequently: true});
         const img = tempImg.current;
 
         var hRatio = image.current.width / img.width;
@@ -323,7 +324,7 @@ export default PlayView = ({route, navigation}) => {
             centerShift_x,centerShift_y,img.width*ratio, img.height*ratio
         );
 
-        let pixels = ctx.getImageData(0, 0, image.current.width, image.current.height, {willReadFrequently: true});
+        let pixels = ctx.getImageData(0, 0, image.current.width, image.current.height);
         imageWorker.postMessage({
             pixels: pixels.data.buffer,
             width: image.current.width,
@@ -337,13 +338,13 @@ export default PlayView = ({route, navigation}) => {
     useEffect(() => {
         tempImg.current.crossOrigin = "Anonymous";
         tempImg.current.onload = drawImage;
+        tempImg.current.onerror = () => tempImg.current.src = HTTP.getProxyUrl(artwork);
     }, []);
 
 
     useEffect(() => {
-        if (artwork && image.current) {
+        if (artwork && image.current)
             tempImg.current.src = artwork;
-        }
     }, [artwork]);
 
 
