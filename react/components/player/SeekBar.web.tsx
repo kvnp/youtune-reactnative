@@ -4,19 +4,6 @@ import { View, Text, StyleSheet, TextStyle } from 'react-native';
 import { Slider } from '@miblanchard/react-native-slider';
 import Music from '../../services/music/Music';
 
-function pad(n: number, width: number, z = '0') {
-    let s = n + '';
-    return s.length >= width
-        ? s
-        : new Array(width - s.length + 1).join(z) + n;
-}
-
-const minutesAndSeconds = (position: number) => ([
-    pad( ~~(position / 60), 2),
-    pad( ~~(position % 60), 2),
-]);
-
-
 
 const SeekBar = ({style, thumbColor, fontColor, buttonColor}: {style: CSSStyleDeclaration, thumbColor: string, fontColor: string, buttonColor: string}) => {
     const { duration } = Music.metadata;
@@ -24,29 +11,45 @@ const SeekBar = ({style, thumbColor, fontColor, buttonColor}: {style: CSSStyleDe
     const [sliderStyle, setSliderStyle] = useState({trackHeight: 5, thumbWidth: 20, thumbMargin: 0, thumbBorderRadius: 10});
 
     const [isSliding, setSliding] = useState(false);
-    const [cache, setCache] = useState(0);
+    const cache = useRef<number>(0);
+
+    const pad = (n: number, width: number, z = '0') => {
+        let s = n + '';
+        return s.length >= width
+            ? s
+            : new Array(width - s.length + 1).join(z) + n;
+    }
 
     const minutesAndSeconds = useCallback((position: number) => ([
         pad( ~~(position / 60), 2),
         pad( ~~(position % 60), 2),
-    ]), []);
+    ].join(":")), []);
 
     const slider = useRef<HTMLElement>(null);
     const leftBar = useRef<HTMLElement>(null);
     const rightBar = useRef<HTMLElement>(null);
     const thumb = useRef<HTMLElement>(null);
 
+    const currentPosition = useRef<HTMLElement | null>(null);
+    const remainingPosition = useRef<HTMLElement | null>(null);
+
     const realPosition = isSliding != true
         ? position
-        : cache;
+        : cache.current;
 
     const elapsed = minutesAndSeconds(realPosition);
-    const remaining = minutesAndSeconds(duration - realPosition);
+    const remaining = "-" + minutesAndSeconds(duration - realPosition);
     const container = useRef<HTMLElement>(null);
 
     useEffect(() => {
         if (container.current == null)
             return;
+
+        let seekbar = container.current.childNodes[0] as HTMLElement;
+        let positions = container.current.childNodes[1] as HTMLElement;
+
+        currentPosition.current = positions.childNodes[0] as HTMLElement;
+        remainingPosition.current = positions.childNodes[2] as HTMLElement;
 
         /*slider = container.current.childNodes[0];
         leftBar = slider.childNodes[0] as HTMLElement;
@@ -103,21 +106,22 @@ const SeekBar = ({style, thumbColor, fontColor, buttonColor}: {style: CSSStyleDe
                 rightBar.style.transition = "height .3s, flex-grow .3s";*/
                 Music.seekTo(position[0]);
                 setSliding(false);
-                setCache(0);
+                cache.current = 0;
             }}
 
             onValueChange={value => {
-                if (isSliding) {
+                if (isSliding)
                     setSliding(true);
-                    setCache(value[0]);
-                }
+                
+                cache.current = value[0];
+                currentPosition.current!.innerText = minutesAndSeconds(value[0]);
+                remainingPosition.current!.innerText = "-" + minutesAndSeconds(duration - value[0]);
             }}
             
-            onSlidingStart={currentPosition => {
+            onSlidingStart={_currentPosition => {
                 /*leftBar.style.transition = "height .3s";
                 rightBar.style.transition = "height .3s";*/
                 setSliding(true);
-                setCache(currentPosition[0]);
             }}
             
             value={realPosition}
@@ -139,11 +143,11 @@ const SeekBar = ({style, thumbColor, fontColor, buttonColor}: {style: CSSStyleDe
 
         <View style={{ flexDirection: 'row', paddingRight: 15, paddingLeft: 15 }}>
             <Text style={[styles.text, {color: fontColor} as TextStyle]}>
-                {elapsed[0] + ':' + elapsed[1]}
+                {elapsed}
             </Text>
             <View style={{ flex: 1 }} />
             <Text style={[styles.text, {textAlign: 'right', color: fontColor} as TextStyle]}>
-                {'-' + remaining[0] + ':' + remaining[1]}
+                {remaining}
             </Text>
         </View>
     </View>
