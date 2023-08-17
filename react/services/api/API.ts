@@ -4,6 +4,7 @@ import Settings from "../device/Settings";
 import HTTP from "./HTTP";
 import IO from "../device/IO";
 import UI from "../ui/UI";
+import Track from "../../model/music/track";
 
 export default class API {
     static RequestBody = class RequestBody {
@@ -11,7 +12,7 @@ export default class API {
             context: {
                 client: {
                     clientName: "ANDROID_MUSIC",
-                    clientVersion: "4.57",
+                    clientVersion: "5.16.51",
                     ...(Settings.Values.transmitLanguage
                         ? {gl: Device.Language.GL, hl: Device.Language.HL}
                         : undefined
@@ -228,9 +229,15 @@ export default class API {
         return blob;
     }
 
-    static async getLyrics({track}) {
+    static async getLyrics(track: Track) {
         let artist = track.artist;
         let title = track.title;
+
+        if (artist == undefined || title == undefined)
+            return {
+                then: () => {return null}
+            };
+
         if (artist.includes("("))
             artist = artist.substring(0, artist.indexOf("(")).trim();
 
