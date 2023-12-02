@@ -45,8 +45,11 @@ export default SwipeLyrics = ({playlist, track, backgroundColor, textColor, styl
             return;
 
         container.current.innerHtml = "";
-        API.getLyrics({track})
+        API.getLyrics(track)
             .then(response => {
+                if (response == null)
+                    return;
+                
                 for (let s of response.lyrics) {
                     container.current.insertAdjacentText('beforeend', s);
                     container.current.insertAdjacentHTML('beforeend', "<br>");

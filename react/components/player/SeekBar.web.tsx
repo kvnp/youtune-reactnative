@@ -25,10 +25,10 @@ const SeekBar = ({style, thumbColor, fontColor, buttonColor}: {style: CSSStyleDe
         pad( ~~(position % 60), 2),
     ].join(":")), []);
 
-    const slider = useRef<HTMLElement>(null);
-    const leftBar = useRef<HTMLElement>(null);
-    const rightBar = useRef<HTMLElement>(null);
-    const thumb = useRef<HTMLElement>(null);
+    const slider = useRef<HTMLElement | null>(null);
+    const leftBar = useRef<HTMLElement | null>(null);
+    const rightBar = useRef<HTMLElement | null>(null);
+    const thumb = useRef<HTMLElement | null>(null);
 
     const currentPosition = useRef<HTMLElement | null>(null);
     const remainingPosition = useRef<HTMLElement | null>(null);
@@ -45,30 +45,29 @@ const SeekBar = ({style, thumbColor, fontColor, buttonColor}: {style: CSSStyleDe
         if (container.current == null)
             return;
 
-        let seekbar = container.current.childNodes[0] as HTMLElement;
         let positions = container.current.childNodes[1] as HTMLElement;
 
         currentPosition.current = positions.childNodes[0] as HTMLElement;
         remainingPosition.current = positions.childNodes[2] as HTMLElement;
 
-        /*slider = container.current.childNodes[0];
-        leftBar = slider.childNodes[0] as HTMLElement;
-        rightBar = slider.childNodes[2] as HTMLElement;
-        thumb = slider.childNodes[1] as HTMLElement;
+        /*slider.current = container.current.childNodes[0] as HTMLElement;
+        leftBar.current = slider.current.childNodes[0] as HTMLElement;
+        rightBar.current = slider.current.childNodes[2] as HTMLElement;
+        thumb.current = slider.current.childNodes[1] as HTMLElement;
 
-        leftBar.style.borderRadius = "";
-        leftBar.style.borderBottomRightRadius = "0px";
-        leftBar.style.borderTopRightRadius = "0px";
-        rightBar.style.borderRadius = "";
-        rightBar.style.borderBottomLeftRadius = "0px";
-        rightBar.style.borderTopLeftRadius = "0px";
+        leftBar.current.style.borderRadius = "";
+        leftBar.current.style.borderBottomRightRadius = "0px";
+        leftBar.current.style.borderTopRightRadius = "0px";
+        rightBar.current.style.borderRadius = "";
+        rightBar.current.style.borderBottomLeftRadius = "0px";
+        rightBar.current.style.borderTopLeftRadius = "0px";
 
 
-        leftBar.style.transition = "height .3s, border-radius .3s, flex-grow .3s";
-        rightBar.style.transition = "height .3s, border-radius .3s, flex-grow .3s";
-        thumb.style.transition = "width .3s, border-radius .3s";*/
+        leftBar.current.style.transition = "height .3s, border-radius .3s, flex-grow .3s";
+        rightBar.current.style.transition = "height .3s, border-radius .3s, flex-grow .3s";
+        thumb.current.style.transition = "width .3s, border-radius .3s";
 
-        /*const enter = (e: TouchEvent | MouseEvent) => {
+        const enter = (e: TouchEvent | MouseEvent) => {
             setSliderStyle({trackHeight: 20, thumbWidth: 8, thumbMargin: -8, thumbBorderRadius: 0});
             e.preventDefault();
         };
@@ -102,8 +101,8 @@ const SeekBar = ({style, thumbColor, fontColor, buttonColor}: {style: CSSStyleDe
     return <View ref={container} style={[styles.container, style]}>
         <Slider
             onSlidingComplete={position => {
-                /*leftBar.style.transition = "height .3s, flex-grow .3s";
-                rightBar.style.transition = "height .3s, flex-grow .3s";*/
+                /*leftBar.current.style.transition = "height .3s, flex-grow .3s";
+                rightBar.current.style.transition = "height .3s, flex-grow .3s";*/
                 Music.seekTo(position[0]);
                 setSliding(false);
                 cache.current = 0;

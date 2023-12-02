@@ -122,6 +122,10 @@ module.exports = () => ({
         host: "0.0.0.0",
         port: process.env.PORT || 8080,
 
+        headers: {
+
+        },
+
         proxy: {
             '/proxy/watch': {
                 target: wwwYoutube,
@@ -203,7 +207,36 @@ module.exports = () => ({
                     "Origin": musicYoutube,
                     "User-Agent": userAgent
                 }
-            }
+            },
+
+            '/consent/': {
+                target: "https://consent.youtube.com/",
+                secure: true,
+                changeOrigin: true,
+                pathRewrite: {'^/consent' : ''},
+
+                headers: {
+                    "Referer": musicYoutube,
+                    "Origin": musicYoutube,
+                    "User-Agent": userAgent
+                },
+
+                onProxyRes: (proxyRes, req, res) => {
+                    Object.keys(proxyRes.headers).forEach(key => {
+                        if (key == "set-cookie") {
+                            proxyRes.headers[key] = proxyRes.headers[key].map(cookie => {
+                                return cookie
+                                    .replace("SameSite=lax", "SameSite=none")
+                                    .replace("Domain=.youtube.com", "Domain=localhost");
+                            });
+                            console.log(key);
+                            console.log(proxyRes.headers[key]);
+                        }
+                        
+                        res.append(key, proxyRes.headers[key]);
+                    });
+                },
+            },
         },
 
         historyApiFallback: true,
@@ -283,6 +316,10 @@ module.exports = () => ({
     },
     
     resolve: {
+        fallback: {
+            util: require.resolve("util/"),
+        },
+
         alias: {
             'react-native': 'react-native-web',
             'react-native-linear-gradient': 'react-native-web-linear-gradient'

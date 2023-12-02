@@ -25,12 +25,14 @@ export default function digestNextResults(json) {
         } else {
             playlistRenderer = musicQueueRenderer.content.playlistPanelRenderer;
         }*/
+        
         if (musicQueueRenderer?.content)
             playlistRenderer = musicQueueRenderer.content.playlistPanelRenderer;
         else {
+            
             let videoId = json.currentVideoEndpoint.watchEndpoint.videoId;
             let artwork = null;
-            let playlistId = null;
+            let playlistId = json.contents.singleColumnMusicWatchNextResultsRenderer.tabbedRenderer.watchNextTabbedResultsRenderer.tabs[0].tabRenderer.content.musicQueueRenderer.content.playlistPanelRenderer.contents[0].playlistPanelVideoRenderer.menu.menuRenderer.items[0].menuNavigationItemRenderer.navigationEndpoint.watchEndpoint.playlistId;
             let title = null;
             let artist = null;
             let duration = 0;

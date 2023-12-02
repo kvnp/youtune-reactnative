@@ -119,7 +119,7 @@ export default class Downloads {
         });
     }
 
-    static likeTrack(videoId: string, like: boolean) {
+    static likeTrack(videoId: string, like: boolean | null) {
         return new Promise(async(resolve, reject) => {
             let prevState = await Storage.getItem("Likes", videoId);
             console.log({previousState: prevState});

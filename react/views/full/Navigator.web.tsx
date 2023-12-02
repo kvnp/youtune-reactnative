@@ -75,7 +75,7 @@ export default Navigator = () => {
         <Nav.Navigator
             tabBarPosition="bottom"
             overScrollMode="always"
-            sceneAnimationEnabled={true} shifting={true} labeled={true}
+            sceneAnimationEnabled={true} shifting={true} labeled={true} lazy={true}
             screenOptions={{...tabOptions, ...navigationOptions}}
             screenListeners={({route, navigation}) => {
                 if (!fixedNavigation) {

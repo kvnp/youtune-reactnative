@@ -193,6 +193,11 @@ export default class API {
     }
 
     static async getNextSongs({videoId, playlistId}) {
+        if (!playlistId) {
+            console.log("song radio enabled");
+            playlistId = "RDAMVM" + videoId;
+        }
+
         let requestBody = API.RequestBody.BODY;
         requestBody.enablePersistentPlaylistPanel = true;
         requestBody.isAudioOnly = true;
@@ -210,6 +215,12 @@ export default class API {
         
         let response = await HTTP.getResponse(url, input, type);
         let playlist = Extractor.digestNextResponse(response);
+        for (let i = 0; i < playlist.list.length; i++) {
+            if (playlist.list[i].videoId == videoId) {
+                playlist.index = i;
+                break;
+            }
+        }
         
         return playlist;
     }

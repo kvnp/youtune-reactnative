@@ -504,7 +504,6 @@ export default class Music {
                 playlist.list[i].url = content.url;
                 playlist.list[i].contentType = content.mimeType;
                 Music.trackUrlLoaded[i] = true;
-                console.log(playlist.list[i]);
             }
 
             if (i == playlist.index + 1)
