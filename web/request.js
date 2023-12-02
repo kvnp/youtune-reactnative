@@ -8,7 +8,7 @@ function get(url) {
             res.on("data", chunk => data += chunk);
             res.on("end", () => resolve(data));
         }).on("error", e => {
-            resolve(e);
+            reject(e);
         });
     });
 }
@@ -41,28 +41,28 @@ function getLyrics(search) {
         const apiUrl = "https://genius.com/api/search/multi?q=" + search;
         try {
             const searchResponse = JSON.parse(await get(apiUrl));
+            for (let e of searchResponse.response.sections) {
+                if (e.type == "top_hit") {
+                    const lyricsUrl = "https://genius.com" + e.hits[0].result.path;
+                    const lyricsHtml = await get(lyricsUrl);
+                    const dom = new jsdom.JSDOM(lyricsHtml);
+                    let lyricsRoot = dom.window.document.getElementById("lyrics-root");
+                    let excludeList = lyricsRoot.querySelectorAll('[data-exclude-from-selection="true"]');
+                    for (let exclusion of excludeList) {
+                        exclusion.remove();
+                    }
+
+                    let lyricsContainerList = lyricsRoot.querySelectorAll('[data-lyrics-container="true"]');
+                    let finalHtml = [];
+                    for (let container of lyricsContainerList) {
+                        finalHtml.push(container.innerHTML);
+                    }
+
+                    return resolve(finalHtml.join(""));
+                }
+            }
         } catch (e) {
             return reject(e);
-        }
-        for (let e of searchResponse.response.sections) {
-            if (e.type == "top_hit") {
-                const lyricsUrl = "https://genius.com" + e.hits[0].result.path;
-                const lyricsHtml = await get(lyricsUrl);
-                const dom = new jsdom.JSDOM(lyricsHtml);
-                let lyricsRoot = dom.window.document.getElementById("lyrics-root");
-                let excludeList = lyricsRoot.querySelectorAll('[data-exclude-from-selection="true"]');
-                for (let exclusion of excludeList) {
-                    exclusion.remove();
-                }
-
-                let lyricsContainerList = lyricsRoot.querySelectorAll('[data-lyrics-container="true"]');
-                let finalHtml = [];
-                for (let container of lyricsContainerList) {
-                    finalHtml.push(container.innerHTML);
-                }
-
-                return resolve(finalHtml.join(""));
-            }
         }
         
     });
