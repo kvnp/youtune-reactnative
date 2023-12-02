@@ -8,49 +8,49 @@ export default function digestResultResponse(json) {
     };
 
     let sectionList = json.contents.tabbedSearchResultsRenderer.tabs[0].tabRenderer.content.sectionListRenderer.contents;
-    if (sectionList[0]?.itemSectionRenderer) {
-        let itemSection = sectionList[0].itemSectionRenderer.contents[0];
+    // if (sectionList[0]?.itemSectionRenderer) {
+    //     let itemSection = sectionList[0].itemSectionRenderer.contents[0];
         
-        /*if (itemSection?.messageRenderer) {
-            let message = itemSection.messageRenderer.text.runs[0].text;
-            final.reason = message;
-            return final;
+    //     /*if (itemSection?.messageRenderer) {
+    //         let message = itemSection.messageRenderer.text.runs[0].text;
+    //         final.reason = message;
+    //         return final;
 
-        } else*/
-        if (itemSection?.didYouMeanRenderer) {
-            final.suggestionOption = {correctedList: [], endpoints: {text: "", query: ""}};
-            let renderer = itemSection.didYouMeanRenderer;
+    //     } else*/
+    //     if (itemSection?.didYouMeanRenderer) {
+    //         final.suggestionOption = {correctedList: [], endpoints: {text: "", query: ""}};
+    //         let renderer = itemSection.didYouMeanRenderer;
 
-            final.suggestionOption.endpoints.query = renderer.correctedQueryEndpoint.searchEndpoint.query;
-            for (let dym = 0; dym < renderer.didYouMean.runs.length; dym++)
-                final.suggestionOption.endpoints.text += renderer.didYouMean.runs[dym].text;
+    //         final.suggestionOption.endpoints.query = renderer.correctedQueryEndpoint.searchEndpoint.query;
+    //         for (let dym = 0; dym < renderer.didYouMean.runs.length; dym++)
+    //             final.suggestionOption.endpoints.text += renderer.didYouMean.runs[dym].text;
             
-            for (let crq = 0; crq < renderer.correctedQuery.runs.length; crq++)
-                final.suggestionOption.correctedList.push(renderer.correctedQuery.runs[crq]);
+    //         for (let crq = 0; crq < renderer.correctedQuery.runs.length; crq++)
+    //             final.suggestionOption.correctedList.push(renderer.correctedQuery.runs[crq]);
             
 
-        } else if (itemSection?.showingResultsForRenderer) {
-            final.insteadOption = {correctedList: [], originalList: [], endpoints: {corrected: {text: "", query: ""}, original: {text: "", query: ""}}};
+    //     } else if (itemSection?.showingResultsForRenderer) {
+    //         final.insteadOption = {correctedList: [], originalList: [], endpoints: {corrected: {text: "", query: ""}, original: {text: "", query: ""}}};
 
-            let renderer = itemSection.showingResultsForRenderer;
+    //         let renderer = itemSection.showingResultsForRenderer;
 
-            for (let srf = 0; srf < renderer.showingResultsFor.runs.length; srf++)
-                final.insteadOption.endpoints.corrected.text += renderer.showingResultsFor.runs[srf].text;
+    //         for (let srf = 0; srf < renderer.showingResultsFor.runs.length; srf++)
+    //             final.insteadOption.endpoints.corrected.text += renderer.showingResultsFor.runs[srf].text;
 
-            for (let sif = 0; sif < renderer.searchInsteadFor.runs.length; sif++)
-                final.insteadOption.endpoints.original.text += renderer.searchInsteadFor.runs[sif].text;
+    //         for (let sif = 0; sif < renderer.searchInsteadFor.runs.length; sif++)
+    //             final.insteadOption.endpoints.original.text += renderer.searchInsteadFor.runs[sif].text;
 
-            for (let cq = 0; cq < renderer.correctedQuery.runs.length; cq++) {
-                final.insteadOption.correctedList.push(renderer.correctedQuery.runs[cq]);
-                final.insteadOption.endpoints.corrected.query += renderer.correctedQuery.runs[cq].text;
-            }
+    //         for (let cq = 0; cq < renderer.correctedQuery.runs.length; cq++) {
+    //             final.insteadOption.correctedList.push(renderer.correctedQuery.runs[cq]);
+    //             final.insteadOption.endpoints.corrected.query += renderer.correctedQuery.runs[cq].text;
+    //         }
 
-            for (let oq = 0; oq < renderer.originalQuery.runs.length; oq++) {
-                final.insteadOption.originalList.push(renderer.originalQuery.runs[oq]);
-                final.insteadOption.endpoints.original.query += renderer.originalQuery.runs[oq].text;
-            }
-        }
-    }
+    //         for (let oq = 0; oq < renderer.originalQuery.runs.length; oq++) {
+    //             final.insteadOption.originalList.push(renderer.originalQuery.runs[oq]);
+    //             final.insteadOption.endpoints.original.query += renderer.originalQuery.runs[oq].text;
+    //         }
+    //     }
+    // }
 
     for (let sl = 0; sl < sectionList.length; sl++) {
         let itemSection = sectionList[sl];
@@ -88,6 +88,7 @@ export default function digestResultResponse(json) {
             let responsiveMusicList = musicShelf.contents;
             for (let rml = 0; rml < responsiveMusicList.length; rml++) {
                 let responsiveMusicItem = responsiveMusicList[rml].musicResponsiveListItemRenderer;
+                console.log(responsiveMusicItem);
                 let entry = {
                     title: "",
                     subtitle: "",
@@ -162,11 +163,34 @@ export default function digestResultResponse(json) {
                     entry.type = "Title";
                     
                     entry.videoId = responsiveMusicItem.playlistItemData.videoId;
-                    entry.playlistId = responsiveMusicItem.flexColumns[0].musicResponsiveListItemFlexColumnRenderer.text.runs[0].navigationEndpoint.watchEndpoint.playlistId;
+                    let watchEndpoint = responsiveMusicItem.flexColumns[0].musicResponsiveListItemFlexColumnRenderer.text.runs[0].navigationEndpoint.watchEndpoint;
+                    if (watchEndpoint) {
+                        if (watchEndpoint.hasOwnProperty("playlistId"))
+                            entry.playlistId = watchEndpoint.playlistId;
+                        
+                        if (watchEndpoint.hasOwnProperty("browseId"))
+                            entry.browseId = watchEndpoint.browseId;
+                    }
                 }
 
                 final.results += 1;
                 shelf.data.push(entry);
+
+                // let itemRenderer = responsiveMusicList[rml].musicTwoColumnItemRenderer;
+                // console.log(itemRenderer);
+                // let entry = {
+                //     title: itemRenderer.title.runs.map(x => x.text).join(""),
+                //     subtitle: itemRenderer.subtitle.runs.map(x => x.text).join(""),
+                //     secondTitle: "",
+                //     secondSubtitle: "",
+                //     additionalInfo: "",
+                //     videoId: itemRenderer.navigationEndpoint.watchEndpoint.videoId,
+                //     playlistId: itemRenderer.menu.menuRenderer.items[5].menuNavigationItemRenderer.navigationEndpoint.browseEndpoint.browseId,
+                //     browseId: itemRenderer.menu.menuRenderer.items[6].menuNavigationItemRenderer.navigationEndpoint.browseEndpoint.browseId,
+                //     thumbnail: itemRenderer.thumbnail.musicThumbnailRenderer.thumbnail.thumbnails.pop().url,
+                // };
+
+                // shelf.data.push(entry);
             }
 
             final.shelves.push(shelf);

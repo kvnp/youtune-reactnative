@@ -77,13 +77,14 @@ export default SearchTab = () => {
                     setSuggestion(data.suggestion);
                     setLoading(false);
                 })
-                .catch(() => {
+                .catch(e => {
                     setLoading(false);
                     setSearchText("You are offline");
 
                     setTimeout(() => {
                         setSearchText("Look for music using the search bar");
                     }, 2000);
+                    console.error(e);
                 });
         }
     }
