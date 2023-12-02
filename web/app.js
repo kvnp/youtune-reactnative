@@ -12,16 +12,18 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.get("/watch/", function(req, res, next) {
     const v = req.query.v;
     const url = "https://music.youtube.com/watch?v=" + v;
-    getTags(url).then(({title, description, image}) => {
-        title = title.split("-").slice(0, -1).join(" ").trim();
-        description = description.split("·")[1].trim();
+    getTags(url)
+        .then(({title, description, image}) => {
+            title = title.split("-").slice(0, -1).join(" ").trim();
+            description = description.split("·")[1].trim();
 
-        res.setHeader("Content-Type", "text/html");
-        const tags = `<meta property="og:title" content="${title}">
-        <meta property="og:description" content="${description}">
-        <meta property="og:image" content="${image}">`;
-        res.send(html.substring(0, headIndex) + tags + html.substring(headIndex));
-    });
+            res.setHeader("Content-Type", "text/html");
+            const tags = `<meta property="og:title" content="${title}">
+            <meta property="og:description" content="${description}">
+            <meta property="og:image" content="${image}">`;
+            res.send(html.substring(0, headIndex) + tags + html.substring(headIndex));
+        })
+        .catch(err => res.send({err}));
 });
 
 app.get("/lyrics/", function(req, res, next) {

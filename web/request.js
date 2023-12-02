@@ -8,34 +8,42 @@ function get(url) {
             res.on("data", chunk => data += chunk);
             res.on("end", () => resolve(data));
         }).on("error", e => {
-            resolve(null);
+            resolve(e);
         });
     });
 }
 
 function getTags(url) {
     return new Promise(async(resolve, reject) => {
-        let html = await get(url);
-        let title = null;
-        let description = null;
-        let image = null;
-        if (html != null) {
-            html = html.substring(html.indexOf("og:title") + 19);
-            title = html.substring(0, html.indexOf('">'));
-            html = html.substring(html.indexOf('content="') + 9);
-            description = html.substring(0, html.indexOf('">'));
-            html = html.substring(html.indexOf('content="') + 9);
-            image = html.substring(0, html.indexOf('">'));
-        }
+        try {
+            let html = await get(url);
+            let title = null;
+            let description = null;
+            let image = null;
+            if (html != null) {
+                html = html.substring(html.indexOf("og:title") + 19);
+                title = html.substring(0, html.indexOf('">'));
+                html = html.substring(html.indexOf('content="') + 9);
+                description = html.substring(0, html.indexOf('">'));
+                html = html.substring(html.indexOf('content="') + 9);
+                image = html.substring(0, html.indexOf('">'));
+            }
 
-        resolve({title, description, image});
+            resolve({title, description, image});
+        } catch (e) {
+            reject(e);
+        }
     });
 }
 
 function getLyrics(search) {
     return new Promise(async(resolve, reject) => {
         const apiUrl = "https://genius.com/api/search/multi?q=" + search;
-        const searchResponse = JSON.parse(await get(apiUrl));
+        try {
+            const searchResponse = JSON.parse(await get(apiUrl));
+        } catch (e) {
+            return reject(e);
+        }
         for (let e of searchResponse.response.sections) {
             if (e.type == "top_hit") {
                 const lyricsUrl = "https://genius.com" + e.hits[0].result.path;
