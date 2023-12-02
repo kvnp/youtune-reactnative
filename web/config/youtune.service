@@ -1,10 +1,13 @@
+  GNU nano 7.2                              /lib/systemd/system/youtune.service
 [Unit]
 Description=YouTune service
 
 [Service]
 Type=simple
-WorkingDirectory=/home/user/youtune-reactnative
-ExecStart=git pull && npm i && npm start
+WorkingDirectory=/opt/youtune-reactnative
+ExecStartPre=git pull https://github.com/kvnp/youtune-reactnative main
+ExecStartPre=npm i
+ExecStart=npm start
 
 [Install]
 WantedBy=multi-user.target
