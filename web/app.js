@@ -25,19 +25,23 @@ app.get("/watch/", function(req, res, next) {
 });
 
 app.get("/lyrics/", function(req, res, next) {
-    getLyrics(req.query.q).then(lyrics => res.send({lyrics: lyrics.split("<br>")}));
+    getLyrics(req.query.q)
+        .then(lyrics => res.send({lyrics: lyrics.split("<br>")}))
+        .catch(err => res.send({lyrics: [], error: err}));
 });
 
 app.get("/playlist/", function(req, res, next) {
     const list = req.query.list;
     const url = "https://music.youtube.com/playlist?list=" + list;
-    getTags(url).then(value => {
-        res.setHeader("Content-Type", "text/html");
-        const tags = `<meta property="og:title" content="${value.title}">
-        <meta property="og:description" content="${value.description}">
-        <meta property="og:image" content="${value.image}">`;
-        res.send(html.substring(0, headIndex) + tags + html.substring(headIndex));
-    });
+    getTags(url)
+        .then(value => {
+            res.setHeader("Content-Type", "text/html");
+            const tags = `<meta property="og:title" content="${value.title}">
+            <meta property="og:description" content="${value.description}">
+            <meta property="og:image" content="${value.image}">`;
+            res.send(html.substring(0, headIndex) + tags + html.substring(headIndex));
+        })
+        .catch(err => res.send({err}));
 });
 
 app.use('/proxy/videoplayback', createProxyMiddleware({
