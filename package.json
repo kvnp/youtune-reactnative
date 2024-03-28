@@ -28,7 +28,7 @@
         "@react-navigation/material-top-tabs": "^6.6.5",
         "@react-navigation/native": "^6.1.9",
         "@react-navigation/stack": "^6.3.20",
-        "express": "^4.18.2",
+        "express": "^4.19.2",
         "jsdom": "^23.0.1",
         "queue-promise": "^2.2.1",
         "react": "^18.2.0",
