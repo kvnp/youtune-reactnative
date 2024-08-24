@@ -1,9 +1,14 @@
 [Unit]
 Description=YouTune service
+After=network.target
+StartLimitIntervalSec=0
 
 [Service]
 Type=simple
-WorkingDirectory=/opt/youtune-reactnative
+Restart=always
+RestartSec=1
+User=http
+WorkingDirectory=/var/www/youtune-reactnative
 ExecStartPre=git pull https://github.com/kvnp/youtune-reactnative main
 ExecStartPre=npm i
 ExecStart=npm start
