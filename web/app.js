@@ -1,7 +1,7 @@
 const express = require('express');
 const path = require('path');
 const fs = require("fs");
-const { createProxyMiddleware } = require('http-proxy-middleware');
+const { legacyCreateProxyMiddleware } = require('http-proxy-middleware');
 const { getTags, getLyrics } = require("./request");
 const app = express();
 
@@ -46,7 +46,7 @@ app.get("/playlist/", function(req, res, next) {
         .catch(err => res.send({err}));
 });
 
-app.use('/proxy/videoplayback', createProxyMiddleware({
+app.use('/proxy/videoplayback', legacyCreateProxyMiddleware({
     target: "https://redirector.googlevideo.com",
     changeOrigin: true,
     secure: false,
@@ -60,7 +60,7 @@ app.use('/proxy/videoplayback', createProxyMiddleware({
     pathRewrite: {'^/proxy' : ''}
 }));
 
-app.use('/proxy/lh3', createProxyMiddleware({
+app.use('/proxy/lh3', legacyCreateProxyMiddleware({
     target: "https://lh3.googleusercontent.com",
     changeOrigin: true,
     pathRewrite: {'^/proxy/lh3/' : ''},
@@ -72,7 +72,7 @@ app.use('/proxy/lh3', createProxyMiddleware({
     }
 }));
 
-app.use('/proxy/vi', createProxyMiddleware({
+app.use('/proxy/vi', legacyCreateProxyMiddleware({
     target: "https://i.ytimg.com",
     changeOrigin: true,
     pathRewrite: {'^/proxy' : ''},
@@ -84,7 +84,7 @@ app.use('/proxy/vi', createProxyMiddleware({
     }
 }));
 
-app.use('/proxy', createProxyMiddleware({
+app.use('/proxy', legacyCreateProxyMiddleware({
     target: "https://music.youtube.com",
     changeOrigin: true,
     pathRewrite: {'^/proxy' : ''},
