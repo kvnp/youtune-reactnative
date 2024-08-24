@@ -121,13 +121,10 @@ module.exports = () => ({
     devServer: {
         host: "0.0.0.0",
         port: process.env.PORT || 8080,
-
-        headers: {
-
-        },
-
-        proxy: {
-            '/proxy/watch': {
+        headers: {},
+        proxy: [
+            {
+                context: ['/proxy/watch'],
                 target: wwwYoutube,
                 changeOrigin: true,
                 secure: false,
@@ -141,7 +138,8 @@ module.exports = () => ({
                 }
             },
 
-            '/proxy/s': {
+            {
+                context: ['/proxy/s'],
                 target: wwwYoutube,
                 changeOrigin: true,
                 secure: false,
@@ -155,7 +153,8 @@ module.exports = () => ({
                 }
             },
 
-            '/proxy/videoplayback': {
+            {
+                context: ['/proxy/videoplayback'],
                 target: videoYoutube,
                 changeOrigin: true,
                 secure: false,
@@ -170,7 +169,8 @@ module.exports = () => ({
                 }
             },
 
-            '/proxy/vi': {
+            {
+                context: ['/proxy/vi'],
                 target: imgYoutube,
                 secure: true,
                 changeOrigin: true,
@@ -183,7 +183,8 @@ module.exports = () => ({
                 }
             },
 
-            '/proxy/lh3/': {
+            {
+                context: ['/proxy/lh3/'],
                 target: "https://lh3.googleusercontent.com",
                 secure: true,
                 changeOrigin: true,
@@ -196,7 +197,8 @@ module.exports = () => ({
                 }
             },
 
-            '/proxy/': {
+            {
+                context: ['/proxy/'],
                 target: musicYoutube,
                 secure: true,
                 changeOrigin: true,
@@ -209,7 +211,8 @@ module.exports = () => ({
                 }
             },
 
-            '/consent/': {
+            {
+                context: ['/consent/'],
                 target: "https://consent.youtube.com/",
                 secure: true,
                 changeOrigin: true,
@@ -236,12 +239,11 @@ module.exports = () => ({
                         res.append(key, proxyRes.headers[key]);
                     });
                 },
-            },
-        },
+            }
+        ],
 
         historyApiFallback: true,
         compress: true,
-
         watchFiles: {
             options: {
                 ignored: [
